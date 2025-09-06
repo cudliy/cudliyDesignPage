@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+
+@layer utilities {
+  .font-abril { font-family: "Abril Fatface", serif; }
+}
+
+/* iro.js Color Picker Custom Styles */
+.IroWheel {
+  border-radius: 50% !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  border: 3px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.IroSlider {
+  border-radius: 12px !important;
+  margin-left: 15px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.IroHandle {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Premium styling for color picker container */
+.color-picker-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Custom border utilities */
+.border-3 {
+  border-width: 3px !important;
+}
+

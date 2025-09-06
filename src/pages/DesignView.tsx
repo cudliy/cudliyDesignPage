@@ -1,0 +1,452 @@
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { apiService } from '../services/api';
+import ModelViewer from '../components/ModelViewer';
+import type { Design } from '../services/api';
+
+export default function DesignView() {
+  const { designId } = useParams<{ designId: string }>();
+  const [design, setDesign] = useState<Design | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
+  
+  // Control states - matching the image positions
+  const [lighting, setLighting] = useState(30);
+  const [background, setBackground] = useState(45);
+  const [size, setSize] = useState(50);
+  const [cameraAngle, setCameraAngle] = useState(50);
+
+  useEffect(() => {
+    if (!designId) return;
+
+    const fetchDesign = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getDesign(designId);
+        
+        if (response.success && response.data) {
+          console.log('DesignView: Design data loaded:', response.data);
+          console.log('DesignView: Model files:', response.data.modelFiles);
+          setDesign(response.data);
+        } else {
+          console.error('DesignView: Failed to load design:', response);
+          setError('Failed to load design');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load design');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDesign();
+  }, [designId]);
+
+  const handleRegenerateModel = async () => {
+    if (!design || !design.images || design.images.length === 0) return;
+    
+    try {
+      setRegenerating(true);
+      const selectedImage = design.images.find(img => img.selected)?.url || design.images[0]?.url;
+      
+      if (!selectedImage) {
+        throw new Error('No image found to generate 3D model from');
+      }
+
+      console.log('Regenerating 3D model from image:', selectedImage);
+      
+      const response = await apiService.generate3DModel({
+        image_url: selectedImage,
+        user_id: design.userId,
+        creation_id: design.creationId,
+        session_id: design.sessionId,
+        options: design.generationOptions || {}
+      });
+
+      if (response.success && response.data) {
+        // Refresh the design data to get the new model URLs
+        if (designId) {
+          const updatedResponse = await apiService.getDesign(designId);
+          if (updatedResponse.success && updatedResponse.data) {
+            setDesign(updatedResponse.data);
+            console.log('3D model regenerated successfully');
+          }
+        }
+      } else {
+        throw new Error(response.error || 'Failed to regenerate 3D model');
+      }
+    } catch (err) {
+      console.error('Error regenerating 3D model:', err);
+      setError(err instanceof Error ? err.message : 'Failed to regenerate 3D model');
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your 3D model...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !design) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Design</h2>
+          <p className="text-gray-600 mb-4">{error || 'Design not found'}</p>
+          <button 
+            onClick={() => window.history.back()}
+            className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const modelUrl = design.modelFiles?.storedModelUrl || design.modelFiles?.modelFile;
+
+  return (
+    <div className="w-screen h-screen bg-gray-100 overflow-hidden flex p-4 gap-4">
+      {/* Left Pane */}
+      <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden">
+        <button 
+          onClick={() => window.history.back()}
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-sm text-white/70 z-10 hover:text-white transition-colors cursor-pointer"
+        >
+          Back
+        </button>
+        
+        {/* Brand and title area */}
+        <div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
+          {/* Mode selector */}
+          <div className="mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-black/50">
+            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-colors hover:bg-white/10 font-medium">
+              Voice
+            </button>
+            <button className="flex-1 h-[22px] rounded-full text-xs bg-[#DFDFDF] text-black transition-colors font-medium shadow-sm">
+              Chat
+            </button>
+            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-colors hover:bg-white/10 font-medium">
+              Draw
+            </button>
+          </div>
+          
+          {/* Title */}
+          <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl leading-tight text-center max-w-full mb-2">
+            Playground
+          </h1>
+          <p className="mt-1 lg:mt-2 opacity-80 text-xs sm:text-sm mb-8">
+            You are a Vibe Designer now
+          </p>
+
+          {/* Control Sliders Section */}
+          <div className="mt-4 w-full max-w-[320px] flex-grow min-h-0">
+            <div className="space-y-6">
+              {/* Lighting Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-white/90 text-sm font-medium">Lighting</span>
+                </div>
+                <div className="relative h-2">
+                  <div className="absolute inset-0 bg-white/20 rounded-full"></div>
+                  <div 
+                    className="absolute top-0 h-2 bg-[#E70D57] rounded-full pointer-events-none"
+                    style={{ width: `${lighting}%` }}
+                  ></div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={lighting}
+                    onChange={(e) => setLighting(Number(e.target.value))}
+                    className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer slider"
+                  />
+                  <div 
+                    className="absolute top-1/2 w-5 h-5 bg-white rounded-full shadow-lg transform -translate-y-1/2 pointer-events-none border-2 border-gray-200"
+                    style={{ left: `calc(${lighting}% - 10px)` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Background Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-white/90 text-sm font-medium">Background</span>
+                </div>
+                <div className="relative h-2">
+                  <div className="absolute inset-0 bg-white/20 rounded-full"></div>
+                  <div 
+                    className="absolute top-0 h-2 bg-[#E70D57] rounded-full pointer-events-none"
+                    style={{ width: `${background}%` }}
+                  ></div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={background}
+                    onChange={(e) => setBackground(Number(e.target.value))}
+                    className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer slider"
+                  />
+                  <div 
+                    className="absolute top-1/2 w-5 h-5 bg-white rounded-full shadow-lg transform -translate-y-1/2 pointer-events-none border-2 border-gray-200"
+                    style={{ left: `calc(${background}% - 10px)` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Size Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-white/90 text-sm font-medium">Size</span>
+                  <span className="text-white text-xs bg-white/15 px-2 py-1 rounded-md font-medium">{Math.round(size * 0.8)}</span>
+                </div>
+                <div className="relative h-2">
+                  <div className="absolute inset-0 bg-white/20 rounded-full"></div>
+                  <div 
+                    className="absolute top-0 h-2 bg-[#E70D57] rounded-full pointer-events-none"
+                    style={{ width: `${size}%` }}
+                  ></div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={size}
+                    onChange={(e) => setSize(Number(e.target.value))}
+                    className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer slider"
+                  />
+                  <div 
+                    className="absolute top-1/2 w-5 h-5 bg-white rounded-full shadow-lg transform -translate-y-1/2 pointer-events-none border-2 border-gray-200"
+                    style={{ left: `calc(${size}% - 10px)` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Camera Angle Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-white/90 text-sm font-medium">Camera Angle</span>
+                </div>
+                <div className="relative h-2">
+                  <div className="absolute inset-0 bg-white/20 rounded-full"></div>
+                  <div 
+                    className="absolute top-0 h-2 bg-[#E70D57] rounded-full pointer-events-none"
+                    style={{ width: `${cameraAngle}%` }}
+                  ></div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={cameraAngle}
+                    onChange={(e) => setCameraAngle(Number(e.target.value))}
+                    className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer slider"
+                  />
+                  <div 
+                    className="absolute top-1/2 w-5 h-5 bg-white rounded-full shadow-lg transform -translate-y-1/2 pointer-events-none border-2 border-gray-200"
+                    style={{ left: `calc(${cameraAngle}% - 10px)` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <button className="mt-8 w-full max-w-[200px] py-3 bg-[#575757] hover:bg-[#676767] text-white font-medium rounded-full transition-colors hover:scale-105">
+              Save to draft
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Center Panel - 3D Model */}
+      <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden">
+        {/* 3D Model Area */}
+        <div className="flex-1 flex items-center justify-center p-8 relative">
+          {modelUrl && (
+            <div className="w-full h-full max-w-full max-h-full">
+              <ModelViewer 
+                modelUrl={modelUrl} 
+                className="w-full h-full"
+                lighting={lighting}
+                background={background}
+                size={size}
+                cameraAngle={cameraAngle}
+              />
+            </div>
+          )}
+          {!modelUrl && (
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">3D Model Generation Failed</h3>
+              <p className="text-gray-600 mb-4">
+                {design.status === 'completed' 
+                  ? 'The design process completed, but the 3D model could not be generated.'
+                  : 'The 3D model is still being processed.'}
+              </p>
+              
+              {design.images && design.images.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-500 mb-2">Generated from this image:</p>
+                  <img 
+                    src={design.images.find(img => img.selected)?.url || design.images[0]?.url} 
+                    alt="Original design" 
+                    className="w-32 h-32 object-cover rounded-lg mx-auto border-2 border-gray-200"
+                  />
+                </div>
+              )}
+              
+              <button 
+                onClick={handleRegenerateModel}
+                disabled={regenerating}
+                className="px-6 py-3 bg-[#E70D57] hover:bg-[#d10c50] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-full transition-colors flex items-center gap-2 mx-auto"
+              >
+                {regenerating && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                )}
+                {regenerating ? 'Generating 3D Model...' : 'Try to Generate 3D Model Again'}
+              </button>
+              
+              <div className="mt-4 text-xs text-gray-400 bg-gray-50 rounded-lg p-3">
+                <div><strong>Status:</strong> {design.status}</div>
+                <div><strong>Issue:</strong> Model generation returned null URLs</div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Section */}
+        <div className="p-6 space-y-4 flex-shrink-0">
+          {/* Interaction Hint */}
+          <div className="flex items-center justify-center gap-2 text-gray-600 mb-4">
+            <div className="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7L8 5z"/>
+              </svg>
+            </div>
+            <span className="text-sm">Click & hold to rotate</span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4">
+            <button className="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
+              Download
+            </button>
+            <button className="px-8 py-3 bg-[#E70D57] text-white rounded-lg font-medium hover:bg-[#d10c50] transition-colors">
+              Make
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Options */}
+      <div className="w-80 bg-[#313131] rounded-[40px] p-6 flex flex-col shadow-lg flex-shrink-0">
+        {/* Price */}
+        <div className="mb-8 text-right">
+          <h3 className="text-white/70 text-sm font-medium mb-1">Est. Price:</h3>
+          <p className="text-4xl font-bold text-white">$24</p>
+        </div>
+
+        {/* Menu Items */}
+        <div className="space-y-2 flex-1">
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span className="font-medium">Creator's Zone</span>
+          </button>
+
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+            </svg>
+            <span className="font-medium">View Setting</span>
+          </button>
+
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
+            </svg>
+            <span className="font-medium">Design Tips</span>
+          </button>
+
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20.5 7h-17C2.67 7 2 7.67 2 8.5v7C2 16.33 2.67 17 3.5 17h17c.83 0 1.5-.67 1.5-1.5v-7C22 7.67 21.33 7 20.5 7zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+            </svg>
+            <span className="font-medium">AR/VR</span>
+          </button>
+        </div>
+
+        {/* Brand - Vertical Text */}
+        <div className="text-right mt-auto pt-8">
+          <div className="flex justify-end">
+            <div className="transform rotate-90 origin-bottom-right">
+              <span className="text-white/60 text-lg font-light tracking-wider">
+                Cudliy.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .slider {
+          background: transparent !important;
+        }
+        
+        .slider::-webkit-slider-track {
+          background: transparent;
+          height: 8px;
+          border: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 0;
+          width: 0;
+          background: transparent;
+          cursor: pointer;
+          border: none;
+        }
+        
+        .slider::-moz-range-track {
+          background: transparent;
+          height: 8px;
+          border: none;
+        }
+        
+        .slider::-moz-range-thumb {
+          height: 0;
+          width: 0;
+          background: transparent;
+          cursor: pointer;
+          border: none;
+        }
+        
+        input[type="range"] {
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          outline: none;
+        }
+      `}</style>
+    </div>
+  );
+}

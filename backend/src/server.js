@@ -1,0 +1,157 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Import utilities and services
+import logger from './utils/logger.js';
+import { globalErrorHandler } from './utils/errorHandler.js';
+import { generalLimiter } from './utils/rateLimiter.js';
+import connectDB from './config/database.js';
+import { cleanupOldSessions } from './controllers/sessionController.js';
+
+// Import routes
+import designRoutes from './routes/designRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import sessionRoutes from './routes/sessionRoutes.js';
+
+// Environment variables are loaded in index.js
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Trust proxy for rate limiting behind reverse proxy
+app.set('trust proxy', 1);
+
+// Security middleware
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:", "storage.googleapis.com"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"]
+    }
+  }
+}));
+
+// CORS configuration - Hardcoded origins for production and development
+const corsOptions = {
+  origin: [
+    'https://cudliy-design-page.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:4173',
+     'https://www.cudliy-design-page.vercel.app'
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+};
+app.use(cors(corsOptions));
+
+// Compression and logging
+app.use(compression());
+app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
+
+// Body parsing middleware
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Rate limiting
+app.use('/api/', generalLimiter);
+
+// Connect to database
+connectDB();
+
+// Health Check
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    environment: process.env.NODE_ENV
+  });
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Backend is healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
+  });
+});
+
+// API Routes
+app.use('/api/designs', designRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/session', sessionRoutes);
+
+// Error handling middleware
+app.use(globalErrorHandler);
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `Endpoint ${req.originalUrl} not found`
+  });
+});
+
+// Graceful shutdown
+const gracefulShutdown = () => {
+  logger.info('Received shutdown signal, starting graceful shutdown...');
+  
+  server.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
+
+  // Force close after 30 seconds
+  setTimeout(() => {
+    logger.error('Could not close connections in time, forcefully shutting down');
+    process.exit(1);
+  }, 30000);
+};
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+
+// Run cleanup every hour
+setInterval(cleanupOldSessions, 60 * 60 * 1000);
+
+// Start server
+const server = app.listen(PORT, () => {
+  logger.info(`🚀 Cudliy Backend Server running on port ${PORT}`);
+  logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info(`🔗 Health check: http://localhost:${PORT}/api/health`);
+  
+  // Log available endpoints
+  const routes = [
+    'POST /api/designs/generate-images - Generate AI images from design specifications',
+    'POST /api/designs/generate-3d-model - Convert selected image to 3D model',
+    'POST /api/upload/image - Upload custom image for 3D conversion',
+    'GET  /api/designs/:designId - Get design details',
+    'GET  /api/designs/user/:userId/designs - Get user\'s designs with pagination',
+    'GET  /api/session/:sessionId - Get session status',
+    'DELETE /api/designs/:designId - Delete design',
+    'PATCH /api/designs/:designId - Update design metadata'
+  ];
+  
+  logger.info('🛠️  Available API endpoints:');
+  routes.forEach(route => logger.info(`   ${route}`));
+});
+
+export default app;
