@@ -11,16 +11,19 @@ export default defineConfig({
         target: 'https://replicate.delivery',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/proxy\/replicate/, ''),
-        configure: (proxy, _options) => {
-          proxy.on('error', (err, _req, _res) => {
-            console.log('proxy error', err);
-          });
-          proxy.on('proxyReq', (proxyReq, req, _res) => {
-            console.log('Sending Request to the Target:', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, _res) => {
-            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
-          });
+        configure: (proxy: any, _options: any) => {
+          // Only add logging in development mode
+          if (process.env.NODE_ENV === 'development') {
+            proxy.on('error', (err: any, _req: any, _res: any) => {
+              console.log('proxy error', err);
+            });
+            proxy.on('proxyReq', (_proxyReq: any, req: any, _res: any) => {
+              console.log('Sending Request to the Target:', req.method, req.url);
+            });
+            proxy.on('proxyRes', (proxyRes: any, req: any, _res: any) => {
+              console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+            });
+          }
         },
       }
     }
