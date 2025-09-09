@@ -4,6 +4,7 @@ import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/
 
 interface ImageGenerationWorkflowProps {
   prompt: string;
+  enhancedPrompt?: string; // Strategic Enhancement: Accept enhanced prompt
   onComplete: (designId: string) => void;
   onError: (error: string) => void;
 }
@@ -14,7 +15,7 @@ interface GeneratedImage {
   index: number;
 }
 
-export default function ImageGenerationWorkflow({ prompt, onComplete, onError }: ImageGenerationWorkflowProps) {
+export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComplete, onError }: ImageGenerationWorkflowProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImageIndex, setIsSelectedImageIndex] = useState<number | null>(null);
@@ -23,7 +24,10 @@ export default function ImageGenerationWorkflow({ prompt, onComplete, onError }:
   const [creationId, setCreationId] = useState<string>('');
 
   const generateImages = async () => {
-    if (!prompt.trim()) {
+    // Strategic Enhancement: Use enhanced prompt if available, otherwise fallback to original
+    const finalPrompt = enhancedPrompt || prompt;
+    
+    if (!finalPrompt.trim()) {
       onError('Please enter a prompt first');
       return;
     }
@@ -37,8 +41,10 @@ export default function ImageGenerationWorkflow({ prompt, onComplete, onError }:
       const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       setCreationId(newCreationId);
 
+      console.log('🚀 Strategic Enhancement: Using enhanced prompt:', finalPrompt);
+      
       const request: GenerateImagesRequest = {
-        text: prompt,
+        text: finalPrompt, // Strategic Enhancement: Send enhanced prompt to backend
         user_id: 'user_123', // TODO: Replace with actual user ID
         creation_id: newCreationId,
         color: '#FF6B6B',

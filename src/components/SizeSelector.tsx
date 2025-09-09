@@ -45,10 +45,29 @@ export default function SizeSelector({
             <div key={option.key} className="flex flex-col items-center">
               <button
                 onClick={() => onSizeChange(option.key)}
-                className={`transition-all duration-300 hover:scale-110 ${
+                className={`transition-all duration-300 hover:scale-110 relative ${
                   selectedSize === option.key ? 'scale-110' : ''
                 }`}
               >
+                {/* Selection Ring */}
+                {selectedSize === option.key && (
+                  <div className="absolute inset-0 rounded-full border-2 border-[#E70D57] animate-pulse" 
+                       style={{ 
+                         width: `${option.size + 8}px`, 
+                         height: `${option.size + 8}px`,
+                         top: '-4px',
+                         left: '-4px'
+                       }}
+                  />
+                )}
+                {/* Selection Badge */}
+                {selectedSize === option.key && (
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#E70D57] rounded-full flex items-center justify-center z-10">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
                 <img
                   src={option.icon}
                   alt={`Size ${option.label}`}
@@ -60,7 +79,11 @@ export default function SizeSelector({
                   }}
                 />
               </button>
-              <span className="text-white text-sm font-medium mt-2">{option.label}</span>
+              <span className={`text-sm font-medium mt-2 ${
+                selectedSize === option.key ? 'text-[#E70D57]' : 'text-white'
+              }`}>
+                {option.label}
+              </span>
             </div>
           ))}
         </div>

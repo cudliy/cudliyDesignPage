@@ -6,6 +6,7 @@ import StyleSelector from "../components/StyleSelector";
 import MaterialSelector from "../components/MaterialSelector";
 import DetailSelector from "../components/DetailSelector";
 import ImageGenerationWorkflow from "../components/ImageGenerationWorkflow";
+import { usePropertiesAggregator } from "../hooks/usePropertiesAggregator";
 
 export default function DesignPage() {
 	const videoRef = useRef<HTMLVideoElement>(null);
@@ -27,11 +28,34 @@ export default function DesignPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [completedDesignId, setCompletedDesignId] = useState<string | null>(null);
 
+	// Strategic Properties Aggregation System
+	const {
+		addColor,
+		addSize,
+		addProduction,
+		addStyle,
+		addMaterial,
+		addDetails,
+		generateEnhancedPrompt,
+		getProperties,
+		resetProperties,
+		hasProperties
+	} = usePropertiesAggregator();
+
 
 	useEffect(() => {
 		const timer = setTimeout(() => setIsLoaded(true), 100);
 		return () => clearTimeout(timer);
 	}, []);
+
+	// Strategic Enhancement: Sync initial state with properties aggregator
+	useEffect(() => {
+		// Initialize with default size selection if not already set
+		if (selectedSize === 'M' && !hasProperties()) {
+			addSize(selectedSize, customWidth, customHeight);
+			console.log('Initialized with default size:', selectedSize);
+		}
+	}, [selectedSize, customWidth, customHeight, addSize, hasProperties]);
 
 	const handleModalPlay = () => {
 		if (modalVideoRef.current) {
@@ -74,29 +98,48 @@ export default function DesignPage() {
 		setSelectedCategory(null);
 	};
 
+	const handleSelectAndReturn = () => {
+		// Go back to main categories after selection
+		setSelectedCategory(null);
+	};
+
 	const handleSizeChange = (size: string) => {
 		setSelectedSize(size);
+		// Strategic Enhancement: Add size to properties aggregator
+		addSize(size, customWidth, customHeight);
+		console.log('Size changed to:', size, 'Properties:', getProperties());
 	};
 
 	const handleCustomSizeChange = (width: string, height: string) => {
 		setCustomWidth(width);
 		setCustomHeight(height);
+		// Strategic Enhancement: Update size with custom dimensions
+		addSize(selectedSize, width, height);
 	};
 
 	const handleProductionChange = (production: string) => {
 		setSelectedProduction(production);
+		// Strategic Enhancement: Add production to properties aggregator
+		addProduction(production as 'handmade' | 'digital');
 	};
 
 	const handleStyleChange = (style: string) => {
 		setSelectedStyle(style);
+		// Strategic Enhancement: Add style to properties aggregator
+		addStyle(style);
+		console.log('Style changed to:', style, 'Properties:', getProperties());
 	};
 
 	const handleMaterialChange = (material: string) => {
 		setSelectedMaterial(material);
+		// Strategic Enhancement: Add material to properties aggregator
+		addMaterial(material);
 	};
 
 	const handleDetailChange = (details: string[]) => {
 		setSelectedDetails(details);
+		// Strategic Enhancement: Add details to properties aggregator
+		addDetails(details);
 	};
 
 	const handleCreateClick = () => {
@@ -125,7 +168,8 @@ export default function DesignPage() {
 	};
 
 	const handleColorChange = (color: string) => {
-		// Handle color change if needed
+		// Strategic Enhancement: Add color to properties aggregator
+		addColor(color);
 		console.log('Color changed to:', color);
 	};
 
@@ -134,6 +178,8 @@ export default function DesignPage() {
 		setError(null);
 		setCompletedDesignId(null);
 		setPrompt('');
+		// Strategic Enhancement: Reset properties aggregator
+		resetProperties();
 	};
 
 	// Advanced mode sections
@@ -196,6 +242,7 @@ export default function DesignPage() {
 
 				{/* Select Button */}
 				<button 
+					onClick={handleSelectAndReturn}
 					className={`w-[133px] h-[39px] rounded-[40px] bg-[#575757] hover:bg-[#676767] text-white font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}
@@ -235,6 +282,7 @@ export default function DesignPage() {
 
 				{/* Select Button */}
 				<button 
+					onClick={handleSelectAndReturn}
 					className={`w-[133px] h-[39px] rounded-[40px] bg-[#575757] hover:bg-[#676767] text-white font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}
@@ -274,6 +322,7 @@ export default function DesignPage() {
 
 				{/* Select Button */}
 				<button 
+					onClick={handleSelectAndReturn}
 					className={`w-[133px] h-[39px] rounded-[40px] bg-[#575757] hover:bg-[#676767] text-white font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}
@@ -313,6 +362,7 @@ export default function DesignPage() {
 
 				{/* Select Button */}
 				<button 
+					onClick={handleSelectAndReturn}
 					className={`w-[133px] h-[39px] rounded-[40px] bg-[#575757] hover:bg-[#676767] text-white font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}
@@ -352,6 +402,7 @@ export default function DesignPage() {
 				{/* Select Button - Fixed at bottom */}
 				<div className="mt-3 flex-shrink-0">
 					<button 
+						onClick={handleSelectAndReturn}
 						className={`w-[133px] h-[39px] rounded-[40px] bg-[#575757] hover:bg-[#676767] text-white font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}
@@ -391,6 +442,7 @@ export default function DesignPage() {
 
 				{/* Select Button */}
 				<button 
+					onClick={handleSelectAndReturn}
 					className={`w-[133px] h-[39px] rounded-[40px] bg-[#575757] hover:bg-[#676767] text-white font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}
@@ -402,48 +454,83 @@ export default function DesignPage() {
 	};
 
 	const renderAdvancedCategories = () => {
+		// Check which categories have selections
+		const properties = getProperties();
+		const hasColorSelection = !!properties.color;
+		const hasSizeSelection = !!properties.size;
+		const hasProductionSelection = !!properties.production;
+		const hasStyleSelection = !!properties.style;
+		const hasMaterialSelection = !!properties.material;
+		const hasDetailSelection = !!properties.details && Object.keys(properties.details).some(key => properties.details![key as keyof typeof properties.details]?.length);
+
+		const categoryStatus = {
+			color: hasColorSelection,
+			size: hasSizeSelection,
+			production: hasProductionSelection,
+			style: hasStyleSelection,
+			material: hasMaterialSelection,
+			detail: hasDetailSelection
+		};
+
 		return (
 			<div className="flex flex-col items-center text-center h-full">
 				
 				<div className={`grid grid-cols-3 gap-3 w-full max-w-[280px] transition-all duration-700 delay-300 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
-					{Object.entries(sections).map(([key, section], index) => (
-						<div
-							key={key}
-							className="flex flex-col items-center gap-1 p-2 transition-all duration-300 hover:scale-105 cursor-pointer"
-							style={{ transitionDelay: `${400 + index * 50}ms` }}
-							onClick={() => handleCategoryClick(key)}
-						>
-							<img 
-								src={section.icon} 
-								alt={section.title} 
-								className="w-[45px] h-[45px] object-contain" 
-								style={{
-									width: '45px',
-									height: '45px',
-									transform: 'rotate(0deg)',
-									opacity: 1
-								}}
-							/>
-							<span className="text-xs font-medium text-white/90">{section.title}</span>
-						</div>
-					))}
+					{Object.entries(sections).map(([key, section], index) => {
+						const isSelected = categoryStatus[key as keyof typeof categoryStatus];
+						return (
+							<div
+								key={key}
+								className={`flex flex-col items-center gap-1 p-2 transition-all duration-300 hover:scale-105 cursor-pointer relative ${
+									isSelected ? 'ring-2 ring-[#E70D57] ring-opacity-60 rounded-lg' : ''
+								}`}
+								style={{ transitionDelay: `${400 + index * 50}ms` }}
+								onClick={() => handleCategoryClick(key)}
+							>
+								{isSelected && (
+									<div className="absolute -top-1 -right-1 w-4 h-4 bg-[#E70D57] rounded-full flex items-center justify-center">
+										<svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+											<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+										</svg>
+									</div>
+								)}
+								<img 
+									src={section.icon} 
+									alt={section.title} 
+									className="w-[45px] h-[45px] object-contain" 
+									style={{
+										width: '45px',
+										height: '45px',
+										transform: 'rotate(0deg)',
+										opacity: isSelected ? 1 : 0.8
+									}}
+								/>
+								<span className={`text-xs font-medium ${isSelected ? 'text-[#E70D57]' : 'text-white/90'}`}>
+									{section.title}
+								</span>
+							</div>
+						);
+					})}
 				</div>
 
-				{/* Progress dots */}
+				{/* Progress dots - Dynamic based on selections */}
 				<div className={`mt-6 flex items-center justify-center gap-2 transition-all duration-700 delay-500 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
-					<div className="w-2 h-2 rounded-full bg-white/30"></div>
-					<div className="w-2 h-2 rounded-full bg-white/30"></div>
-					<div className="w-2 h-2 rounded-full bg-[#E70D57]"></div>
-					<div className="w-2 h-2 rounded-full bg-white/30"></div>
-					<div className="w-2 h-2 rounded-full bg-white/30"></div>
-					<div className="w-2 h-2 rounded-full bg-white/30"></div>
+					{Object.entries(categoryStatus).map(([key, isSelected]) => (
+						<div 
+							key={key}
+							className={`w-2 h-2 rounded-full transition-all duration-300 ${
+								isSelected ? 'bg-[#E70D57]' : 'bg-white/30'
+							}`}
+						></div>
+					))}
 				</div>
 
 				<button 
+					onClick={handleCreateClick}
 					className={`mt-4 px-6 py-2 w-[120px] h-[35px] rounded-[30px] bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}
@@ -609,6 +696,7 @@ export default function DesignPage() {
 						</div>
 						<ImageGenerationWorkflow
 							prompt={prompt}
+							enhancedPrompt={hasProperties() ? generateEnhancedPrompt(prompt) : undefined}
 							onComplete={handleWorkflowComplete}
 							onError={handleWorkflowError}
 						/>

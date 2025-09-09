@@ -31,10 +31,18 @@ export default function ProductionSelector({
           <div key={option.key} className="flex flex-col items-center">
             <button
               onClick={() => onProductionChange(option.key)}
-              className={`transition-all duration-300 hover:scale-110 ${
+              className={`transition-all duration-300 hover:scale-110 relative ${
                 selectedProduction === option.key ? 'scale-110' : ''
               }`}
             >
+              {/* Selection Badge */}
+              {selectedProduction === option.key && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#E70D57] rounded-full flex items-center justify-center z-10">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              )}
                              <div 
                  className={`rounded-full border flex items-center justify-center text-2xl transition-all duration-300 ${
                    selectedProduction === option.key 
@@ -62,7 +70,9 @@ export default function ProductionSelector({
                   />
               </div>
             </button>
-                         <span className="text-sm font-medium mt-3 text-center" style={{ color: '#CCCCCC' }}>
+                         <span className={`text-sm font-medium mt-3 text-center ${
+               selectedProduction === option.key ? 'text-[#E70D57]' : 'text-[#CCCCCC]'
+             }`}>
                {option.label}
              </span>
           </div>
