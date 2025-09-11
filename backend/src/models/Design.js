@@ -39,14 +39,26 @@ const designSchema = new mongoose.Schema({
   
   // AI Generation
   generatedPrompt: String,
+  generatedImages: [{
+    url: String,
+    prompt: String,
+    index: Number,
+    selected: { type: Boolean, default: false }
+  }],
+  selectedImageIndex: Number,
+  // Legacy support for images field
   images: [{
     url: String,
     prompt: String,
     selected: { type: Boolean, default: false }
   }],
-  selectedImageIndex: Number,
   
   // 3D Model Data
+  generated3DModel: {
+    url: String,
+    prompt: String,
+    format: String
+  },
   modelFiles: {
     originalImage: String,
     processedImage: String,

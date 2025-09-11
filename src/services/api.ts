@@ -293,7 +293,8 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || `HTTP ${response.status}`);
+        const errorMessage = data.error || data.message || `HTTP ${response.status}`;
+        throw new Error(errorMessage);
       }
 
       return data;
@@ -339,7 +340,8 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || `HTTP ${response.status}`);
+        const errorMessage = data.error || data.message || `HTTP ${response.status}`;
+        throw new Error(errorMessage);
       }
 
       return data;

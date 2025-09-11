@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
 // Import utilities and services
 import logger from './utils/logger.js';
@@ -50,15 +51,17 @@ app.use(helmet({
   }
 }));
 
-// CORS configuration - Hardcoded origins for production and development
+// CORS configuration - Dynamic origins based on environment
 const corsOptions = {
-  origin: [
-    'https://cudliy-design-page.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://localhost:4173',
-     'https://www.cudliy-design-page.vercel.app'
-  ],
+  origin: process.env.CORS_ORIGINS ? 
+    process.env.CORS_ORIGINS.split(',').map(origin => origin.trim()) :
+    [
+      'https://cudliy-design-page.vercel.app',
+      'https://www.cudliy-design-page.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:4173'
+    ],
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -77,18 +80,39 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Rate limiting
 app.use('/api/', generalLimiter);
 
+// Validate required environment variables
+const requiredEnvVars = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'FRONTEND_URL'];
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+  logger.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  if (process.env.NODE_ENV === 'production') {
+    logger.error('Exiting due to missing required environment variables in production');
+    process.exit(1);
+  } else {
+    logger.warn('Continuing in development mode with missing environment variables');
+  }
+}
+
 // Connect to database
 connectDB();
 
 // Health Check
 app.get('/api/health', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  const stripeStatus = process.env.STRIPE_SECRET_KEY ? 'configured' : 'not_configured';
+  
   res.json({
     success: true,
     status: 'healthy',
     message: 'Backend is healthy',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
+    services: {
+      database: dbStatus,
+      stripe: stripeStatus
+    }
   });
 });
 

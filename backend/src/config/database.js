@@ -6,12 +6,24 @@ const connectDB = async () => {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferMaxEntries: 0,
+      bufferCommands: false,
+      retryWrites: true,
+      w: 'majority'
     });
 
     logger.info(`MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
     logger.error('Database connection error:', error);
+    // Don't exit in production, let the app continue with graceful degradation
+    if (process.env.NODE_ENV === 'production') {
+      logger.warn('Database connection failed, continuing without database...');
+      return null;
+    }
     process.exit(1);
   }
 };
@@ -27,6 +39,19 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.connection.on('disconnected', () => {
   logger.warn('Mongoose disconnected');
+  // Attempt to reconnect in production
+  if (process.env.NODE_ENV === 'production') {
+    setTimeout(() => {
+      connectDB().catch(err => {
+        logger.error('Reconnection failed:', err);
+      });
+    }, 5000);
+  }
+});
+
+// Handle reconnection
+mongoose.connection.on('reconnected', () => {
+  logger.info('Mongoose reconnected to MongoDB');
 });
 
 // Graceful shutdown

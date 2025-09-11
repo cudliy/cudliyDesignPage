@@ -63,7 +63,7 @@ export const createStripeCheckout = async (req, res, next) => {
           product_data: {
             name: design.originalText || 'Custom 3D Design',
             description: `3D printed toy - ${design.userSelections?.color || 'blue'} ${design.userSelections?.style || 'playful'} design`,
-            images: [design.images?.[0]?.url || 'https://via.placeholder.com/512x512/4F46E5/FFFFFF?text=Sample+3D+Toy']
+            images: [design.generatedImages?.[0]?.url || design.images?.[0]?.url || 'https://via.placeholder.com/512x512/4F46E5/FFFFFF?text=Sample+3D+Toy']
           },
           unit_amount: Math.round(unitPrice * 100) // Convert to cents
         },
@@ -94,7 +94,7 @@ export const createStripeCheckout = async (req, res, next) => {
     ];
 
     // Create Stripe Checkout Session
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://cudliy-design-page.vercel.app';
     const session = await stripeService.createCheckoutSession(
       lineItems,
       customer.id,
@@ -116,7 +116,7 @@ export const createStripeCheckout = async (req, res, next) => {
       items: [{
         designId: design.id,
         designTitle: design.originalText || 'Custom 3D Design',
-        designImage: design.images?.[0]?.url || '',
+        designImage: design.generatedImages?.[0]?.url || design.images?.[0]?.url || '',
         quantity,
         unitPrice,
         totalPrice: subtotal
@@ -144,6 +144,20 @@ export const createStripeCheckout = async (req, res, next) => {
     });
   } catch (error) {
     logger.error('Create Stripe Checkout Error:', error);
+    
+    // Handle specific error types
+    if (error.message?.includes('STRIPE_SECRET_KEY')) {
+      return next(new AppError('Payment service configuration error', 503));
+    }
+    
+    if (error.message?.includes('customer')) {
+      return next(new AppError('Unable to process customer information', 400));
+    }
+    
+    if (error.message?.includes('session')) {
+      return next(new AppError('Unable to create payment session', 500));
+    }
+    
     next(new AppError(error.message || 'Failed to create checkout session', 500));
   }
 };
@@ -203,7 +217,7 @@ export const createCheckout = async (req, res, next) => {
       items: [{
         designId: design.id,
         designTitle: design.originalText || 'Custom 3D Design',
-        designImage: design.images?.[0]?.url || '',
+        designImage: design.generatedImages?.[0]?.url || design.images?.[0]?.url || '',
         quantity,
         unitPrice,
         totalPrice: subtotal

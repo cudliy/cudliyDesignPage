@@ -36,9 +36,10 @@ const handleJWTExpiredError = () =>
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
+    success: false,
+    error: err.message,
     message: err.message,
+    status: err.status,
     stack: err.stack
   });
 };
@@ -46,14 +47,18 @@ const sendErrorDev = (err, res) => {
 const sendErrorProd = (err, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message
+      success: false,
+      error: err.message,
+      message: err.message,
+      status: err.status
     });
   } else {
     logger.error('ERROR', err);
     res.status(500).json({
-      status: 'error',
-      message: 'Something went wrong!'
+      success: false,
+      error: 'Something went wrong!',
+      message: 'Something went wrong!',
+      status: 'error'
     });
   }
 };
