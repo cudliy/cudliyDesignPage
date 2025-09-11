@@ -35,40 +35,35 @@ const validateRequest = (schema) => {
   };
 };
 
-// Checkout routes
+// Checkout routes (temporarily without auth for development)
 router.post('/checkout',
-  verifyPaymentAuth,
   validateRequest(createCheckoutSchema),
   createCheckout
 );
 
-router.get('/checkout/:checkoutId', verifyPaymentAuth, getCheckout);
+router.get('/checkout/:checkoutId', getCheckout);
 
 router.patch('/checkout/:checkoutId/shipping',
-  verifyPaymentAuth,
   validateRequest(updateShippingSchema),
   updateShippingInfo
 );
 
 router.patch('/checkout/:checkoutId/billing',
-  verifyPaymentAuth,
   validateRequest(updateBillingSchema),
   updateBillingInfo
 );
 
 router.post('/checkout/:checkoutId/payment-intent',
-  verifyPaymentAuth,
   createPaymentIntent
 );
 
 router.post('/checkout/:checkoutId/complete',
-  verifyPaymentAuth,
   validateRequest(completeCheckoutSchema),
   completeCheckout
 );
 
-// Order routes
-router.get('/users/:userId/orders', verifyPaymentAuth, getUserOrders);
-router.get('/orders/:orderId', verifyPaymentAuth, getOrder);
+// Order routes (temporarily without auth for development)
+router.get('/users/:userId/orders', getUserOrders);
+router.get('/orders/:orderId', getOrder);
 
 export default router;
