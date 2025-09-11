@@ -13,9 +13,10 @@ export default function OrderSuccessPage() {
     // Check for session_id in URL params (from Stripe redirect)
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
+    const isMock = urlParams.get('mock') === 'true';
     
     if (sessionId) {
-      // Handle Stripe checkout success
+      // Handle Stripe checkout success (or mock checkout)
       setLoading(false);
       setOrder({
         id: 'temp-order',
@@ -143,6 +144,13 @@ export default function OrderSuccessPage() {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Successful!</h1>
           <p className="text-gray-600">Thank you for your order. We'll start processing it right away.</p>
+          {new URLSearchParams(window.location.search).get('mock') === 'true' && (
+            <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+              <p className="text-yellow-800 text-sm">
+                🧪 <strong>Test Mode:</strong> This is a mock order for testing purposes. No actual payment was processed.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">

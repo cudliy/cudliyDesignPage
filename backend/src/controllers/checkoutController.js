@@ -53,6 +53,52 @@ export const createStripeCheckout = async (req, res, next) => {
     const shipping = 5.99; // Standard shipping
     const total = subtotal + tax + shipping;
 
+    // TEMPORARY: Skip Stripe for testing - create mock checkout session
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('sk_test_51H1234')) {
+      logger.warn('Using mock Stripe checkout for testing');
+      
+      // Create mock checkout session
+      const mockSessionId = `cs_test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Save checkout session to database
+      const checkout = new Checkout({
+        userId,
+        designId,
+        sessionId: mockSessionId,
+        status: 'pending',
+        items: [{
+          designId: design.id,
+          designTitle: design.originalText || 'Custom 3D Design',
+          designImage: design.generatedImages?.[0]?.url || design.images?.[0]?.url || '',
+          quantity,
+          unitPrice,
+          totalPrice: subtotal
+        }],
+        pricing: {
+          subtotal,
+          tax,
+          shipping,
+          total,
+          currency: 'USD'
+        }
+      });
+
+      await checkout.save();
+
+      return res.json({
+        success: true,
+        data: {
+          checkoutId: checkout.id,
+          sessionId: mockSessionId,
+          url: `${frontendUrl}/order-success?session_id=${mockSessionId}&mock=true`,
+          pricing: checkout.pricing,
+          items: checkout.items,
+          mock: true,
+          message: 'Mock checkout session created - Stripe not configured'
+        }
+      });
+    }
+
     // Get or create customer
     let customer;
     try {

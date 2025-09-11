@@ -523,9 +523,19 @@ export default function CheckoutPage() {
 
         if (response.success && response.data) {
           setCheckoutData(response.data);
-          // Redirect to Stripe Checkout
-          if (response.data.url) {
-            window.location.href = response.data.url;
+          
+          // Check if this is a mock checkout
+          if (response.data.mock) {
+            console.log('Mock checkout detected:', response.data.message);
+            // For mock checkout, just redirect to success page
+            if (response.data.url) {
+              window.location.href = response.data.url;
+            }
+          } else {
+            // Redirect to Stripe Checkout
+            if (response.data.url) {
+              window.location.href = response.data.url;
+            }
           }
         } else {
           throw new Error('Failed to create checkout');
