@@ -80,17 +80,23 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Rate limiting
 app.use('/api/', generalLimiter);
 
-// Validate required environment variables
-const requiredEnvVars = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'FRONTEND_URL'];
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+// Set default values for missing environment variables
+if (!process.env.FRONTEND_URL) {
+  process.env.FRONTEND_URL = 'https://cudliy-design-page.vercel.app';
+  logger.warn('FRONTEND_URL not set, using default: https://cudliy-design-page.vercel.app');
+}
 
-if (missingEnvVars.length > 0) {
-  logger.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+// Validate critical environment variables
+const criticalEnvVars = ['MONGODB_URI', 'STRIPE_SECRET_KEY'];
+const missingCriticalVars = criticalEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingCriticalVars.length > 0) {
+  logger.error(`Missing critical environment variables: ${missingCriticalVars.join(', ')}`);
   if (process.env.NODE_ENV === 'production') {
-    logger.error('Exiting due to missing required environment variables in production');
+    logger.error('Exiting due to missing critical environment variables in production');
     process.exit(1);
   } else {
-    logger.warn('Continuing in development mode with missing environment variables');
+    logger.warn('Continuing in development mode with missing critical environment variables');
   }
 }
 

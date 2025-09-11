@@ -11,17 +11,23 @@ import User from '../models/User.js';
 class StripeService {
   constructor() {
     if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error('STRIPE_SECRET_KEY environment variable is required');
+      logger.warn('STRIPE_SECRET_KEY not found, Stripe functionality will be limited');
+      this.stripe = null;
+      this.webhookSecret = null;
+    } else {
+      this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: '2023-10-16',
+        typescript: true
+      });
+      this.webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     }
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2023-10-16',
-      typescript: true
-    });
-    this.webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   }
 
   // Customer Management
   async createCustomer(userId, email, name, metadata = {}) {
+    if (!this.stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
     try {
       const customer = await this.stripe.customers.create({
         email,
@@ -51,6 +57,9 @@ class StripeService {
   }
 
   async getCustomer(userId) {
+    if (!this.stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
     try {
       let customerRecord = await Customer.findOne({ userId });
       
@@ -166,6 +175,9 @@ class StripeService {
 
   // Checkout Sessions
   async createCheckoutSession(lineItems, customerId, successUrl, cancelUrl, metadata = {}) {
+    if (!this.stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
     try {
       const session = await this.stripe.checkout.sessions.create({
         customer: customerId,

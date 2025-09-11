@@ -3,14 +3,18 @@ import logger from '../utils/logger.js';
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+    // Ensure MONGODB_URI has proper format
+    let mongoUri = process.env.MONGODB_URI;
+    if (mongoUri && !mongoUri.includes('?')) {
+      mongoUri += '?retryWrites=true&w=majority';
+    }
+    
+    const conn = await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
-      bufferMaxEntries: 0,
-      bufferCommands: false,
       retryWrites: true,
       w: 'majority'
     });
