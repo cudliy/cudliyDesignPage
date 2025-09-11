@@ -48,12 +48,15 @@ export default function ModelViewer({
 
     // Set a timeout for model loading (30 seconds)
     timeoutRef.current = setTimeout(() => {
-      if (loadingState === 'loading') {
-        const timeoutError = 'Model loading timed out. Please try again.';
-        setLoadingState('error');
-        setErrorMessage(timeoutError);
-        onError?.(timeoutError);
-      }
+      setLoadingState(currentState => {
+        if (currentState === 'loading') {
+          const timeoutError = 'Model loading timed out. Please try again.';
+          setErrorMessage(timeoutError);
+          onError?.(timeoutError);
+          return 'error';
+        }
+        return currentState;
+      });
     }, 30000);
 
     const createModelViewer = () => {
@@ -114,7 +117,7 @@ export default function ModelViewer({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [modelUrl || '', onError]); // Always provide a string to keep dependency array size constant
+  }, [modelUrl, onError]); // Remove the fallback string to avoid dependency issues
 
   // Helper function to convert 0-100 values to appropriate ranges
   const updateControls = (modelViewer: any) => {

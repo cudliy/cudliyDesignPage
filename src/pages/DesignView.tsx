@@ -16,6 +16,56 @@ export default function DesignView() {
   const [background, setBackground] = useState(45);
   const [size, setSize] = useState(50);
   const [cameraAngle, setCameraAngle] = useState(50);
+  
+  // Model loading states - must be at top level
+  const [modelLoadError, setModelLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
+
+  // Helper functions - defined after all hooks
+  const getValidModelUrl = () => {
+    if (!design) return null;
+    
+    const urls = [
+      design.modelFiles?.storedModelUrl,
+      design.modelFiles?.modelFile,
+      design.modelFiles?.gaussianPly
+    ].filter(Boolean);
+    
+    // Find the first valid URL
+    for (const url of urls) {
+      if (url && typeof url === 'string' && url.trim() !== '') {
+        // Basic URL validation
+        try {
+          new URL(url);
+          return url;
+        } catch {
+          // If it's not a full URL, check if it's a relative path or data URL
+          if (url.startsWith('/') || url.startsWith('./') || url.startsWith('data:')) {
+            return url;
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  const handleModelError = (error: string) => {
+    console.error('Model loading error:', error);
+    setModelLoadError(error);
+  };
+
+  const handleRetryModel = () => {
+    if (retryCount < maxRetries) {
+      setRetryCount(prev => prev + 1);
+      setModelLoadError(null);
+      // Force re-render of ModelViewer by updating a state
+      setLighting(prev => prev);
+    } else {
+      // If max retries reached, try regenerating the model
+      handleRegenerateModel();
+    }
+  };
 
   useEffect(() => {
     if (!designId) return;
@@ -118,53 +168,7 @@ export default function DesignView() {
     );
   }
 
-  // Enhanced model URL validation and fallback logic
-  const getValidModelUrl = () => {
-    const urls = [
-      design.modelFiles?.storedModelUrl,
-      design.modelFiles?.modelFile,
-      design.modelFiles?.gaussianPly
-    ].filter(Boolean);
-    
-    // Find the first valid URL
-    for (const url of urls) {
-      if (url && typeof url === 'string' && url.trim() !== '') {
-        // Basic URL validation
-        try {
-          new URL(url);
-          return url;
-        } catch {
-          // If it's not a full URL, check if it's a relative path or data URL
-          if (url.startsWith('/') || url.startsWith('./') || url.startsWith('data:')) {
-            return url;
-          }
-        }
-      }
-    }
-    return null;
-  };
-
   const modelUrl = getValidModelUrl();
-  const [modelLoadError, setModelLoadError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 3;
-
-  const handleModelError = (error: string) => {
-    console.error('Model loading error:', error);
-    setModelLoadError(error);
-  };
-
-  const handleRetryModel = () => {
-    if (retryCount < maxRetries) {
-      setRetryCount(prev => prev + 1);
-      setModelLoadError(null);
-      // Force re-render of ModelViewer by updating a state
-      setLighting(prev => prev);
-    } else {
-      // If max retries reached, try regenerating the model
-      handleRegenerateModel();
-    }
-  };
 
   return (
     <div className="w-screen h-screen bg-gray-100 overflow-hidden flex p-4 gap-4">
