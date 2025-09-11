@@ -1,8 +1,29 @@
 @import "tailwindcss";
 
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+
+/* Import Fromage ExtraBold from Google Fonts or custom source */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+
 
 @layer utilities {
   .font-abril { font-family: "Abril Fatface", serif; }
+  .font-manrope { font-family: "Manrope", sans-serif; }
+  .font-fromage { font-family: "Playfair Display", serif; }
+}
+
+/* Custom font definitions for better fallbacks */
+.font-fromage-extrabold {
+  font-family: "Playfair Display", "Times New Roman", serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.font-manrope-bold {
+  font-family: "Manrope", "Arial", sans-serif;
+  font-weight: 800;
+  font-style: normal;
 }
 
 /* iro.js Color Picker Custom Styles */
@@ -37,5 +58,28 @@
 /* Custom border utilities */
 .border-3 {
   border-width: 3px !important;
+}
+
+/* CUDLIY Brand Text - Highly visible outline */
+.cudliy-outline {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 
+    3px 3px 0 rgba(0, 0, 0, 0.8),
+    -3px -3px 0 rgba(0, 0, 0, 0.8),
+    3px -3px 0 rgba(0, 0, 0, 0.8),
+    -3px 3px 0 rgba(0, 0, 0, 0.8),
+    2px 2px 0 rgba(0, 0, 0, 0.9),
+    -2px -2px 0 rgba(0, 0, 0, 0.9),
+    2px -2px 0 rgba(0, 0, 0, 0.9),
+    -2px 2px 0 rgba(0, 0, 0, 0.9),
+    1px 1px 0 rgba(0, 0, 0, 1),
+    -1px -1px 0 rgba(0, 0, 0, 1),
+    1px -1px 0 rgba(0, 0, 0, 1),
+    -1px 1px 0 rgba(0, 0, 0, 1),
+    0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 20px rgba(255, 255, 255, 0.3) !important;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
 }
 

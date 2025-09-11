@@ -10,6 +10,10 @@ export default {
 			},
 		},
 		extend: {
+			fontFamily: {
+				'manrope': ['Manrope', 'sans-serif'],
+				'fromage': ['Playfair Display', 'serif'],
+			},
 			colors: {
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",

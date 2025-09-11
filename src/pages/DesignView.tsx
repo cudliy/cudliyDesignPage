@@ -398,7 +398,7 @@ export default function DesignView() {
         <div className="text-right mt-auto pt-8">
           <div className="flex justify-end">
             <div className="transform rotate-90 origin-bottom-right">
-              <span className="text-white/60 text-lg font-light tracking-wider">
+              <span className="text-white/90 text-lg font-light tracking-wider">
                 Cudliy.
               </span>
             </div>

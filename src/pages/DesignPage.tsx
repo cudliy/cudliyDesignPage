@@ -547,12 +547,20 @@ export default function DesignPage() {
 			<aside className={`flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden transition-all duration-1000 ease-out ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
 			}`}>
-				<button 
-					onClick={handleAdvancedClick}
-					className="absolute top-4 right-4 sm:top-6 sm:right-6 text-sm text-white/70 z-10 hover:text-white transition-colors cursor-pointer"
-				>
-					{isAdvanced ? 'Basic' : 'Advanced'}
-				</button>
+				<div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex gap-2 z-10">
+					<button 
+						onClick={() => window.location.href = '/dashboard'}
+						className="text-sm text-white/70 hover:text-white transition-colors cursor-pointer"
+					>
+						Dashboard
+					</button>
+					<button 
+						onClick={handleAdvancedClick}
+						className="text-sm text-white/70 hover:text-white transition-colors cursor-pointer"
+					>
+						{isAdvanced ? 'Basic' : 'Advanced'}
+					</button>
+				</div>
 				
 							{/* Brand and title area */}
 			<div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
