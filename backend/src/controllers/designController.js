@@ -4,6 +4,8 @@ import logger from '../utils/logger.js';
 import { AppError } from '../utils/errorHandler.js';
 import Design from '../models/Design.js';
 import Session from '../models/Session.js';
+import User from '../models/User.js';
+import Subscription from '../models/Subscription.js';
 import aiService from '../services/aiService.js';
 import storageService from '../services/storageService.js';
 
@@ -25,6 +27,38 @@ export const generateImages = async (req, res, next) => {
     } = req.body;
 
     logger.info(`Starting image generation for user: ${user_id}`);
+
+    // Check usage limits
+    const user = await User.findOne({ id: user_id });
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    // Check if user has reached their limits
+    const subscription = await Subscription.findOne({ 
+      userId: user_id, 
+      status: { $in: ['active', 'trialing'] } 
+    });
+
+    let limits = { imagesPerMonth: 3, modelsPerMonth: 1 }; // Free tier
+    if (subscription) {
+      limits = subscription.plan.limits;
+    }
+
+    // Check image generation limit
+    if (limits.imagesPerMonth !== -1 && user.usage.imagesGenerated >= limits.imagesPerMonth) {
+      return res.status(402).json({
+        success: false,
+        error: 'Usage limit exceeded',
+        data: {
+          limit: limits.imagesPerMonth,
+          used: user.usage.imagesGenerated,
+          type: 'image',
+          upgradeRequired: true,
+          message: 'You have reached your monthly image generation limit. Please upgrade to continue.'
+        }
+      });
+    }
 
     // Create session
     const session = new Session({
@@ -63,6 +97,17 @@ export const generateImages = async (req, res, next) => {
     session.currentStep = 'image_selection';
     await session.save();
 
+    // Update user usage
+    user.usage.imagesGenerated += 1;
+    user.usage.lastUsed = new Date();
+    await user.save();
+
+    // Update subscription usage if applicable
+    if (subscription) {
+      subscription.usage.imagesGenerated += 1;
+      await subscription.save();
+    }
+
     logger.info(`Images generated successfully for session: ${session.id}`);
 
     res.json({
@@ -73,6 +118,11 @@ export const generateImages = async (req, res, next) => {
         creation_id,
         user_id,
         prompt: enhancedPrompt,
+        usage: {
+          imagesGenerated: user.usage.imagesGenerated,
+          modelsGenerated: user.usage.modelsGenerated,
+          limits
+        },
         message: 'AI images generated successfully'
       }
     });
@@ -95,6 +145,38 @@ export const generate3DModel = async (req, res, next) => {
     } = req.body;
 
     logger.info(`Starting 3D model generation for session: ${session_id}`);
+
+    // Check usage limits
+    const user = await User.findOne({ id: user_id });
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    // Check if user has reached their limits
+    const subscription = await Subscription.findOne({ 
+      userId: user_id, 
+      status: { $in: ['active', 'trialing'] } 
+    });
+
+    let limits = { imagesPerMonth: 3, modelsPerMonth: 1 }; // Free tier
+    if (subscription) {
+      limits = subscription.plan.limits;
+    }
+
+    // Check model generation limit
+    if (limits.modelsPerMonth !== -1 && user.usage.modelsGenerated >= limits.modelsPerMonth) {
+      return res.status(402).json({
+        success: false,
+        error: 'Usage limit exceeded',
+        data: {
+          limit: limits.modelsPerMonth,
+          used: user.usage.modelsGenerated,
+          type: 'model',
+          upgradeRequired: true,
+          message: 'You have reached your monthly model generation limit. Please upgrade to continue.'
+        }
+      });
+    }
 
     // Get session data
     const session = session_id ? await Session.findOne({ id: session_id }) : null;
@@ -180,6 +262,17 @@ export const generate3DModel = async (req, res, next) => {
       await session.save();
     }
 
+    // Update user usage
+    user.usage.modelsGenerated += 1;
+    user.usage.lastUsed = new Date();
+    await user.save();
+
+    // Update subscription usage if applicable
+    if (subscription) {
+      subscription.usage.modelsGenerated += 1;
+      await subscription.save();
+    }
+
     logger.info(`3D model generated successfully. Design ID: ${design.id}`);
 
     res.json({
@@ -193,6 +286,11 @@ export const generate3DModel = async (req, res, next) => {
         color_video: modelResult.color_video,
         creation_id: creation_id || session?.creationId,
         user_id: user_id || session?.userId,
+        usage: {
+          imagesGenerated: user.usage.imagesGenerated,
+          modelsGenerated: user.usage.modelsGenerated,
+          limits
+        },
         message: '3D model generated successfully'
       }
     });

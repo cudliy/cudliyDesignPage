@@ -37,3 +37,9 @@ export const uploadLimiter = createRateLimiter(
   50, // limit each IP to 50 uploads per 15 minutes
   'Too many upload requests, please try again later.'
 );
+
+export const paymentLimiter = createRateLimiter(
+  15 * 60 * 1000, // 15 minutes
+  30, // limit each IP to 30 payment requests per 15 minutes
+  'Too many payment requests, please try again later.'
+);

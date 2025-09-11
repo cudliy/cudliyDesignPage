@@ -142,6 +142,139 @@ interface Session {
   updatedAt: string;
 }
 
+// Payment and Checkout Interfaces
+interface CheckoutRequest {
+  userId: string;
+  designId: string;
+  quantity?: number;
+}
+
+interface CheckoutResponse {
+  checkoutId: string;
+  sessionId: string;
+  pricing: {
+    subtotal: number;
+    tax: number;
+    shipping: number;
+    total: number;
+    currency: string;
+  };
+  items: Array<{
+    designId: string;
+    designTitle: string;
+    designImage: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }>;
+}
+
+interface ShippingInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  method: 'standard' | 'express' | 'overnight';
+}
+
+interface BillingInfo {
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  sameAsShipping: boolean;
+}
+
+interface PaymentIntentResponse {
+  clientSecret: string;
+  paymentIntentId: string;
+  amount: number;
+  currency: string;
+}
+
+interface Order {
+  id: string;
+  userId: string;
+  designId: string;
+  orderNumber: string;
+  status: 'pending' | 'processing' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  items: Array<{
+    designId: string;
+    designTitle: string;
+    designImage: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }>;
+  pricing: {
+    subtotal: number;
+    tax: number;
+    shipping: number;
+    discount: number;
+    total: number;
+    currency: string;
+  };
+  shipping: ShippingInfo;
+  billing: BillingInfo;
+  payment: {
+    method: string;
+    status: string;
+    transactionId: string;
+    paidAt: string;
+  };
+  production: {
+    status: 'queued' | 'printing' | 'post_processing' | 'quality_check' | 'packaging' | 'ready_for_shipping';
+    estimatedCompletion: string;
+    actualCompletion?: string;
+    notes?: string;
+  };
+  tracking?: {
+    carrier: string;
+    trackingNumber: string;
+    trackingUrl: string;
+    shippedAt: string;
+    deliveredAt?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface UsageLimits {
+  plan: string;
+  limits: {
+    imagesPerMonth: number;
+    modelsPerMonth: number;
+    storageGB: number;
+    prioritySupport: boolean;
+    customBranding: boolean;
+    apiAccess: boolean;
+  };
+  usage: {
+    imagesGenerated: number;
+    modelsGenerated: number;
+    storageUsed: number;
+  };
+  remaining: {
+    images: number;
+    models: number;
+  };
+}
+
 class ApiService {
   private async request<T>(
     endpoint: string,
@@ -261,6 +394,72 @@ class ApiService {
       body: JSON.stringify(updates),
     });
   }
+
+  // Checkout methods
+  async createCheckout(request: CheckoutRequest): Promise<ApiResponse<CheckoutResponse>> {
+    return this.request('/checkout/checkout', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getCheckout(checkoutId: string): Promise<ApiResponse<CheckoutResponse>> {
+    return this.request(`/checkout/checkout/${checkoutId}`);
+  }
+
+  async updateShippingInfo(checkoutId: string, shippingInfo: ShippingInfo): Promise<ApiResponse<CheckoutResponse>> {
+    return this.request(`/checkout/checkout/${checkoutId}/shipping`, {
+      method: 'PATCH',
+      body: JSON.stringify(shippingInfo),
+    });
+  }
+
+  async updateBillingInfo(checkoutId: string, billingInfo: BillingInfo): Promise<ApiResponse<CheckoutResponse>> {
+    return this.request(`/checkout/checkout/${checkoutId}/billing`, {
+      method: 'PATCH',
+      body: JSON.stringify(billingInfo),
+    });
+  }
+
+  async createPaymentIntent(checkoutId: string): Promise<ApiResponse<PaymentIntentResponse>> {
+    return this.request(`/checkout/checkout/${checkoutId}/payment-intent`, {
+      method: 'POST',
+    });
+  }
+
+  async completeCheckout(checkoutId: string, paymentIntentId: string): Promise<ApiResponse<{ orderId: string; orderNumber: string; status: string; total: number; estimatedDelivery: string }>> {
+    return this.request(`/checkout/checkout/${checkoutId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify({ paymentIntentId }),
+    });
+  }
+
+  // Order methods
+  async getUserOrders(userId: string, page: number = 1, limit: number = 10, status?: string): Promise<ApiResponse<{ orders: Order[]; pagination: any }>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      ...(status && { status }),
+    });
+
+    return this.request(`/checkout/users/${userId}/orders?${params}`);
+  }
+
+  async getOrder(orderId: string): Promise<ApiResponse<Order>> {
+    return this.request(`/checkout/orders/${orderId}`);
+  }
+
+  // Usage and limits
+  async checkUsageLimits(userId: string): Promise<ApiResponse<UsageLimits>> {
+    return this.request(`/payments/users/${userId}/usage/limits`);
+  }
+
+  async trackUsage(userId: string, type: 'image' | 'model', amount: number = 1): Promise<ApiResponse<{ usage: any; subscription: any }>> {
+    return this.request(`/payments/users/${userId}/usage/track`, {
+      method: 'POST',
+      body: JSON.stringify({ type, amount }),
+    });
+  }
 }
 
 export const apiService = new ApiService();
@@ -274,4 +473,11 @@ export type {
   UploadImageResponse,
   Design,
   Session,
+  CheckoutRequest,
+  CheckoutResponse,
+  ShippingInfo,
+  BillingInfo,
+  PaymentIntentResponse,
+  Order,
+  UsageLimits,
 };

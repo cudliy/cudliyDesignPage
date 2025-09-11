@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import ModelViewer from '../components/ModelViewer';
 import type { Design } from '../services/api';
 
 export default function DesignView() {
   const { designId } = useParams<{ designId: string }>();
+  const navigate = useNavigate();
   const [design, setDesign] = useState<Design | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
+  const [userId] = useState('user-123'); // This should come from auth context
   
   // Control states - matching the image positions
   const [lighting, setLighting] = useState(30);
@@ -131,6 +133,12 @@ export default function DesignView() {
       setError(err instanceof Error ? err.message : 'Failed to regenerate 3D model');
     } finally {
       setRegenerating(false);
+    }
+  };
+
+  const handleMakeOrder = () => {
+    if (designId) {
+      navigate(`/checkout/${designId}`);
     }
   };
 
@@ -419,7 +427,10 @@ export default function DesignView() {
             <button className="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
               Download
             </button>
-            <button className="px-8 py-3 bg-[#E70D57] text-white rounded-lg font-medium hover:bg-[#d10c50] transition-colors">
+            <button 
+              onClick={handleMakeOrder}
+              className="px-8 py-3 bg-[#E70D57] text-white rounded-lg font-medium hover:bg-[#d10c50] transition-colors"
+            >
               Make
             </button>
           </div>

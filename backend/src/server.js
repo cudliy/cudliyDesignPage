@@ -18,6 +18,9 @@ import { cleanupOldSessions } from './controllers/sessionController.js';
 import designRoutes from './routes/designRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import sessionRoutes from './routes/sessionRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import checkoutRoutes from './routes/checkoutRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js';
 
 // Environment variables are loaded in index.js
 
@@ -119,6 +122,9 @@ app.get('/api/models/*', (req, res) => {
 app.use('/api/designs', designRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/session', sessionRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/checkout', checkoutRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Error handling middleware
 app.use(globalErrorHandler);

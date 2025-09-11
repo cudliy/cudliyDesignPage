@@ -51,3 +51,77 @@ export const userRegistrationSchema = Joi.object({
   firstName: Joi.string().max(50),
   lastName: Joi.string().max(50)
 });
+
+// Stripe Payment Validation Schemas
+export const createCustomerSchema = Joi.object({
+  userId: Joi.string().required(),
+  email: Joi.string().email().required(),
+  name: Joi.string().max(100),
+  metadata: Joi.object().optional()
+});
+
+export const createPaymentIntentSchema = Joi.object({
+  userId: Joi.string().required(),
+  amount: Joi.number().positive().required(),
+  currency: Joi.string().length(3).uppercase().default('USD'),
+  metadata: Joi.object().optional()
+});
+
+export const createSubscriptionSchema = Joi.object({
+  userId: Joi.string().required(),
+  priceId: Joi.string().required(),
+  metadata: Joi.object().optional()
+});
+
+export const trackUsageSchema = Joi.object({
+  type: Joi.string().valid('image', 'model').required(),
+  amount: Joi.number().integer().min(1).default(1)
+});
+
+export const createRefundSchema = Joi.object({
+  paymentIntentId: Joi.string().required(),
+  amount: Joi.number().positive().optional(),
+  reason: Joi.string().valid('duplicate', 'fraudulent', 'requested_by_customer').default('requested_by_customer')
+});
+
+// Checkout Validation Schemas
+export const createCheckoutSchema = Joi.object({
+  userId: Joi.string().required(),
+  designId: Joi.string().required(),
+  quantity: Joi.number().integer().min(1).default(1)
+});
+
+export const updateShippingSchema = Joi.object({
+  firstName: Joi.string().required().max(50),
+  lastName: Joi.string().required().max(50),
+  email: Joi.string().email().required(),
+  phone: Joi.string().required().max(20),
+  address: Joi.object({
+    line1: Joi.string().required().max(100),
+    line2: Joi.string().max(100).optional(),
+    city: Joi.string().required().max(50),
+    state: Joi.string().required().max(50),
+    postalCode: Joi.string().required().max(20),
+    country: Joi.string().required().max(50)
+  }).required(),
+  method: Joi.string().valid('standard', 'express', 'overnight').default('standard')
+});
+
+export const updateBillingSchema = Joi.object({
+  firstName: Joi.string().required().max(50),
+  lastName: Joi.string().required().max(50),
+  email: Joi.string().email().required(),
+  address: Joi.object({
+    line1: Joi.string().required().max(100),
+    line2: Joi.string().max(100).optional(),
+    city: Joi.string().required().max(50),
+    state: Joi.string().required().max(50),
+    postalCode: Joi.string().required().max(20),
+    country: Joi.string().required().max(50)
+  }).required(),
+  sameAsShipping: Joi.boolean().default(true)
+});
+
+export const completeCheckoutSchema = Joi.object({
+  paymentIntentId: Joi.string().required()
+});

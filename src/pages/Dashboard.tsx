@@ -1,13 +1,46 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { apiService, type Design } from '../services/api';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [, setActiveSection] = useState('recent');
+  const [activeSection, setActiveSection] = useState('recent');
+  const [designs, setDesigns] = useState<Design[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userId] = useState('user-123'); // This should come from auth context
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const fetchDesigns = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.getUserDesigns(userId, 1, 20);
+        
+        if (response.success && response.data) {
+          setDesigns(response.data.designs);
+        } else {
+          throw new Error('Failed to fetch designs');
+        }
+      } catch (err) {
+        console.error('Error fetching designs:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch designs');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDesigns();
+  }, [userId]);
+
+  const handleDesignClick = (designId: string) => {
+    navigate(`/design/${designId}`);
+  };
 
   const navigationItems = {
     explore: [
@@ -27,36 +60,33 @@ export default function Dashboard() {
     ]
   };
 
-  const designCards = [
-    {
-      id: 1,
-      title: 'Cute Dinosaur',
-      category: '3D Toys',
-      image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkY2B0I4Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjE1IiBmaWxsPSIjRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjgiIGZpbGw9IiMzMzMiLz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIyMCIgcnk9IjEwIiBmaWxsPSIjRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI3NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRpbm88L3RleHQ+Cjwvc3ZnPgo=',
-      borderColor: 'border-pink-300'
-    },
-    {
-      id: 2,
-      title: 'Cute Dino bird',
-      category: '3D Toys',
-      image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjOERDQjk3Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjE1IiBmaWxsPSIjRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjgiIGZpbGw9IiMzMzMiLz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIyMCIgcnk9IjEwIiBmaWxsPSIjRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI3NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkJpcmQ8L3RleHQ+Cjwvc3ZnPgo=',
-      borderColor: 'border-gray-300'
-    },
-    {
-      id: 3,
-      title: 'Spiky Creature',
-      category: '3D Toys',
-      image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjQjA4NEVEIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjE1IiBmaWxsPSIjRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjgiIGZpbGw9IiMzMzMiLz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIyMCIgcnk9IjEwIiBmaWxsPSIjRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI3NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNwaWt5PC90ZXh0Pgo8L3N2Zz4K',
-      borderColor: 'border-purple-300'
-    },
-    {
-      id: 4,
-      title: 'Cool Sunglasses',
-      category: '3D Toys',
-      image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNDBFMEQwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjE1IiBmaWxsPSIjRkZGIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjgiIGZpbGw9IiMzMzMiLz4KPGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIyMCIgcnk9IjEwIiBmaWxsPSIjRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI3NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNvb2w8L3RleHQ+Cjwvc3ZnPgo=',
-      borderColor: 'border-teal-300'
+  // Helper function to get design image
+  const getDesignImage = (design: Design) => {
+    if (design.images && design.images.length > 0) {
+      return design.images[0].url;
     }
-  ];
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+';
+  };
+
+  // Helper function to get design title
+  const getDesignTitle = (design: Design) => {
+    return design.originalText || 'Untitled Design';
+  };
+
+  // Helper function to get design category
+  const getDesignCategory = (design: Design) => {
+    if (design.userSelections?.style) {
+      return `${design.userSelections.style} Design`;
+    }
+    return '3D Design';
+  };
+
+  // Helper function to get border color based on design
+  const getBorderColor = (design: Design) => {
+    const colors = ['border-pink-300', 'border-gray-300', 'border-purple-300', 'border-teal-300', 'border-blue-300', 'border-green-300'];
+    const hash = design.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    return colors[hash % colors.length];
+  };
 
   return (
     <div className="w-full h-screen bg-gray-50 overflow-hidden flex p-2 sm:p-4">
@@ -194,46 +224,121 @@ export default function Dashboard() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-4xl">
-            {designCards.map((card, index) => (
-              <div
-                key={card.id}
-                className={`bg-white border-2 ${card.borderColor} rounded-2xl p-3 sm:p-4 lg:p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 ${
-                  isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-                } relative group`}
-                style={{ transitionDelay: `${index * 150}ms` }}
-              >
-                <div className="flex justify-end mb-2 sm:mb-3 lg:mb-4">
-                  <button className="text-gray-300 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-all">
-                    <svg className="w-4 sm:w-5 lg:w-6 h-4 sm:h-5 lg:h-6" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                  </button>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading your designs...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
                 </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Error Loading Designs</h3>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          ) : designs.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">No Designs Yet</h3>
+                <p className="text-gray-600 mb-4">Start creating your first 3D design!</p>
+                <button 
+                  onClick={() => navigate('/design')}
+                  className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
+                >
+                  Create Design
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-4xl">
+              {designs.map((design, index) => (
+                <div
+                  key={design.id}
+                  onClick={() => handleDesignClick(design.id)}
+                  className={`bg-white border-2 ${getBorderColor(design)} rounded-2xl p-3 sm:p-4 lg:p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 ${
+                    isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+                  } relative group cursor-pointer`}
+                  style={{ transitionDelay: `${index * 150}ms` }}
+                >
+                  <div className="flex justify-end mb-2 sm:mb-3 lg:mb-4">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle menu click
+                      }}
+                      className="text-gray-300 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-all"
+                    >
+                      <svg className="w-4 sm:w-5 lg:w-6 h-4 sm:h-5 lg:h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                  </div>
 
-                <div className="flex justify-center mb-3 sm:mb-4 lg:mb-6">
-                  <div className="w-16 sm:w-20 lg:w-24 xl:w-32 h-16 sm:h-20 lg:h-24 xl:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <img
-                      src={card.image}
-                      alt={card.title}
-                      className="w-14 sm:w-16 lg:w-20 xl:w-24 h-14 sm:h-16 lg:h-20 xl:h-24 object-contain"
-                    />
+                  <div className="flex justify-center mb-3 sm:mb-4 lg:mb-6">
+                    <div className="w-16 sm:w-20 lg:w-24 xl:w-32 h-16 sm:h-20 lg:h-24 xl:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                      <img
+                        src={getDesignImage(design)}
+                        alt={getDesignTitle(design)}
+                        className="w-14 sm:w-16 lg:w-20 xl:w-24 h-14 sm:h-16 lg:h-20 xl:h-24 object-contain"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <h3 className="font-semibold text-black mb-1 sm:mb-2" 
+                        style={{ fontSize: 'clamp(14px, 2.5vw, 20px)' }}>
+                      {getDesignTitle(design)}
+                    </h3>
+                    <p className="text-gray-400 font-medium" 
+                       style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
+                      {getDesignCategory(design)}
+                    </p>
+                    <div className="mt-2 flex items-center justify-center space-x-4 text-xs text-gray-500">
+                      <span className="flex items-center">
+                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        {design.likes}
+                      </span>
+                      <span className="flex items-center">
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        {design.views}
+                      </span>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        design.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        design.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                        design.status === 'failed' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {design.status}
+                      </span>
+                    </div>
                   </div>
                 </div>
-
-                <div className="text-center">
-                  <h3 className="font-semibold text-black mb-1 sm:mb-2" 
-                      style={{ fontSize: 'clamp(14px, 2.5vw, 20px)' }}>
-                    {card.title}
-                  </h3>
-                  <p className="text-gray-400 font-medium" 
-                     style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
-                    {card.category}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
