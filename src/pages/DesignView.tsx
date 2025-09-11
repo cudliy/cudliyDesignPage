@@ -118,7 +118,53 @@ export default function DesignView() {
     );
   }
 
-  const modelUrl = design.modelFiles?.storedModelUrl || design.modelFiles?.modelFile;
+  // Enhanced model URL validation and fallback logic
+  const getValidModelUrl = () => {
+    const urls = [
+      design.modelFiles?.storedModelUrl,
+      design.modelFiles?.modelFile,
+      design.modelFiles?.gaussianPly
+    ].filter(Boolean);
+    
+    // Find the first valid URL
+    for (const url of urls) {
+      if (url && typeof url === 'string' && url.trim() !== '') {
+        // Basic URL validation
+        try {
+          new URL(url);
+          return url;
+        } catch {
+          // If it's not a full URL, check if it's a relative path or data URL
+          if (url.startsWith('/') || url.startsWith('./') || url.startsWith('data:')) {
+            return url;
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  const modelUrl = getValidModelUrl();
+  const [modelLoadError, setModelLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
+
+  const handleModelError = (error: string) => {
+    console.error('Model loading error:', error);
+    setModelLoadError(error);
+  };
+
+  const handleRetryModel = () => {
+    if (retryCount < maxRetries) {
+      setRetryCount(prev => prev + 1);
+      setModelLoadError(null);
+      // Force re-render of ModelViewer by updating a state
+      setLighting(prev => prev);
+    } else {
+      // If max retries reached, try regenerating the model
+      handleRegenerateModel();
+    }
+  };
 
   return (
     <div className="w-screen h-screen bg-gray-100 overflow-hidden flex p-4 gap-4">
@@ -275,30 +321,35 @@ export default function DesignView() {
       <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden">
         {/* 3D Model Area */}
         <div className="flex-1 flex items-center justify-center p-8 relative">
-          {modelUrl && (
+          {modelUrl && !modelLoadError ? (
             <div className="w-full h-full max-w-full max-h-full">
               <ModelViewer 
+                key={`${modelUrl}-${retryCount}`} // Force re-render on retry
                 modelUrl={modelUrl} 
                 className="w-full h-full"
                 lighting={lighting}
                 background={background}
                 size={size}
                 cameraAngle={cameraAngle}
+                onError={handleModelError}
               />
             </div>
-          )}
-          {!modelUrl && (
+          ) : (
             <div className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">3D Model Generation Failed</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {modelLoadError ? '3D Model Loading Failed' : '3D Model Generation Failed'}
+              </h3>
               <p className="text-gray-600 mb-4">
-                {design.status === 'completed' 
-                  ? 'The design process completed, but the 3D model could not be generated.'
-                  : 'The 3D model is still being processed.'}
+                {modelLoadError 
+                  ? modelLoadError
+                  : design.status === 'completed' 
+                    ? 'The design process completed, but the 3D model could not be generated.'
+                    : 'The 3D model is still being processed.'}
               </p>
               
               {design.images && design.images.length > 0 && (
@@ -312,20 +363,36 @@ export default function DesignView() {
                 </div>
               )}
               
-              <button 
-                onClick={handleRegenerateModel}
-                disabled={regenerating}
-                className="px-6 py-3 bg-[#E70D57] hover:bg-[#d10c50] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-full transition-colors flex items-center gap-2 mx-auto"
-              >
-                {regenerating && (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <div className="flex flex-col gap-3 items-center">
+                {modelLoadError && retryCount < maxRetries && (
+                  <button 
+                    onClick={handleRetryModel}
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Retry Loading ({retryCount}/{maxRetries})
+                  </button>
                 )}
-                {regenerating ? 'Generating 3D Model...' : 'Try to Generate 3D Model Again'}
-              </button>
+                
+                <button 
+                  onClick={handleRegenerateModel}
+                  disabled={regenerating}
+                  className="px-6 py-3 bg-[#E70D57] hover:bg-[#d10c50] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-full transition-colors flex items-center gap-2"
+                >
+                  {regenerating && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  )}
+                  {regenerating ? 'Generating 3D Model...' : 'Generate New 3D Model'}
+                </button>
+              </div>
               
               <div className="mt-4 text-xs text-gray-400 bg-gray-50 rounded-lg p-3">
                 <div><strong>Status:</strong> {design.status}</div>
-                <div><strong>Issue:</strong> Model generation returned null URLs</div>
+                <div><strong>Model URLs:</strong> {JSON.stringify(design.modelFiles, null, 2)}</div>
+                {modelLoadError && <div><strong>Error:</strong> {modelLoadError}</div>}
+                {retryCount > 0 && <div><strong>Retry Attempts:</strong> {retryCount}</div>}
               </div>
             </div>
           )}

@@ -9,6 +9,7 @@ interface ModelViewerProps {
   background?: number; // 0-100 -> controls environment lighting
   size?: number; // 0-100 -> controls field of view (zoom)
   cameraAngle?: number; // 0-100 -> controls camera orbit position
+  onError?: (error: string) => void; // Callback for error handling
 }
 
 export default function ModelViewer({ 
@@ -17,12 +18,14 @@ export default function ModelViewer({
   lighting = 50,
   background = 50,
   size = 50,
-  cameraAngle = 50
+  cameraAngle = 50,
+  onError
 }: ModelViewerProps) {
   const [loadingState, setLoadingState] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const modelViewerRef = useRef<any>(null);
   const modelElementRef = useRef<any>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     console.log('ModelViewer: modelUrl received:', modelUrl);
@@ -31,10 +34,27 @@ export default function ModelViewer({
       console.warn('ModelViewer: Missing model URL');
       setLoadingState('error');
       setErrorMessage('Missing model URL');
+      onError?.('Missing model URL');
       return;
     }
 
     setLoadingState('loading');
+    setErrorMessage('');
+
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Set a timeout for model loading (30 seconds)
+    timeoutRef.current = setTimeout(() => {
+      if (loadingState === 'loading') {
+        const timeoutError = 'Model loading timed out. Please try again.';
+        setLoadingState('error');
+        setErrorMessage(timeoutError);
+        onError?.(timeoutError);
+      }
+    }, 30000);
 
     const createModelViewer = () => {
       if (modelViewerRef.current && modelUrl) {
@@ -89,8 +109,12 @@ export default function ModelViewer({
       if (modelViewerRef.current) {
         modelViewerRef.current.innerHTML = '';
       }
+      // Clear timeout on cleanup
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, [modelUrl || '']); // Always provide a string to keep dependency array size constant
+  }, [modelUrl || '', onError]); // Always provide a string to keep dependency array size constant
 
   // Helper function to convert 0-100 values to appropriate ranges
   const updateControls = (modelViewer: any) => {
@@ -162,12 +186,24 @@ export default function ModelViewer({
   const handleLoad = () => {
     console.log('ModelViewer: Model loaded successfully');
     setLoadingState('loaded');
+    // Clear timeout on successful load
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
   };
 
   const handleError = (event: any) => {
     console.error('ModelViewer: Error loading model:', event);
+    const errorMsg = 'Failed to load 3D model. Please check the model file.';
     setLoadingState('error');
-    setErrorMessage('Failed to load 3D model. Please check the model file.');
+    setErrorMessage(errorMsg);
+    onError?.(errorMsg);
+    // Clear timeout on error
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
   };
 
   return (

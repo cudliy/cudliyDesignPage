@@ -36,9 +36,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:", "storage.googleapis.com"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"]
+      imgSrc: ["'self'", "data:", "https:", "storage.googleapis.com", "*.replicate.com", "*.amazonaws.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "https:", "wss:", "*.replicate.com", "*.amazonaws.com"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'", "https:", "data:"],
+      frameSrc: ["'none'"]
     }
   }
 }));
@@ -91,6 +95,23 @@ app.get('/api/health', (req, res) => {
     message: 'Backend is healthy',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
+  });
+});
+
+// 3D Model serving endpoint with proper headers
+app.get('/api/models/*', (req, res) => {
+  // Set headers for 3D model files
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year cache
+  res.setHeader('Content-Type', 'application/octet-stream');
+  
+  // For now, redirect to the actual model URL
+  // In production, you might want to proxy the file or serve it directly
+  res.status(404).json({
+    success: false,
+    error: 'Model serving endpoint not implemented yet'
   });
 });
 

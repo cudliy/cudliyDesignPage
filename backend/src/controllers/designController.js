@@ -123,8 +123,29 @@ export const generate3DModel = async (req, res, next) => {
     const modelFilename = `models/${Date.now()}-${uuidv4()}.obj`;
     let storedModelUrl = null;
     
+    // Validate and fix model URLs
+    const validateModelUrl = (url) => {
+      if (!url || typeof url !== 'string') return null;
+      
+      // If it's already a valid URL, return it
+      try {
+        new URL(url);
+        return url;
+      } catch {
+        // If it's a relative path or filename, make it absolute
+        if (url.startsWith('/') || url.startsWith('./')) {
+          return url;
+        }
+        // If it's just a filename, prepend a path
+        if (!url.includes('/')) {
+          return `/models/${url}`;
+        }
+        return url;
+      }
+    };
+    
     // Use the original model URL for now (file upload temporarily disabled)
-    storedModelUrl = modelResult.model_file;
+    storedModelUrl = validateModelUrl(modelResult.model_file);
 
     // Create design record
     const design = new Design({
@@ -142,10 +163,10 @@ export const generate3DModel = async (req, res, next) => {
       selectedImageIndex: 0,
       modelFiles: {
         originalImage: image_url,
-        modelFile: modelResult.model_file,
+        modelFile: validateModelUrl(modelResult.model_file),
         storedModelUrl,
-        gaussianPly: modelResult.gaussian_ply,
-        colorVideo: modelResult.color_video
+        gaussianPly: validateModelUrl(modelResult.gaussian_ply),
+        colorVideo: validateModelUrl(modelResult.color_video)
       },
       generationOptions: options,
       status: 'completed'
