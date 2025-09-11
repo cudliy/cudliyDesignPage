@@ -44,7 +44,6 @@ import { AppError } from '../utils/errorHandler.js';
 import { 
   verifyPaymentAuth, 
   requireActiveSubscription, 
-  checkUsageLimits,
   verifyPaymentOwnership 
 } from '../middleware/paymentAuth.js';
 
