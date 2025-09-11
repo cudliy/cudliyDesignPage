@@ -68,9 +68,6 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleOrderSuccess = (orderId: string) => {
-    navigate(`/order-success/${orderId}`);
-  };
 
   if (loading) {
     return (

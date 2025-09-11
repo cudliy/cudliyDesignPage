@@ -152,6 +152,7 @@ interface CheckoutRequest {
 interface CheckoutResponse {
   checkoutId: string;
   sessionId: string;
+  url?: string;
   pricing: {
     subtotal: number;
     tax: number;
