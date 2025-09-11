@@ -53,19 +53,32 @@ app.use(helmet({
 
 // CORS configuration - Dynamic origins based on environment
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS ? 
-    process.env.CORS_ORIGINS.split(',').map(origin => origin.trim()) :
-    [
-      'https://cudliy-design-page.vercel.app',
-      'https://www.cudliy-design-page.vercel.app',
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:4173'
-    ],
+  origin: function (origin, callback) {
+    const allowedOrigins = process.env.CORS_ORIGINS ? 
+      process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
+      [
+        'https://cudliy-design-page.vercel.app',
+        'https://www.cudliy-design-page.vercel.app',
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost:4173'
+      ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar']
 };
 app.use(cors(corsOptions));
 
@@ -79,6 +92,29 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Rate limiting
 app.use('/api/', generalLimiter);
+
+// Global CORS preflight handler
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = process.env.CORS_ORIGINS ? 
+    process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
+    [
+      'https://cudliy-design-page.vercel.app',
+      'https://www.cudliy-design-page.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:4173'
+    ];
+  
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  }
+  res.status(200).end();
+});
 
 // Set default values for missing environment variables
 if (!process.env.FRONTEND_URL) {

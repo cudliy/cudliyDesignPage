@@ -38,6 +38,15 @@ const validateRequest = (schema) => {
   };
 };
 
+// Handle CORS preflight requests
+router.options('/stripe', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
+
 // Checkout routes (temporarily without auth for development)
 router.post('/stripe',
   validateRequest(createCheckoutSchema),
