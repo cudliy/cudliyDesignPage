@@ -65,7 +65,7 @@ export const createStripeCheckout = async (req, res, next) => {
         userId,
         designId,
         sessionId: mockSessionId,
-        status: 'pending',
+        status: 'draft',
         items: [{
           designId: design.id,
           designTitle: design.originalText || 'Custom 3D Design',
@@ -197,7 +197,7 @@ export const createStripeCheckout = async (req, res, next) => {
       userId,
       designId,
       sessionId: session.id,
-      status: 'pending',
+      status: 'draft',
       items: [{
         designId: design.id,
         designTitle: design.originalText || 'Custom 3D Design',
