@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiService, type CheckoutResponse, type ShippingInfo, type BillingInfo, type PaymentIntentResponse } from '../services/api';
+import { apiService, type CheckoutResponse, type ShippingInfo, type BillingInfo } from '../services/api';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key');
 
-interface CheckoutPageProps {
-  designId: string;
-  userId: string;
-}
 
 function CheckoutForm({ checkoutData, onSuccess }: { checkoutData: CheckoutResponse; onSuccess: (orderId: string) => void }) {
   const stripe = useStripe();

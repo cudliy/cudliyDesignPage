@@ -5,7 +5,6 @@ import { apiService, type Design } from '../services/api';
 export default function Dashboard() {
   const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [activeSection, setActiveSection] = useState('recent');
   const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -159,7 +158,6 @@ export default function Dashboard() {
                       className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left ${
                         item.active ? 'bg-[#E91E63] text-white shadow-lg shadow-[#E91E63]/20' : ''
                       }`}
-                      onClick={() => setActiveSection(item.name.toLowerCase().replace(' ', ''))}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
                       <span className="font-medium text-xs sm:text-sm">{item.name}</span>

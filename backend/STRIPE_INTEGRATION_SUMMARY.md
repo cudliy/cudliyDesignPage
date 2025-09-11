@@ -33,7 +33,6 @@ I've successfully implemented a **comprehensive Stripe payment system** for your
 
 ### **Package Dependencies**
 - Added `stripe: ^14.12.0`
-- Added `stripe-webhook-signature: ^1.0.1`
 
 ### **Server Configuration**
 - Added payment and webhook routes

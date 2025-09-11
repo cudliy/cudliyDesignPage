@@ -11,7 +11,6 @@ export default function DesignView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
-  const [userId] = useState('user-123'); // This should come from auth context
   
   // Control states - matching the image positions
   const [lighting, setLighting] = useState(30);
