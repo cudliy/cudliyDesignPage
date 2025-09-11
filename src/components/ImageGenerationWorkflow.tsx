@@ -45,7 +45,17 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
       
       const request: GenerateImagesRequest = {
         text: finalPrompt, // Strategic Enhancement: Send enhanced prompt to backend
-        user_id: 'user_123', // TODO: Replace with actual user ID
+        user_id: (() => {
+          // Generate a unique user ID for this session
+          // In a real app, this would come from authentication context
+          const storedUserId = localStorage.getItem('guestUserId');
+          if (storedUserId) {
+            return storedUserId;
+          }
+          const newUserId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          localStorage.setItem('guestUserId', newUserId);
+          return newUserId;
+        })(),
         creation_id: newCreationId,
         color: '#FF6B6B',
         size: 'M',

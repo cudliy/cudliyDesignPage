@@ -497,7 +497,17 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [checkoutData, setCheckoutData] = useState<CheckoutResponse | null>(null);
-  const [userId] = useState('user-123'); // This should come from auth context
+  const [userId] = useState(() => {
+    // Generate a unique user ID for this session
+    // In a real app, this would come from authentication context
+    const storedUserId = localStorage.getItem('guestUserId');
+    if (storedUserId) {
+      return storedUserId;
+    }
+    const newUserId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('guestUserId', newUserId);
+    return newUserId;
+  });
 
   useEffect(() => {
     if (!designId) return;

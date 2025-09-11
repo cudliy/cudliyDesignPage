@@ -4,6 +4,7 @@ import { AppError } from '../utils/errorHandler.js';
 import Checkout from '../models/Checkout.js';
 import Order from '../models/Order.js';
 import Design from '../models/Design.js';
+import User from '../models/User.js';
 import stripeService from '../services/stripeService.js';
 
 // Create Stripe Checkout Session
@@ -61,7 +62,27 @@ export const createStripeCheckout = async (req, res, next) => {
       if (error.message.includes('Stripe is not configured')) {
         return next(new AppError('Payment service is not configured. Please contact support.', 503));
       }
-      throw error;
+      if (error.message.includes('User not found')) {
+        // Create a temporary user for guest checkout
+        logger.info(`Creating temporary user for checkout: ${userId}`);
+        const tempUser = new User({
+          id: userId,
+          email: `guest-${userId}@temp.com`,
+          username: `guest-${userId}`,
+          password: 'temp-password', // This will be hashed if needed
+          profile: {
+            firstName: 'Guest',
+            lastName: 'User'
+          }
+        });
+        await tempUser.save();
+        logger.info(`Temporary user created: ${userId}`);
+        
+        // Try to get customer again
+        customer = await stripeService.getCustomer(userId);
+      } else {
+        throw error;
+      }
     }
 
     // Create line items for Stripe Checkout
