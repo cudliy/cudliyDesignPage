@@ -97,6 +97,8 @@ export const updateShippingInfo = async (req, res, next) => {
   try {
     const { checkoutId } = req.params;
     const shippingInfo = req.body;
+    
+    logger.info('Update shipping info request:', { checkoutId, shippingInfo });
 
     const checkout = await Checkout.findOne({ id: checkoutId });
     if (!checkout) {

@@ -29,6 +29,7 @@ const validateRequest = (schema) => {
   return (req, res, next) => {
     const { error } = schema.validate(req.body);
     if (error) {
+      console.log('Validation error:', error.details);
       return next(new AppError(error.details[0].message, 400));
     }
     next();

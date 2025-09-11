@@ -397,38 +397,38 @@ class ApiService {
 
   // Checkout methods
   async createCheckout(request: CheckoutRequest): Promise<ApiResponse<CheckoutResponse>> {
-    return this.request('/checkout/checkout', {
+    return this.request('/checkout', {
       method: 'POST',
       body: JSON.stringify(request),
     });
   }
 
   async getCheckout(checkoutId: string): Promise<ApiResponse<CheckoutResponse>> {
-    return this.request(`/checkout/checkout/${checkoutId}`);
+    return this.request(`/checkout/${checkoutId}`);
   }
 
   async updateShippingInfo(checkoutId: string, shippingInfo: ShippingInfo): Promise<ApiResponse<CheckoutResponse>> {
-    return this.request(`/checkout/checkout/${checkoutId}/shipping`, {
+    return this.request(`/checkout/${checkoutId}/shipping`, {
       method: 'PATCH',
       body: JSON.stringify(shippingInfo),
     });
   }
 
   async updateBillingInfo(checkoutId: string, billingInfo: BillingInfo): Promise<ApiResponse<CheckoutResponse>> {
-    return this.request(`/checkout/checkout/${checkoutId}/billing`, {
+    return this.request(`/checkout/${checkoutId}/billing`, {
       method: 'PATCH',
       body: JSON.stringify(billingInfo),
     });
   }
 
   async createPaymentIntent(checkoutId: string): Promise<ApiResponse<PaymentIntentResponse>> {
-    return this.request(`/checkout/checkout/${checkoutId}/payment-intent`, {
+    return this.request(`/checkout/${checkoutId}/payment-intent`, {
       method: 'POST',
     });
   }
 
   async completeCheckout(checkoutId: string, paymentIntentId: string): Promise<ApiResponse<{ orderId: string; orderNumber: string; status: string; total: number; estimatedDelivery: string }>> {
-    return this.request(`/checkout/checkout/${checkoutId}/complete`, {
+    return this.request(`/checkout/${checkoutId}/complete`, {
       method: 'POST',
       body: JSON.stringify({ paymentIntentId }),
     });
