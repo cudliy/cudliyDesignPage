@@ -44,6 +44,7 @@ import { AppError } from '../utils/errorHandler.js';
 import { 
   verifyPaymentAuth, 
   requireActiveSubscription, 
+  validateUsageLimits,
   verifyPaymentOwnership 
 } from '../middleware/paymentAuth.js';
 
@@ -110,7 +111,7 @@ router.get('/users/:userId/payments', verifyPaymentAuth, getPaymentHistory);
 router.post('/refunds', verifyPaymentAuth, verifyPaymentOwnership, createRefund);
 router.post('/users/:userId/usage/track',
   verifyPaymentAuth,
-  checkUsageLimits,
+  validateUsageLimits,
   validateRequest(trackUsageSchema),
   trackUsage
 );

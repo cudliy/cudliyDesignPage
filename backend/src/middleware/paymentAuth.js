@@ -93,7 +93,7 @@ export const requireActiveSubscription = async (req, res, next) => {
 };
 
 // Check usage limits before processing
-export const checkUsageLimits = async (req, res, next) => {
+export const validateUsageLimits = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const { type } = req.body; // 'image' or 'model'
