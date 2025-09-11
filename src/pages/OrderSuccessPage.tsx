@@ -13,7 +13,6 @@ export default function OrderSuccessPage() {
     // Check for session_id in URL params (from Stripe redirect)
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
-    const isMock = urlParams.get('mock') === 'true';
     
     if (sessionId) {
       // Handle Stripe checkout success (or mock checkout)

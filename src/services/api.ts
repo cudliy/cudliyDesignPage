@@ -167,6 +167,8 @@ interface CheckoutResponse {
     unitPrice: number;
     totalPrice: number;
   }>;
+  mock?: boolean;
+  message?: string;
 }
 
 interface ShippingInfo {
