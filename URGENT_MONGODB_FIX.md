@@ -10,12 +10,12 @@ Your MongoDB URI is incomplete and the old code is still deployed. You need to:
 
 **Current (WRONG):**
 ```
-MONGODB_URI=mongodb+srv://Cudliy:Cudliy123%23@cudliy.gjp016l.mongodb.net/
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
 ```
 
 **Correct (FIXED):**
 ```
-MONGODB_URI=mongodb+srv://Cudliy:Cudliy123%23@cudliy.gjp016l.mongodb.net/cudliy?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/cudliy?retryWrites=true&w=majority
 ```
 
 ## Steps to Fix:
@@ -26,7 +26,7 @@ MONGODB_URI=mongodb+srv://Cudliy:Cudliy123%23@cudliy.gjp016l.mongodb.net/cudliy?
 - Click "Environment" tab
 - Find `MONGODB_URI` and update it to:
   ```
-  mongodb+srv://Cudliy:Cudliy123%23@cudliy.gjp016l.mongodb.net/cudliy?retryWrites=true&w=majority
+  mongodb+srv://username:password@cluster.mongodb.net/cudliy?retryWrites=true&w=majority
   ```
 
 ### 2. Add Missing Environment Variables

@@ -521,7 +521,9 @@ export default function CheckoutPage() {
           throw new Error('Failed to create checkout');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to create checkout');
+        console.error('Checkout creation error:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to create checkout';
+        setError(`Checkout Error: ${errorMessage}`);
       } finally {
         setLoading(false);
       }

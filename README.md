@@ -119,7 +119,7 @@ cudliy-design-platform/
    ```env
    NODE_ENV=development
    PORT=3001
-   MONGODB_URI=mongodb://localhost:27017/cudliy
+   MONGODB_URI=mongodb://localhost:27017/database
    GOOGLE_CLOUD_PROJECT_ID=your-project-id
    GOOGLE_CLOUD_BUCKET_NAME=your-bucket-name
    GOOGLE_CLOUD_KEY_FILE=path/to/service-account.json

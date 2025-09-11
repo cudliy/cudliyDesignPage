@@ -300,7 +300,10 @@ class ApiService {
       return data;
     } catch (error) {
       console.error('API request failed:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(`API Error: ${error.message}`);
+      }
+      throw new Error('API request failed');
     }
   }
 

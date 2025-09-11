@@ -8,7 +8,7 @@ Go to your Render dashboard and add these environment variables:
 
 **Required Variables:**
 ```
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/cudliy?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
 STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key_here
 STRIPE_PUBLISHABLE_KEY=pk_live_your_stripe_publishable_key_here
 FRONTEND_URL=https://cudliy-design-page.vercel.app

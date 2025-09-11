@@ -53,7 +53,16 @@ export const createStripeCheckout = async (req, res, next) => {
     const total = subtotal + tax + shipping;
 
     // Get or create customer
-    const customer = await stripeService.getCustomer(userId);
+    let customer;
+    try {
+      customer = await stripeService.getCustomer(userId);
+    } catch (error) {
+      logger.error('Customer creation failed:', error);
+      if (error.message.includes('Stripe is not configured')) {
+        return next(new AppError('Payment service is not configured. Please contact support.', 503));
+      }
+      throw error;
+    }
 
     // Create line items for Stripe Checkout
     const lineItems = [
@@ -95,17 +104,26 @@ export const createStripeCheckout = async (req, res, next) => {
 
     // Create Stripe Checkout Session
     const frontendUrl = process.env.FRONTEND_URL || 'https://cudliy-design-page.vercel.app';
-    const session = await stripeService.createCheckoutSession(
-      lineItems,
-      customer.id,
-      `${frontendUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-      `${frontendUrl}/checkout/${designId}?cancelled=true`,
-      {
-        userId,
-        designId,
-        quantity: quantity.toString()
+    let session;
+    try {
+      session = await stripeService.createCheckoutSession(
+        lineItems,
+        customer.id,
+        `${frontendUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`,
+        `${frontendUrl}/checkout/${designId}?cancelled=true`,
+        {
+          userId,
+          designId,
+          quantity: quantity.toString()
+        }
+      );
+    } catch (error) {
+      logger.error('Stripe checkout session creation failed:', error);
+      if (error.message.includes('Stripe is not configured')) {
+        return next(new AppError('Payment service is not configured. Please contact support.', 503));
       }
-    );
+      throw error;
+    }
 
     // Save checkout session to database
     const checkout = new Checkout({

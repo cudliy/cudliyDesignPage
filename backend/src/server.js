@@ -122,6 +122,32 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Debug endpoint for checkout testing
+app.post('/api/debug/checkout', (req, res) => {
+  try {
+    const { userId, designId, quantity } = req.body;
+    
+    res.json({
+      success: true,
+      message: 'Debug checkout endpoint working',
+      data: {
+        userId,
+        designId,
+        quantity,
+        stripeConfigured: !!process.env.STRIPE_SECRET_KEY,
+        frontendUrl: process.env.FRONTEND_URL,
+        environment: process.env.NODE_ENV
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: 'Debug checkout failed'
+    });
+  }
+});
+
 // 3D Model serving endpoint with proper headers
 app.get('/api/models/*', (req, res) => {
   // Set headers for 3D model files
