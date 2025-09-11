@@ -396,6 +396,13 @@ class ApiService {
   }
 
   // Checkout methods
+  async createStripeCheckout(request: CheckoutRequest): Promise<ApiResponse<CheckoutResponse & { url: string }>> {
+    return this.request('/checkout/stripe', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
   async createCheckout(request: CheckoutRequest): Promise<ApiResponse<CheckoutResponse>> {
     return this.request('/checkout', {
       method: 'POST',

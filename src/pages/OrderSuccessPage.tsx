@@ -10,6 +10,73 @@ export default function OrderSuccessPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check for session_id in URL params (from Stripe redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    if (sessionId) {
+      // Handle Stripe checkout success
+      setLoading(false);
+      setOrder({
+        id: 'temp-order',
+        userId: 'user-123',
+        designId: 'temp-design',
+        orderNumber: `ORD-${Date.now()}`,
+        status: 'paid',
+        items: [],
+        pricing: {
+          subtotal: 0,
+          tax: 0,
+          shipping: 0,
+          discount: 0,
+          total: 0,
+          currency: 'USD'
+        },
+        shipping: {
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          address: {
+            line1: '',
+            line2: '',
+            city: '',
+            state: '',
+            postalCode: '',
+            country: ''
+          },
+          method: 'standard'
+        },
+        billing: {
+          firstName: '',
+          lastName: '',
+          email: '',
+          address: {
+            line1: '',
+            line2: '',
+            city: '',
+            state: '',
+            postalCode: '',
+            country: ''
+          },
+          sameAsShipping: true
+        },
+        payment: {
+          method: 'card',
+          status: 'paid',
+          transactionId: sessionId,
+          paidAt: new Date().toISOString()
+        },
+        production: {
+          status: 'queued',
+          estimatedCompletion: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      return;
+    }
+
     if (!orderId) return;
 
     const fetchOrder = async () => {

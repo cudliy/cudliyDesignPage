@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  createStripeCheckout,
   createCheckout,
   updateShippingInfo,
   updateBillingInfo,
@@ -7,7 +8,8 @@ import {
   completeCheckout,
   getCheckout,
   getUserOrders,
-  getOrder
+  getOrder,
+  handleCheckoutSessionCompleted
 } from '../controllers/checkoutController.js';
 import { paymentLimiter } from '../utils/rateLimiter.js';
 import { 
@@ -37,6 +39,11 @@ const validateRequest = (schema) => {
 };
 
 // Checkout routes (temporarily without auth for development)
+router.post('/stripe',
+  validateRequest(createCheckoutSchema),
+  createStripeCheckout
+);
+
 router.post('/',
   validateRequest(createCheckoutSchema),
   createCheckout

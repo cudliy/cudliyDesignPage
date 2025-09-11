@@ -505,7 +505,7 @@ export default function CheckoutPage() {
     const createCheckout = async () => {
       try {
         setLoading(true);
-        const response = await apiService.createCheckout({
+        const response = await apiService.createStripeCheckout({
           userId,
           designId,
           quantity: 1
@@ -513,6 +513,10 @@ export default function CheckoutPage() {
 
         if (response.success && response.data) {
           setCheckoutData(response.data);
+          // Redirect to Stripe Checkout
+          if (response.data.url) {
+            window.location.href = response.data.url;
+          }
         } else {
           throw new Error('Failed to create checkout');
         }

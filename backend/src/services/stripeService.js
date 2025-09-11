@@ -161,6 +161,44 @@ class StripeService {
     }
   }
 
+  // Checkout Sessions
+  async createCheckoutSession(lineItems, customerId, successUrl, cancelUrl, metadata = {}) {
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata,
+        shipping_address_collection: {
+          allowed_countries: ['US', 'CA', 'GB', 'AU']
+        },
+        billing_address_collection: 'required',
+        customer_update: {
+          address: 'auto',
+          name: 'auto'
+        }
+      });
+
+      return session;
+    } catch (error) {
+      logger.error('Create Checkout Session Error:', error);
+      throw error;
+    }
+  }
+
+  async getCheckoutSession(sessionId) {
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+      return session;
+    } catch (error) {
+      logger.error('Get Checkout Session Error:', error);
+      throw error;
+    }
+  }
+
   // Payment Intents
   async createPaymentIntent(amount, currency, customerId, metadata = {}) {
     try {
@@ -391,6 +429,9 @@ class StripeService {
       logger.info(`Webhook received: ${event.type}`);
 
       switch (event.type) {
+        case 'checkout.session.completed':
+          await this.handleCheckoutSessionCompleted(event.data.object);
+          break;
         case 'payment_intent.succeeded':
           await this.handlePaymentSucceeded(event.data.object);
           break;
@@ -424,6 +465,17 @@ class StripeService {
   }
 
   // Webhook Handlers
+  async handleCheckoutSessionCompleted(session) {
+    try {
+      // Import the handler function dynamically to avoid circular imports
+      const { handleCheckoutSessionCompleted } = await import('../controllers/checkoutController.js');
+      await handleCheckoutSessionCompleted(session);
+      logger.info(`Checkout session completed: ${session.id}`);
+    } catch (error) {
+      logger.error('Handle Checkout Session Completed Error:', error);
+    }
+  }
+
   async handlePaymentSucceeded(paymentIntent) {
     try {
       await Payment.findOneAndUpdate(
