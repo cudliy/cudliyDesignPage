@@ -37,28 +37,28 @@ const validateRequest = (schema) => {
 };
 
 // Checkout routes (temporarily without auth for development)
-router.post('/checkout',
+router.post('/',
   validateRequest(createCheckoutSchema),
   createCheckout
 );
 
-router.get('/checkout/:checkoutId', getCheckout);
+router.get('/:checkoutId', getCheckout);
 
-router.patch('/checkout/:checkoutId/shipping',
+router.patch('/:checkoutId/shipping',
   validateRequest(updateShippingSchema),
   updateShippingInfo
 );
 
-router.patch('/checkout/:checkoutId/billing',
+router.patch('/:checkoutId/billing',
   validateRequest(updateBillingSchema),
   updateBillingInfo
 );
 
-router.post('/checkout/:checkoutId/payment-intent',
+router.post('/:checkoutId/payment-intent',
   createPaymentIntent
 );
 
-router.post('/checkout/:checkoutId/complete',
+router.post('/:checkoutId/complete',
   validateRequest(completeCheckoutSchema),
   completeCheckout
 );

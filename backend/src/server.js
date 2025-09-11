@@ -85,18 +85,9 @@ app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     status: 'healthy',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    environment: process.env.NODE_ENV
-  });
-});
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    success: true,
     message: 'Backend is healthy',
     timestamp: new Date().toISOString(),
+    version: '1.0.0',
     environment: process.env.NODE_ENV
   });
 });
