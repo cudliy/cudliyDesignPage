@@ -8,33 +8,53 @@ export default function Dashboard() {
   const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userId] = useState('user-123'); // This should come from auth context
+  const [refreshing, setRefreshing] = useState(false);
+  const [userId] = useState(() => {
+    // Get user ID from session storage (same as used in 3D generation)
+    return sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    const fetchDesigns = async () => {
-      try {
+  const fetchDesigns = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
-        const response = await apiService.getUserDesigns(userId, 1, 20);
-        
-        if (response.success && response.data) {
-          setDesigns(response.data.designs);
-        } else {
-          throw new Error('Failed to fetch designs');
-        }
-      } catch (err) {
-        console.error('Error fetching designs:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch designs');
-      } finally {
-        setLoading(false);
       }
-    };
+      
+      const response = await apiService.getUserDesigns(userId, 1, 20);
+      
+      if (response.success && response.data) {
+        setDesigns(response.data.designs);
+        setError(null);
+      } else {
+        throw new Error('Failed to fetch designs');
+      }
+    } catch (err) {
+      console.error('Error fetching designs:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch designs');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDesigns();
+  }, [userId]);
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDesigns(true);
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [userId]);
 
   const handleDesignClick = (designId: string) => {
@@ -214,12 +234,41 @@ export default function Dashboard() {
             Recent
           </h2>
 
-          <div className="mb-6 sm:mb-8 lg:mb-10">
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full max-w-md sm:max-w-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#E91E63] focus:border-transparent bg-white shadow-sm text-sm sm:text-base lg:text-lg"
-            />
+          <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Search"
+                className="w-full max-w-md sm:max-w-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#E91E63] focus:border-transparent bg-white shadow-sm text-sm sm:text-base lg:text-lg"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => fetchDesigns(true)}
+                disabled={refreshing}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+              >
+                {refreshing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                  </>
+                )}
+              </button>
+              <button 
+                onClick={() => navigate('/design')}
+                className="px-6 py-2 bg-[#E70D57] text-white rounded-lg font-medium hover:bg-[#d10c50] transition-colors text-sm"
+              >
+                New Design
+              </button>
+            </div>
           </div>
 
           {loading ? (

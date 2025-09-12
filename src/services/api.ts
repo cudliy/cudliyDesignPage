@@ -377,7 +377,7 @@ class ApiService {
       ...(style && { style }),
     });
 
-    return this.request(`/designs/user/${userId}?${params}`);
+    return this.request(`/designs/user/${userId}/designs?${params}`);
   }
 
   // Get session status

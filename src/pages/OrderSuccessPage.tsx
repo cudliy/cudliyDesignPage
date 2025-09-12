@@ -17,28 +17,39 @@ export default function OrderSuccessPage() {
     if (sessionId) {
       // Handle Stripe checkout success (or mock checkout)
       setLoading(false);
+      
+      // Get user ID from session storage or generate one
+      const userId = sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
       setOrder({
-        id: 'temp-order',
-        userId: 'user-123',
-        designId: 'temp-design',
+        id: `order_${Date.now()}`,
+        userId: userId,
+        designId: urlParams.get('design_id') || 'temp-design',
         orderNumber: `ORD-${Date.now()}`,
         status: 'paid',
-        items: [],
+        items: [{
+          designId: urlParams.get('design_id') || 'temp-design',
+          designTitle: 'Custom 3D Design',
+          designImage: urlParams.get('design_image') || 'https://via.placeholder.com/512x512/4F46E5/FFFFFF?text=3D+Design',
+          quantity: 1,
+          unitPrice: 24.00,
+          totalPrice: 24.00
+        }],
         pricing: {
-          subtotal: 0,
-          tax: 0,
-          shipping: 0,
+          subtotal: 24.00,
+          tax: 1.92,
+          shipping: 5.99,
           discount: 0,
-          total: 0,
+          total: 31.91,
           currency: 'USD'
         },
         shipping: {
-          firstName: '',
-          lastName: '',
-          email: '',
+          firstName: 'Guest',
+          lastName: 'User',
+          email: `guest-${userId}@temp.com`,
           phone: '',
           address: {
-            line1: '',
+            line1: 'Address will be collected during checkout',
             line2: '',
             city: '',
             state: '',
@@ -48,11 +59,11 @@ export default function OrderSuccessPage() {
           method: 'standard'
         },
         billing: {
-          firstName: '',
-          lastName: '',
-          email: '',
+          firstName: 'Guest',
+          lastName: 'User',
+          email: `guest-${userId}@temp.com`,
           address: {
-            line1: '',
+            line1: 'Address will be collected during checkout',
             line2: '',
             city: '',
             state: '',

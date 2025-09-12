@@ -48,12 +48,12 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
         user_id: (() => {
           // Generate a unique user ID for this session
           // In a real app, this would come from authentication context
-          const storedUserId = localStorage.getItem('guestUserId');
+          const storedUserId = sessionStorage.getItem('guest_user_id');
           if (storedUserId) {
             return storedUserId;
           }
-          const newUserId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-          localStorage.setItem('guestUserId', newUserId);
+          const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          sessionStorage.setItem('guest_user_id', newUserId);
           return newUserId;
         })(),
         creation_id: newCreationId,
