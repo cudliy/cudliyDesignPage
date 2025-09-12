@@ -27,17 +27,36 @@ export default function Dashboard() {
         setLoading(true);
       }
       
-      const response = await apiService.getUserDesigns(userId, 1, 20);
+      console.log('Dashboard: Fetching designs for user:', userId);
+      
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000);
+      });
+      
+      const apiPromise = apiService.getUserDesigns(userId, 1, 20);
+      const response = await Promise.race([apiPromise, timeoutPromise]) as any;
+      
+      console.log('Dashboard: API response:', response);
       
       if (response.success && response.data) {
         setDesigns(response.data.designs);
         setError(null);
+        console.log('Dashboard: Designs loaded:', response.data.designs);
       } else {
-        throw new Error('Failed to fetch designs');
+        throw new Error(response.error || 'Failed to fetch designs');
       }
     } catch (err) {
-      console.error('Error fetching designs:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch designs');
+      console.error('Dashboard: Error fetching designs:', err);
+      
+      // If it's a network error or backend is not available, show empty state instead of error
+      if (err instanceof Error && (err.message.includes('timeout') || err.message.includes('Failed to fetch') || err.message.includes('Network'))) {
+        console.log('Dashboard: Backend not available, showing empty state');
+        setDesigns([]);
+        setError(null);
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to fetch designs');
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -229,10 +248,21 @@ export default function Dashboard() {
 
         {/* Content - Scrollable */}
         <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
-          <h2 className="font-['Georgia'] font-normal text-black mb-4 sm:mb-6 lg:mb-8" 
-              style={{ fontSize: 'clamp(28px, 5vw, 48px)' }}>
-            Recent
-          </h2>
+          <div className="flex items-center justify-between mb-4 sm:mb-6 lg:mb-8">
+            <h2 className="font-['Georgia'] font-normal text-black" 
+                style={{ fontSize: 'clamp(28px, 5vw, 48px)' }}>
+              Recent
+            </h2>
+            {/* Debug info - remove in production */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
+                <div>User ID: {userId}</div>
+                <div>Loading: {loading ? 'Yes' : 'No'}</div>
+                <div>Error: {error || 'None'}</div>
+                <div>Designs: {designs.length}</div>
+              </div>
+            )}
+          </div>
 
           <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="flex-1">
@@ -306,12 +336,20 @@ export default function Dashboard() {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">No Designs Yet</h3>
                 <p className="text-gray-600 mb-4">Start creating your first 3D design!</p>
-                <button 
-                  onClick={() => navigate('/design')}
-                  className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
-                >
-                  Create Design
-                </button>
+                <div className="flex gap-2 justify-center">
+                  <button 
+                    onClick={() => navigate('/design')}
+                    className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
+                  >
+                    Create Design
+                  </button>
+                  <button 
+                    onClick={() => fetchDesigns(true)}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-full transition-colors"
+                  >
+                    Refresh
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
