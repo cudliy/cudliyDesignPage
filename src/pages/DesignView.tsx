@@ -107,9 +107,15 @@ export default function DesignView() {
 
       console.log('Regenerating 3D model from image:', selectedImage);
       
+      // Use existing user ID or generate a new one for guest users
+      const userId = design.userId || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      if (!sessionStorage.getItem('guest_user_id') && !design.userId) {
+        sessionStorage.setItem('guest_user_id', userId);
+      }
+      
       const response = await apiService.generate3DModel({
         image_url: selectedImage,
-        user_id: design.userId,
+        user_id: userId,
         creation_id: design.creationId,
         session_id: design.sessionId,
         options: design.generationOptions || {}

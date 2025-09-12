@@ -96,10 +96,16 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
     try {
       const selectedImage = generatedImages[selectedImageIndex];
       
+      // Generate a unique user ID for this session if not already set
+      const userId = sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      if (!sessionStorage.getItem('guest_user_id')) {
+        sessionStorage.setItem('guest_user_id', userId);
+      }
+      
       const request: Generate3DModelRequest = {
         image_url: selectedImage.url,
         session_id: sessionId,
-        user_id: 'user_123', // TODO: Replace with actual user ID
+        user_id: userId,
         creation_id: creationId,
         options: {
           texture_size: 2048,
