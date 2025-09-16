@@ -8,7 +8,7 @@ export const generateImagesSchema = Joi.object({
   material: Joi.string(),
   production: Joi.string().valid('handmade', 'digital'),
   details: Joi.array().items(Joi.string()),
-  user_id: Joi.string().required(),
+  //user_id: Joi.string().required(),
   creation_id: Joi.string().required(),
   customWidth: Joi.when('size', {
     is: 'custom',
@@ -25,7 +25,7 @@ export const generateImagesSchema = Joi.object({
 export const generate3DSchema = Joi.object({
   image_url: Joi.string().uri().required(),
   session_id: Joi.string(),
-  user_id: Joi.string().required(),
+  //user_id: Joi.string().required(),
   creation_id: Joi.string().required(),
   options: Joi.object({
     seed: Joi.number().integer(),

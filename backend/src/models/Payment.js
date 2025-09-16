@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 const paymentSchema = new mongoose.Schema({
   id: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
     default: () => uuidv4()
   },

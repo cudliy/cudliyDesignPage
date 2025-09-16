@@ -29,6 +29,8 @@ export default function ModelViewer({
 
   useEffect(() => {
     console.log('ModelViewer: modelUrl received:', modelUrl);
+    console.log('ModelViewer: modelUrl type:', typeof modelUrl);
+    console.log('ModelViewer: modelUrl length:', modelUrl?.length);
     
     if (!modelUrl) {
       console.warn('ModelViewer: Missing model URL');
@@ -60,12 +62,18 @@ export default function ModelViewer({
     }, 30000);
 
     const createModelViewer = () => {
+      console.log('ModelViewer: createModelViewer called');
+      console.log('ModelViewer: modelViewerRef.current:', modelViewerRef.current);
+      console.log('ModelViewer: modelUrl:', modelUrl);
+      
       if (modelViewerRef.current && modelUrl) {
+        console.log('ModelViewer: Creating model-viewer element');
         // Clear existing content
         modelViewerRef.current.innerHTML = '';
         
         // Create model-viewer element
         const modelViewer = document.createElement('model-viewer');
+        console.log('ModelViewer: Setting src attribute to:', modelUrl);
         modelViewer.setAttribute('src', modelUrl);
         modelViewer.setAttribute('alt', '3D Model');
         modelViewer.setAttribute('camera-controls', '');
@@ -198,6 +206,12 @@ export default function ModelViewer({
 
   const handleError = (event: any) => {
     console.error('ModelViewer: Error loading model:', event);
+    console.error('ModelViewer: Error details:', {
+      type: event.type,
+      target: event.target,
+      currentSrc: event.target?.src,
+      error: event.detail
+    });
     const errorMsg = 'Failed to load 3D model. Please check the model file.';
     setLoadingState('error');
     setErrorMessage(errorMsg);

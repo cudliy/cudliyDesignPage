@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import DesignPage from './pages/DesignPage'
+// @ts-ignore
 import DesignView from './pages/DesignView'
 import Dashboard from './pages/Dashboard'
 import CheckoutPage from './pages/CheckoutPage'

@@ -11,6 +11,8 @@ import stripeService from '../services/stripeService.js';
 export const createStripeCheckout = async (req, res, next) => {
   try {
     const { userId, designId, quantity = 1 } = req.body;
+    
+    logger.info(`Creating checkout for userId: ${userId}, designId: ${designId}, quantity: ${quantity}`);
 
     // Get design details or create a placeholder if not found
     let design = await Design.findOne({ id: designId });
@@ -54,8 +56,8 @@ export const createStripeCheckout = async (req, res, next) => {
     const total = subtotal + tax + shipping;
 
     // TEMPORARY: Skip Stripe for testing - create mock checkout session
-    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('sk_test_51H1234')) {
-      logger.warn('Using mock Stripe checkout for testing');
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('sk_test_51H1234') || process.env.STRIPE_SECRET_KEY === 'your-stripe-secret-key-here') {
+      logger.warn('Using mock Stripe checkout for testing - Stripe not properly configured');
       
       // Create mock checkout session
       const mockSessionId = `cs_test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -102,33 +104,56 @@ export const createStripeCheckout = async (req, res, next) => {
     // Get or create customer
     let customer;
     try {
+      // First, ensure the user exists in the database
+      let user = await User.findOne({ id: userId });
+      if (!user) {
+        logger.info(`Creating temporary user for checkout: ${userId}`);
+        try {
+          user = new User({
+            id: userId,
+            email: `guest-${userId}@temp.com`,
+            username: `guest-${userId}`,
+            password: 'temp-password',
+            profile: {
+              firstName: 'Guest',
+              lastName: 'User'
+            },
+            subscription: {
+              type: 'free'
+            },
+            usage: {
+              imagesGenerated: 0,
+              modelsGenerated: 0,
+              lastUsed: new Date()
+            }
+          });
+          await user.save();
+          logger.info(`Temporary user created: ${userId}`);
+        } catch (userError) {
+          // Handle duplicate key error specifically
+          if (userError.code === 11000) {
+            logger.warn(`User ${userId} already exists, continuing with existing user`);
+            // Try to find the existing user
+            user = await User.findOne({ id: userId });
+            if (!user) {
+              throw new Error('User creation failed and user not found');
+            }
+          } else {
+            throw userError;
+          }
+        }
+      } else {
+        logger.info(`User already exists: ${userId}`);
+      }
+
+      // Now try to get the customer
       customer = await stripeService.getCustomer(userId);
     } catch (error) {
       logger.error('Customer creation failed:', error);
       if (error.message.includes('Stripe is not configured')) {
         return next(new AppError('Payment service is not configured. Please contact support.', 503));
       }
-      if (error.message.includes('User not found')) {
-        // Create a temporary user for guest checkout
-        logger.info(`Creating temporary user for checkout: ${userId}`);
-        const tempUser = new User({
-          id: userId,
-          email: `guest-${userId}@temp.com`,
-          username: `guest-${userId}`,
-          password: 'temp-password', // This will be hashed if needed
-          profile: {
-            firstName: 'Guest',
-            lastName: 'User'
-          }
-        });
-        await tempUser.save();
-        logger.info(`Temporary user created: ${userId}`);
-        
-        // Try to get customer again
-        customer = await stripeService.getCustomer(userId);
-      } else {
-        throw error;
-      }
+      throw error;
     }
 
     // Create line items for Stripe Checkout

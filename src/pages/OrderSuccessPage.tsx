@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiService, type Order } from '../services/api';
+import { apiService } from '../services/api';
+import type { Order } from '../types/order';
 
 export default function OrderSuccessPage() {
-  const { orderId } = useParams<{ orderId: string }>();
+  const { orderId } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [, setSlant3DOrder] = useState<any>(null);
+  const [, setShippingInfo] = useState<any>(null);
 
   useEffect(() => {
     // Check for session_id in URL params (from Stripe redirect)
@@ -21,10 +24,40 @@ export default function OrderSuccessPage() {
       // Get user ID from session storage or generate one
       const userId = sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
+      // Load Slant3D order information
+      const storedSlant3DOrder = sessionStorage.getItem('slant3d_order_id');
+      const storedShippingInfo = sessionStorage.getItem('shipping_info');
+      const storedPricing = sessionStorage.getItem('slant3d_pricing');
+      
+      if (storedSlant3DOrder) {
+        setSlant3DOrder({ order_id: storedSlant3DOrder } as any);
+      }
+      
+      if (storedShippingInfo) {
+        setShippingInfo(JSON.parse(storedShippingInfo));
+      }
+      
+      // Parse pricing information
+      let pricing = {
+        subtotal: 24.00,
+        tax: 1.92,
+        shipping: 5.99,
+        discount: 0,
+        total: 31.91,
+        currency: 'USD'
+      };
+      
+      if (storedPricing) {
+        const slant3DPricing = JSON.parse(storedPricing);
+        pricing = slant3DPricing.pricing;
+      }
+      
       setOrder({
         id: `order_${Date.now()}`,
         userId: userId,
         designId: urlParams.get('design_id') || 'temp-design',
+        stripeSessionId: sessionId || '',
+        stripePaymentIntentId: '',
         orderNumber: `ORD-${Date.now()}`,
         status: 'paid',
         items: [{
@@ -32,18 +65,25 @@ export default function OrderSuccessPage() {
           designTitle: 'Custom 3D Design',
           designImage: urlParams.get('design_image') || 'https://via.placeholder.com/512x512/4F46E5/FFFFFF?text=3D+Design',
           quantity: 1,
-          unitPrice: 24.00,
-          totalPrice: 24.00
+          unitPrice: pricing.subtotal,
+          totalPrice: pricing.subtotal
         }],
-        pricing: {
-          subtotal: 24.00,
-          tax: 1.92,
-          shipping: 5.99,
-          discount: 0,
-          total: 31.91,
-          currency: 'USD'
-        },
-        shipping: {
+        pricing: pricing,
+        shipping: storedShippingInfo ? {
+          firstName: JSON.parse(storedShippingInfo).firstName || 'Guest',
+          lastName: JSON.parse(storedShippingInfo).lastName || 'User',
+          email: JSON.parse(storedShippingInfo).email || `guest-${userId}@temp.com`,
+          phone: JSON.parse(storedShippingInfo).phone || '',
+          address: {
+            line1: JSON.parse(storedShippingInfo).address1 || 'Address will be collected during checkout',
+            line2: JSON.parse(storedShippingInfo).address2 || '',
+            city: JSON.parse(storedShippingInfo).city || '',
+            state: JSON.parse(storedShippingInfo).state || '',
+            postalCode: JSON.parse(storedShippingInfo).zip || '',
+            country: JSON.parse(storedShippingInfo).country || 'US'
+          },
+          method: 'standard'
+        } : {
           firstName: 'Guest',
           lastName: 'User',
           email: `guest-${userId}@temp.com`,
@@ -54,7 +94,7 @@ export default function OrderSuccessPage() {
             city: '',
             state: '',
             postalCode: '',
-            country: ''
+            country: 'US'
           },
           method: 'standard'
         },
@@ -75,15 +115,11 @@ export default function OrderSuccessPage() {
         payment: {
           method: 'card',
           status: 'paid',
-          transactionId: sessionId,
-          paidAt: new Date().toISOString()
+          transactionId: sessionId || '',
+          paidAt: new Date()
         },
-        production: {
-          status: 'queued',
-          estimatedCompletion: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
       return;
     }
@@ -96,7 +132,7 @@ export default function OrderSuccessPage() {
         const response = await apiService.getOrder(orderId);
         
         if (response.success && response.data) {
-          setOrder(response.data);
+          setOrder(response.data as unknown as Order);
         } else {
           throw new Error('Failed to fetch order details');
         }

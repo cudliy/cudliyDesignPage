@@ -1,13 +1,47 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { apiService, type CheckoutResponse } from '../services/api';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { apiService } from '../services/api';
+// @ts-ignore
+import { slant3DService } from '../services/slant3dService';
+import type { CheckoutData } from '../types/checkout';
+import type { Slant3DPricing } from '../types/slant3d';
 
 export default function CheckoutPage() {
-  const { designId } = useParams<{ designId: string }>();
+  const { designId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [checkoutData, setCheckoutData] = useState<CheckoutResponse | null>(null);
+  const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
+  const [slant3DPricing, setSlant3DPricing] = useState<Slant3DPricing | null>(null);
+  const [modelUrl, setModelUrl] = useState<string | null>(null);
+  const [orderProcessing, setOrderProcessing] = useState(false);
+  
+  // Shipping form state
+  const [shippingInfo, setShippingInfo] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  }>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: 'US'
+  });
+
   const [userId] = useState(() => {
     // Generate a unique user ID for this session
     // In a real app, this would come from authentication context
@@ -15,7 +49,8 @@ export default function CheckoutPage() {
     if (storedUserId) {
       return storedUserId;
     }
-    const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Use a more unique ID to prevent collisions
+    const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${Math.random().toString(36).substr(2, 5)}`;
     sessionStorage.setItem('guest_user_id', newUserId);
     return newUserId;
   });
@@ -23,9 +58,27 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!designId) return;
 
-    const createCheckout = async () => {
+    const initializeCheckout = async () => {
       try {
         setLoading(true);
+        
+        // Load Slant3D pricing from session storage or location state
+        const storedPricing = sessionStorage.getItem('slant3d_pricing');
+        const storedModelUrl = sessionStorage.getItem('slant3d_model_url');
+        
+        if (storedPricing) {
+          setSlant3DPricing(JSON.parse(storedPricing));
+        } else if (location.state?.slant3DPricing) {
+          setSlant3DPricing(location.state.slant3DPricing);
+        }
+        
+        if (storedModelUrl) {
+          setModelUrl(storedModelUrl);
+        } else if (location.state?.modelUrl) {
+          setModelUrl(location.state.modelUrl);
+        }
+
+        // Create checkout session (for payment processing)
         const response = await apiService.createStripeCheckout({
           userId,
           designId,
@@ -33,38 +86,108 @@ export default function CheckoutPage() {
         });
 
         if (response.success && response.data) {
-          setCheckoutData(response.data);
-          // Don't redirect immediately - show the checkout form first
+          setCheckoutData(response.data as unknown as CheckoutData);
         } else {
           throw new Error('Failed to create checkout');
         }
       } catch (err) {
-        console.error('Checkout creation error:', err);
-        const errorMessage = err instanceof Error ? err.message : 'Failed to create checkout';
+        console.error('Checkout initialization error:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to initialize checkout';
         setError(`Checkout Error: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
     };
 
-    createCheckout();
-  }, [designId, userId]);
+    initializeCheckout();
+  }, [designId, userId, location.state]);
 
-  const handleProceedToPayment = () => {
-    if (!checkoutData) return;
+  const handleShippingChange = (field: keyof typeof shippingInfo, value: string) => {
+    setShippingInfo(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
-    // Check if this is a mock checkout
-    if (checkoutData.mock) {
-      console.log('Mock checkout detected:', checkoutData.message);
-      // For mock checkout, just redirect to success page
-      if (checkoutData.url) {
-        window.location.href = checkoutData.url;
+  const validateShippingInfo = () => {
+    const required: (keyof typeof shippingInfo)[] = ['firstName', 'lastName', 'email', 'address1', 'city', 'state', 'zip'];
+    return required.every(field => shippingInfo[field].trim() !== '');
+  };
+
+  const processSlant3DOrder = async () => {
+    if (!slant3DPricing || !modelUrl) {
+      throw new Error('Missing pricing or model data');
+    }
+
+    try {
+      // Upload model to Slant3D
+      const uploadResult = await slant3DService.uploadModel(modelUrl, {
+        material: slant3DPricing.material,
+        quantity: slant3DPricing.quantity
+      });
+
+      // Create order with Slant3D
+      const orderResult = await slant3DService.createOrder({
+        modelId: uploadResult.model_id,
+        quantity: slant3DPricing.quantity,
+        material: slant3DPricing.material,
+        shipping: {
+          name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+          company: '',
+          address1: shippingInfo.address1,
+          address2: shippingInfo.address2,
+          city: shippingInfo.city,
+          state: shippingInfo.state,
+          zip: shippingInfo.zip,
+          country: shippingInfo.country,
+          phone: shippingInfo.phone
+        },
+        payment_method: 'card'
+      });
+
+      return orderResult;
+    } catch (error) {
+      console.error('Slant3D order processing error:', error);
+      throw error;
+    }
+  };
+
+  const handleProceedToPayment = async () => {
+    if (!checkoutData || !slant3DPricing) return;
+
+    // Validate shipping information
+    if (!validateShippingInfo()) {
+      setError('Please fill in all required shipping fields');
+      return;
+    }
+
+    try {
+      setOrderProcessing(true);
+      setError(null);
+
+      // Process order with Slant3D
+      const slant3DOrder = await processSlant3DOrder();
+      
+      // Store order information
+      sessionStorage.setItem('slant3d_order_id', slant3DOrder.order_id);
+      sessionStorage.setItem('shipping_info', JSON.stringify(shippingInfo));
+
+      // Check if this is a mock checkout
+      if (checkoutData.mock) {
+        console.log('Mock checkout detected:', checkoutData.message);
+        // For mock checkout, redirect to success page
+        navigate(`/order-success?session_id=mock_${Date.now()}&order_id=${slant3DOrder.order_id}`);
+      } else {
+        // Redirect to Stripe Checkout
+        if (checkoutData.url) {
+          window.location.href = checkoutData.url;
+        }
       }
-    } else {
-      // Redirect to Stripe Checkout
-      if (checkoutData.url) {
-        window.location.href = checkoutData.url;
-      }
+    } catch (err) {
+      console.error('Order processing error:', err);
+      setError(`Order processing failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setOrderProcessing(false);
     }
   };
 
@@ -143,32 +266,73 @@ export default function CheckoutPage() {
 
               {/* Pricing Breakdown */}
               <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Sub Total</span>
-                  <span className="font-medium">${checkoutData.pricing.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax (10%)</span>
-                  <span className="font-medium">${checkoutData.pricing.tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">${checkoutData.pricing.shipping.toFixed(2)}</span>
-                </div>
-                <div className="border-t pt-3">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span>${checkoutData.pricing.total.toFixed(2)}</span>
-                  </div>
-                </div>
+                {slant3DPricing ? (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Sub Total</span>
+                      <span className="font-medium">${slant3DPricing.pricing.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tax</span>
+                      <span className="font-medium">${slant3DPricing.pricing.tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="font-medium">${slant3DPricing.pricing.shipping.toFixed(2)}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                      <div>Material: {slant3DPricing.material}</div>
+                      <div>Est. Delivery: {slant3DPricing.estimated_days} days</div>
+                    </div>
+                    <div className="border-t pt-3">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total</span>
+                        <span>${slant3DPricing.pricing.total.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Sub Total</span>
+                      <span className="font-medium">${checkoutData.pricing.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tax (10%)</span>
+                      <span className="font-medium">${checkoutData.pricing.tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="font-medium">${checkoutData.pricing.shipping.toFixed(2)}</span>
+                    </div>
+                    <div className="border-t pt-3">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total</span>
+                        <span>${checkoutData.pricing.total.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Confirm Button */}
               <button
                 onClick={handleProceedToPayment}
-                className="w-full mt-6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-4 px-6 rounded-lg transition-colors duration-200"
+                disabled={orderProcessing || !slant3DPricing}
+                className={`w-full mt-6 font-semibold py-4 px-6 rounded-lg transition-colors duration-200 ${
+                  orderProcessing || !slant3DPricing
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-[#E70D57] hover:bg-[#d10c50] text-white'
+                }`}
               >
-                {checkoutData.mock ? 'Complete Test Order' : 'Confirm and Print Toy'}
+                {orderProcessing ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Processing Order...
+                  </div>
+                ) : (
+                  checkoutData.mock ? 'Complete Test Order' : 'Confirm and Print Toy'
+                )}
               </button>
             </div>
           </div>
@@ -233,7 +397,10 @@ export default function CheckoutPage() {
               <input
                 type="email"
                 placeholder="Email address"
+                value={shippingInfo.email}
+                onChange={(e) => handleShippingChange('email', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                required
               />
             </div>
 
@@ -247,24 +414,54 @@ export default function CheckoutPage() {
                   <div>
                     <input
                       type="text"
-                      placeholder="First Name"
+                      placeholder="First Name *"
+                      value={shippingInfo.firstName}
+                      onChange={(e) => handleShippingChange('firstName', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                      required
                     />
                   </div>
                   <div>
                     <input
                       type="text"
-                      placeholder="Last Name"
+                      placeholder="Last Name *"
+                      value={shippingInfo.lastName}
+                      onChange={(e) => handleShippingChange('lastName', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                      required
                     />
                   </div>
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={shippingInfo.phone}
+                    onChange={(e) => handleShippingChange('phone', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                  />
                 </div>
 
                 {/* Address */}
                 <div>
                   <input
                     type="text"
-                    placeholder="Address"
+                    placeholder="Address Line 1 *"
+                    value={shippingInfo.address1}
+                    onChange={(e) => handleShippingChange('address1', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Address Line 2 (Optional)"
+                    value={shippingInfo.address2}
+                    onChange={(e) => handleShippingChange('address2', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
                   />
                 </div>
@@ -272,30 +469,48 @@ export default function CheckoutPage() {
                 {/* Location Fields */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent">
-                      <option>Country/region</option>
-                      <option>United States</option>
-                      <option>Canada</option>
-                      <option>United Kingdom</option>
-                      <option>Australia</option>
-                    </select>
-                  </div>
-                  <div>
-                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent">
-                      <option>State</option>
-                      <option>California</option>
-                      <option>New York</option>
-                      <option>Texas</option>
-                      <option>Florida</option>
+                    <select 
+                      value={shippingInfo.country}
+                      onChange={(e) => handleShippingChange('country', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                    >
+                      <option value="US">United States</option>
+                      <option value="CA">Canada</option>
+                      <option value="GB">United Kingdom</option>
+                      <option value="AU">Australia</option>
                     </select>
                   </div>
                   <div>
                     <input
                       type="text"
-                      placeholder="Zip Code"
+                      placeholder="State/Province *"
+                      value={shippingInfo.state}
+                      onChange={(e) => handleShippingChange('state', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                      required
                     />
                   </div>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="ZIP/Postal Code *"
+                      value={shippingInfo.zip}
+                      onChange={(e) => handleShippingChange('zip', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    placeholder="City *"
+                    value={shippingInfo.city}
+                    onChange={(e) => handleShippingChange('city', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E70D57] focus:border-transparent"
+                    required
+                  />
                 </div>
 
                 {/* Save Information Checkbox */}

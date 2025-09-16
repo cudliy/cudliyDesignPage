@@ -8,8 +8,7 @@ import {
   deleteDesign, 
   updateDesign 
 } from '../controllers/designController.js';
-import { imageLimiter, modelLimiter } from '../utils/rateLimiter.js';
-import { generateImagesSchema, generate3DSchema } from '../utils/validation.js';
+// Rate limiting and validation removed for guest access
 import { AppError } from '../utils/errorHandler.js';
 
 const router = express.Router();
@@ -42,18 +41,9 @@ const validateRequest = (schema) => {
   };
 };
 
-// Design routes
-router.post('/generate-images', 
-  imageLimiter,
-  validateRequest(generateImagesSchema),
-  generateImages
-);
-
-router.post('/generate-3d-model',
-  modelLimiter,
-  validateRequest(generate3DSchema),
-  generate3DModel
-);
+// Design routes - No authentication or rate limiting for guest access
+router.post('/generate-images', generateImages);
+router.post('/generate-3d-model', generate3DModel);
 
 router.get('/:designId', getDesign);
 router.get('/user/:userId/designs', getUserDesigns);

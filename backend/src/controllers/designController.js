@@ -9,7 +9,7 @@ import Subscription from '../models/Subscription.js';
 import aiService from '../services/aiService.js';
 import storageService from '../services/storageService.js';
 
-// Generate Images Route (Main workflow endpoint)
+// Generate Images Route (Main workflow endpoint) - No authentication required
 export const generateImages = async (req, res, next) => {
   try {
     const { 
@@ -26,43 +26,14 @@ export const generateImages = async (req, res, next) => {
       customHeight
     } = req.body;
 
-    logger.info(`Starting image generation for user: ${user_id}`);
+    logger.info(`Starting image generation for guest user: ${user_id || 'anonymous'}`);
 
-    // Check usage limits
-    const user = await User.findOne({ id: user_id });
-    if (!user) {
-      return next(new AppError('User not found', 404));
-    }
+    // No user authentication or usage limits for guest access
+    // All users can generate images without restrictions
 
-    // Check if user has reached their limits
-    const subscription = await Subscription.findOne({ 
-      userId: user_id, 
-      status: { $in: ['active', 'trialing'] } 
-    });
-
-    let limits = { imagesPerMonth: 3, modelsPerMonth: 1 }; // Free tier
-    if (subscription) {
-      limits = subscription.plan.limits;
-    }
-
-    // Check image generation limit
-    if (limits.imagesPerMonth !== -1 && user.usage.imagesGenerated >= limits.imagesPerMonth) {
-      return res.status(402).json({
-        success: false,
-        error: 'Usage limit exceeded',
-        data: {
-          limit: limits.imagesPerMonth,
-          used: user.usage.imagesGenerated,
-          type: 'image',
-          upgradeRequired: true,
-          message: 'You have reached your monthly image generation limit. Please upgrade to continue.'
-        }
-      });
-    }
-
-    // Create session
+    // Create session for guest user (no authentication required)
     const session = new Session({
-      userId: user_id,
+      userId: user_id || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       creationId: creation_id,
       originalText: text,
       userSelections: { 
@@ -97,16 +68,7 @@ export const generateImages = async (req, res, next) => {
     session.currentStep = 'image_selection';
     await session.save();
 
-    // Update user usage
-    user.usage.imagesGenerated += 1;
-    user.usage.lastUsed = new Date();
-    await user.save();
-
-    // Update subscription usage if applicable
-    if (subscription) {
-      subscription.usage.imagesGenerated += 1;
-      await subscription.save();
-    }
+    // No usage tracking for guest users - unlimited access
 
     logger.info(`Images generated successfully for session: ${session.id}`);
 
@@ -116,13 +78,9 @@ export const generateImages = async (req, res, next) => {
         session_id: session.id,
         images: imageResults,
         creation_id,
-        user_id,
+        user_id: user_id || session.userId,
         prompt: enhancedPrompt,
-        usage: {
-          imagesGenerated: user.usage.imagesGenerated,
-          modelsGenerated: user.usage.modelsGenerated,
-          limits
-        },
+        // No usage tracking for guest users
         message: 'AI images generated successfully'
       }
     });
@@ -133,7 +91,7 @@ export const generateImages = async (req, res, next) => {
   }
 };
 
-// Generate 3D Model Route (Second workflow endpoint)
+// Generate 3D Model Route (Second workflow endpoint) - No authentication required
 export const generate3DModel = async (req, res, next) => {
   try {
     const { 
@@ -144,80 +102,11 @@ export const generate3DModel = async (req, res, next) => {
       options = {}
     } = req.body;
 
-    logger.info(`Starting 3D model generation for session: ${session_id}`);
+    logger.info(`Starting 3D model generation for guest user: ${user_id || 'anonymous'}`);
 
-    // Generate a temporary user_id if not provided or if user doesn't exist
-    let actualUserId = user_id;
-    let user = null;
-    let limits = { imagesPerMonth: 3, modelsPerMonth: 1 }; // Free tier for guest users
-
-    if (user_id) {
-      user = await User.findOne({ id: user_id });
-      if (user) {
-        // Check if user has reached their limits
-        const subscription = await Subscription.findOne({ 
-          userId: user_id, 
-          status: { $in: ['active', 'trialing'] } 
-        });
-
-        if (subscription) {
-          limits = subscription.plan.limits;
-        }
-
-        // Check model generation limit for existing users
-        if (limits.modelsPerMonth !== -1 && user.usage.modelsGenerated >= limits.modelsPerMonth) {
-          return res.status(402).json({
-            success: false,
-            error: 'Usage limit exceeded',
-            data: {
-              limit: limits.modelsPerMonth,
-              used: user.usage.modelsGenerated,
-              type: 'model',
-              upgradeRequired: true,
-              message: 'You have reached your monthly model generation limit. Please upgrade to continue.'
-            }
-          });
-        }
-      }
-    }
-
-    // If no user_id provided or user doesn't exist, create a temporary guest user
-    if (!user) {
-      actualUserId = user_id || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      logger.info(`Creating temporary guest user for 3D generation: ${actualUserId}`);
-      
-      // Create a temporary user record for tracking
-      user = new User({
-        id: actualUserId,
-        email: `guest-${actualUserId}@temp.com`,
-        username: `guest-${actualUserId}`,
-        password: 'temp-password', // This will be hashed if needed
-        profile: {
-          firstName: 'Guest',
-          lastName: 'User'
-        },
-        subscription: {
-          type: 'free'
-        },
-        usage: {
-          imagesGenerated: 0,
-          modelsGenerated: 0,
-          lastUsed: new Date()
-        }
-      });
-      
-      try {
-        await user.save();
-        logger.info(`Temporary user created: ${actualUserId}`);
-      } catch (error) {
-        // If user already exists, just fetch it
-        if (error.code === 11000) {
-          user = await User.findOne({ id: actualUserId });
-        } else {
-          throw error;
-        }
-      }
-    }
+    // No authentication or usage limits for guest access
+    // All users can generate 3D models without restrictions
+    const actualUserId = user_id || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     // Get session data
     const session = session_id ? await Session.findOne({ id: session_id }) : null;
@@ -303,20 +192,7 @@ export const generate3DModel = async (req, res, next) => {
       await session.save();
     }
 
-    // Update user usage
-    user.usage.modelsGenerated += 1;
-    user.usage.lastUsed = new Date();
-    await user.save();
-
-    // Update subscription usage if applicable (only for existing users with subscriptions)
-    const subscription = await Subscription.findOne({ 
-      userId: actualUserId, 
-      status: { $in: ['active', 'trialing'] } 
-    });
-    if (subscription) {
-      subscription.usage.modelsGenerated += 1;
-      await subscription.save();
-    }
+    // No usage tracking for guest users - unlimited access
 
     logger.info(`3D model generated successfully. Design ID: ${design.id}`);
 
@@ -330,14 +206,9 @@ export const generate3DModel = async (req, res, next) => {
         gaussian_ply: modelResult.gaussian_ply,
         color_video: modelResult.color_video,
         creation_id: creation_id || session?.creationId || design.creationId,
-        user_id: actualUserId,
-        usage: {
-          imagesGenerated: user.usage.imagesGenerated,
-          modelsGenerated: user.usage.modelsGenerated,
-          limits
-        },
-        message: '3D model generated successfully'
-      }
+        user_id: actualUserId
+      },
+      message: '3D model generated successfully'
     });
 
   } catch (error) {

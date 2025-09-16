@@ -69,10 +69,18 @@ class StripeService {
           throw new Error('User not found');
         }
         
+        // Ensure user has required fields for customer creation
+        const email = user.email || `guest-${userId}@temp.com`;
+        const name = user.profile?.firstName 
+          ? `${user.profile.firstName} ${user.profile.lastName || ''}`.trim()
+          : user.username || `Guest User ${userId}`;
+        
+        logger.info(`Creating Stripe customer for user ${userId}: ${email}, ${name}`);
+        
         const customer = await this.createCustomer(
           userId, 
-          user.email, 
-          user.profile?.firstName ? `${user.profile.firstName} ${user.profile.lastName}` : user.username
+          email, 
+          name
         );
         return customer;
       }
@@ -82,6 +90,11 @@ class StripeService {
       return customer;
     } catch (error) {
       logger.error('Get Customer Error:', error);
+      logger.error('Error details:', {
+        userId,
+        error: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }

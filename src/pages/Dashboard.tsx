@@ -254,7 +254,7 @@ export default function Dashboard() {
               Recent
             </h2>
             {/* Debug info - remove in production */}
-            {process.env.NODE_ENV === 'development' && (
+            {import.meta.env.DEV && (
               <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
                 <div>User ID: {userId}</div>
                 <div>Loading: {loading ? 'Yes' : 'No'}</div>
