@@ -5,6 +5,47 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 class Slant3DService {
+  // Upload model to Slant3D using backend proxy
+  async uploadModel(modelUrl, options = {}) {
+    try {
+      console.log('Uploading model to Slant3D:', modelUrl);
+      console.log('Using backend proxy:', API_BASE_URL);
+
+      // Call backend proxy to upload model
+      const response = await fetch(`${API_BASE_URL}/slant3d/upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          modelUrl,
+          options
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Model upload failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Model upload failed');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Slant3D model upload error:', error);
+      
+      // Provide more specific error messages
+      if (error.message.includes('Failed to fetch')) {
+        throw new Error('Backend server is not accessible. Please check if the backend is running.');
+      } else {
+        throw new Error(`Slant3D upload error: ${error.message}`);
+      }
+    }
+  }
+
   // Get pricing for a model using the backend proxy
   async getPricing(modelUrl, options = {}) {
     try {

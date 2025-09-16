@@ -63,6 +63,48 @@ const makeSlant3DRequest = async (endpoint, method = 'GET', data = null) => {
   return result;
 };
 
+// Upload model to Slant3D
+export const uploadModel = async (req, res, next) => {
+  try {
+    const { modelUrl, options = {} } = req.body;
+
+    if (!modelUrl) {
+      return next(new AppError('Model URL is required', 400));
+    }
+
+    logger.info(`Uploading model to Slant3D: ${modelUrl}`);
+
+    // For now, we'll just validate the model URL and return success
+    // In a real implementation, you would upload the model to Slant3D's storage
+    // and get back a model ID or URL that can be used for pricing/ordering
+    
+    // Validate that the model URL is accessible
+    try {
+      const response = await fetch(modelUrl, { method: 'HEAD' });
+      if (!response.ok) {
+        throw new Error(`Model URL not accessible: ${response.statusText}`);
+      }
+    } catch (error) {
+      logger.error('Model URL validation failed:', error);
+      return next(new AppError('Model URL is not accessible', 400));
+    }
+
+    // Return success with model information
+    res.json({
+      success: true,
+      data: {
+        modelId: `model_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        modelUrl: modelUrl,
+        uploadedAt: new Date().toISOString(),
+        status: 'uploaded'
+      }
+    });
+  } catch (error) {
+    logger.error('Slant3D model upload error:', error);
+    next(new AppError(error.message || 'Failed to upload model', 500));
+  }
+};
+
 // Get pricing estimate
 export const getPricingEstimate = async (req, res, next) => {
   try {

@@ -25,6 +25,7 @@ export interface Slant3DOrder {
 }
 
 export interface Slant3DService {
+  uploadModel(modelUrl: string, options?: any): Promise<{ success: boolean; data: any }>;
   getPricing(modelUrl: string, options?: any): Promise<{ success: boolean; data: Slant3DPricing }>;
   createOrder(modelUrl: string, options?: any, customerData?: any): Promise<{ success: boolean; data: Slant3DOrder }>;
   getShippingEstimate(modelUrl: string, options?: any, customerData?: any): Promise<{ success: boolean; data: any }>;

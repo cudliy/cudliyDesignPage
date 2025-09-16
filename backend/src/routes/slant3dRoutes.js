@@ -5,10 +5,14 @@ import {
   getShippingEstimate,
   getOrderTracking,
   getAllOrders,
-  cancelOrder
+  cancelOrder,
+  uploadModel
 } from '../controllers/slant3dController.js';
 
 const router = express.Router();
+
+// Upload model
+router.post('/upload', uploadModel);
 
 // Get pricing estimate
 router.post('/pricing/estimate', getPricingEstimate);
