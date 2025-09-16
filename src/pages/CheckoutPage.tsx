@@ -131,24 +131,27 @@ export default function CheckoutPage() {
         quantity: slant3DPricing.quantity
       });
 
+      console.log('Upload result:', uploadResult);
+
       // Create order with Slant3D
-      const orderResult = await slant3DService.createOrder({
-        modelId: uploadResult.model_id,
-        quantity: slant3DPricing.quantity,
-        material: slant3DPricing.material,
-        shipping: {
+      const orderResult = await slant3DService.createOrder(
+        modelUrl, // Use the original model URL
+        {
+          quantity: slant3DPricing.quantity,
+          material: slant3DPricing.material
+        },
+        {
           name: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
-          company: '',
-          address1: shippingInfo.address1,
+          email: shippingInfo.email,
+          phone: shippingInfo.phone,
+          address: shippingInfo.address1,
           address2: shippingInfo.address2,
           city: shippingInfo.city,
           state: shippingInfo.state,
           zip: shippingInfo.zip,
-          country: shippingInfo.country,
-          phone: shippingInfo.phone
-        },
-        payment_method: 'card'
-      });
+          country: shippingInfo.country
+        }
+      );
 
       return orderResult;
     } catch (error) {

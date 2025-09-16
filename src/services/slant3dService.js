@@ -137,6 +137,8 @@ class Slant3DService {
   async createOrder(modelUrl, options = {}, customerData = {}) {
     try {
       console.log('Creating Slant3D order for:', modelUrl);
+      console.log('Order options:', options);
+      console.log('Customer data:', customerData);
 
       const response = await fetch(`${API_BASE_URL}/slant3d/order`, {
         method: 'POST',
@@ -151,10 +153,13 @@ class Slant3DService {
       });
 
       if (!response.ok) {
-        throw new Error(`Order creation failed: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Order creation response error:', errorText);
+        throw new Error(`Order creation failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const result = await response.json();
+      console.log('Order creation result:', result);
       
       if (!result.success) {
         throw new Error(result.message || 'Order creation failed');

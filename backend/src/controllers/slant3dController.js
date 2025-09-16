@@ -233,6 +233,11 @@ export const createOrder = async (req, res, next) => {
   try {
     const { modelUrl, options = {}, customerData = {} } = req.body;
 
+    logger.info('Create order request body:', req.body);
+    logger.info('Model URL:', modelUrl);
+    logger.info('Options:', options);
+    logger.info('Customer Data:', customerData);
+
     if (!modelUrl) {
       return next(new AppError('Model URL is required', 400));
     }
@@ -283,6 +288,11 @@ export const createOrder = async (req, res, next) => {
     });
   } catch (error) {
     logger.error('Slant3D order creation error:', error);
+    logger.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      requestBody: req.body
+    });
     next(new AppError(error.message || 'Failed to create order', 500));
   }
 };
