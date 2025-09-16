@@ -147,7 +147,7 @@ export const getPricingEstimate = async (req, res, next) => {
       if (contentLength) {
         const fileSizeBytes = parseInt(contentLength);
         const fileSizeMB = fileSizeBytes / (1024 * 1024);
-        const maxSizeMB = 20; // Increased limit to 20MB for testing
+        const maxSizeMB = 4.1; // Slant3D's actual limit is ~4.15MB (4,348,596 bytes)
         
         logger.info(`Model file size for pricing: ${fileSizeMB.toFixed(2)}MB`);
         
@@ -287,7 +287,7 @@ export const createOrder = async (req, res, next) => {
       if (contentLength) {
         const fileSizeBytes = parseInt(contentLength);
         const fileSizeMB = fileSizeBytes / (1024 * 1024);
-        const maxSizeMB = 20; // Increased limit to 20MB for testing
+        const maxSizeMB = 4.1; // Slant3D's actual limit is ~4.15MB (4,348,596 bytes)
         
         logger.info(`Model file size: ${fileSizeMB.toFixed(2)}MB`);
         

@@ -95,15 +95,15 @@ class AIService {
   async generate3DModel(imageUrl, options = {}) {
     const defaultOptions = {
       seed: 0,
-      texture_size: 512, // Further reduced from 1024 to 512 for much smaller file size
-      mesh_simplify: 0.5, // More aggressive simplification from 0.7 to 0.5
+      texture_size: 256, // Very aggressive reduction to 256px for minimal file size
+      mesh_simplify: 0.3, // Very aggressive simplification for smallest possible file
       generate_color: true,
       generate_model: true,
       randomize_seed: true,
       generate_normal: false,
       save_gaussian_ply: false, // Disabled to reduce file size
-      ss_sampling_steps: 20, // Further reduced from 25 to 20
-      slat_sampling_steps: 6, // Further reduced from 8 to 6
+      ss_sampling_steps: 15, // Very low sampling for minimal file size
+      slat_sampling_steps: 4, // Very low sampling for minimal file size
       return_no_background: false,
       ss_guidance_strength: 7.5,
       slat_guidance_strength: 3,
