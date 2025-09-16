@@ -139,6 +139,31 @@ export const getPricingEstimate = async (req, res, next) => {
       return next(new AppError('Model URL is required', 400));
     }
 
+    // Check file size before sending to Slant3D
+    try {
+      const response = await fetch(modelUrl, { method: 'HEAD' });
+      const contentLength = response.headers.get('content-length');
+      
+      if (contentLength) {
+        const fileSizeBytes = parseInt(contentLength);
+        const fileSizeMB = fileSizeBytes / (1024 * 1024);
+        const maxSizeMB = 4.0; // Slant3D limit is around 4.3MB, we'll use 4MB as safe limit
+        
+        logger.info(`Model file size for pricing: ${fileSizeMB.toFixed(2)}MB`);
+        
+        if (fileSizeMB > maxSizeMB) {
+          logger.error(`Model file too large for pricing: ${fileSizeMB.toFixed(2)}MB (max: ${maxSizeMB}MB)`);
+          return next(new AppError(
+            `Model file is too large (${fileSizeMB.toFixed(2)}MB). Maximum allowed size is ${maxSizeMB}MB. Please try regenerating the model with lower quality settings.`, 
+            413
+          ));
+        }
+      }
+    } catch (sizeCheckError) {
+      logger.warn('Could not check file size for pricing:', sizeCheckError.message);
+      // Continue without size check if we can't determine the size
+    }
+
     // Create order data for pricing estimate
     const orderData = {
       email: 'pricing@estimate.com',
@@ -252,6 +277,31 @@ export const createOrder = async (req, res, next) => {
 
     if (!modelUrl) {
       return next(new AppError('Model URL is required', 400));
+    }
+
+    // Check file size before sending to Slant3D
+    try {
+      const response = await fetch(modelUrl, { method: 'HEAD' });
+      const contentLength = response.headers.get('content-length');
+      
+      if (contentLength) {
+        const fileSizeBytes = parseInt(contentLength);
+        const fileSizeMB = fileSizeBytes / (1024 * 1024);
+        const maxSizeMB = 4.0; // Slant3D limit is around 4.3MB, we'll use 4MB as safe limit
+        
+        logger.info(`Model file size: ${fileSizeMB.toFixed(2)}MB`);
+        
+        if (fileSizeMB > maxSizeMB) {
+          logger.error(`Model file too large: ${fileSizeMB.toFixed(2)}MB (max: ${maxSizeMB}MB)`);
+          return next(new AppError(
+            `Model file is too large (${fileSizeMB.toFixed(2)}MB). Maximum allowed size is ${maxSizeMB}MB. Please try regenerating the model with lower quality settings.`, 
+            413
+          ));
+        }
+      }
+    } catch (sizeCheckError) {
+      logger.warn('Could not check file size:', sizeCheckError.message);
+      // Continue without size check if we can't determine the size
     }
 
     // Create order data
