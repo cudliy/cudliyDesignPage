@@ -327,8 +327,17 @@ export default function DesignView() {
       if (slant3DPricing) {
         sessionStorage.setItem('slant3d_pricing', JSON.stringify(slant3DPricing));
         sessionStorage.setItem('slant3d_model_url', finalModelUrl);
+        
         // Store the original HTTP URL for Slant3D API calls
-        sessionStorage.setItem('slant3d_original_model_url', modelUrl || testModelUrl);
+        // Ensure we only store HTTP/HTTPS URLs, never blob URLs
+        const originalUrl = modelUrl || testModelUrl;
+        if (originalUrl && !originalUrl.startsWith('blob:') && 
+            (originalUrl.startsWith('http://') || originalUrl.startsWith('https://'))) {
+          sessionStorage.setItem('slant3d_original_model_url', originalUrl);
+          console.log('DesignView: Stored original HTTP URL for Slant3D:', originalUrl);
+        } else {
+          console.warn('DesignView: No valid HTTP URL to store for Slant3D:', originalUrl);
+        }
       }
 
       // Navigate to checkout with pricing data
@@ -336,7 +345,10 @@ export default function DesignView() {
         state: {
           slant3DPricing: slant3DPricing,
           modelUrl: finalModelUrl,
-          originalModelUrl: modelUrl || testModelUrl, // Pass original URL
+          originalModelUrl: (modelUrl && !modelUrl.startsWith('blob:') && 
+                           (modelUrl.startsWith('http://') || modelUrl.startsWith('https://'))) 
+                         ? modelUrl 
+                         : testModelUrl, // Pass original URL only if it's HTTP/HTTPS
           design: design
         }
       });

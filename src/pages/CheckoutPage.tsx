@@ -130,15 +130,16 @@ export default function CheckoutPage() {
     }
 
     // Get the original HTTP URL for Slant3D operations
-    let originalModelUrl = sessionStorage.getItem('slant3d_original_model_url') || modelUrl;
+    let originalModelUrl = sessionStorage.getItem('slant3d_original_model_url');
     
-    // Fallback protection: If we still have a blob URL, try to find a valid HTTP URL
-    if (originalModelUrl && originalModelUrl.startsWith('blob:')) {
-      console.warn('CheckoutPage: Still got blob URL, trying to find HTTP URL...');
+    // If no original URL in session storage, try to find a valid HTTP URL from various sources
+    if (!originalModelUrl || originalModelUrl.startsWith('blob:')) {
+      console.warn('CheckoutPage: No valid original URL in session storage, searching for HTTP URL...');
       
-      // Try to get from location state
+      // Try to get from location state first
       const stateOriginalUrl = location.state?.originalModelUrl;
-      if (stateOriginalUrl && !stateOriginalUrl.startsWith('blob:')) {
+      if (stateOriginalUrl && !stateOriginalUrl.startsWith('blob:') && 
+          (stateOriginalUrl.startsWith('http://') || stateOriginalUrl.startsWith('https://'))) {
         originalModelUrl = stateOriginalUrl;
         console.log('CheckoutPage: Using original URL from location state:', originalModelUrl);
       } else {
@@ -146,11 +147,19 @@ export default function CheckoutPage() {
         const designOriginalUrl = location.state?.design?.modelFiles?.storedModelUrl || 
                                  location.state?.design?.modelFiles?.modelFile ||
                                  location.state?.design?.modelFiles?.gaussianPly;
-        if (designOriginalUrl && !designOriginalUrl.startsWith('blob:')) {
+        if (designOriginalUrl && !designOriginalUrl.startsWith('blob:') && 
+            (designOriginalUrl.startsWith('http://') || designOriginalUrl.startsWith('https://'))) {
           originalModelUrl = designOriginalUrl;
           console.log('CheckoutPage: Using original URL from design data:', originalModelUrl);
         } else {
-          throw new Error('No valid HTTP URL found for Slant3D. Please try regenerating the model.');
+          // Last resort: try to get from the current modelUrl if it's not a blob
+          if (modelUrl && !modelUrl.startsWith('blob:') && 
+              (modelUrl.startsWith('http://') || modelUrl.startsWith('https://'))) {
+            originalModelUrl = modelUrl;
+            console.log('CheckoutPage: Using current modelUrl as original URL:', originalModelUrl);
+          } else {
+            throw new Error('No valid HTTP URL found for Slant3D. Please try regenerating the model or contact support.');
+          }
         }
       }
     }
@@ -163,12 +172,16 @@ export default function CheckoutPage() {
       console.log('CheckoutPage: Using original URL instead of blob URL for Slant3D');
       
       // Final validation: Ensure we never send blob URLs to Slant3D
-      if (originalModelUrl && originalModelUrl.startsWith('blob:')) {
+      if (!originalModelUrl) {
+        throw new Error('No model URL available for Slant3D. Please try regenerating the model.');
+      }
+      
+      if (originalModelUrl.startsWith('blob:')) {
         throw new Error('Cannot use blob URL for Slant3D. Please try regenerating the model or contact support.');
       }
       
-      if (!originalModelUrl || (!originalModelUrl.startsWith('http://') && !originalModelUrl.startsWith('https://'))) {
-        throw new Error('Invalid model URL for Slant3D. URL must start with http:// or https://');
+      if (!originalModelUrl.startsWith('http://') && !originalModelUrl.startsWith('https://')) {
+        throw new Error(`Invalid model URL for Slant3D. URL must start with http:// or https://. Got: ${originalModelUrl}`);
       }
       
       // Upload model to Slant3D using original HTTP URL
