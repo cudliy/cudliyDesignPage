@@ -120,6 +120,11 @@ export default function CheckoutPage() {
     }
 
     try {
+      console.log('CheckoutPage: About to upload model:', modelUrl);
+      console.log('CheckoutPage: Model URL type:', typeof modelUrl);
+      console.log('CheckoutPage: Model URL value:', modelUrl);
+      console.log('CheckoutPage: Slant3D pricing:', slant3DPricing);
+      
       // Upload model to Slant3D
       const uploadResult = await slant3DService.uploadModel(modelUrl, {
         material: slant3DPricing.material,

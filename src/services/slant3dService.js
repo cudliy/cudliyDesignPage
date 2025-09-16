@@ -2,7 +2,12 @@
 // Uses backend proxy to avoid CORS issues
 // Based on official Slant3D API documentation: https://api-fe-two.vercel.app/Docs
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001/api' : 'https://cudliy.onrender.com/api');
+
+// Debug logging for Slant3D service
+console.log('Slant3D API_BASE_URL:', API_BASE_URL);
+console.log('Slant3D Environment:', import.meta.env.MODE);
+console.log('Slant3D VITE_API_URL:', import.meta.env.VITE_API_URL);
 
 class Slant3DService {
   // Upload model to Slant3D using backend proxy
@@ -24,10 +29,13 @@ class Slant3DService {
       });
 
       if (!response.ok) {
-        throw new Error(`Model upload failed: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Upload response error:', errorText);
+        throw new Error(`Model upload failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const result = await response.json();
+      console.log('Upload result:', result);
       
       if (!result.success) {
         throw new Error(result.message || 'Model upload failed');
