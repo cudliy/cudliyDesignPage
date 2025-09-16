@@ -78,6 +78,16 @@ export default function CheckoutPage() {
           setModelUrl(location.state.modelUrl);
         }
 
+        // Get the original HTTP URL for Slant3D operations
+        const storedOriginalModelUrl = sessionStorage.getItem('slant3d_original_model_url');
+        const originalModelUrl = location.state?.originalModelUrl || storedOriginalModelUrl;
+        
+        if (originalModelUrl) {
+          console.log('CheckoutPage: Original model URL for Slant3D:', originalModelUrl);
+          // Store the original URL for use in Slant3D operations
+          sessionStorage.setItem('slant3d_original_model_url', originalModelUrl);
+        }
+
         // Create checkout session (for payment processing)
         const response = await apiService.createStripeCheckout({
           userId,
@@ -119,23 +129,27 @@ export default function CheckoutPage() {
       throw new Error('Missing pricing or model data');
     }
 
+    // Get the original HTTP URL for Slant3D operations
+    const originalModelUrl = sessionStorage.getItem('slant3d_original_model_url') || modelUrl;
+    
     try {
-      console.log('CheckoutPage: About to upload model:', modelUrl);
-      console.log('CheckoutPage: Model URL type:', typeof modelUrl);
-      console.log('CheckoutPage: Model URL value:', modelUrl);
+      console.log('CheckoutPage: About to upload model:', originalModelUrl);
+      console.log('CheckoutPage: Model URL type:', typeof originalModelUrl);
+      console.log('CheckoutPage: Model URL value:', originalModelUrl);
       console.log('CheckoutPage: Slant3D pricing:', slant3DPricing);
+      console.log('CheckoutPage: Using original URL instead of blob URL for Slant3D');
       
-      // Upload model to Slant3D
-      const uploadResult = await slant3DService.uploadModel(modelUrl, {
+      // Upload model to Slant3D using original HTTP URL
+      const uploadResult = await slant3DService.uploadModel(originalModelUrl, {
         material: slant3DPricing.material,
         quantity: slant3DPricing.quantity
       });
 
       console.log('Upload result:', uploadResult);
 
-      // Create order with Slant3D
+      // Create order with Slant3D using original HTTP URL
       const orderResult = await slant3DService.createOrder(
-        modelUrl, // Use the original model URL
+        originalModelUrl, // Use the original HTTP model URL
         {
           quantity: slant3DPricing.quantity,
           material: slant3DPricing.material

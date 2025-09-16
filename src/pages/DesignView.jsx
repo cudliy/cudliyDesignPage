@@ -327,6 +327,8 @@ export default function DesignView() {
       if (slant3DPricing) {
         sessionStorage.setItem('slant3d_pricing', JSON.stringify(slant3DPricing));
         sessionStorage.setItem('slant3d_model_url', finalModelUrl);
+        // Store the original HTTP URL for Slant3D API calls
+        sessionStorage.setItem('slant3d_original_model_url', modelUrl || testModelUrl);
       }
 
       // Navigate to checkout with pricing data
@@ -334,6 +336,7 @@ export default function DesignView() {
         state: {
           slant3DPricing: slant3DPricing,
           modelUrl: finalModelUrl,
+          originalModelUrl: modelUrl || testModelUrl, // Pass original URL
           design: design
         }
       });
