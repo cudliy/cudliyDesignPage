@@ -5,6 +5,7 @@ import ModelViewer from '../components/ModelViewer';
 import { Upload } from 'lucide-react';
 import { slant3DService } from '../services/slant3dService';
 import { modelConverter } from '../services/modelConverter';
+import { testApiConnection } from '../utils/testApiConnection';
 
 export default function DesignView() {
   const { designId } = useParams();
@@ -78,7 +79,7 @@ export default function DesignView() {
   // Test with a fallback model URL if no model is available
   const testModelUrl = modelUrl || 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Cube/glTF-Binary/Cube.glb';
   
-  // Check if model-viewer is available
+  // Check if model-viewer is available and test API connection
   useEffect(() => {
     console.log('DesignView: Checking model-viewer availability');
     console.log('DesignView: model-viewer defined:', typeof modelViewer !== 'undefined');
@@ -86,6 +87,11 @@ export default function DesignView() {
     if (typeof customElements !== 'undefined') {
       console.log('DesignView: model-viewer custom element defined:', customElements.get('model-viewer'));
     }
+    
+    // Test API connection
+    testApiConnection().then(result => {
+      console.log('DesignView: API connection test result:', result);
+    });
   }, []);
 
   const handleModelError = (error) => {

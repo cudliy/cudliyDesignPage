@@ -1,5 +1,10 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://cudliy.onrender.com/api');
 
+// Debug logging for API URL
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('Environment:', import.meta.env.MODE);
+console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+
 interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -285,6 +290,9 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
+      console.log('Making API request to:', url);
+      console.log('Request options:', options);
+      
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
@@ -293,16 +301,21 @@ class ApiService {
         ...options,
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       const data = await response.json();
 
       if (!response.ok) {
         const errorMessage = data.error || data.message || `HTTP ${response.status}`;
+        console.error('API Error Response:', errorMessage);
         throw new Error(errorMessage);
       }
 
       return data;
     } catch (error) {
       console.error('API request failed:', error);
+      console.error('Request URL:', `${API_BASE_URL}${endpoint}`);
       if (error instanceof Error) {
         throw new Error(`API Error: ${error.message}`);
       }

@@ -61,6 +61,8 @@ const corsOptions = {
       [
         'https://cudliy-design-page.vercel.app',
         'https://www.cudliy-design-page.vercel.app',
+        'https://cudliy-design-page-git-main.vercel.app',
+        'https://cudliy-design-page-git-main-cudliy.vercel.app',
         'http://localhost:5173',
         'http://localhost:3000',
         'http://localhost:4173'
@@ -69,10 +71,16 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Allow all Vercel preview deployments
+    if (origin && origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
+      console.log('Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -83,6 +91,14 @@ const corsOptions = {
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar']
 };
 app.use(cors(corsOptions));
+
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    console.log('CORS Preflight request from:', req.headers.origin);
+  }
+  next();
+});
 
 // Compression and logging
 app.use(compression());
@@ -103,12 +119,17 @@ app.options('*', (req, res) => {
     [
       'https://cudliy-design-page.vercel.app',
       'https://www.cudliy-design-page.vercel.app',
+      'https://cudliy-design-page-git-main.vercel.app',
+      'https://cudliy-design-page-git-main-cudliy.vercel.app',
       'http://localhost:5173',
       'http://localhost:3000',
       'http://localhost:4173'
     ];
   
-  if (allowedOrigins.includes(origin) || !origin) {
+  // Allow all Vercel preview deployments
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('vercel.app'));
+  
+  if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
