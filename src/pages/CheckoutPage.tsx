@@ -130,7 +130,30 @@ export default function CheckoutPage() {
     }
 
     // Get the original HTTP URL for Slant3D operations
-    const originalModelUrl = sessionStorage.getItem('slant3d_original_model_url') || modelUrl;
+    let originalModelUrl = sessionStorage.getItem('slant3d_original_model_url') || modelUrl;
+    
+    // Fallback protection: If we still have a blob URL, try to find a valid HTTP URL
+    if (originalModelUrl && originalModelUrl.startsWith('blob:')) {
+      console.warn('CheckoutPage: Still got blob URL, trying to find HTTP URL...');
+      
+      // Try to get from location state
+      const stateOriginalUrl = location.state?.originalModelUrl;
+      if (stateOriginalUrl && !stateOriginalUrl.startsWith('blob:')) {
+        originalModelUrl = stateOriginalUrl;
+        console.log('CheckoutPage: Using original URL from location state:', originalModelUrl);
+      } else {
+        // Try to get from design data
+        const designOriginalUrl = location.state?.design?.modelFiles?.storedModelUrl || 
+                                 location.state?.design?.modelFiles?.modelFile ||
+                                 location.state?.design?.modelFiles?.gaussianPly;
+        if (designOriginalUrl && !designOriginalUrl.startsWith('blob:')) {
+          originalModelUrl = designOriginalUrl;
+          console.log('CheckoutPage: Using original URL from design data:', originalModelUrl);
+        } else {
+          throw new Error('No valid HTTP URL found for Slant3D. Please try regenerating the model.');
+        }
+      }
+    }
     
     try {
       console.log('CheckoutPage: About to upload model:', originalModelUrl);
@@ -138,6 +161,15 @@ export default function CheckoutPage() {
       console.log('CheckoutPage: Model URL value:', originalModelUrl);
       console.log('CheckoutPage: Slant3D pricing:', slant3DPricing);
       console.log('CheckoutPage: Using original URL instead of blob URL for Slant3D');
+      
+      // Final validation: Ensure we never send blob URLs to Slant3D
+      if (originalModelUrl && originalModelUrl.startsWith('blob:')) {
+        throw new Error('Cannot use blob URL for Slant3D. Please try regenerating the model or contact support.');
+      }
+      
+      if (!originalModelUrl || (!originalModelUrl.startsWith('http://') && !originalModelUrl.startsWith('https://'))) {
+        throw new Error('Invalid model URL for Slant3D. URL must start with http:// or https://');
+      }
       
       // Upload model to Slant3D using original HTTP URL
       const uploadResult = await slant3DService.uploadModel(originalModelUrl, {

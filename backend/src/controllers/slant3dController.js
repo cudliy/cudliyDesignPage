@@ -77,6 +77,18 @@ export const uploadModel = async (req, res, next) => {
       return next(new AppError('Model URL is required', 400));
     }
 
+    // Validate that the model URL is not a blob URL
+    if (modelUrl.startsWith('blob:')) {
+      logger.error('Blob URL not supported:', modelUrl);
+      return next(new AppError('Blob URLs are not supported. Please use an HTTP/HTTPS URL.', 400));
+    }
+
+    // Validate that the model URL is a valid HTTP/HTTPS URL
+    if (!modelUrl.startsWith('http://') && !modelUrl.startsWith('https://')) {
+      logger.error('Invalid URL protocol:', modelUrl);
+      return next(new AppError('Invalid URL protocol. Only HTTP/HTTPS URLs are supported.', 400));
+    }
+
     logger.info(`Uploading model to Slant3D: ${modelUrl}`);
 
     // For now, we'll just validate the model URL and return success

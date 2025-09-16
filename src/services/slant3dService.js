@@ -15,6 +15,15 @@ class Slant3DService {
     try {
       console.log('Uploading model to Slant3D:', modelUrl);
       console.log('Using backend proxy:', API_BASE_URL);
+      
+      // Validate URL before sending to backend
+      if (modelUrl && modelUrl.startsWith('blob:')) {
+        throw new Error('Blob URLs are not supported by Slant3D API. Please use an HTTP/HTTPS URL.');
+      }
+      
+      if (!modelUrl || (!modelUrl.startsWith('http://') && !modelUrl.startsWith('https://'))) {
+        throw new Error('Invalid model URL. Must be a valid HTTP or HTTPS URL.');
+      }
 
       // Call backend proxy to upload model
       const response = await fetch(`${API_BASE_URL}/slant3d/upload`, {
@@ -139,6 +148,15 @@ class Slant3DService {
       console.log('Creating Slant3D order for:', modelUrl);
       console.log('Order options:', options);
       console.log('Customer data:', customerData);
+      
+      // Validate URL before sending to backend
+      if (modelUrl && modelUrl.startsWith('blob:')) {
+        throw new Error('Blob URLs are not supported by Slant3D API. Please use an HTTP/HTTPS URL.');
+      }
+      
+      if (!modelUrl || (!modelUrl.startsWith('http://') && !modelUrl.startsWith('https://'))) {
+        throw new Error('Invalid model URL. Must be a valid HTTP or HTTPS URL.');
+      }
 
       const response = await fetch(`${API_BASE_URL}/slant3d/order`, {
         method: 'POST',
