@@ -3,6 +3,7 @@ import { AppError } from '../utils/errorHandler.js';
 
 const SLANT3D_API_BASE = process.env.SLANT3D_API_BASE || 'https://www.slant3dapi.com/api';
 const SLANT3D_API_KEY = process.env.SLANT3D_API_KEY;
+const SLANT3D_MAX_BYTES = 4348596; // Max offset per Slant3D error implies ~4.15MB limit
 
 // Valid Slant3D colors
 const VALID_COLORS = [
@@ -61,6 +62,40 @@ const makeSlant3DRequest = async (endpoint, method = 'GET', data = null) => {
   const result = await response.json();
   logger.info(`Slant3D API response:`, result);
   return result;
+};
+
+// Helper to determine remote file size in bytes. Uses HEAD first, then Range fallback
+const getRemoteFileSizeBytes = async (fileUrl) => {
+  try {
+    const headResponse = await fetch(fileUrl, { method: 'HEAD' });
+    const contentLengthHeader = headResponse.headers.get('content-length');
+    if (headResponse.ok && contentLengthHeader) {
+      const parsed = parseInt(contentLengthHeader, 10);
+      if (!Number.isNaN(parsed) && parsed >= 0) return parsed;
+    }
+  } catch (err) {
+    logger.warn(`HEAD size check failed for ${fileUrl}: ${err.message}`);
+  }
+
+  // Fallback: Range request to read 1 byte and parse Content-Range: bytes 0-0/total
+  try {
+    const rangeResponse = await fetch(fileUrl, {
+      method: 'GET',
+      headers: { Range: 'bytes=0-0' }
+    });
+    const contentRange = rangeResponse.headers.get('content-range');
+    if (contentRange) {
+      const match = contentRange.match(/\/(\d+)$/);
+      if (match && match[1]) {
+        const total = parseInt(match[1], 10);
+        if (!Number.isNaN(total) && total >= 0) return total;
+      }
+    }
+  } catch (err) {
+    logger.warn(`Range size check failed for ${fileUrl}: ${err.message}`);
+  }
+
+  return undefined;
 };
 
 // Upload model to Slant3D
@@ -279,22 +314,17 @@ export const createOrder = async (req, res, next) => {
       return next(new AppError('Model URL is required', 400));
     }
 
-    // Check file size before sending to Slant3D
+    // Check file size before sending to Slant3D (HEAD then Range fallback)
     try {
-      const response = await fetch(modelUrl, { method: 'HEAD' });
-      const contentLength = response.headers.get('content-length');
-      
-      if (contentLength) {
-        const fileSizeBytes = parseInt(contentLength);
+      const fileSizeBytes = await getRemoteFileSizeBytes(modelUrl);
+      if (typeof fileSizeBytes === 'number') {
         const fileSizeMB = fileSizeBytes / (1024 * 1024);
-        const maxSizeMB = 4.1; // Slant3D's actual limit is ~4.15MB (4,348,596 bytes)
-        
-        logger.info(`Model file size: ${fileSizeMB.toFixed(2)}MB`);
-        
-        if (fileSizeMB > maxSizeMB) {
-          logger.error(`Model file too large: ${fileSizeMB.toFixed(2)}MB (max: ${maxSizeMB}MB)`);
+        logger.info(`Model file size: ${fileSizeMB.toFixed(2)}MB (${fileSizeBytes} bytes)`);
+        if (fileSizeBytes > SLANT3D_MAX_BYTES) {
+          const maxSizeMB = SLANT3D_MAX_BYTES / (1024 * 1024);
+          logger.error(`Model file too large: ${fileSizeMB.toFixed(2)}MB (max: ${maxSizeMB.toFixed(2)}MB)`);
           return next(new AppError(
-            `Model file is too large (${fileSizeMB.toFixed(2)}MB). Maximum allowed size is ${maxSizeMB}MB. Please try regenerating the model with lower quality settings.`, 
+            `Model file is too large (${fileSizeMB.toFixed(2)}MB). Maximum allowed size is ${maxSizeMB.toFixed(2)}MB. Please try regenerating the model with lower quality settings.`,
             413
           ));
         }
@@ -378,7 +408,21 @@ export const createOrder = async (req, res, next) => {
       stack: error.stack,
       requestBody: req.body
     });
-    next(new AppError(error.message || 'Failed to create order', 500));
+
+    // Map known Slant3D errors to clearer responses
+    let statusCode = 500;
+    let errorMessage = error.message || 'Failed to create order';
+    const msg = (error.message || '').toLowerCase();
+    if (msg.includes('offset') && msg.includes('out of range')) {
+      statusCode = 413;
+      const maxSizeMB = SLANT3D_MAX_BYTES / (1024 * 1024);
+      errorMessage = `Model file is too large for Slant3D API. Maximum allowed size is ${maxSizeMB.toFixed(2)}MB.`;
+    } else if (msg.includes('400')) {
+      statusCode = 400;
+      errorMessage = 'Invalid model file format or size. Please try a different model.';
+    }
+
+    next(new AppError(errorMessage, statusCode));
   }
 };
 
