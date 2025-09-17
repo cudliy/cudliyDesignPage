@@ -304,50 +304,73 @@ export const createOrder = async (req, res, next) => {
       // Continue without size check if we can't determine the size
     }
 
-    // Create order data
+    // Validate and sanitize customer data
+    const safeCustomerData = {
+      email: customerData?.email || 'guest@temp.com',
+      phone: customerData?.phone || '000-000-0000',
+      name: customerData?.name || 'Guest User',
+      address: customerData?.address || '123 Temp Street',
+      address2: customerData?.address2 || '',
+      city: customerData?.city || 'Temp City',
+      state: customerData?.state || 'CA',
+      zip: customerData?.zip || '12345',
+      country: customerData?.country || 'US',
+      imageUrl: customerData?.imageUrl || ''
+    };
+
+    // Create order data with safe values
     const orderData = {
-      email: customerData.email || 'guest@temp.com',
-      phone: customerData.phone || '000-000-0000',
-      name: customerData.name || 'Guest User',
+      email: safeCustomerData.email,
+      phone: safeCustomerData.phone,
+      name: safeCustomerData.name,
       orderNumber: `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       filename: modelUrl.split('/').pop() || 'model.stl',
       fileURL: modelUrl,
-      bill_to_street_1: customerData.address || '123 Temp Street',
-      bill_to_street_2: customerData.address2 || '',
+      bill_to_street_1: safeCustomerData.address,
+      bill_to_street_2: safeCustomerData.address2,
       bill_to_street_3: '',
-      bill_to_city: customerData.city || 'Temp City',
-      bill_to_state: customerData.state || 'CA',
-      bill_to_zip: customerData.zip || '12345',
-      bill_to_country_as_iso: customerData.country || 'US',
+      bill_to_city: safeCustomerData.city,
+      bill_to_state: safeCustomerData.state,
+      bill_to_zip: safeCustomerData.zip,
+      bill_to_country_as_iso: safeCustomerData.country,
       bill_to_is_US_residential: 'true',
-      ship_to_name: customerData.name || 'Guest User',
-      ship_to_street_1: customerData.address || '123 Temp Street',
-      ship_to_street_2: customerData.address2 || '',
+      ship_to_name: safeCustomerData.name,
+      ship_to_street_1: safeCustomerData.address,
+      ship_to_street_2: safeCustomerData.address2,
       ship_to_street_3: '',
-      ship_to_city: customerData.city || 'Temp City',
-      ship_to_state: customerData.state || 'CA',
-      ship_to_zip: customerData.zip || '12345',
-      ship_to_country_as_iso: customerData.country || 'US',
+      ship_to_city: safeCustomerData.city,
+      ship_to_state: safeCustomerData.state,
+      ship_to_zip: safeCustomerData.zip,
+      ship_to_country_as_iso: safeCustomerData.country,
       ship_to_is_US_residential: 'true',
       order_item_name: modelUrl.split('/').pop() || 'model.stl',
-      order_quantity: (options.quantity || 1).toString(),
-      order_image_url: customerData.imageUrl || '',
+      order_quantity: (options?.quantity || 1).toString(),
+      order_image_url: safeCustomerData.imageUrl,
       order_sku: `SKU_${Date.now()}`,
-      order_item_color: normalizeColor(options.color),
-      profile: normalizeMaterial(options.material)
+      order_item_color: normalizeColor(options?.color),
+      profile: normalizeMaterial(options?.material)
     };
 
-    // Create order with Slant3D
-    const result = await makeSlant3DRequest('/order', 'POST', [orderData]);
+    // Log the order data for debugging
+    logger.info('Order data being sent to Slant3D:', orderData);
 
-    res.json({
-      success: true,
-      data: {
-        orderId: result.orderId,
-        orderNumber: orderData.orderNumber,
-        status: 'created'
-      }
-    });
+    // Create order with Slant3D
+    try {
+      const result = await makeSlant3DRequest('/order', 'POST', [orderData]);
+      
+      res.json({
+        success: true,
+        data: {
+          orderId: result.orderId,
+          orderNumber: orderData.orderNumber,
+          status: 'created'
+        }
+      });
+    } catch (slant3dError) {
+      logger.error('Slant3D API call failed:', slant3dError);
+      logger.error('Order data that caused the error:', orderData);
+      throw slant3dError; // Re-throw to be caught by outer catch block
+    }
   } catch (error) {
     logger.error('Slant3D order creation error:', error);
     logger.error('Error details:', {
