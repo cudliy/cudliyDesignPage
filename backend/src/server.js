@@ -42,10 +42,10 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:", "storage.googleapis.com", "*.replicate.com", "*.amazonaws.com"],
+      imgSrc: ["'self'", "data:", "https:", "storage.googleapis.com", "*.replicate.com", "*.amazonaws.com", "*.fal.media", "*.fal.run", "*.fal.ai"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.jsdelivr.net"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      connectSrc: ["'self'", "https:", "wss:", "*.replicate.com", "*.amazonaws.com"],
+      connectSrc: ["'self'", "https:", "wss:", "*.replicate.com", "*.amazonaws.com", "*.fal.media", "*.fal.run", "*.fal.ai"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'", "https:", "data:"],
       frameSrc: ["'none'"]
