@@ -179,6 +179,9 @@ class AIService {
 
       // Normalize fal.ai outputs into our expected shape
       const data = result?.data || result || {};
+      
+      // Log the data structure for debugging
+      logger.info('fal.ai TripoSR data structure:', JSON.stringify(data, null, 2));
 
       const collectCandidateUrls = (value) => {
         const candidates = [];
@@ -196,9 +199,9 @@ class AIService {
               pushIfStringUrl(v);
             } else if (Array.isArray(v)) {
               v.forEach(item => scanObject(item));
-            } else if (typeof v === 'object') {
+            } else if (typeof v === 'object' && v !== null) {
               // Common nested shapes like { url: "..." }
-              if (typeof v.url === 'string') pushIfStringUrl(v.url);
+              if (v.url && typeof v.url === 'string') pushIfStringUrl(v.url);
               scanObject(v);
             }
           }
@@ -209,6 +212,8 @@ class AIService {
       };
 
       const candidateUrls = collectCandidateUrls(data);
+      logger.info('fal.ai TripoSR candidate URLs found:', candidateUrls);
+      
       // Prefer .glb/.obj first
       const preferred = candidateUrls.find(u => /\.(glb|gltf|obj)(\?|#|$)/i.test(u)) || candidateUrls[0] || null;
 
@@ -222,8 +227,15 @@ class AIService {
         || data?.output?.model_file
         || preferred;
 
+      logger.info('fal.ai TripoSR final model file URL:', modelFile);
+
+      if (!modelFile) {
+        logger.warn('fal.ai TripoSR: No model file URL found in response');
+        throw new Error('No model file URL found in fal.ai response');
+      }
+
       return {
-        model_file: modelFile || null,
+        model_file: modelFile,
         gaussian_ply: data.gaussian_ply || data?.output?.gaussian_ply || null,
         color_video: data.color_video || data?.output?.color_video || null
       };
