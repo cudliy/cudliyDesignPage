@@ -6,7 +6,6 @@ import { testApiConnection } from '../utils/testApiConnection';
 
 // Lazy load ModelViewer to improve initial load time
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
-const ModelTest = lazy(() => import('../components/ModelTest'));
 
 export default function DesignView() {
   const { designId } = useParams();
@@ -511,13 +510,6 @@ export default function DesignView() {
                 <div>Test URL: {testModelUrl || 'None'}</div>
                 <div>Design Status: {design?.status || 'Unknown'}</div>
                 <div>Model Files: {JSON.stringify(design?.modelFiles || {})}</div>
-              </div>
-              
-              {/* Model Test Component */}
-              <div className="mb-4">
-                <Suspense fallback={<div>Loading test component...</div>}>
-                  <ModelTest />
-                </Suspense>
               </div>
               
               {design.images && design.images.length > 0 && (
