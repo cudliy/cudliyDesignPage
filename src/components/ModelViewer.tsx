@@ -96,9 +96,17 @@ export default function ModelViewer({
         // Ensure proper material rendering
         modelViewer.setAttribute('environment-image', 'neutral');
         modelViewer.setAttribute('skybox-image', 'neutral');
-        // Force material rendering
+        // Force material rendering and texture display
         modelViewer.setAttribute('material-variant', 'default');
         modelViewer.setAttribute('variant', 'default');
+        // Enable texture rendering
+        modelViewer.setAttribute('enable-pan', '');
+        modelViewer.setAttribute('auto-rotate-delay', '0');
+        modelViewer.setAttribute('interaction-policy', 'allow-when-focused');
+        // Ensure materials are visible
+        modelViewer.setAttribute('render-scale', '1');
+        modelViewer.setAttribute('min-camera-orbit', 'auto auto 1m');
+        modelViewer.setAttribute('max-camera-orbit', 'auto auto 10m');
         
         // Set styles
         modelViewer.style.width = '100%';
@@ -146,6 +154,15 @@ export default function ModelViewer({
   // Helper function to convert 0-100 values to appropriate ranges
   const updateControls = (modelViewer: any) => {
     if (!modelViewer) return;
+
+    // Ensure textures are always enabled
+    modelViewer.setAttribute('shadow-intensity', '1');
+    modelViewer.setAttribute('shadow-softness', '0.5');
+    modelViewer.setAttribute('tone-mapping', 'commerce');
+    modelViewer.setAttribute('environment-image', 'neutral');
+    modelViewer.setAttribute('skybox-image', 'neutral');
+    modelViewer.setAttribute('material-variant', 'default');
+    modelViewer.setAttribute('variant', 'default');
 
     // Lighting (0-100) -> Controls both exposure AND environment brightness
     const lightingNormalized = lighting / 100;
@@ -264,9 +281,16 @@ export default function ModelViewer({
         'interpolation-decay': '200',
         loading: 'eager',
         reveal: 'auto',
-        'shadow-intensity': '0',
-        'shadow-softness': '0',
+        'shadow-intensity': '1',
+        'shadow-softness': '0.5',
         exposure: '1',
+        'tone-mapping': 'commerce',
+        'environment-image': 'neutral',
+        'skybox-image': 'neutral',
+        'material-variant': 'default',
+        'variant': 'default',
+        'enable-pan': '',
+        'interaction-policy': 'allow-when-focused',
         style: {
           width: '100%',
           height: '100%',

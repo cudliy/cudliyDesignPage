@@ -193,20 +193,25 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
 
     // NEW: fal.ai Hunyuan3D implementation (with TripoSR fallback)
     try {
-      logger.info('Starting fal.ai Hunyuan3D mini/turbo 3D model generation for image:', imageUrl);
+      logger.info('Starting fal.ai Hunyuan3D mini/turbo textured mesh generation for image:', imageUrl);
       
       // Check if fal client is properly initialized
       if (!fal || typeof fal.subscribe !== 'function') {
         throw new Error('fal.ai client not properly initialized');
       }
       
-      logger.info('fal.ai client initialized, calling Hunyuan3D mini/turbo...');
+      logger.info('fal.ai client initialized, calling Hunyuan3D mini/turbo with textured mesh...');
       
       // Use fal.ai's Hunyuan3D mini/turbo model for faster, simpler 3D generation
       const result = await fal.subscribe("fal-ai/hunyuan3d/v2/mini/turbo", {
         input: {
-          input_image_url: processedImageUrl
-          // Use minimal parameters for mini/turbo version to avoid white rendering issues
+          input_image_url: processedImageUrl,
+          // Enable textured mesh generation (3x cost but essential for proper rendering)
+          textured_mesh: true,
+          // Additional parameters for better quality
+          num_inference_steps: 50,
+          guidance_scale: 7.5,
+          octree_resolution: 256
         },
         logs: true,
         onQueueUpdate: (update) => {
@@ -218,13 +223,13 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
         },
       });
 
-      logger.info('fal.ai Hunyuan3D mini/turbo generation completed:', JSON.stringify(result, null, 2));
+      logger.info('fal.ai Hunyuan3D mini/turbo textured mesh generation completed:', JSON.stringify(result, null, 2));
 
       // Normalize fal.ai Hunyuan3D outputs into our expected shape
       const data = result?.data || result || {};
       
       // Log the data structure for debugging
-      logger.info('fal.ai Hunyuan3D mini/turbo data structure:', JSON.stringify(data, null, 2));
+      logger.info('fal.ai Hunyuan3D mini/turbo textured mesh data structure:', JSON.stringify(data, null, 2));
 
       const collectCandidateUrls = (value) => {
         const candidates = [];
@@ -255,7 +260,7 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
       };
 
       const candidateUrls = collectCandidateUrls(data);
-      logger.info('fal.ai Hunyuan3D mini/turbo candidate URLs found:', candidateUrls);
+      logger.info('fal.ai Hunyuan3D mini/turbo textured mesh candidate URLs found:', candidateUrls);
       
       // Prefer .glb/.obj first
       const preferred = candidateUrls.find(u => /\.(glb|gltf|obj)(\?|#|$)/i.test(u)) || candidateUrls[0] || null;
@@ -270,11 +275,11 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
         || data?.output?.model_file
         || preferred;
 
-      logger.info('fal.ai Hunyuan3D mini/turbo final model file URL:', modelFile);
+      logger.info('fal.ai Hunyuan3D mini/turbo textured mesh final model file URL:', modelFile);
 
       if (!modelFile) {
-        logger.warn('fal.ai Hunyuan3D mini/turbo: No model file URL found in response');
-        throw new Error('No model file URL found in fal.ai Hunyuan3D mini/turbo response');
+        logger.warn('fal.ai Hunyuan3D mini/turbo textured mesh: No model file URL found in response');
+        throw new Error('No model file URL found in fal.ai Hunyuan3D mini/turbo textured mesh response');
       }
 
       return {
@@ -284,10 +289,10 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
       };
       
     } catch (error) {
-      logger.error('fal.ai Hunyuan3D mini/turbo 3D Model Generation Error:', error);
+      logger.error('fal.ai Hunyuan3D mini/turbo textured mesh 3D Model Generation Error:', error);
       
       // Fallback to fal.ai TripoSR if Hunyuan3D fails
-      logger.warn('fal.ai Hunyuan3D mini/turbo failed, falling back to TripoSR...');
+      logger.warn('fal.ai Hunyuan3D mini/turbo textured mesh failed, falling back to TripoSR...');
       
       try {
         logger.info('Starting fal.ai TripoSR 3D model generation for image:', imageUrl);
