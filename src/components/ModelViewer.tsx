@@ -152,7 +152,7 @@ export default function ModelViewer({
           console.error('ModelViewer: Error details:', {
             type: event.type,
             target: event.target,
-            detail: event.detail,
+            detail: (event as any).detail,
             src: modelViewer.src
           });
           handleError('Model loading failed');

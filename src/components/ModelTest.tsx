@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const ModelTest = () => {
   const [testUrl, setTestUrl] = useState('https://v3b.fal.media/files/b/penguin/dysxl2G1ubcEHGKQnyEg1_mesh-1758385541.glb');
