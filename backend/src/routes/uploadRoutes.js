@@ -1,33 +1,32 @@
 import express from 'express';
-import multer from 'multer';
-import { uploadImage } from '../controllers/uploadController.js';
-import { uploadLimiter } from '../utils/rateLimiter.js';
-import { AppError } from '../utils/errorHandler.js';
+import { 
+  uploadImage, 
+  upload3DModel, 
+  uploadMultipleFiles, 
+  deleteFile, 
+  listFiles, 
+  getFileMetadata,
+  upload 
+} from '../controllers/uploadController.js';
 
 const router = express.Router();
 
-// Configure multer for file uploads
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024,
-    files: 5
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = process.env.ALLOWED_IMAGE_TYPES?.split(',') || ['image/jpeg', 'image/png', 'image/webp'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new AppError('Invalid file type. Only JPEG, PNG, and WebP are allowed.', 400), false);
-    }
-  }
-});
+// Upload single image
+router.post('/image', upload.single('image'), uploadImage);
 
-// Upload routes
-router.post('/image', 
-  uploadLimiter,
-  upload.single('image'), 
-  uploadImage
-);
+// Upload single 3D model
+router.post('/model', upload.single('model'), upload3DModel);
+
+// Upload multiple files (images and models)
+router.post('/multiple', upload.array('files', 10), uploadMultipleFiles);
+
+// Delete file from GCS
+router.delete('/file/:fileName', deleteFile);
+
+// List files in bucket
+router.get('/files', listFiles);
+
+// Get file metadata
+router.get('/file/:fileName/metadata', getFileMetadata);
 
 export default router;

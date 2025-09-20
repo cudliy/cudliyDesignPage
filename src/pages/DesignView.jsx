@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
-import { Upload } from 'lucide-react';
+import { Upload, Download, Loader2 } from 'lucide-react';
 import { testApiConnection } from '../utils/testApiConnection';
+import { downloadAllDesignFiles, download3DModel, getFileExtension } from '../utils/downloadUtils';
 
 // Lazy load ModelViewer to improve initial load time
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
@@ -14,6 +15,7 @@ export default function DesignView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [regenerating, setRegenerating] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const navigate = useNavigate();
   
   // Control states - matching the image positions
@@ -211,8 +213,33 @@ export default function DesignView() {
     }
   }, [designId, testModelUrl, modelUrl, design, navigate]);
 
+  // Memoized download function
+  const handleDownload = useCallback(async () => {
+    if (!design || downloading) return;
 
-
+    setDownloading(true);
+    try {
+      // Get the best available model URL
+      const modelUrl = getValidModelUrl();
+      
+      if (modelUrl) {
+        // Determine file type from URL
+        const fileType = getFileExtension(modelUrl);
+        
+        // Download the 3D model
+        await download3DModel(modelUrl, design.id || designId, fileType);
+        
+        console.log('Download completed successfully');
+      } else {
+        throw new Error('No valid model URL available for download');
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+      setError(`Download failed: ${error.message}`);
+    } finally {
+      setDownloading(false);
+    }
+  }, [design, designId, downloading, getValidModelUrl]);
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
@@ -573,8 +600,22 @@ export default function DesignView() {
 
           {/* Action Buttons */}
           <div className="flex justify-center gap-4">
-            <button className="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
-              Download
+            <button 
+              onClick={handleDownload}
+              disabled={downloading || !getValidModelUrl()}
+              className="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {downloading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Download
+                </>
+              )}
             </button>
             <button 
               onClick={handleMakeOrder}
@@ -625,6 +666,19 @@ export default function DesignView() {
 
         {/* Menu Items */}
         <div className="space-y-2 flex-1">
+          <button 
+            onClick={handleDownload}
+            disabled={downloading || !getValidModelUrl()}
+            className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {downloading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Download className="w-5 h-5" />
+            )}
+            <span className="font-medium">{downloading ? 'Downloading...' : 'Download Model'}</span>
+          </button>
+
           <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>

@@ -8,6 +8,85 @@ import User from '../models/User.js';
 import Subscription from '../models/Subscription.js';
 import aiService from '../services/aiService.js';
 import storageService from '../services/storageService.js';
+import gcsService from '../services/gcsService.js';
+
+// Helper function to save images to Google Cloud Storage
+const saveImagesToGCS = async (imageUrls) => {
+  const savedImages = [];
+  
+  for (const imageUrl of imageUrls) {
+    try {
+      // Generate a unique filename
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substr(2, 9);
+      const fileName = `image_${timestamp}_${randomId}.jpg`;
+      
+      // Upload image to GCS
+      const gcsUrl = await gcsService.uploadFromUrl(imageUrl, fileName, {
+        contentType: 'image/jpeg',
+        metadata: {
+          source: 'ai_generation',
+          uploadedAt: new Date().toISOString()
+        }
+      });
+      
+      savedImages.push({
+        originalUrl: imageUrl,
+        gcsUrl: gcsUrl,
+        fileName: fileName
+      });
+      
+      logger.info(`Image saved to GCS: ${imageUrl} -> ${gcsUrl}`);
+    } catch (error) {
+      logger.error(`Failed to save image to GCS: ${imageUrl}`, error);
+      // Keep original URL if GCS upload fails
+      savedImages.push({
+        originalUrl: imageUrl,
+        gcsUrl: imageUrl, // Fallback to original URL
+        fileName: null,
+        error: error.message
+      });
+    }
+  }
+  
+  return savedImages;
+};
+
+// Helper function to save 3D model to Google Cloud Storage
+const saveModelToGCS = async (modelUrl, modelType = 'glb') => {
+  try {
+    // Generate a unique filename
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substr(2, 9);
+    const fileName = `model_${timestamp}_${randomId}.${modelType}`;
+    
+    // Upload model to GCS
+    const gcsUrl = await gcsService.uploadFromUrl(modelUrl, fileName, {
+      contentType: modelType === 'glb' ? 'model/gltf-binary' : 'model/gltf+json',
+      metadata: {
+        source: 'ai_generation',
+        modelType: modelType,
+        uploadedAt: new Date().toISOString()
+      }
+    });
+    
+    logger.info(`3D model saved to GCS: ${modelUrl} -> ${gcsUrl}`);
+    return {
+      originalUrl: modelUrl,
+      gcsUrl: gcsUrl,
+      fileName: fileName
+    };
+  } catch (error) {
+    logger.error(`Failed to save 3D model to GCS: ${modelUrl}`, error);
+    // Return original URL if GCS upload fails
+    return {
+      originalUrl: modelUrl,
+      gcsUrl: modelUrl, // Fallback to original URL
+      fileName: null,
+      error: error.message
+    };
+  }
+};
 
 // Generate Images Route (Main workflow endpoint) - No authentication required
 export const generateImages = async (req, res, next) => {
@@ -63,25 +142,34 @@ export const generateImages = async (req, res, next) => {
     // Generate image variations
     const imageResults = await aiService.generateImageVariations(enhancedPrompt, 3);
 
-    // Update session with images
+    // Save images to Google Cloud Storage
+    const imageUrls = imageResults.map(img => img.url);
+    const savedImages = await saveImagesToGCS(imageUrls);
+
+    // Update session with both original and GCS URLs
     session.generatedImages = imageResults.map(img => img.url);
+    session.savedImages = savedImages; // Store GCS information
     session.currentStep = 'image_selection';
     await session.save();
 
     // No usage tracking for guest users - unlimited access
 
-    logger.info(`Images generated successfully for session: ${session.id}`);
+    logger.info(`Images generated and saved to GCS for session: ${session.id}`);
 
     res.json({
       success: true,
       data: {
         session_id: session.id,
-        images: imageResults,
+        images: imageResults.map((img, index) => ({
+          ...img,
+          gcsUrl: savedImages[index]?.gcsUrl || img.url,
+          fileName: savedImages[index]?.fileName
+        })),
         creation_id,
         user_id: user_id || session.userId,
         prompt: enhancedPrompt,
         // No usage tracking for guest users
-        message: 'AI images generated successfully'
+        message: 'AI images generated and saved to cloud storage successfully'
       }
     });
 
@@ -132,8 +220,19 @@ export const generate3DModel = async (req, res, next) => {
 
     logger.info('3D model generation result:', modelResult);
 
-    const modelFilename = `models/${Date.now()}-${uuidv4()}.obj`;
+    // Save 3D models to Google Cloud Storage
     let storedModelUrl = null;
+    let storedPlyUrl = null;
+    
+    if (modelResult.model_file) {
+      const modelSaveResult = await saveModelToGCS(modelResult.model_file, 'glb');
+      storedModelUrl = modelSaveResult.gcsUrl;
+    }
+    
+    if (modelResult.gaussian_ply) {
+      const plySaveResult = await saveModelToGCS(modelResult.gaussian_ply, 'ply');
+      storedPlyUrl = plySaveResult.gcsUrl;
+    }
     
     // Validate and fix model URLs
     const validateModelUrl = (url) => {
@@ -156,10 +255,7 @@ export const generate3DModel = async (req, res, next) => {
       }
     };
     
-    // Use the original model URL for now (file upload temporarily disabled)
-    storedModelUrl = validateModelUrl(modelResult.model_file);
-
-    // Create design record
+    // Create design record with GCS URLs
     const design = new Design({
       userId: actualUserId,
       creationId: creation_id || session?.creationId || `creation_${Date.now()}`,
@@ -175,13 +271,27 @@ export const generate3DModel = async (req, res, next) => {
       selectedImageIndex: 0,
       modelFiles: {
         originalImage: image_url,
-        modelFile: validateModelUrl(modelResult.model_file),
-        storedModelUrl,
-        gaussianPly: validateModelUrl(modelResult.gaussian_ply),
-        colorVideo: validateModelUrl(modelResult.color_video)
+        modelFile: storedModelUrl || validateModelUrl(modelResult.model_file),
+        storedModelUrl: storedModelUrl,
+        gaussianPly: storedPlyUrl || validateModelUrl(modelResult.gaussian_ply),
+        colorVideo: validateModelUrl(modelResult.color_video),
+        // Store both original and GCS URLs for reference
+        originalModelFile: modelResult.model_file,
+        originalGaussianPly: modelResult.gaussian_ply
       },
       generationOptions: options,
-      status: 'completed'
+      status: 'completed',
+      // Store GCS information
+      gcsStorage: {
+        modelFile: storedModelUrl ? {
+          gcsUrl: storedModelUrl,
+          originalUrl: modelResult.model_file
+        } : null,
+        gaussianPly: storedPlyUrl ? {
+          gcsUrl: storedPlyUrl,
+          originalUrl: modelResult.gaussian_ply
+        } : null
+      }
     });
 
     await design.save();
@@ -201,14 +311,26 @@ export const generate3DModel = async (req, res, next) => {
       data: {
         design_id: design.id,
         image_url,
-        model_url: modelResult.model_file,
+        model_url: storedModelUrl || modelResult.model_file,
+        original_model_url: modelResult.model_file,
         stored_model_url: storedModelUrl,
-        gaussian_ply: modelResult.gaussian_ply,
+        gaussian_ply: storedPlyUrl || modelResult.gaussian_ply,
+        original_gaussian_ply: modelResult.gaussian_ply,
         color_video: modelResult.color_video,
         creation_id: creation_id || session?.creationId || design.creationId,
-        user_id: actualUserId
+        user_id: actualUserId,
+        gcs_storage: {
+          model_file: storedModelUrl ? {
+            gcs_url: storedModelUrl,
+            original_url: modelResult.model_file
+          } : null,
+          gaussian_ply: storedPlyUrl ? {
+            gcs_url: storedPlyUrl,
+            original_url: modelResult.gaussian_ply
+          } : null
+        }
       },
-      message: '3D model generated successfully'
+      message: '3D model generated and saved to cloud storage successfully'
     });
 
   } catch (error) {
