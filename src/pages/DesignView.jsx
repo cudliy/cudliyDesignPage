@@ -4,7 +4,6 @@ import { apiService } from '../services/api';
 import ModelViewer from '../components/ModelViewer';
 import { Upload } from 'lucide-react';
 import { slant3DService } from '../services/slant3dService';
-import { modelConverter } from '../services/modelConverter';
 import { testApiConnection } from '../utils/testApiConnection';
 
 export default function DesignView() {
@@ -15,9 +14,6 @@ export default function DesignView() {
   const [regenerating, setRegenerating] = useState(false);
   const [slant3DPricing, setSlant3DPricing] = useState(null);
   const [pricingLoading, setPricingLoading] = useState(false);
-  const [converting, setConverting] = useState(false);
-  const [conversionProgress, setConversionProgress] = useState(0);
-  const [stlUrl, setStlUrl] = useState(null);
   const navigate = useNavigate();
   
   // Control states - matching the image positions
@@ -99,50 +95,6 @@ export default function DesignView() {
     setModelLoadError(error);
   };
 
-  // Convert GLB to STL if needed
-  const convertModelToSTL = async (modelUrlParam) => {
-    if (!modelUrlParam) return null;
-    
-    try {
-      setConverting(true);
-      setConversionProgress(0);
-      
-      // Check if it's a GLB file
-      if (modelUrlParam.toLowerCase().includes('.glb') || modelUrlParam.toLowerCase().includes('glb')) {
-        console.log('Converting GLB to STL for 3D printing...');
-        
-        // Fetch the GLB file
-        const response = await fetch(modelUrlParam);
-        const glbBlob = await response.blob();
-        const glbFile = new File([glbBlob], 'model.glb', { type: 'model/gltf-binary' });
-        
-        // Convert to STL using smart conversion (client-side first, backend fallback)
-        const conversionResult = await modelConverter.convertGLBToSTLSmart(modelUrlParam, {
-          binary: true,
-          filename: 'model.stl'
-        });
-        
-        if (conversionResult.success) {
-          setStlUrl(conversionResult.stlUrl);
-          console.log('GLB to STL conversion successful');
-          return conversionResult.stlUrl;
-        } else {
-          throw new Error('GLB to STL conversion failed');
-        }
-      }
-      
-      // If it's already an STL file, return the original URL
-      return modelUrlParam;
-      
-    } catch (error) {
-      console.error('Model conversion error:', error);
-      setError('Failed to convert model for 3D printing');
-      return null;
-    } finally {
-      setConverting(false);
-      setConversionProgress(0);
-    }
-  };
 
   // Load Slant3D pricing when model is available
   useEffect(() => {
@@ -155,23 +107,9 @@ export default function DesignView() {
         // Use testModelUrl for pricing (either real model or fallback)
         const pricingModelUrl = testModelUrl;
         
-        // Convert model to STL if needed (only for real models, not test models)
-        let stlModelUrl = pricingModelUrl;
-        
-        // Check if we have a blob URL that needs to be converted to HTTP URL
-        if (pricingModelUrl && pricingModelUrl.startsWith('blob:')) {
-          console.log('DesignView: Blob URL detected, using fallback test model for pricing');
-          stlModelUrl = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Cube/glTF-Binary/Cube.glb';
-        } else if (modelUrl && !pricingModelUrl.includes('modelviewer.dev') && !pricingModelUrl.includes('githubusercontent.com')) {
-          stlModelUrl = await convertModelToSTL(modelUrl);
-          if (!stlModelUrl) {
-            throw new Error('Failed to prepare model for pricing');
-          }
-        }
-        
-          // Use STL URL for pricing calculation
-          console.log('DesignView: Getting pricing for URL:', stlModelUrl);
-          const pricing = await slant3DService.getPricing(stlModelUrl, {
+        // Use model URL directly for pricing calculation
+        console.log('DesignView: Getting pricing for URL:', pricingModelUrl);
+          const pricing = await slant3DService.getPricing(pricingModelUrl, {
             material: 'PLA',
             color: 'black', // Use a valid color from the allowed enum
             quantity: 1
@@ -305,23 +243,8 @@ export default function DesignView() {
     }
 
     try {
-      // Ensure we have an STL file for Slant3D
+      // Use the model URL directly for Slant3D
       let finalModelUrl = testModelUrl;
-      
-      // Only convert to STL if it's a real model (not the test model)
-      if (modelUrl && !testModelUrl.includes('modelviewer.dev')) {
-        if (stlUrl) {
-          finalModelUrl = stlUrl;
-        } else if (modelUrl.toLowerCase().includes('.glb') || modelUrl.toLowerCase().includes('glb')) {
-          // Convert GLB to STL if not already done
-          const convertedUrl = await convertModelToSTL(modelUrl);
-          if (convertedUrl) {
-            finalModelUrl = convertedUrl;
-          } else {
-            throw new Error('Failed to convert model for 3D printing');
-          }
-        }
-      }
 
       // Store pricing data in session storage for checkout
       if (slant3DPricing) {
@@ -653,14 +576,14 @@ export default function DesignView() {
             </button>
             <button 
               onClick={handleMakeOrder}
-              disabled={converting || pricingLoading || !slant3DPricing}
+              disabled={pricingLoading || !slant3DPricing}
               className={`px-8 py-3 rounded-lg font-medium transition-colors ${
-                converting || pricingLoading || !slant3DPricing
+                pricingLoading || !slant3DPricing
                   ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                   : 'bg-[#E70D57] text-white hover:bg-[#d10c50]'
               }`}
             >
-              {converting ? 'Converting...' : pricingLoading ? 'Calculating...' : !slant3DPricing ? 'Pricing Required' : 'Make'}
+              {pricingLoading ? 'Calculating...' : !slant3DPricing ? 'Pricing Required' : 'Make'}
             </button>
           </div>
         </div>
@@ -671,22 +594,9 @@ export default function DesignView() {
         {/* Price */}
         <div className="mb-8 text-right">
           <h3 className="text-white/70 text-sm font-medium mb-1">
-            {converting ? 'Converting...' : pricingLoading ? 'Calculating...' : 'Real Price:'}
+            {pricingLoading ? 'Calculating...' : 'Real Price:'}
           </h3>
-          {converting ? (
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                <span className="text-white text-sm">Converting GLB to STL...</span>
-              </div>
-              <div className="w-32 bg-white/20 rounded-full h-2">
-                <div 
-                  className="bg-[#E70D57] h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${conversionProgress}%` }}
-                ></div>
-              </div>
-            </div>
-          ) : pricingLoading ? (
+          {pricingLoading ? (
             <div className="flex items-center justify-end gap-2">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
               <span className="text-white text-sm">Loading...</span>
@@ -699,7 +609,6 @@ export default function DesignView() {
               <div className="text-xs text-white/60 mt-1">
                 <div>Material: {slant3DPricing.material}</div>
                 <div>Est. {slant3DPricing.estimated_days} days</div>
-                {stlUrl && <div className="text-green-400">✓ STL Ready</div>}
               </div>
               {console.log('DesignView: Displaying Slant3D pricing:', slant3DPricing)}
             </div>
