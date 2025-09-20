@@ -58,6 +58,10 @@ interface Generate3DModelRequest {
     return_no_background?: boolean;
     ss_guidance_strength?: number;
     slat_guidance_strength?: number;
+    // Color preservation options
+    preserve_colors?: boolean;
+    enhance_colors?: boolean;
+    color_accuracy?: string;
   };
 }
 
