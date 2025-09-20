@@ -6,6 +6,7 @@ import { testApiConnection } from '../utils/testApiConnection';
 
 // Lazy load ModelViewer to improve initial load time
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
+const XometryPricing = lazy(() => import('../components/XometryPricing'));
 
 export default function DesignView() {
   const { designId } = useParams();
@@ -587,6 +588,25 @@ export default function DesignView() {
 
       {/* Right Panel - Options */}
       <div className="w-80 bg-[#313131] rounded-[40px] p-6 flex flex-col shadow-lg flex-shrink-0">
+        {/* Xometry Pricing - Placeholder version (disabled) */}
+        {testModelUrl && (
+          <div className="mb-8">
+            <Suspense fallback={
+              <div className="bg-gray-800 text-white p-4 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-500"></div>
+                  <span className="text-sm">Loading pricing...</span>
+                </div>
+              </div>
+            }>
+              <XometryPricing 
+                modelUrl={testModelUrl}
+                className="w-full"
+              />
+            </Suspense>
+          </div>
+        )}
+
         {/* Design Info */}
         <div className="mb-8 text-right">
           <h3 className="text-white/70 text-sm font-medium mb-1">
