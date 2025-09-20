@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import '@google/model-viewer';
+
+// Import model-viewer only if not already defined
+if (typeof customElements !== 'undefined' && !customElements.get('model-viewer')) {
+  import('@google/model-viewer');
+}
 
 interface ModelViewerProps {
   modelUrl: string;
@@ -77,6 +81,14 @@ export default function ModelViewer({
       console.log('ModelViewer: createModelViewer called');
       console.log('ModelViewer: modelViewerRef.current:', modelViewerRef.current);
       console.log('ModelViewer: modelUrl:', modelUrl);
+      
+      // Check if model-viewer custom element is available
+      if (typeof customElements !== 'undefined' && !customElements.get('model-viewer')) {
+        console.warn('ModelViewer: model-viewer custom element not available yet');
+        // Wait a bit and try again
+        setTimeout(createModelViewer, 100);
+        return;
+      }
       
       if (modelViewerRef.current && modelUrl) {
         console.log('ModelViewer: Creating model-viewer element');
@@ -297,10 +309,13 @@ export default function ModelViewer({
     }
   };
 
+  // Check if model-viewer custom element is available
+  const isModelViewerAvailable = typeof customElements !== 'undefined' && customElements.get('model-viewer');
+
   return (
     <div className={`w-full h-full min-h-[400px] max-w-full max-h-full rounded-lg overflow-hidden relative ${className}`}>
       {/* Direct Model Viewer - Primary approach */}
-      {loadingState !== 'error' && modelUrl && React.createElement('model-viewer', {
+      {loadingState !== 'error' && modelUrl && isModelViewerAvailable && React.createElement('model-viewer', {
         ref: (el: any) => {
           if (el) {
             modelElementRef.current = el;
@@ -351,16 +366,18 @@ export default function ModelViewer({
         className="w-full h-full"
         style={{ 
           backgroundColor: '#ffffff',
-          display: loadingState === 'error' || !modelUrl ? 'block' : 'none'
+          display: loadingState === 'error' || !modelUrl || !isModelViewerAvailable ? 'block' : 'none'
         }}
       />
       
       {/* Loading State */}
-      {loadingState === 'loading' && (
+      {(loadingState === 'loading' || !isModelViewerAvailable) && (
         <div className="absolute inset-0 flex items-center justify-center bg-transparent">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E70D57] mx-auto mb-2"></div>
-            <p className="text-sm text-gray-600">Loading 3D model...</p>
+            <p className="text-sm text-gray-600">
+              {!isModelViewerAvailable ? 'Initializing 3D viewer...' : 'Loading 3D model...'}
+            </p>
           </div>
         </div>
       )}
