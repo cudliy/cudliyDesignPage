@@ -150,9 +150,109 @@ class AIService {
     //   throw new Error('Failed to generate 3D model');
     // }
 
-    // NEW: fal.ai TripoSR implementation
+    // NEW: fal.ai Hunyuan3D implementation (with TripoSR fallback)
     try {
-      logger.info('Starting fal.ai TripoSR 3D model generation for image:', imageUrl);
+      logger.info('Starting fal.ai Hunyuan3D 3D model generation for image:', imageUrl);
+      
+      // Check if fal client is properly initialized
+      if (!fal || typeof fal.subscribe !== 'function') {
+        throw new Error('fal.ai client not properly initialized');
+      }
+      
+      logger.info('fal.ai client initialized, calling Hunyuan3D...');
+      
+      // Use fal.ai's Hunyuan3D model
+      const result = await fal.subscribe("fal-ai/hunyuan3d/v2/multi-view/turbo", {
+        input: {
+          front_image_url: imageUrl,
+          // For single image, we'll use the same image for all views
+          // In a real implementation, you might want to generate multiple views
+          back_image_url: imageUrl,
+          left_image_url: imageUrl
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === "IN_PROGRESS") {
+            update.logs.map((log) => log.message).forEach((message) => {
+              logger.info('fal.ai Hunyuan3D:', message);
+            });
+          }
+        },
+      });
+
+      logger.info('fal.ai Hunyuan3D generation completed:', JSON.stringify(result, null, 2));
+
+      // Normalize fal.ai Hunyuan3D outputs into our expected shape
+      const data = result?.data || result || {};
+      
+      // Log the data structure for debugging
+      logger.info('fal.ai Hunyuan3D data structure:', JSON.stringify(data, null, 2));
+
+      const collectCandidateUrls = (value) => {
+        const candidates = [];
+        const pushIfStringUrl = (v) => {
+          if (typeof v === 'string' && (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('/') || v.startsWith('./'))) {
+            candidates.push(v);
+          }
+        };
+
+        const scanObject = (obj) => {
+          if (!obj || typeof obj !== 'object') return;
+          for (const key of Object.keys(obj)) {
+            const v = obj[key];
+            if (typeof v === 'string') {
+              pushIfStringUrl(v);
+            } else if (Array.isArray(v)) {
+              v.forEach(item => scanObject(item));
+            } else if (typeof v === 'object' && v !== null) {
+              // Common nested shapes like { url: "..." }
+              if (v.url && typeof v.url === 'string') pushIfStringUrl(v.url);
+              scanObject(v);
+            }
+          }
+        };
+
+        scanObject(value);
+        return candidates;
+      };
+
+      const candidateUrls = collectCandidateUrls(data);
+      logger.info('fal.ai Hunyuan3D candidate URLs found:', candidateUrls);
+      
+      // Prefer .glb/.obj first
+      const preferred = candidateUrls.find(u => /\.(glb|gltf|obj)(\?|#|$)/i.test(u)) || candidateUrls[0] || null;
+
+      const modelFile = data.model_file
+        || data.modelUrl
+        || data.model
+        || data.glb
+        || data.glb_url
+        || data.file
+        || data.file_url
+        || data?.output?.model_file
+        || preferred;
+
+      logger.info('fal.ai Hunyuan3D final model file URL:', modelFile);
+
+      if (!modelFile) {
+        logger.warn('fal.ai Hunyuan3D: No model file URL found in response');
+        throw new Error('No model file URL found in fal.ai Hunyuan3D response');
+      }
+
+      return {
+        model_file: modelFile,
+        gaussian_ply: data.gaussian_ply || data?.output?.gaussian_ply || null,
+        color_video: data.color_video || data?.output?.color_video || null
+      };
+      
+    } catch (error) {
+      logger.error('fal.ai Hunyuan3D 3D Model Generation Error:', error);
+      
+      // Fallback to fal.ai TripoSR if Hunyuan3D fails
+      logger.warn('fal.ai Hunyuan3D failed, falling back to TripoSR...');
+      
+      try {
+        logger.info('Starting fal.ai TripoSR 3D model generation for image:', imageUrl);
       
       // Check if fal client is properly initialized
       if (!fal || typeof fal.subscribe !== 'function') {

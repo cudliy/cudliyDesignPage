@@ -21,6 +21,8 @@ railway variables --set OPENROUTER_API_KEY="your_actual_openrouter_key"
 railway variables --set STRIPE_SECRET_KEY="your_actual_stripe_secret"
 railway variables --set STRIPE_PUBLISHABLE_KEY="your_actual_stripe_publishable"
 railway variables --set SLANT3D_API_KEY="your_actual_slant3d_key"
+
+# Hunyuan3D is now integrated via fal.ai - no additional setup needed
 ```
 
 ### 2. Deploy
@@ -40,6 +42,7 @@ You'll need to obtain these API keys and replace the placeholders:
 - **STRIPE_SECRET_KEY**: Get from [Stripe Dashboard](https://dashboard.stripe.com/apikeys)
 - **STRIPE_PUBLISHABLE_KEY**: Get from [Stripe Dashboard](https://dashboard.stripe.com/apikeys)
 - **SLANT3D_API_KEY**: Get from [Slant3D](https://slant3d.com/)
+- **Hunyuan3D**: Now available via fal.ai (no additional setup required)
 
 ## 🔧 Alternative: Use Railway Dashboard
 
