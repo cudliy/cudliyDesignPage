@@ -40,6 +40,18 @@ export default function ModelViewer({
       return;
     }
 
+    // Validate URL format
+    try {
+      new URL(modelUrl);
+      console.log('ModelViewer: URL is valid');
+    } catch (error) {
+      console.error('ModelViewer: Invalid URL format:', error);
+      setLoadingState('error');
+      setErrorMessage('Invalid model URL format');
+      onError?.('Invalid model URL format');
+      return;
+    }
+
     setLoadingState('loading');
     setErrorMessage('');
 
@@ -48,18 +60,18 @@ export default function ModelViewer({
       clearTimeout(timeoutRef.current);
     }
 
-    // Set a timeout for model loading (30 seconds)
+    // Set a timeout for model loading (45 seconds for large models)
     timeoutRef.current = setTimeout(() => {
       setLoadingState(currentState => {
         if (currentState === 'loading') {
-          const timeoutError = 'Model loading timed out. Please try again.';
+          const timeoutError = 'Model loading timed out. The model might be too large or the server is slow.';
           setErrorMessage(timeoutError);
           onError?.(timeoutError);
           return 'error';
         }
         return currentState;
       });
-    }, 30000);
+    }, 45000);
 
     const createModelViewer = () => {
       console.log('ModelViewer: createModelViewer called');
@@ -74,39 +86,52 @@ export default function ModelViewer({
         // Create model-viewer element
         const modelViewer = document.createElement('model-viewer');
         console.log('ModelViewer: Setting src attribute to:', modelUrl);
+        
+        // Basic attributes
         modelViewer.setAttribute('src', modelUrl);
         modelViewer.setAttribute('alt', '3D Model');
         modelViewer.setAttribute('camera-controls', '');
         modelViewer.setAttribute('auto-rotate', '');
         modelViewer.setAttribute('interaction-prompt', 'Click & hold to rotate');
+        
+        // Camera settings
         modelViewer.setAttribute('camera-orbit', '45deg 75deg 2.5m');
         modelViewer.setAttribute('field-of-view', '30deg');
         modelViewer.setAttribute('min-camera-orbit', 'auto auto 1m');
         modelViewer.setAttribute('max-camera-orbit', 'auto auto 10m');
         modelViewer.setAttribute('min-field-of-view', '10deg');
         modelViewer.setAttribute('max-field-of-view', '45deg');
-        modelViewer.setAttribute('interpolation-decay', '200');
+        
+        // Loading and rendering settings
         modelViewer.setAttribute('loading', 'eager');
         modelViewer.setAttribute('reveal', 'auto');
+        modelViewer.setAttribute('interpolation-decay', '200');
+        
+        // Lighting and materials
         modelViewer.setAttribute('shadow-intensity', '1');
         modelViewer.setAttribute('shadow-softness', '0.5');
         modelViewer.setAttribute('exposure', '1');
         modelViewer.setAttribute('tone-mapping', 'commerce');
         modelViewer.setAttribute('poster-color', 'transparent');
-        // Ensure proper material rendering
+        
+        // Environment settings for better material rendering
         modelViewer.setAttribute('environment-image', 'neutral');
         modelViewer.setAttribute('skybox-image', 'neutral');
-        // Force material rendering and texture display
-        modelViewer.setAttribute('material-variant', 'default');
-        modelViewer.setAttribute('variant', 'default');
-        // Enable texture rendering
+        
+        // Interaction settings
         modelViewer.setAttribute('enable-pan', '');
         modelViewer.setAttribute('auto-rotate-delay', '0');
         modelViewer.setAttribute('interaction-policy', 'allow-when-focused');
-        // Ensure materials are visible
+        
+        // Ensure proper rendering
         modelViewer.setAttribute('render-scale', '1');
-        modelViewer.setAttribute('min-camera-orbit', 'auto auto 1m');
-        modelViewer.setAttribute('max-camera-orbit', 'auto auto 10m');
+        modelViewer.setAttribute('preload', '');
+        modelViewer.setAttribute('quick-look-browsers', 'safari chrome');
+        
+        // Add specific attributes for glTF files
+        modelViewer.setAttribute('ios-src', modelUrl);
+        modelViewer.setAttribute('ar', '');
+        modelViewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
         
         // Set styles
         modelViewer.style.width = '100%';
@@ -117,12 +142,28 @@ export default function ModelViewer({
         modelViewer.addEventListener('load', (event) => {
           console.log('ModelViewer: Model loaded successfully:', event);
           console.log('ModelViewer: Model URL:', modelUrl);
+          console.log('ModelViewer: Model element:', modelViewer);
           handleLoad();
         });
+        
         modelViewer.addEventListener('error', (event) => {
           console.error('ModelViewer: Model loading error:', event);
           console.error('ModelViewer: Model URL:', modelUrl);
+          console.error('ModelViewer: Error details:', {
+            type: event.type,
+            target: event.target,
+            detail: event.detail,
+            src: modelViewer.src
+          });
           handleError('Model loading failed');
+        });
+        
+        modelViewer.addEventListener('model-visibility', (event) => {
+          console.log('ModelViewer: Model visibility changed:', event);
+        });
+        
+        modelViewer.addEventListener('progress', (event) => {
+          console.log('ModelViewer: Loading progress:', event);
         });
         
         // Store reference to model element for controls
@@ -287,10 +328,14 @@ export default function ModelViewer({
         'tone-mapping': 'commerce',
         'environment-image': 'neutral',
         'skybox-image': 'neutral',
-        'material-variant': 'default',
-        'variant': 'default',
         'enable-pan': '',
         'interaction-policy': 'allow-when-focused',
+        'render-scale': '1',
+        preload: '',
+        'quick-look-browsers': 'safari chrome',
+        'ios-src': modelUrl,
+        ar: '',
+        'ar-modes': 'webxr scene-viewer quick-look',
         style: {
           width: '100%',
           height: '100%',
