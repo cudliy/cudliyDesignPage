@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import axios from 'axios';
 import logger from '../utils/logger.js';
 import { fal } from '@fal-ai/client';
@@ -10,6 +11,11 @@ class AIService {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
     });
+    
+    // Initialize Google Gemini
+    this.gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    this.geminiModel = this.gemini.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    
     this.replicateToken = process.env.REPLICATE_API_TOKEN;
     
     // Initialize fal.ai client
@@ -21,42 +27,56 @@ class AIService {
   async generateEnhancedPrompt(userSelections) {
     const { text, color, size, style, material, production, details } = userSelections;
     
-    const systemPrompt = `You are an expert prompt engineer for AI image generation, specializing in 3D printable objects. 
-    Create detailed, specific prompts that will generate high-quality images suitable for 3D model conversion.
-    
-    Requirements:
-    - Background must be pure white
-    - Object must be fully visible within frame
-    - Style should be clear and well-defined for 3D printing
-    - Include material properties and textures
-    - Consider the production method for appropriate detail level
-    
-    User specifications:
-    - Base description: ${text}
-    - Color: ${color}
-    - Size: ${size}
-    - Style: ${style}
-    - Material: ${material}
-    - Production: ${production}
-    - Details: ${details.join(', ')}
-    
-    Generate a comprehensive prompt that incorporates all these elements naturally.`;
+    const systemPrompt = `You are a helpful assistant that create standard prompt for image generation. The background of the image must always be pure white and the characters described must be fully within the frame of the image. DO NOT CREATE THE IMAGE YOU MUST ONLY WRITE A PROMPT. ONLY IN ALPHABETS NO NUMBERS OR SYMBOLS.`;
 
     try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: text }
-        ],
-        max_tokens: 300,
-        temperature: 0.7
-      });
+      // Try Google Gemini 2.0 Flash first (priority)
+      logger.info('Attempting to generate prompt with Google Gemini 2.0 Flash...');
+      
+      const geminiPrompt = `${systemPrompt}
 
-      return response.choices[0].message.content.trim();
-    } catch (error) {
-      logger.error('OpenAI API Error:', error);
-      throw new Error('Failed to generate enhanced prompt');
+User specifications:
+- Base description: ${text}
+- Color: ${color}
+- Size: ${size}
+- Style: ${style}
+- Material: ${material}
+- Production: ${production}
+- Details: ${details.join(', ')}
+
+Generate a comprehensive prompt that incorporates all these elements naturally.`;
+
+      const geminiResult = await this.geminiModel.generateContent(geminiPrompt);
+      const geminiResponse = await geminiResult.response;
+      const geminiText = geminiResponse.text();
+      
+      logger.info('Google Gemini 2.0 Flash prompt generation successful');
+      return geminiText.trim();
+      
+    } catch (geminiError) {
+      logger.warn('Google Gemini 2.0 Flash failed, falling back to OpenAI:', geminiError.message);
+      
+      try {
+        // Fallback to OpenAI
+        logger.info('Attempting to generate prompt with OpenAI...');
+        
+        const response = await this.openai.chat.completions.create({
+          model: 'gpt-4.1-nano',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Base description: ${text}, Color: ${color}, Size: ${size}, Style: ${style}, Material: ${material}, Production: ${production}, Details: ${details.join(', ')}` }
+          ],
+          max_tokens: 300,
+          temperature: 0.7
+        });
+
+        logger.info('OpenAI prompt generation successful');
+        return response.choices[0].message.content.trim();
+        
+      } catch (openaiError) {
+        logger.error('Both Google Gemini and OpenAI failed:', { geminiError: geminiError.message, openaiError: openaiError.message });
+        throw new Error('Failed to generate enhanced prompt with both AI services');
+      }
     }
   }
 
@@ -173,42 +193,20 @@ class AIService {
 
     // NEW: fal.ai Hunyuan3D implementation (with TripoSR fallback)
     try {
-      logger.info('Starting fal.ai Hunyuan3D 3D model generation for image:', imageUrl);
+      logger.info('Starting fal.ai Hunyuan3D mini/turbo 3D model generation for image:', imageUrl);
       
       // Check if fal client is properly initialized
       if (!fal || typeof fal.subscribe !== 'function') {
         throw new Error('fal.ai client not properly initialized');
       }
       
-      logger.info('fal.ai client initialized, calling Hunyuan3D...');
+      logger.info('fal.ai client initialized, calling Hunyuan3D mini/turbo...');
       
-      // Use fal.ai's Hunyuan3D model with optimized quality settings
-      const result = await fal.subscribe("fal-ai/hunyuan3d/v2/multi-view/turbo", {
+      // Use fal.ai's Hunyuan3D mini/turbo model for faster, simpler 3D generation
+      const result = await fal.subscribe("fal-ai/hunyuan3d/v2/mini/turbo", {
         input: {
-          front_image_url: processedImageUrl,
-          // For single image, we'll use the same image for all views
-          // In a real implementation, you might want to generate multiple views
-          back_image_url: processedImageUrl,
-          left_image_url: processedImageUrl,
-          // Quality enhancement parameters
-          enable_quality_enhancement: true,
-          mesh_resolution: "high", // Options: low, medium, high
-          texture_resolution: "high", // Options: low, medium, high
-          enable_normal_map: true,
-          enable_roughness_map: true,
-          enable_metallic_map: true,
-          enable_occlusion_map: true,
-          // Ensure color preservation
-          preserve_colors: true,
-          enhance_colors: true,
-          color_accuracy: "high",
-          // Advanced mesh settings
-          mesh_simplification: 0.1, // Lower = higher quality (0.1 = 90% of original detail)
-          texture_compression: "high_quality", // Options: low, medium, high_quality
-          // Rendering quality
-          render_quality: "ultra", // Options: low, medium, high, ultra
-          enable_physically_based_rendering: true,
-          enable_global_illumination: true
+          input_image_url: processedImageUrl
+          // Use minimal parameters for mini/turbo version to avoid white rendering issues
         },
         logs: true,
         onQueueUpdate: (update) => {
@@ -220,13 +218,13 @@ class AIService {
         },
       });
 
-      logger.info('fal.ai Hunyuan3D generation completed:', JSON.stringify(result, null, 2));
+      logger.info('fal.ai Hunyuan3D mini/turbo generation completed:', JSON.stringify(result, null, 2));
 
       // Normalize fal.ai Hunyuan3D outputs into our expected shape
       const data = result?.data || result || {};
       
       // Log the data structure for debugging
-      logger.info('fal.ai Hunyuan3D data structure:', JSON.stringify(data, null, 2));
+      logger.info('fal.ai Hunyuan3D mini/turbo data structure:', JSON.stringify(data, null, 2));
 
       const collectCandidateUrls = (value) => {
         const candidates = [];
@@ -257,7 +255,7 @@ class AIService {
       };
 
       const candidateUrls = collectCandidateUrls(data);
-      logger.info('fal.ai Hunyuan3D candidate URLs found:', candidateUrls);
+      logger.info('fal.ai Hunyuan3D mini/turbo candidate URLs found:', candidateUrls);
       
       // Prefer .glb/.obj first
       const preferred = candidateUrls.find(u => /\.(glb|gltf|obj)(\?|#|$)/i.test(u)) || candidateUrls[0] || null;
@@ -272,11 +270,11 @@ class AIService {
         || data?.output?.model_file
         || preferred;
 
-      logger.info('fal.ai Hunyuan3D final model file URL:', modelFile);
+      logger.info('fal.ai Hunyuan3D mini/turbo final model file URL:', modelFile);
 
       if (!modelFile) {
-        logger.warn('fal.ai Hunyuan3D: No model file URL found in response');
-        throw new Error('No model file URL found in fal.ai Hunyuan3D response');
+        logger.warn('fal.ai Hunyuan3D mini/turbo: No model file URL found in response');
+        throw new Error('No model file URL found in fal.ai Hunyuan3D mini/turbo response');
       }
 
       return {
@@ -286,10 +284,10 @@ class AIService {
       };
       
     } catch (error) {
-      logger.error('fal.ai Hunyuan3D 3D Model Generation Error:', error);
+      logger.error('fal.ai Hunyuan3D mini/turbo 3D Model Generation Error:', error);
       
       // Fallback to fal.ai TripoSR if Hunyuan3D fails
-      logger.warn('fal.ai Hunyuan3D failed, falling back to TripoSR...');
+      logger.warn('fal.ai Hunyuan3D mini/turbo failed, falling back to TripoSR...');
       
       try {
         logger.info('Starting fal.ai TripoSR 3D model generation for image:', imageUrl);

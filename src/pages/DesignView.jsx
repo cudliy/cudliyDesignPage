@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
-import ModelViewer from '../components/ModelViewer';
 import { Upload } from 'lucide-react';
 import { testApiConnection } from '../utils/testApiConnection';
+
+// Lazy load ModelViewer to improve initial load time
+const ModelViewer = lazy(() => import('../components/ModelViewer'));
 
 export default function DesignView() {
   const { designId } = useParams();
@@ -24,16 +26,9 @@ export default function DesignView() {
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
 
-  // Helper functions - defined after all hooks
-  const getValidModelUrl = () => {
-    console.log('DesignView: getValidModelUrl called, design:', design);
-    
-    if (!design) {
-      console.log('DesignView: No design data available');
-      return null;
-    }
-    
-    console.log('DesignView: Design modelFiles:', design.modelFiles);
+  // Memoized helper function to get valid model URL
+  const getValidModelUrl = useCallback(() => {
+    if (!design) return null;
     
     const urls = [
       design.modelFiles?.storedModelUrl,
@@ -41,36 +36,31 @@ export default function DesignView() {
       design.modelFiles?.gaussianPly
     ].filter(Boolean);
     
-    console.log('DesignView: Available URLs:', urls);
-    
     // Find the first valid URL
     for (const url of urls) {
       if (url && typeof url === 'string' && url.trim() !== '') {
-        console.log('DesignView: Checking URL:', url);
-        // Basic URL validation
         try {
           new URL(url);
-          console.log('DesignView: Valid URL found:', url);
           return url;
         } catch {
-          // If it's not a full URL, check if it's a relative path or data URL
           if (url.startsWith('/') || url.startsWith('./') || url.startsWith('data:')) {
-            console.log('DesignView: Valid relative/data URL found:', url);
             return url;
           }
         }
       }
     }
     
-    console.log('DesignView: No valid model URL found');
     return null;
-  };
+  }, [design]);
 
-  // Get model URL after function is defined
-  const modelUrl = getValidModelUrl();
+  // Memoized model URL to prevent unnecessary re-renders
+  const modelUrl = useMemo(() => getValidModelUrl(), [getValidModelUrl]);
   
-  // Test with a fallback model URL if no model is available
-  const testModelUrl = modelUrl || 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Cube/glTF-Binary/Cube.glb';
+  // Memoized test model URL with fallback
+  const testModelUrl = useMemo(() => 
+    modelUrl || 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Cube/glTF-Binary/Cube.glb',
+    [modelUrl]
+  );
   
   // Check if model-viewer is available and test API connection
   useEffect(() => {
@@ -87,13 +77,13 @@ export default function DesignView() {
     });
   }, []);
 
-  const handleModelError = (error) => {
+  // Memoized event handlers to prevent unnecessary re-renders
+  const handleModelError = useCallback((error) => {
     console.error('Model loading error:', error);
     setModelLoadError(error);
-  };
+  }, []);
 
-
-  const handleRetryModel = () => {
+  const handleRetryModel = useCallback(() => {
     if (retryCount < maxRetries) {
       setRetryCount(prev => prev + 1);
       setModelLoadError(null);
@@ -103,46 +93,59 @@ export default function DesignView() {
       // If max retries reached, try regenerating the model
       handleRegenerateModel();
     }
-  };
+  }, [retryCount, maxRetries]);
 
+  // Optimized data fetching with better error handling
   useEffect(() => {
     if (!designId) return;
+
+    let isCancelled = false;
 
     const fetchDesign = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
         const response = await apiService.getDesign(designId);
         
-        if (response.success && response.data) {
-          console.log('DesignView: Design data loaded:', response.data);
-          console.log('DesignView: Model files:', response.data.modelFiles);
-          setDesign(response.data);
-        } else {
-          console.error('DesignView: Failed to load design:', response);
-          setError('Failed to load design');
+        if (!isCancelled) {
+          if (response.success && response.data) {
+            setDesign(response.data);
+          } else {
+            setError('Failed to load design');
+          }
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load design');
+        if (!isCancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load design');
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchDesign();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [designId]);
 
-  const handleRegenerateModel = async () => {
+  // Memoized regenerate model function
+  const handleRegenerateModel = useCallback(async () => {
     if (!design || !design.images || design.images.length === 0) return;
     
     try {
       setRegenerating(true);
+      setError(null);
+      
       const selectedImage = design.images.find(img => img.selected)?.url || design.images[0]?.url;
       
       if (!selectedImage) {
         throw new Error('No image found to generate 3D model from');
       }
-
-      console.log('Regenerating 3D model from image:', selectedImage);
       
       // Use existing user ID or generate a new one for guest users
       const userId = design.userId || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${Math.random().toString(36).substr(2, 5)}`;
@@ -164,7 +167,7 @@ export default function DesignView() {
           const updatedResponse = await apiService.getDesign(designId);
           if (updatedResponse.success && updatedResponse.data) {
             setDesign(updatedResponse.data);
-            console.log('3D model regenerated successfully');
+            setModelLoadError(null); // Clear any previous errors
           }
         }
       } else {
@@ -176,10 +179,11 @@ export default function DesignView() {
     } finally {
       setRegenerating(false);
     }
-  };
+  }, [design, designId]);
 
 
-  const handleMakeOrder = async () => {
+  // Memoized make order function
+  const handleMakeOrder = useCallback(async () => {
     if (!designId || !testModelUrl) {
       console.error('Missing designId or modelUrl', { designId, testModelUrl });
       return;
@@ -187,7 +191,7 @@ export default function DesignView() {
 
     try {
       // Use the model URL directly
-      let finalModelUrl = testModelUrl;
+      const finalModelUrl = testModelUrl;
 
       // Navigate to checkout
       navigate(`/checkout/${designId}`, {
@@ -196,7 +200,7 @@ export default function DesignView() {
           originalModelUrl: (modelUrl && !modelUrl.startsWith('blob:') && 
                            (modelUrl.startsWith('http://') || modelUrl.startsWith('https://'))) 
                          ? modelUrl 
-                         : testModelUrl, // Pass original URL only if it's HTTP/HTTPS
+                         : testModelUrl,
           design: design
         }
       });
@@ -204,20 +208,85 @@ export default function DesignView() {
       console.error('Error preparing order:', error);
       setError('Failed to prepare order. Please try again.');
     }
-  };
+  }, [designId, testModelUrl, modelUrl, design, navigate]);
 
 
 
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your 3D model...</p>
+  // Loading skeleton component
+  const LoadingSkeleton = () => (
+    <div className="w-screen h-screen bg-gray-100 overflow-hidden flex p-4 gap-4">
+      {/* Left Pane Skeleton */}
+      <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden animate-pulse">
+        <div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full">
+          <div className="mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-black/50">
+            <div className="flex-1 h-[22px] rounded-full bg-white/20"></div>
+            <div className="flex-1 h-[22px] rounded-full bg-white/40"></div>
+            <div className="flex-1 h-[22px] rounded-full bg-white/20"></div>
+          </div>
+          <div className="h-8 bg-white/20 rounded w-48 mb-2"></div>
+          <div className="h-4 bg-white/20 rounded w-32 mb-8"></div>
+          <div className="mt-4 w-full max-w-[320px] flex-grow min-h-0 space-y-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i}>
+                <div className="h-4 bg-white/20 rounded w-20 mb-3"></div>
+                <div className="h-2 bg-white/20 rounded-full"></div>
+              </div>
+            ))}
+            <div className="mt-8 w-full max-w-[200px] h-12 bg-white/20 rounded-full"></div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Center Panel Skeleton */}
+      <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="w-full h-full bg-gray-200 rounded-lg animate-pulse flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading your 3D model...</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-6 space-y-4 flex-shrink-0">
+          <div className="flex items-center justify-center gap-2 text-gray-600 mb-4">
+            <div className="w-6 h-6 rounded-full border border-gray-400 bg-gray-200"></div>
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+          </div>
+          <div className="flex justify-center gap-4">
+            <div className="w-24 h-12 bg-gray-200 rounded-lg"></div>
+            <div className="w-16 h-12 bg-gray-200 rounded-lg"></div>
+          </div>
         </div>
       </div>
-    );
+
+      {/* Right Panel Skeleton */}
+      <div className="w-80 bg-[#313131] rounded-[40px] p-6 flex flex-col shadow-lg flex-shrink-0 animate-pulse">
+        <div className="mb-8 text-right">
+          <div className="h-4 bg-white/20 rounded w-20 mb-1"></div>
+          <div className="h-8 bg-white/20 rounded w-24 mb-1"></div>
+          <div className="space-y-1">
+            <div className="h-3 bg-white/20 rounded w-16"></div>
+            <div className="h-3 bg-white/20 rounded w-20"></div>
+          </div>
+        </div>
+        <div className="space-y-2 flex-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="w-full flex items-center gap-4 p-4">
+              <div className="w-5 h-5 bg-white/20 rounded"></div>
+              <div className="h-4 bg-white/20 rounded w-24"></div>
+            </div>
+          ))}
+        </div>
+        <div className="text-right mt-auto pt-8">
+          <div className="h-6 bg-white/20 rounded w-16"></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return <LoadingSkeleton />;
   }
 
   if (error || !design) {
@@ -397,18 +466,26 @@ export default function DesignView() {
       <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden">
         {/* 3D Model Area */}
         <div className="flex-1 flex items-center justify-center p-8 relative">
-          {console.log('DesignView: Rendering model area, modelUrl:', modelUrl, 'testModelUrl:', testModelUrl, 'modelLoadError:', modelLoadError, 'design:', design)}
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full max-w-full max-h-full">
-              <ModelViewer
-                modelUrl={testModelUrl}
-                className="w-full h-full"
-                lighting={lighting}
-                background={background}
-                size={size}
-                cameraAngle={cameraAngle}
-                onError={handleModelError}
-              />
+              <Suspense fallback={
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E70D57] mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600">Loading 3D model...</p>
+                  </div>
+                </div>
+              }>
+                <ModelViewer
+                  modelUrl={testModelUrl}
+                  className="w-full h-full"
+                  lighting={lighting}
+                  background={background}
+                  size={size}
+                  cameraAngle={cameraAngle}
+                  onError={handleModelError}
+                />
+              </Suspense>
             </div>
           ) : (
             <div className="text-center">
