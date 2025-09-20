@@ -126,9 +126,8 @@ export default function ModelViewer({
         modelViewer.setAttribute('tone-mapping', 'commerce');
         modelViewer.setAttribute('poster-color', 'transparent');
         
-        // Environment settings for better material rendering
-        modelViewer.setAttribute('environment-image', 'neutral');
-        modelViewer.setAttribute('skybox-image', 'neutral');
+        // Use default environment (no custom environment images)
+        // This prevents HDR loading errors
         
         // Interaction settings
         modelViewer.setAttribute('enable-pan', '');
@@ -155,6 +154,8 @@ export default function ModelViewer({
           console.log('ModelViewer: Model loaded successfully:', event);
           console.log('ModelViewer: Model URL:', modelUrl);
           console.log('ModelViewer: Model element:', modelViewer);
+          console.log('ModelViewer: Model bounds:', modelViewer.getBoundingBox());
+          console.log('ModelViewer: Model scale:', modelViewer.getScale());
           handleLoad();
         });
         
@@ -212,45 +213,29 @@ export default function ModelViewer({
     modelViewer.setAttribute('shadow-intensity', '1');
     modelViewer.setAttribute('shadow-softness', '0.5');
     modelViewer.setAttribute('tone-mapping', 'commerce');
-    modelViewer.setAttribute('environment-image', 'neutral');
-    modelViewer.setAttribute('skybox-image', 'neutral');
     modelViewer.setAttribute('material-variant', 'default');
     modelViewer.setAttribute('variant', 'default');
 
-    // Lighting (0-100) -> Controls both exposure AND environment brightness
+    // Lighting (0-100) -> Controls exposure
     const lightingNormalized = lighting / 100;
     
     // Exposure for direct lighting (0.5 - 2.0)
     const exposureValue = 0.5 + lightingNormalized * 1.5;
     modelViewer.setAttribute('exposure', exposureValue.toString());
-    
-    // Also control environment lighting intensity
-    if (lightingNormalized < 0.3) {
-      modelViewer.setAttribute('environment-image', 'neutral'); // Darker environment
-    } else if (lightingNormalized < 0.7) {
-      modelViewer.setAttribute('environment-image', 'legacy'); // Medium environment
-    } else {
-      modelViewer.removeAttribute('environment-image'); // Bright/Default environment
-    }
 
     // Background (0-100) -> Controls scene background color/intensity
     const backgroundIntensity = background / 100;
     
-    // Method 1: Use skybox-image for different background environments
+    // Set background color without using skybox images
     if (backgroundIntensity < 0.2) {
-      modelViewer.setAttribute('skybox-image', 'neutral');
       modelViewer.style.backgroundColor = '#1a1a1a'; // Dark
     } else if (backgroundIntensity < 0.4) {
-      modelViewer.setAttribute('skybox-image', 'legacy'); 
       modelViewer.style.backgroundColor = '#404040'; // Medium-dark
     } else if (backgroundIntensity < 0.6) {
-      modelViewer.removeAttribute('skybox-image');
       modelViewer.style.backgroundColor = '#808080'; // Medium
     } else if (backgroundIntensity < 0.8) {
-      modelViewer.removeAttribute('skybox-image');
       modelViewer.style.backgroundColor = '#c0c0c0'; // Light
     } else {
-      modelViewer.removeAttribute('skybox-image');
       modelViewer.style.backgroundColor = '#ffffff'; // White
     }
     
@@ -341,8 +326,6 @@ export default function ModelViewer({
         'shadow-softness': '0.5',
         exposure: '1',
         'tone-mapping': 'commerce',
-        'environment-image': 'neutral',
-        'skybox-image': 'neutral',
         'enable-pan': '',
         'interaction-policy': 'allow-when-focused',
         'render-scale': '1',
@@ -393,6 +376,10 @@ export default function ModelViewer({
             </div>
             <p className="text-sm font-medium text-gray-800 mb-1">Failed to load 3D model</p>
             <p className="text-xs text-gray-500 break-words">{errorMessage}</p>
+            <div className="text-xs text-gray-400 mt-2">
+              <p>Model URL: {modelUrl}</p>
+              <p>Model Viewer Available: {isModelViewerAvailable ? 'Yes' : 'No'}</p>
+            </div>
             <button 
               onClick={() => window.location.reload()} 
               className="mt-3 px-3 py-1 text-xs bg-[#E70D57] text-white rounded-md hover:bg-[#d10c50] transition-colors"
