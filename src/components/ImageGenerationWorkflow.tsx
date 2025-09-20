@@ -120,7 +120,11 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
           slat_sampling_steps: 25, // Increased from default for better quality
           ss_guidance_strength: 7.5, // Optimized guidance strength
           slat_guidance_strength: 3.0, // Optimized guidance strength
-          return_no_background: true // Remove background for cleaner models
+          return_no_background: true, // Remove background for cleaner models
+          // Ensure color preservation
+          preserve_colors: true,
+          enhance_colors: true,
+          color_accuracy: "high"
         }
       };
 

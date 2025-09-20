@@ -400,15 +400,14 @@ export default function DesignView() {
           {console.log('DesignView: Rendering model area, modelUrl:', modelUrl, 'testModelUrl:', testModelUrl, 'modelLoadError:', modelLoadError, 'design:', design)}
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full max-w-full max-h-full">
-              {/* Test with a simple model-viewer element first */}
-              <model-viewer
-                src={testModelUrl}
-                alt="3D Model"
-                camera-controls
-                auto-rotate
-                style={{ width: '100%', height: '100%' }}
-                onLoad={() => console.log('Direct model-viewer loaded successfully')}
-                onError={(e) => console.error('Direct model-viewer error:', e)}
+              <ModelViewer
+                modelUrl={testModelUrl}
+                className="w-full h-full"
+                lighting={lighting}
+                background={background}
+                size={size}
+                cameraAngle={cameraAngle}
+                onError={handleModelError}
               />
             </div>
           ) : (

@@ -88,9 +88,17 @@ export default function ModelViewer({
         modelViewer.setAttribute('interpolation-decay', '200');
         modelViewer.setAttribute('loading', 'eager');
         modelViewer.setAttribute('reveal', 'auto');
-        modelViewer.setAttribute('shadow-intensity', '0');
-        modelViewer.setAttribute('shadow-softness', '0');
+        modelViewer.setAttribute('shadow-intensity', '1');
+        modelViewer.setAttribute('shadow-softness', '0.5');
         modelViewer.setAttribute('exposure', '1');
+        modelViewer.setAttribute('tone-mapping', 'commerce');
+        modelViewer.setAttribute('poster-color', 'transparent');
+        // Ensure proper material rendering
+        modelViewer.setAttribute('environment-image', 'neutral');
+        modelViewer.setAttribute('skybox-image', 'neutral');
+        // Force material rendering
+        modelViewer.setAttribute('material-variant', 'default');
+        modelViewer.setAttribute('variant', 'default');
         
         // Set styles
         modelViewer.style.width = '100%';
@@ -98,8 +106,16 @@ export default function ModelViewer({
         modelViewer.style.backgroundColor = 'transparent';
         
         // Add event listeners
-        modelViewer.addEventListener('load', handleLoad);
-        modelViewer.addEventListener('error', handleError);
+        modelViewer.addEventListener('load', (event) => {
+          console.log('ModelViewer: Model loaded successfully:', event);
+          console.log('ModelViewer: Model URL:', modelUrl);
+          handleLoad();
+        });
+        modelViewer.addEventListener('error', (event) => {
+          console.error('ModelViewer: Model loading error:', event);
+          console.error('ModelViewer: Model URL:', modelUrl);
+          handleError('Model loading failed');
+        });
         
         // Store reference to model element for controls
         modelElementRef.current = modelViewer;

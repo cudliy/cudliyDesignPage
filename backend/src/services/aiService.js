@@ -198,6 +198,10 @@ class AIService {
           enable_roughness_map: true,
           enable_metallic_map: true,
           enable_occlusion_map: true,
+          // Ensure color preservation
+          preserve_colors: true,
+          enhance_colors: true,
+          color_accuracy: "high",
           // Advanced mesh settings
           mesh_simplification: 0.1, // Lower = higher quality (0.1 = 90% of original detail)
           texture_compression: "high_quality", // Options: low, medium, high_quality
@@ -305,6 +309,10 @@ class AIService {
           mesh_resolution: "high", // Options: low, medium, high
           texture_resolution: "high", // Options: low, medium, high
           enable_normal_map: true,
+          // Ensure color preservation
+          preserve_colors: true,
+          enhance_colors: true,
+          color_accuracy: "high",
           // Advanced mesh settings
           mesh_simplification: 0.1, // Lower = higher quality
           texture_compression: "high_quality",
