@@ -93,8 +93,10 @@ app.use(cors(corsOptions));
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl} from origin: ${req.headers.origin}`);
   if (req.method === 'OPTIONS') {
     console.log('CORS Preflight request from:', req.headers.origin);
+    console.log('Request headers:', req.headers);
   }
   next();
 });
@@ -110,9 +112,12 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Rate limiting
 app.use('/api/', generalLimiter);
 
-// Global CORS preflight handler
+// Global CORS preflight handler - MUST be before routes
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
+  console.log('CORS Preflight OPTIONS request from origin:', origin);
+  console.log('Requested URL:', req.originalUrl);
+  
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
@@ -125,17 +130,25 @@ app.options('*', (req, res) => {
       'http://localhost:4173'
     ];
   
+  console.log('Allowed origins:', allowedOrigins);
+  
   // Allow all Vercel preview deployments
   const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('vercel.app'));
+  
+  console.log('Is origin allowed?', isAllowed);
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Max-Age', '86400'); // 24 hours
+    console.log('CORS headers set for origin:', origin);
+    res.status(200).end();
+  } else {
+    console.log('CORS blocked origin:', origin);
+    res.status(403).json({ error: 'CORS policy violation' });
   }
-  res.status(200).end();
 });
 
 // Set default values for missing environment variables
@@ -221,6 +234,71 @@ app.get('/api/models/*', (req, res) => {
     success: false,
     error: 'Model serving endpoint not implemented yet'
   });
+});
+
+// Specific CORS handler for designs route
+app.use('/api/designs', (req, res, next) => {
+  const origin = req.headers.origin;
+  console.log(`Designs route ${req.method} ${req.originalUrl} from origin: ${origin}`);
+  
+  const allowedOrigins = process.env.CORS_ORIGINS ? 
+    process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
+    [
+      'https://cudliy-design-page.vercel.app',
+      'https://www.cudliy-design-page.vercel.app',
+      'https://cudliy-design-page-git-main.vercel.app',
+      'https://cudliy-design-page-git-main-cudliy.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:4173'
+    ];
+  
+  // Set CORS headers for all requests to designs route
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('vercel.app'));
+  
+  if (isAllowed) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    console.log('CORS headers set for designs route, origin:', origin);
+  } else {
+    console.log('CORS blocked for designs route, origin:', origin);
+  }
+  next();
+});
+
+// Specific OPTIONS handler for designs route
+app.options('/api/designs/*', (req, res) => {
+  const origin = req.headers.origin;
+  console.log('Designs OPTIONS request from origin:', origin);
+  
+  const allowedOrigins = process.env.CORS_ORIGINS ? 
+    process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
+    [
+      'https://cudliy-design-page.vercel.app',
+      'https://www.cudliy-design-page.vercel.app',
+      'https://cudliy-design-page-git-main.vercel.app',
+      'https://cudliy-design-page-git-main-cudliy.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:4173'
+    ];
+  
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('vercel.app'));
+  
+  if (isAllowed) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400');
+    console.log('Designs OPTIONS CORS headers set for origin:', origin);
+    res.status(200).end();
+  } else {
+    console.log('Designs OPTIONS CORS blocked origin:', origin);
+    res.status(403).json({ error: 'CORS policy violation' });
+  }
 });
 
 // API Routes
