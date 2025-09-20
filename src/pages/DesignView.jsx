@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import ModelViewer from '../components/ModelViewer';
 import { Upload } from 'lucide-react';
-import { slant3DService } from '../services/slant3dService';
 import { testApiConnection } from '../utils/testApiConnection';
 
 export default function DesignView() {
@@ -12,8 +11,6 @@ export default function DesignView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [regenerating, setRegenerating] = useState(false);
-  const [slant3DPricing, setSlant3DPricing] = useState(null);
-  const [pricingLoading, setPricingLoading] = useState(false);
   const navigate = useNavigate();
   
   // Control states - matching the image positions
@@ -96,60 +93,6 @@ export default function DesignView() {
   };
 
 
-  // Load Slant3D pricing when model is available
-  useEffect(() => {
-    const loadSlant3DPricing = async () => {
-      if (!design) return;
-
-      try {
-        setPricingLoading(true);
-        
-        // Use testModelUrl for pricing (either real model or fallback)
-        const pricingModelUrl = testModelUrl;
-        
-        // Use model URL directly for pricing calculation
-        console.log('DesignView: Getting pricing for URL:', pricingModelUrl);
-          const pricing = await slant3DService.getPricing(pricingModelUrl, {
-            material: 'PLA',
-            color: 'black', // Use a valid color from the allowed enum
-            quantity: 1
-          });
-
-        console.log('DesignView: Pricing response:', pricing);
-        if (pricing.success) {
-          setSlant3DPricing(pricing.data);
-          console.log('DesignView: Slant3D pricing set:', pricing.data);
-        } else {
-          throw new Error('Slant3D pricing request failed');
-        }
-      } catch (error) {
-        console.error('Failed to load Slant3D pricing:', error);
-        
-        // Check if it's an API configuration issue
-        if (error.message.includes('API key not configured')) {
-          setError('Slant3D API key not configured. Please set VITE_SLANT3D_API_KEY in your environment variables.');
-        } else if (error.message.includes('API is not accessible')) {
-          setError('Slant3D API is not accessible. The API is currently in beta and may not be publicly available yet. Please contact Slant3D support for API access.');
-        } else if (error.message.includes('too large') || error.message.includes('offset')) {
-          setError('The model file is too large for pricing calculation. Please try with a smaller model or contact support for assistance.');
-        } else if (error.message.includes('Blob URLs are not supported')) {
-          setError('The uploaded model file cannot be used for pricing. Please try with a different model or contact support.');
-        } else if (error.message.includes('Invalid color selection')) {
-          setError('There was an issue with the color selection. Please try again.');
-        } else if (error.message.includes('Invalid model file format')) {
-          setError('The model file format is not supported for pricing. Please try with a different model file.');
-        } else {
-          setError(`Pricing unavailable: ${error.message}. Please check your Slant3D API configuration.`);
-        }
-        
-        setSlant3DPricing(null);
-      } finally {
-        setPricingLoading(false);
-      }
-    };
-
-    loadSlant3DPricing();
-  }, [design, testModelUrl]);
   const handleRetryModel = () => {
     if (retryCount < maxRetries) {
       setRetryCount(prev => prev + 1);
@@ -243,30 +186,12 @@ export default function DesignView() {
     }
 
     try {
-      // Use the model URL directly for Slant3D
+      // Use the model URL directly
       let finalModelUrl = testModelUrl;
 
-      // Store pricing data in session storage for checkout
-      if (slant3DPricing) {
-        sessionStorage.setItem('slant3d_pricing', JSON.stringify(slant3DPricing));
-        sessionStorage.setItem('slant3d_model_url', finalModelUrl);
-        
-        // Store the original HTTP URL for Slant3D API calls
-        // Ensure we only store HTTP/HTTPS URLs, never blob URLs
-        const originalUrl = modelUrl || testModelUrl;
-        if (originalUrl && !originalUrl.startsWith('blob:') && 
-            (originalUrl.startsWith('http://') || originalUrl.startsWith('https://'))) {
-          sessionStorage.setItem('slant3d_original_model_url', originalUrl);
-          console.log('DesignView: Stored original HTTP URL for Slant3D:', originalUrl);
-        } else {
-          console.warn('DesignView: No valid HTTP URL to store for Slant3D:', originalUrl);
-        }
-      }
-
-      // Navigate to checkout with pricing data
+      // Navigate to checkout
       navigate(`/checkout/${designId}`, {
         state: {
-          slant3DPricing: slant3DPricing,
           modelUrl: finalModelUrl,
           originalModelUrl: (modelUrl && !modelUrl.startsWith('blob:') && 
                            (modelUrl.startsWith('http://') || modelUrl.startsWith('https://'))) 
@@ -576,14 +501,9 @@ export default function DesignView() {
             </button>
             <button 
               onClick={handleMakeOrder}
-              disabled={pricingLoading || !slant3DPricing}
-              className={`px-8 py-3 rounded-lg font-medium transition-colors ${
-                pricingLoading || !slant3DPricing
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-[#E70D57] text-white hover:bg-[#d10c50]'
-              }`}
+              className="px-8 py-3 rounded-lg font-medium transition-colors bg-[#E70D57] text-white hover:bg-[#d10c50]"
             >
-              {pricingLoading ? 'Calculating...' : !slant3DPricing ? 'Pricing Required' : 'Make'}
+              Make
             </button>
           </div>
         </div>
@@ -591,40 +511,20 @@ export default function DesignView() {
 
       {/* Right Panel - Options */}
       <div className="w-80 bg-[#313131] rounded-[40px] p-6 flex flex-col shadow-lg flex-shrink-0">
-        {/* Price */}
+        {/* Design Info */}
         <div className="mb-8 text-right">
           <h3 className="text-white/70 text-sm font-medium mb-1">
-            {pricingLoading ? 'Calculating...' : 'Real Price:'}
+            Design Ready
           </h3>
-          {pricingLoading ? (
-            <div className="flex items-center justify-end gap-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-              <span className="text-white text-sm">Loading...</span>
+          <div>
+            <p className="text-2xl font-bold text-white">
+              3D Model
+            </p>
+            <div className="text-xs text-white/60 mt-1">
+              <div>High Quality</div>
+              <div>Download Available</div>
             </div>
-          ) : slant3DPricing ? (
-            <div>
-              <p className="text-4xl font-bold text-white">
-                ${slant3DPricing.pricing.total.toFixed(2)}
-              </p>
-              <div className="text-xs text-white/60 mt-1">
-                <div>Material: {slant3DPricing.material}</div>
-                <div>Est. {slant3DPricing.estimated_days} days</div>
-              </div>
-              {console.log('DesignView: Displaying Slant3D pricing:', slant3DPricing)}
-            </div>
-          ) : (
-            <div>
-              <p className="text-4xl font-bold text-red-400">API in Beta</p>
-              <div className="text-xs text-red-300 mt-1">
-                <div>Slant3D API not accessible</div>
-                <div>Contact Slant3D for access</div>
-              </div>
-              <div className="text-xs text-white/60 mt-1">
-                <div>Beta API - Limited Access</div>
-                {console.log('DesignView: No Slant3D pricing available, API in beta')}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Menu Items */}
