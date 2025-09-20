@@ -154,8 +154,10 @@ export default function ModelViewer({
           console.log('ModelViewer: Model loaded successfully:', event);
           console.log('ModelViewer: Model URL:', modelUrl);
           console.log('ModelViewer: Model element:', modelViewer);
-          console.log('ModelViewer: Model bounds:', modelViewer.getBoundingBox());
-          console.log('ModelViewer: Model scale:', modelViewer.getScale());
+          console.log('ModelViewer: Model dimensions:', {
+            width: modelViewer.offsetWidth,
+            height: modelViewer.offsetHeight
+          });
           handleLoad();
         });
         
