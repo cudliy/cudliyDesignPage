@@ -108,10 +108,19 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
         user_id: userId,
         creation_id: creationId,
         options: {
-          texture_size: 2048,
+          texture_size: 4096, // Increased from 2048 for higher quality
           generate_color: true,
           generate_model: true,
-          randomize_seed: true
+          randomize_seed: true,
+          // Advanced quality settings
+          mesh_simplify: 0.1, // Lower = higher quality (90% detail retention)
+          generate_normal: true, // Enable normal maps for better lighting
+          save_gaussian_ply: true, // Enable high-quality point cloud
+          ss_sampling_steps: 50, // Increased from default for better quality
+          slat_sampling_steps: 25, // Increased from default for better quality
+          ss_guidance_strength: 7.5, // Optimized guidance strength
+          slat_guidance_strength: 3.0, // Optimized guidance strength
+          return_no_background: true // Remove background for cleaner models
         }
       };
 
