@@ -61,8 +61,8 @@ const SignUp = () => {
 
     setIsLoading(true);
     try {
-      const resp = await apiService.signup(formData.email, formData.password, formData.name);
-      if (!resp.success) throw new Error(resp.error || resp.message || 'Signup failed');
+      const resp: any = await apiService.signup(formData.email, formData.password, formData.name);
+      if (resp && resp.error) throw new Error(resp.error || resp.message || 'Signup failed');
       toast.success("Account created successfully! Please sign in.");
       navigate("/signin");
     } catch (error: any) {
