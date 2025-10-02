@@ -9,7 +9,16 @@ pnpm-debug.log*
 dist/
 build/
 *.tsbuildinfo
+# Secrets & keys (root-only rule above may miss nested paths)
 keys/
+backend/keys/
+**/keys/**
+**/service-account*.json
+**/*.pem
+**/*.p12
+**/*.pfx
+**/*.crt
+**/*.key
 .env
 # Environment variables
 .env
@@ -36,6 +45,7 @@ Thumbs.db
 
 # Logs
 logs
+backend/logs/
 *.log
 
 # Runtime data

@@ -5,19 +5,34 @@ import DesignView from './pages/DesignView'
 import Dashboard from './pages/Dashboard'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
+import Index from './pages/Index'
+import SignInPage from './pages/SignInPage'
+import SignUpPage from './pages/SignUpPage'
+import NotFound from './pages/NotFound'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
+import BlogPage from './pages/BlogPage'
+import PricingPage from './pages/PricingPage'
 
 function App() {
   return (
     <Router>
       <div className="h-screen w-screen bg-white">
         <Routes>
-          <Route path="/" element={<DesignPage />} />
+          <Route path="/" element={<Index />} />
           <Route path="/design" element={<DesignPage />} />
           <Route path="/design/:designId" element={<DesignView />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checkout/:designId" element={<CheckoutPage />} />
           <Route path="/order-success" element={<OrderSuccessPage />} />
           <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>

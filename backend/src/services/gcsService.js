@@ -17,12 +17,46 @@ class GCSService {
 
   initializeStorage() {
     try {
-      // Check if we have a key file path
-      const keyFilePath = process.env.GOOGLE_CLOUD_KEY_FILE;
+      // Check if we have individual service account environment variables
+      const hasIndividualVars = process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_TYPE && 
+                               process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_PRIVATE_KEY;
       
-      if (keyFilePath) {
+      if (hasIndividualVars) {
+        // Use individual environment variables
+        const serviceAccountKey = {
+          type: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_TYPE,
+          project_id: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_PROJECT_ID || this.projectId,
+          private_key_id: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_PRIVATE_KEY_ID,
+          private_key: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          client_email: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_CLIENT_EMAIL,
+          client_id: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_CLIENT_ID,
+          auth_uri: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_AUTH_URI,
+          token_uri: process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_TOKEN_URI
+        };
+        
+        this.storage = new Storage({
+          projectId: this.projectId,
+          credentials: serviceAccountKey
+        });
+        logger.info('GCS initialized with individual service account environment variables');
+      } else if (process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY) {
+        // Use base64 encoded service account key
+        const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY, 'base64').toString());
+        this.storage = new Storage({
+          projectId: this.projectId,
+          credentials: serviceAccountKey
+        });
+        logger.info('GCS initialized with base64 encoded service account key');
+      } else if (process.env.GOOGLE_CLOUD_KEY_FILE) {
         // Use service account key file
-        const fullKeyPath = path.resolve(__dirname, '../../..', keyFilePath);
+        let fullKeyPath;
+        if (process.env.GOOGLE_CLOUD_KEY_FILE.startsWith('/')) {
+          // Absolute path (Railway production)
+          fullKeyPath = process.env.GOOGLE_CLOUD_KEY_FILE;
+        } else {
+          // Relative path (local development)
+          fullKeyPath = path.resolve(__dirname, '../../..', process.env.GOOGLE_CLOUD_KEY_FILE);
+        }
         this.storage = new Storage({
           projectId: this.projectId,
           keyFilename: fullKeyPath

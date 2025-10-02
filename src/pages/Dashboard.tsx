@@ -10,8 +10,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [userId] = useState(() => {
-    // Get user ID from session storage (same as used in 3D generation)
-    return sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   });
 
   useEffect(() => {

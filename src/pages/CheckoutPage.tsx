@@ -43,16 +43,13 @@ export default function CheckoutPage() {
   });
 
   const [userId] = useState(() => {
-    // Generate a unique user ID for this session
-    // In a real app, this would come from authentication context
-    const storedUserId = sessionStorage.getItem('guest_user_id');
-    if (storedUserId) {
-      return storedUserId;
-    }
-    // Use a more unique ID to prevent collisions
-    const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${Math.random().toString(36).substr(2, 5)}`;
-    sessionStorage.setItem('guest_user_id', newUserId);
-    return newUserId;
+    const authed = sessionStorage.getItem('user_id');
+    if (authed) return authed;
+    const guest = sessionStorage.getItem('guest_user_id');
+    if (guest) return guest;
+    const newGuest = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${Math.random().toString(36).substr(2, 5)}`;
+    sessionStorage.setItem('guest_user_id', newGuest);
+    return newGuest;
   });
 
   useEffect(() => {

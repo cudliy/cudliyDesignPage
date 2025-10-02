@@ -46,12 +46,10 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
       const request: GenerateImagesRequest = {
         text: finalPrompt, // Strategic Enhancement: Send enhanced prompt to backend
         user_id: (() => {
-          // Generate a unique user ID for this session
-          // In a real app, this would come from authentication context
+          const authed = sessionStorage.getItem('user_id');
+          if (authed) return authed;
           const storedUserId = sessionStorage.getItem('guest_user_id');
-          if (storedUserId) {
-            return storedUserId;
-          }
+          if (storedUserId) return storedUserId;
           const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           sessionStorage.setItem('guest_user_id', newUserId);
           return newUserId;
@@ -96,9 +94,8 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
     try {
       const selectedImage = generatedImages[selectedImageIndex];
       
-      // Generate a unique user ID for this session if not already set
-      const userId = sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      if (!sessionStorage.getItem('guest_user_id')) {
+      const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      if (!sessionStorage.getItem('guest_user_id') && !sessionStorage.getItem('user_id')) {
         sessionStorage.setItem('guest_user_id', userId);
       }
       

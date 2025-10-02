@@ -22,7 +22,7 @@ export default function OrderSuccessPage() {
       setLoading(false);
       
       // Get user ID from session storage or generate one
-      const userId = sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       // Load Slant3D order information
       const storedSlant3DOrder = sessionStorage.getItem('slant3d_order_id');

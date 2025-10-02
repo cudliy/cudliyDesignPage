@@ -20,6 +20,7 @@ import designRoutes from './routes/designRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import sessionRoutes from './routes/sessionRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import checkoutRoutes from './routes/checkoutRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import slant3dRoutes from './routes/slant3dRoutes.js';
@@ -305,6 +306,7 @@ app.options('/api/designs/*', (req, res) => {
 app.use('/api/designs', designRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/session', sessionRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/webhooks', webhookRoutes);

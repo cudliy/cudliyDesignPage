@@ -7,8 +7,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
 
+/* Cudliy Trademark Font */
+@font-face {
+  font-family: 'CudliyTrademark';
+  /* Encode parentheses to avoid CSS minifier parse issues */
+  src: url('./assets/Cudily%20Font%20Trademark%20%281%29.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 @layer utilities {
-  .font-abril { font-family: "Abril Fatface", serif; }
+  .font-abril { font-family: "CudliyTrademark", serif !important; }
   .font-manrope { font-family: "Manrope", sans-serif; }
   .font-fromage { font-family: "Playfair Display", serif; }
 }
@@ -81,5 +92,13 @@
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)) !important;
   font-weight: 900 !important;
   letter-spacing: 0.1em !important;
+}
+
+/* Hide scrollbars while preserving scroll (desktop + mobile) */
+html, body {
+  scrollbar-width: none; /* Firefox */
+}
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }
 

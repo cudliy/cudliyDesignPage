@@ -327,6 +327,21 @@ class ApiService {
     }
   }
 
+  // Auth
+  async signup(email: string, password: string, username?: string): Promise<ApiResponse<{ token: string; data: any }>> {
+    return this.request('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, username })
+    });
+  }
+
+  async login(email: string, password: string): Promise<ApiResponse<{ token: string; data: any }>> {
+    return this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+  }
+
   // Health check
   async healthCheck(): Promise<ApiResponse> {
     return this.request('/health');
@@ -426,6 +441,14 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify(request),
     });
+  }
+
+  // Pricing
+  async getProducts(): Promise<ApiResponse<any>> {
+    return this.request('/payments/products');
+  }
+  async getPrices(productId: string): Promise<ApiResponse<any>> {
+    return this.request(`/payments/products/${productId}/prices`);
   }
 
   async createCheckout(request: CheckoutRequest): Promise<ApiResponse<CheckoutResponse>> {
