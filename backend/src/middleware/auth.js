@@ -11,8 +11,15 @@ export const signToken = (id) => {
 export const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   
+  // Sanitize cookie expiry from env (in days). Fallback to 7 days if unset/invalid
+  const cookieExpireDaysRaw = process.env.JWT_COOKIE_EXPIRES_IN;
+  const cookieExpireDaysParsed = Number(cookieExpireDaysRaw);
+  const cookieExpireDays = Number.isFinite(cookieExpireDaysParsed) && cookieExpireDaysParsed > 0
+    ? cookieExpireDaysParsed
+    : 7;
+
   const cookieOptions = {
-    maxAge: process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000, // in milliseconds
+    maxAge: Math.round(cookieExpireDays * 24 * 60 * 60 * 1000), // milliseconds
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none'
