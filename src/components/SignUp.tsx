@@ -61,10 +61,31 @@ const SignUp = () => {
     try {
       const resp = await apiService.signup(formData.email, formData.password);
       if (!resp.success) throw new Error(resp.error || resp.message || 'Signup failed');
-      toast.success("Account created successfully!");
+      toast.success("Account created successfully! Please sign in.");
       navigate("/signin");
-    } catch (error) {
-      toast.error("An unexpected error occurred");
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      
+      // Parse specific error messages
+      let errorMessage = "An unexpected error occurred";
+      
+      if (error.message) {
+        if (error.message.includes('400') || error.message.includes('Bad Request')) {
+          errorMessage = "Please check your email format and password requirements.";
+        } else if (error.message.includes('409') || error.message.includes('already exists')) {
+          errorMessage = "An account with this email already exists. Please sign in instead.";
+        } else if (error.message.includes('500') || error.message.includes('Internal Server Error')) {
+          errorMessage = "Server error. Please try again later.";
+        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+          errorMessage = "Network error. Please check your connection.";
+        } else if (error.message.includes('API Error:')) {
+          errorMessage = error.message.replace('API Error: ', '');
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -215,7 +236,7 @@ const SignUp = () => {
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Processing...</span>
+                    <span>Creating account</span>
                   </div>
                 ) : (
                   getButtonText()

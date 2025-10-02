@@ -10,16 +10,22 @@
 /* Cudliy Trademark Font */
 @font-face {
   font-family: 'CudliyTrademark';
-  /* Use public path for production compatibility */
-  src: url('/Cudily%20Font%20Trademark%20%281%29.ttf') format('truetype');
+  /* Use public path for production compatibility - avoid parentheses in URL */
+  src: url('/Cudily-Font-Trademark.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
+/* Apply trademark font to headings by default */
+h1, h2, h3, .heading {
+  font-family: "CudliyTrademark", "Abril Fatface", "Playfair Display", serif;
+}
 
 @layer utilities {
-  .font-abril { font-family: "CudliyTrademark" !important; }
+  .font-abril { 
+    font-family: "CudliyTrademark", "Abril Fatface", "Playfair Display", serif !important; 
+  }
   .font-manrope { font-family: "Manrope", sans-serif; }
   .font-fromage { font-family: "Playfair Display", serif; }
 }

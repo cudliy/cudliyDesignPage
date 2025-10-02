@@ -32,10 +32,31 @@ const SignIn = () => {
         sessionStorage.setItem('user_id', userId);
         sessionStorage.removeItem('guest_user_id');
       }
-      toast.success("Signed in successfully!");
+      toast.success("Welcome back! Signed in successfully.");
       navigate("/dashboard");
-    } catch (error) {
-      toast.error("An unexpected error occurred");
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Parse specific error messages
+      let errorMessage = "An unexpected error occurred";
+      
+      if (error.message) {
+        if (error.message.includes('401') || error.message.includes('Invalid credentials')) {
+          errorMessage = "Incorrect email or password. Please try again.";
+        } else if (error.message.includes('400') || error.message.includes('Bad Request')) {
+          errorMessage = "Please check your email and password format.";
+        } else if (error.message.includes('500') || error.message.includes('Internal Server Error')) {
+          errorMessage = "Server error. Please try again later.";
+        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+          errorMessage = "Network error. Please check your connection.";
+        } else if (error.message.includes('API Error:')) {
+          errorMessage = error.message.replace('API Error: ', '');
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -151,7 +172,7 @@ const SignIn = () => {
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Signing in...</span>
+                    <span>Signing in</span>
                   </div>
                 ) : (
                   "Continue"

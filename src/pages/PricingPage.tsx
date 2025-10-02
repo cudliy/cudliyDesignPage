@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import GlassNav from "@/components/GlassNav";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
+import { useNavigate } from "react-router-dom";
 
 const PricingPage = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setTimeout(() => setIsVisible(true), 50);
@@ -148,7 +150,9 @@ const PricingPage = () => {
             {pricingPlans.map((plan, index) => (
               <div
                 key={plan.name}
-                className={`relative p-6 border ${
+                className={`relative p-6 border transform transition-all duration-1000 delay-${600 + index * 100} ease-out ${
+                  isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                } ${
                   plan.isPopular ? 'ring-2 ring-[#E70A55] scale-105 bg-white rounded-2xl' : 
                   index === 0 || index === 1 ? 'text-white border-gray-700 rounded-2xl' :
                   index === 3 ? 'text-white border-gray-700 rounded-2xl' : 'bg-white border-gray-200 rounded-2xl'
@@ -160,7 +164,7 @@ const PricingPage = () => {
                   borderRadius: index === 0 || index === 1 ? '20px' : index === 2 ? '20px' : '16px',
                   margin: index === 2 ? '11.0px' : '5.0px',
                   backgroundColor: index === 0 || index === 1 || index === 3 ? '#313030' : 'white',
-                  boxShadow: index === 2 ? '-8px 4.81px 45px 0px rgba(0, 0, 0, 0.15)' : (index === 0 || index === 1 || index === 3) ? '-4px 4px 30px 0px rgba(0, 0, 0, 0.1)' : 'none',
+                  boxShadow: index === 2 ? '-8px 4.81px 45px 0px rgba(0, 0, 0, 0.15)' : (index === 0 || index === 1 || index === 3) ? '-4px 4px 30px 0px rgba(0, 0, 0, 0.1)' : '0px 2px 8px 0px rgba(0, 0, 0, 0.1)',
                   outline: index === 2 ? 'none' : undefined
                 }}
               >
@@ -201,14 +205,21 @@ const PricingPage = () => {
                 </div>
 
                 <Button
-                  className={`font-semibold text-sm rounded-2xl transition-colors bg-[#E70A55] text-white hover:opacity-90`}
+                  className={`font-semibold text-sm rounded-2xl transition-colors text-white`}
                   style={{
-                    width: index === 0 || index === 1 ? '176px' : index === 3 ? '176px' : '252.72px',
-                    height: index === 0 || index === 1 ? '45px' : index === 3 ? '45px' : '53.10px',
-                    paddingTop: index === 0 || index === 1 || index === 3 ? '15px' : '18.05px',
-                    paddingBottom: index === 0 || index === 1 || index === 3 ? '15px' : '18.05px',
-                    paddingRight: index === 0 || index === 1 ? '10px' : index === 3 ? '10px' : '40.92px',
-                    gap: index === 0 || index === 1 || index === 3 ? '10px' : '12.03px'
+                    width: '176px',
+                    height: '45px',
+                    borderRadius: '15px',
+                    gap: '10px',
+                    paddingTop: '15px',
+                    paddingBottom: '15px',
+                    background: '#E70A55',
+                    opacity: 1
+                  }}
+                  onClick={() => {
+                    if ((plan.buttonText || '').toLowerCase().includes('create a free account')) {
+                      navigate('/signup');
+                    }
                   }}
                 >
                   {plan.buttonText}
@@ -238,7 +249,7 @@ const PricingPage = () => {
       {/* Student Plan */}
       <section className="py-16 px-4 md:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-2xl p-8" style={{
+          <div className={`bg-white rounded-2xl p-8 transform transition-all duration-1000 delay-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} style={{
             width: '1300px',
             height: '212px',
             borderRadius: '20px',
@@ -273,7 +284,7 @@ const PricingPage = () => {
       {/* Consultation Section */}
       <section className="py-16 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-2xl p-8 shadow-lg">
+          <div className={`bg-white rounded-2xl p-8 shadow-lg transform transition-all duration-1000 delay-1200 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
             <div className="flex flex-col lg:flex-row justify-between gap-8 items-center">
               {/* Left content constrained to design width to preserve space for CTA */}
               <div className="flex-1 w-full text-left" style={{maxWidth: '821px'}}>
