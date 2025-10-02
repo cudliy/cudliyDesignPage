@@ -32,6 +32,10 @@ const SignIn = () => {
         sessionStorage.setItem('user_id', userId);
         sessionStorage.removeItem('guest_user_id');
       }
+      const userName = userObj?.name || userObj?.username || userObj?.email || '';
+      if (userName) {
+        sessionStorage.setItem('user_name', userName);
+      }
       toast.success("Welcome back! Signed in successfully.");
       navigate("/dashboard");
     } catch (error: any) {

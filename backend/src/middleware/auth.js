@@ -3,8 +3,27 @@ import { AppError } from '../utils/errorHandler.js';
 import User from '../models/User.js';
 
 export const signToken = (id) => {
+  // Parse JWT_EXPIRES_IN format (e.g., "7d", "24h", "3600s") into seconds
+  const parseExpiresIn = (expiresIn) => {
+    if (!expiresIn) return '7d'; // default fallback
+    
+    const match = expiresIn.match(/^(\d+)([dhms])$/);
+    if (!match) return expiresIn; // return as-is if not in expected format
+    
+    const [, value, unit] = match;
+    const num = parseInt(value, 10);
+    
+    switch (unit) {
+      case 'd': return num * 24 * 60 * 60; // days to seconds
+      case 'h': return num * 60 * 60;       // hours to seconds
+      case 'm': return num * 60;            // minutes to seconds
+      case 's': return num;                 // seconds
+      default: return expiresIn;
+    }
+  };
+
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+    expiresIn: parseExpiresIn(process.env.JWT_EXPIRES_IN)
   });
 };
 

@@ -8,6 +8,7 @@ import { toast } from "@/lib/sonner";
 const SignUp = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -24,6 +25,7 @@ const SignUp = () => {
   }, []);
 
   const steps = [
+    { field: "name", placeholder: "Username" },
     { field: "email", placeholder: "Email Address" },
     { field: "password", placeholder: "Password" },
     { field: "confirmPassword", placeholder: "Confirm Password" }
@@ -59,7 +61,7 @@ const SignUp = () => {
 
     setIsLoading(true);
     try {
-      const resp = await apiService.signup(formData.email, formData.password);
+      const resp = await apiService.signup(formData.email, formData.password, formData.name);
       if (!resp.success) throw new Error(resp.error || resp.message || 'Signup failed');
       toast.success("Account created successfully! Please sign in.");
       navigate("/signin");
@@ -168,9 +170,9 @@ const SignUp = () => {
                 {steps.map((step, index) => (
                   <div key={index} className="w-full flex-shrink-0">
                     <Input
-                      type={step.field === "password" || step.field === "confirmPassword" ? "password" : "email"}
+                      type={step.field === "password" || step.field === "confirmPassword" ? "password" : (step.field === 'email' ? 'email' : 'text')}
                       placeholder={step.placeholder}
-                      value={formData[step.field as keyof typeof formData]}
+                      value={formData[step.field as keyof typeof formData] as string}
                       onChange={(e) => handleInputChange(e.target.value)}
                       className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E70A55] focus:border-transparent"
                       style={{

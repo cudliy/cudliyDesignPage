@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService, type Design } from '../services/api';
 
@@ -9,9 +9,23 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentView, setCurrentView] = useState<'recent' | 'all' | 'orders' | 'trash' | 'tutorial' | 'community' | 'credits' | 'upgrade' | 'edu'>('recent');
   const [userId] = useState(() => {
     return sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   });
+
+  const userName = useMemo(() => sessionStorage.getItem('user_name') || '', []);
+  const userInitials = useMemo(() => {
+    const source = userName || userId || '';
+    if (!source) return 'GU';
+    let namePart = source;
+    if (source.includes('@')) namePart = source.split('@')[0];
+    const parts = namePart.replace(/[_.-]+/g, ' ').trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'GU';
+    const first = parts[0]?.[0] || '';
+    const last = (parts.length > 1 ? parts[parts.length - 1] : parts[0])?.[0] || '';
+    return (first + last).toUpperCase();
+  }, [userName, userId]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -81,19 +95,19 @@ export default function Dashboard() {
 
   const navigationItems = {
     explore: [
-      { name: 'Tutorial', icon: '🎓', active: false },
-      { name: 'Community', icon: '👥', active: false }
+      { name: 'Tutorial', icon: '🎓', key: 'tutorial' as const },
+      { name: 'Community', icon: '👥', key: 'community' as const }
     ],
     creations: [
-      { name: 'Recent', icon: '📄', active: true },
-      { name: 'All Files', icon: '📄', active: false },
-      { name: 'Order history', icon: '🕐', active: false },
-      { name: 'Trash', icon: '🗑️', active: false }
+      { name: 'Recent', icon: '📄', key: 'recent' as const },
+      { name: 'All Files', icon: '📄', key: 'all' as const },
+      { name: 'Order history', icon: '🕐', key: 'orders' as const },
+      { name: 'Trash', icon: '🗑️', key: 'trash' as const }
     ],
     subscription: [
-      { name: 'Credit balance', icon: '💳', active: false },
-      { name: 'Upgrade to Pro', icon: '⚡', active: false },
-      { name: 'EDU License', icon: '🧭', active: false }
+      { name: 'Credit balance', icon: '💳', key: 'credits' as const },
+      { name: 'Upgrade to Pro', icon: '⚡', key: 'upgrade' as const },
+      { name: 'EDU License', icon: '🧭', key: 'edu' as const }
     ]
   };
 
@@ -175,8 +189,9 @@ export default function Dashboard() {
                   {navigationItems.explore.map((item, index) => (
                     <button
                       key={index}
+                      onClick={() => setCurrentView(item.key)}
                       className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left ${
-                        item.active ? 'bg-white/10 text-white' : ''
+                        currentView === item.key ? 'bg-white/10 text-white' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -193,8 +208,9 @@ export default function Dashboard() {
                   {navigationItems.creations.map((item, index) => (
                     <button
                       key={index}
+                      onClick={() => setCurrentView(item.key)}
                       className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left ${
-                        item.active ? 'bg-[#E91E63] text-white shadow-lg shadow-[#E91E63]/20' : ''
+                        currentView === item.key ? 'bg-[#E91E63] text-white shadow-lg shadow-[#E91E63]/20' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -211,8 +227,15 @@ export default function Dashboard() {
                   {navigationItems.subscription.map((item, index) => (
                     <button
                       key={index}
+                      onClick={() => {
+                        if (item.key === 'upgrade') {
+                          navigate('/pricing');
+                        } else {
+                          setCurrentView(item.key);
+                        }
+                      }}
                       className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left ${
-                        item.active ? 'bg-white/10 text-white' : ''
+                        currentView === item.key ? 'bg-white/10 text-white' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -239,9 +262,9 @@ export default function Dashboard() {
             <button className="px-3 sm:px-6 lg:px-8 py-1.5 sm:py-2 lg:py-3 bg-[#E91E63] text-white rounded-full font-semibold hover:bg-[#d81b60] transition-colors shadow-lg text-xs sm:text-sm lg:text-base">
               New Design
             </button>
-            <div className="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 bg-[#FF9800] rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base lg:text-lg shadow-lg">
-              GP
-            </div>
+          <div className="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 bg-[#FF9800] rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base lg:text-lg shadow-lg">
+            {userInitials}
+          </div>
           </div>
         </div>
 
@@ -250,7 +273,14 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4 sm:mb-6 lg:mb-8">
             <h2 className="font-['Georgia'] font-normal text-black" 
                 style={{ fontSize: 'clamp(28px, 5vw, 48px)' }}>
-              Recent
+              {currentView === 'recent' && 'Recent'}
+              {currentView === 'all' && 'All Files'}
+              {currentView === 'orders' && 'Order history'}
+              {currentView === 'trash' && 'Trash'}
+              {currentView === 'tutorial' && 'Tutorial'}
+              {currentView === 'community' && 'Community'}
+              {currentView === 'credits' && 'Credit balance'}
+              {currentView === 'edu' && 'EDU License'}
             </h2>
             {/* Debug info - remove in production */}
             {import.meta.env.DEV && (
@@ -325,7 +355,7 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-          ) : designs.length === 0 ? (
+          ) : (currentView === 'recent' || currentView === 'all') && designs.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -350,6 +380,30 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
+            </div>
+          ) : currentView === 'orders' ? (
+            <div className="py-12 text-center text-gray-600">
+              Order history will appear here.
+            </div>
+          ) : currentView === 'trash' ? (
+            <div className="py-12 text-center text-gray-600">
+              Trash is empty.
+            </div>
+          ) : currentView === 'tutorial' ? (
+            <div className="py-12 text-center text-gray-600">
+              Tutorial coming soon.
+            </div>
+          ) : currentView === 'community' ? (
+            <div className="py-12 text-center text-gray-600">
+              Community features coming soon.
+            </div>
+          ) : currentView === 'credits' ? (
+            <div className="py-12 text-center text-gray-600">
+              Credit balance: 0 (mock).
+            </div>
+          ) : currentView === 'edu' ? (
+            <div className="py-12 text-center text-gray-600">
+              EDU License information coming soon.
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-4xl">
