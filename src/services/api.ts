@@ -302,6 +302,7 @@ class ApiService {
           'Content-Type': 'application/json',
           ...options.headers,
         },
+        credentials: 'include',
         ...options,
       });
 

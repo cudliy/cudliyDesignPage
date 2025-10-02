@@ -1,7 +1,10 @@
+// Bridge to the local toast system implemented in hooks/useToast
+import { toast as toastImpl } from '@/hooks/useToast';
+
 export const toast = {
-  success: (msg: string) => console.log(`[success] ${msg}`),
-  error: (msg: string) => console.error(`[error] ${msg}`),
-  info: (msg: string) => console.info(`[info] ${msg}`),
+  success: (msg: string) => toastImpl({ title: msg }),
+  error: (msg: string) => toastImpl({ title: msg }),
+  info: (msg: string) => toastImpl({ title: msg })
 };
 
 export default toast;

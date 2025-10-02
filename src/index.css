@@ -19,7 +19,7 @@
 
 
 @layer utilities {
-  .font-abril { font-family: "CudliyTrademark", serif !important; }
+  .font-abril { font-family: "CudliyTrademark" !important; }
   .font-manrope { font-family: "Manrope", sans-serif; }
   .font-fromage { font-family: "Playfair Display", serif; }
 }

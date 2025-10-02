@@ -13,11 +13,13 @@ import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import BlogPage from './pages/BlogPage'
 import PricingPage from './pages/PricingPage'
+import Toaster from '@/components/ui/Toaster'
 
 function App() {
   return (
     <Router>
       <div className="h-screen w-screen bg-white">
+        <Toaster />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/design" element={<DesignPage />} />
