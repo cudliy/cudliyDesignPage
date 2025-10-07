@@ -18,10 +18,23 @@ class AIService {
     
     this.replicateToken = process.env.REPLICATE_API_TOKEN;
     
-    // Initialize fal.ai client
+    // Initialize fal.ai client - require API key to be set in environment
+    if (!process.env.FAL_API_KEY) {
+      logger.warn('FAL_API_KEY not set - 3D model generation will not work');
+    } else {
+      logger.info('FAL_API_KEY configured successfully');
+    }
+    
     fal.config({
-      credentials: process.env.FAL_API_KEY || '95638d63-2011-4a66-bf8a-b3647febaf43:cb00658666e670d5ae87a52ce827b874'
+      credentials: process.env.FAL_API_KEY
     });
+    
+    // Validate Replicate token
+    if (!this.replicateToken) {
+      logger.warn('REPLICATE_API_TOKEN not set - 3D model generation fallback will not work');
+    } else {
+      logger.info('REPLICATE_API_TOKEN configured successfully');
+    }
   }
 
   async generateEnhancedPrompt(userSelections) {
