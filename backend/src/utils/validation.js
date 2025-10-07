@@ -69,7 +69,8 @@ export const createPaymentIntentSchema = Joi.object({
 
 export const createSubscriptionSchema = Joi.object({
   userId: Joi.string().required(),
-  priceId: Joi.string().required(),
+  planType: Joi.string().valid('free', 'premium', 'pro').required(),
+  interval: Joi.string().valid('month', 'year').required(),
   metadata: Joi.object().optional()
 });
 

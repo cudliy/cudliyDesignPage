@@ -70,10 +70,10 @@ class StripeService {
         }
         
         // Ensure user has required fields for customer creation
-        const email = user.email || `guest-${userId}@temp.com`;
+        const email = user.email || `user-${userId}@temp.com`;
         const name = user.profile?.firstName 
           ? `${user.profile.firstName} ${user.profile.lastName || ''}`.trim()
-          : user.username || `Guest User ${userId}`;
+          : user.username || `User ${userId}`;
         
         logger.info(`Creating Stripe customer for user ${userId}: ${email}, ${name}`);
         
@@ -187,29 +187,61 @@ class StripeService {
   }
 
   // Checkout Sessions
-  async createCheckoutSession(lineItems, customerId, successUrl, cancelUrl, metadata = {}) {
+  async createCheckoutSession(options) {
     if (!this.stripe) {
       throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
     }
     try {
-      const session = await this.stripe.checkout.sessions.create({
-        customer: customerId,
-        payment_method_types: ['card'],
-        line_items: lineItems,
-        mode: 'payment',
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        metadata,
-        shipping_address_collection: {
-          allowed_countries: ['US', 'CA', 'GB', 'AU']
-        },
-        billing_address_collection: 'required',
-        customer_update: {
-          address: 'auto',
-          name: 'auto'
-        }
-      });
+      // Support both old signature (lineItems, customerId, ...) and new signature (options object)
+      let sessionConfig;
+      
+      if (typeof options === 'object' && options.mode === 'subscription') {
+        // New subscription flow
+        sessionConfig = {
+          customer: options.customerId,
+          payment_method_types: ['card'],
+          line_items: [{
+            price: options.priceId,
+            quantity: 1
+          }],
+          mode: 'subscription',
+          success_url: options.successUrl,
+          cancel_url: options.cancelUrl,
+          metadata: options.metadata || {},
+          billing_address_collection: 'required',
+          customer_update: {
+            address: 'auto',
+            name: 'auto'
+          }
+        };
+      } else {
+        // Legacy one-time payment flow
+        const lineItems = Array.isArray(options) ? options : options.lineItems;
+        const customerId = arguments[1] || options.customerId;
+        const successUrl = arguments[2] || options.successUrl;
+        const cancelUrl = arguments[3] || options.cancelUrl;
+        const metadata = arguments[4] || options.metadata || {};
+        
+        sessionConfig = {
+          customer: customerId,
+          payment_method_types: ['card'],
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+          metadata,
+          shipping_address_collection: {
+            allowed_countries: ['US', 'CA', 'GB', 'AU']
+          },
+          billing_address_collection: 'required',
+          customer_update: {
+            address: 'auto',
+            name: 'auto'
+          }
+        };
+      }
 
+      const session = await this.stripe.checkout.sessions.create(sessionConfig);
       return session;
     } catch (error) {
       logger.error('Create Checkout Session Error:', error);

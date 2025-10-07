@@ -1,47 +1,44 @@
-import dotenv from 'dotenv'
-dotenv.config()
-import { Storage } from '@google-cloud/storage';
+import dotenv from 'dotenv';
+dotenv.config();
+
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import sharp from 'sharp';
 import axios from 'axios';
 import logger from '../utils/logger.js';
 
 class StorageService {
   constructor() {
-    this.storage = new Storage({
-      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-      keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE
+    this.s3Client = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+      }
     });
-    this.bucket = this.storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME);
+    this.bucketName = process.env.AWS_BUCKET_NAME;
   }
 
   async uploadFile(buffer, filename, contentType, metadata = {}) {
     try {
-      const file = this.bucket.file(filename);
-      const stream = file.createWriteStream({
-        metadata: {
-          contentType,
-          cacheControl: 'public, max-age=31536000',
-          ...metadata
-        },
-        public: true
+      const command = new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: filename,
+        Body: buffer,
+        ContentType: contentType,
+        CacheControl: 'public, max-age=31536000',
+        ACL: 'public-read',
+        Metadata: metadata
       });
 
-      return new Promise((resolve, reject) => {
-        stream.on('error', (error) => {
-          logger.error('GCS Upload Error:', error);
-          reject(error);
-        });
-        
-        stream.on('finish', () => {
-          const publicUrl = `https://storage.googleapis.com/${this.bucket.name}/${filename}`;
-          logger.info(`File uploaded successfully: ${publicUrl}`);
-          resolve(publicUrl);
-        });
-        
-        stream.end(buffer);
-      });
+      await this.s3Client.send(command);
+
+      const publicUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
+      logger.info(`File uploaded successfully to S3: ${publicUrl}`);
+      
+      return publicUrl;
     } catch (error) {
-      logger.error('Storage Service Error:', error);
+      logger.error('S3 Upload Error:', error);
       throw error;
     }
   }
@@ -98,8 +95,13 @@ class StorageService {
 
   async deleteFile(filename) {
     try {
-      await this.bucket.file(filename).delete();
-      logger.info(`File deleted: ${filename}`);
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: filename
+      });
+      
+      await this.s3Client.send(command);
+      logger.info(`File deleted from S3: ${filename}`);
     } catch (error) {
       logger.error('File Deletion Error:', error);
       throw error;
@@ -108,10 +110,15 @@ class StorageService {
 
   async getSignedUrl(filename, expiration = 3600) {
     try {
-      const [url] = await this.bucket.file(filename).getSignedUrl({
-        action: 'read',
-        expires: Date.now() + expiration * 1000
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: filename
       });
+      
+      const url = await getSignedUrl(this.s3Client, command, {
+        expiresIn: expiration
+      });
+      
       return url;
     } catch (error) {
       logger.error('Signed URL Error:', error);

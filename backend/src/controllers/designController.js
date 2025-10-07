@@ -8,10 +8,10 @@ import User from '../models/User.js';
 import Subscription from '../models/Subscription.js';
 import aiService from '../services/aiService.js';
 import storageService from '../services/storageService.js';
-import gcsService from '../services/gcsService.js';
+import awsService from '../services/awsService.js';
 
-// Helper function to save images to Google Cloud Storage
-const saveImagesToGCS = async (imageUrls) => {
+// Helper function to save images to AWS S3
+const saveImagesToS3 = async (imageUrls) => {
   const savedImages = [];
   
   for (const imageUrl of imageUrls) {
@@ -21,8 +21,8 @@ const saveImagesToGCS = async (imageUrls) => {
       const randomId = Math.random().toString(36).substr(2, 9);
       const fileName = `image_${timestamp}_${randomId}.jpg`;
       
-      // Upload image to GCS
-      const gcsUrl = await gcsService.uploadFromUrl(imageUrl, fileName, {
+      // Upload image to AWS S3
+      const s3Url = await awsService.uploadFromUrl(imageUrl, fileName, {
         contentType: 'image/jpeg',
         metadata: {
           source: 'ai_generation',
@@ -32,17 +32,17 @@ const saveImagesToGCS = async (imageUrls) => {
       
       savedImages.push({
         originalUrl: imageUrl,
-        gcsUrl: gcsUrl,
+        s3Url: s3Url,
         fileName: fileName
       });
       
-      logger.info(`Image saved to GCS: ${imageUrl} -> ${gcsUrl}`);
+      logger.info(`Image saved to S3: ${imageUrl} -> ${s3Url}`);
     } catch (error) {
-      logger.error(`Failed to save image to GCS: ${imageUrl}`, error);
-      // Keep original URL if GCS upload fails
+      logger.error(`Failed to save image to S3: ${imageUrl}`, error);
+      // Keep original URL if S3 upload fails
       savedImages.push({
         originalUrl: imageUrl,
-        gcsUrl: imageUrl, // Fallback to original URL
+        s3Url: imageUrl, // Fallback to original URL
         fileName: null,
         error: error.message
       });
@@ -52,16 +52,16 @@ const saveImagesToGCS = async (imageUrls) => {
   return savedImages;
 };
 
-// Helper function to save 3D model to Google Cloud Storage
-const saveModelToGCS = async (modelUrl, modelType = 'glb') => {
+// Helper function to save 3D model to AWS S3
+const saveModelToS3 = async (modelUrl, modelType = 'glb') => {
   try {
     // Generate a unique filename
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substr(2, 9);
     const fileName = `model_${timestamp}_${randomId}.${modelType}`;
     
-    // Upload model to GCS
-    const gcsUrl = await gcsService.uploadFromUrl(modelUrl, fileName, {
+    // Upload model to AWS S3
+    const s3Url = await awsService.uploadFromUrl(modelUrl, fileName, {
       contentType: modelType === 'glb' ? 'model/gltf-binary' : 'model/gltf+json',
       metadata: {
         source: 'ai_generation',
@@ -70,18 +70,18 @@ const saveModelToGCS = async (modelUrl, modelType = 'glb') => {
       }
     });
     
-    logger.info(`3D model saved to GCS: ${modelUrl} -> ${gcsUrl}`);
+    logger.info(`3D model saved to S3: ${modelUrl} -> ${s3Url}`);
     return {
       originalUrl: modelUrl,
-      gcsUrl: gcsUrl,
+      s3Url: s3Url,
       fileName: fileName
     };
   } catch (error) {
-    logger.error(`Failed to save 3D model to GCS: ${modelUrl}`, error);
-    // Return original URL if GCS upload fails
+    logger.error(`Failed to save 3D model to S3: ${modelUrl}`, error);
+    // Return original URL if S3 upload fails
     return {
       originalUrl: modelUrl,
-      gcsUrl: modelUrl, // Fallback to original URL
+      s3Url: modelUrl, // Fallback to original URL
       fileName: null,
       error: error.message
     };
@@ -144,17 +144,17 @@ export const generateImages = async (req, res, next) => {
 
     // Save images to Google Cloud Storage
     const imageUrls = imageResults.map(img => img.url);
-    const savedImages = await saveImagesToGCS(imageUrls);
+    const savedImages = await saveImagesToS3(imageUrls);
 
-    // Update session with both original and GCS URLs
+    // Update session with both original and S3 URLs
     session.generatedImages = imageResults.map(img => img.url);
-    session.savedImages = savedImages; // Store GCS information
+    session.savedImages = savedImages; // Store S3 information
     session.currentStep = 'image_selection';
     await session.save();
 
     // No usage tracking for guest users - unlimited access
 
-    logger.info(`Images generated and saved to GCS for session: ${session.id}`);
+    logger.info(`Images generated and saved to S3 for session: ${session.id}`);
 
     res.json({
       success: true,
@@ -162,7 +162,7 @@ export const generateImages = async (req, res, next) => {
         session_id: session.id,
         images: imageResults.map((img, index) => ({
           ...img,
-          gcsUrl: savedImages[index]?.gcsUrl || img.url,
+          s3Url: savedImages[index]?.s3Url || img.url,
           fileName: savedImages[index]?.fileName
         })),
         creation_id,
@@ -225,13 +225,13 @@ export const generate3DModel = async (req, res, next) => {
     let storedPlyUrl = null;
     
     if (modelResult.model_file) {
-      const modelSaveResult = await saveModelToGCS(modelResult.model_file, 'glb');
-      storedModelUrl = modelSaveResult.gcsUrl;
+      const modelSaveResult = await saveModelToS3(modelResult.model_file, 'glb');
+      storedModelUrl = modelSaveResult.s3Url;
     }
     
     if (modelResult.gaussian_ply) {
-      const plySaveResult = await saveModelToGCS(modelResult.gaussian_ply, 'ply');
-      storedPlyUrl = plySaveResult.gcsUrl;
+      const plySaveResult = await saveModelToS3(modelResult.gaussian_ply, 'ply');
+      storedPlyUrl = plySaveResult.s3Url;
     }
     
     // Validate and fix model URLs
@@ -255,7 +255,7 @@ export const generate3DModel = async (req, res, next) => {
       }
     };
     
-    // Create design record with GCS URLs
+    // Create design record with S3 URLs
     const design = new Design({
       userId: actualUserId,
       creationId: creation_id || session?.creationId || `creation_${Date.now()}`,
@@ -275,20 +275,20 @@ export const generate3DModel = async (req, res, next) => {
         storedModelUrl: storedModelUrl,
         gaussianPly: storedPlyUrl || validateModelUrl(modelResult.gaussian_ply),
         colorVideo: validateModelUrl(modelResult.color_video),
-        // Store both original and GCS URLs for reference
+        // Store both original and S3 URLs for reference
         originalModelFile: modelResult.model_file,
         originalGaussianPly: modelResult.gaussian_ply
       },
       generationOptions: options,
       status: 'completed',
-      // Store GCS information
-      gcsStorage: {
+      // Store S3 information
+      s3Storage: {
         modelFile: storedModelUrl ? {
-          gcsUrl: storedModelUrl,
+          s3Url: storedModelUrl,
           originalUrl: modelResult.model_file
         } : null,
         gaussianPly: storedPlyUrl ? {
-          gcsUrl: storedPlyUrl,
+          s3Url: storedPlyUrl,
           originalUrl: modelResult.gaussian_ply
         } : null
       }
@@ -319,13 +319,13 @@ export const generate3DModel = async (req, res, next) => {
         color_video: modelResult.color_video,
         creation_id: creation_id || session?.creationId || design.creationId,
         user_id: actualUserId,
-        gcs_storage: {
+        s3_storage: {
           model_file: storedModelUrl ? {
-            gcs_url: storedModelUrl,
+            s3_url: storedModelUrl,
             original_url: modelResult.model_file
           } : null,
           gaussian_ply: storedPlyUrl ? {
-            gcs_url: storedPlyUrl,
+            s3_url: storedPlyUrl,
             original_url: modelResult.gaussian_ply
           } : null
         }

@@ -200,23 +200,55 @@ export const getPaymentIntent = async (req, res, next) => {
 // Subscriptions
 export const createSubscription = async (req, res, next) => {
   try {
-    const { userId, priceId, metadata = {} } = req.body;
+    const { userId, planType, interval, metadata = {} } = req.body;
 
+    // Get or create customer
     const customer = await stripeService.getCustomer(userId);
-    const subscription = await stripeService.createSubscription(
-      customer.id, 
-      priceId, 
-      { userId, ...metadata }
-    );
+    
+    // Get products to find the correct price ID
+    const products = await stripeService.getProducts();
+    let targetPriceId = null;
+    
+    // Find the price ID based on plan type and interval
+    for (const product of products) {
+      if (product.metadata?.planType === planType) {
+        const prices = await stripeService.getPrices(product.id);
+        const targetPrice = prices.find(price => 
+          price.recurring?.interval === interval && 
+          price.active === true
+        );
+        if (targetPrice) {
+          targetPriceId = targetPrice.id;
+          break;
+        }
+      }
+    }
+
+    if (!targetPriceId) {
+      return next(new AppError(`No price found for plan type: ${planType} with interval: ${interval}`, 400));
+    }
+
+    // Create Stripe Checkout Session for subscription payment
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5174';
+    const checkoutSession = await stripeService.createCheckoutSession({
+      customerId: customer.id,
+      priceId: targetPriceId,
+      mode: 'subscription',
+      successUrl: `${frontendUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${frontendUrl}/pricing`,
+      metadata: {
+        userId,
+        planType,
+        interval,
+        ...metadata
+      }
+    });
 
     res.json({
       success: true,
       data: {
-        subscriptionId: subscription.id,
-        status: subscription.status,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
-        currentPeriodStart: subscription.current_period_start,
-        currentPeriodEnd: subscription.current_period_end
+        checkoutUrl: checkoutSession.url,
+        sessionId: checkoutSession.id
       }
     });
   } catch (error) {

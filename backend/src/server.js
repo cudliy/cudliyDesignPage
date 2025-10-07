@@ -64,6 +64,7 @@ const corsOptions = {
         'https://cudliy-design-page-git-main.vercel.app',
         'https://cudliy-design-page-git-main-cudliy.vercel.app',
         'http://localhost:5173',
+        'http://localhost:5174',
         'http://localhost:3000',
         'http://localhost:4173'
       ];
@@ -127,6 +128,7 @@ app.options('*', (req, res) => {
       'https://cudliy-design-page-git-main.vercel.app',
       'https://cudliy-design-page-git-main-cudliy.vercel.app',
       'http://localhost:5173',
+      'http://localhost:5174',
       'http://localhost:3000',
       'http://localhost:4173'
     ];

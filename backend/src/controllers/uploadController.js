@@ -1,9 +1,9 @@
 import multer from 'multer';
 import logger from '../utils/logger.js';
 import { AppError } from '../utils/errorHandler.js';
-import gcsService from '../services/gcsService.js';
+import awsService from '../services/awsService.js';
 
-// Configure multer for memory storage (we'll upload directly to GCS)
+// Configure multer for memory storage (we'll upload directly to AWS S3)
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -43,17 +43,17 @@ export const uploadImage = async (req, res, next) => {
 
     const { originalname, buffer, mimetype } = req.file;
     
-    // Upload to Google Cloud Storage
-    const gcsUrl = await gcsService.uploadImage(buffer, originalname, mimetype);
+    // Upload to AWS S3
+    const s3Url = await awsService.uploadImage(buffer, originalname, mimetype);
     
-    logger.info(`Image uploaded successfully: ${originalname} -> ${gcsUrl}`);
+    logger.info(`Image uploaded successfully: ${originalname} -> ${s3Url}`);
 
     res.json({
       success: true,
       data: {
         originalName: originalname,
-        fileName: gcsUrl.split('/').pop(),
-        url: gcsUrl,
+        fileName: s3Url.split('/').pop(),
+        url: s3Url,
         size: buffer.length,
         contentType: mimetype
       },
@@ -85,17 +85,17 @@ export const upload3DModel = async (req, res, next) => {
       contentType = 'application/sla';
     }
     
-    // Upload to Google Cloud Storage
-    const gcsUrl = await gcsService.upload3DModel(buffer, originalname, contentType);
+    // Upload to AWS S3
+    const s3Url = await awsService.upload3DModel(buffer, originalname, contentType);
     
-    logger.info(`3D model uploaded successfully: ${originalname} -> ${gcsUrl}`);
+    logger.info(`3D model uploaded successfully: ${originalname} -> ${s3Url}`);
 
     res.json({
       success: true,
       data: {
         originalName: originalname,
-        fileName: gcsUrl.split('/').pop(),
-        url: gcsUrl,
+        fileName: s3Url.split('/').pop(),
+        url: s3Url,
         size: buffer.length,
         contentType: contentType
       },
@@ -126,9 +126,9 @@ export const uploadMultipleFiles = async (req, res, next) => {
         const isImage = mimetype.startsWith('image/') || 
                        originalname.toLowerCase().match(/\.(jpg|jpeg|png|webp)$/);
         
-        let gcsUrl;
+        let s3Url;
         if (isImage) {
-          gcsUrl = await gcsService.uploadImage(buffer, originalname, mimetype);
+          s3Url = await awsService.uploadImage(buffer, originalname, mimetype);
         } else {
           // 3D model
           let contentType = mimetype;
@@ -139,19 +139,19 @@ export const uploadMultipleFiles = async (req, res, next) => {
           } else if (originalname.toLowerCase().endsWith('.stl')) {
             contentType = 'application/sla';
           }
-          gcsUrl = await gcsService.upload3DModel(buffer, originalname, contentType);
+          s3Url = await awsService.upload3DModel(buffer, originalname, contentType);
         }
         
         uploadedFiles.push({
           originalName: originalname,
-          fileName: gcsUrl.split('/').pop(),
-          url: gcsUrl,
+          fileName: s3Url.split('/').pop(),
+          url: s3Url,
           size: buffer.length,
           contentType: mimetype,
           type: isImage ? 'image' : '3d_model'
         });
         
-        logger.info(`File uploaded successfully: ${originalname} -> ${gcsUrl}`);
+        logger.info(`File uploaded successfully: ${originalname} -> ${s3Url}`);
         
       } catch (error) {
         logger.error(`Failed to upload file ${file.originalname}:`, error);
@@ -179,7 +179,7 @@ export const uploadMultipleFiles = async (req, res, next) => {
   }
 };
 
-// Delete file from GCS
+// Delete file from AWS S3
 export const deleteFile = async (req, res, next) => {
   try {
     const { fileName } = req.params;
@@ -188,7 +188,7 @@ export const deleteFile = async (req, res, next) => {
       return next(new AppError('File name is required', 400));
     }
 
-    const deleted = await gcsService.deleteFile(fileName);
+    const deleted = await awsService.deleteFile(fileName);
     
     if (deleted) {
       logger.info(`File deleted successfully: ${fileName}`);
@@ -209,12 +209,12 @@ export const deleteFile = async (req, res, next) => {
   }
 };
 
-// List files in GCS bucket
+// List files in AWS S3 bucket
 export const listFiles = async (req, res, next) => {
   try {
     const { prefix } = req.query;
     
-    const files = await gcsService.listFiles(prefix);
+    const files = await awsService.listFiles(prefix);
     
     res.json({
       success: true,
@@ -241,7 +241,7 @@ export const getFileMetadata = async (req, res, next) => {
       return next(new AppError('File name is required', 400));
     }
 
-    const metadata = await gcsService.getFileMetadata(fileName);
+    const metadata = await awsService.getFileMetadata(fileName);
     
     res.json({
       success: true,
