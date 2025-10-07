@@ -91,8 +91,8 @@ const PricingPage = () => {
     },
     {
       name: "Creator Plan",
-      price: isYearly ? "$12.99" : "$14.99",
-      period: isYearly ? "/month billed yearly ($155.88/year)" : "/month",
+      price: isYearly ? "$12.99" : "$9.99",
+      period: isYearly ? "/month billed yearly ($155.88/year)" : "/1st month then $14.99/month",
       description: "For everyday creators, who want to design with heart.",
       buttonText: isAuthenticated ? "Upgrade Now" : "Create a free account",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",

@@ -11,7 +11,11 @@
         "test:connection": "node test-connection.js",
         "build": "echo 'No build step required for Node.js'",
         "lint": "eslint .",
-        "lint:fix": "eslint . --fix"
+        "lint:fix": "eslint . --fix",
+        "stripe:setup": "node setup-stripe-products.js",
+        "stripe:check": "node check-stripe-products.js",
+        "stripe:fix-yearly": "node fix-stripe-yearly-prices.js",
+        "stripe:setup-promo": "node setup-promotional-coupon.js"
     },
     "keywords": [
         "3d-printing",

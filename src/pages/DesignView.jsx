@@ -339,12 +339,12 @@ export default function DesignView() {
   }
 
   return (
-    <div className="w-screen h-screen bg-gray-100 overflow-hidden flex p-4 gap-4">
+    <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
       {/* Left Pane */}
-      <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden">
+      <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] rounded-[40px] relative overflow-hidden shadow-2xl border border-white/5">
         <button 
           onClick={() => window.history.back()}
-          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-sm text-white/70 z-10 hover:text-white transition-colors cursor-pointer"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg z-10"
         >
           Back
         </button>
@@ -352,14 +352,14 @@ export default function DesignView() {
         {/* Brand and title area */}
         <div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
           {/* Mode selector */}
-          <div className="mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-black/50">
-            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-colors hover:bg-white/10 font-medium">
+          <div className="mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-lg">
+            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
               Voice
             </button>
-            <button className="flex-1 h-[22px] rounded-full text-xs bg-[#DFDFDF] text-black transition-colors font-medium shadow-sm">
+            <button className="flex-1 h-[22px] rounded-full text-xs bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
               Chat
             </button>
-            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-colors hover:bg-white/10 font-medium">
+            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
               Draw
             </button>
           </div>
@@ -482,7 +482,7 @@ export default function DesignView() {
             </div>
 
             {/* Save Button */}
-            <button className="mt-8 w-full max-w-[200px] py-3 bg-[#575757] hover:bg-[#676767] text-white font-medium rounded-full transition-colors hover:scale-105">
+            <button className="mt-8 w-full max-w-[200px] py-3 bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
               Save to draft
             </button>
           </div>
@@ -490,7 +490,7 @@ export default function DesignView() {
       </aside>
 
       {/* Center Panel - 3D Model */}
-      <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden">
+      <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden shadow-xl border border-gray-200/50">
         {/* 3D Model Area */}
         <div className="flex-1 flex items-center justify-center p-8 relative">
           {testModelUrl && !modelLoadError ? (
@@ -602,7 +602,7 @@ export default function DesignView() {
             <button 
               onClick={handleDownload}
               disabled={downloading || !getValidModelUrl()}
-              className="px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-8 py-3 bg-gradient-to-r from-black to-gray-800 text-white rounded-lg font-medium hover:from-gray-800 hover:to-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
             >
               {downloading ? (
                 <>
@@ -618,7 +618,7 @@ export default function DesignView() {
             </button>
             <button 
               onClick={handleMakeOrder}
-              className="px-8 py-3 rounded-lg font-medium transition-colors bg-[#E70D57] text-white hover:bg-[#d10c50]"
+              className="px-8 py-3 rounded-lg font-medium transition-all duration-300 bg-gradient-to-r from-[#E70D57] to-[#d10c50] text-white hover:from-[#d10c50] hover:to-[#E70D57] shadow-lg shadow-[#E70D57]/50 hover:shadow-xl hover:scale-105"
             >
               Make
             </button>
@@ -627,7 +627,7 @@ export default function DesignView() {
       </div>
 
       {/* Right Panel - Options */}
-      <div className="w-80 bg-[#313131] rounded-[40px] p-6 flex flex-col shadow-lg flex-shrink-0">
+      <div className="w-80 bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] rounded-[40px] p-6 flex flex-col shadow-2xl flex-shrink-0 border border-white/5">
 
         {/* Design Info */}
         <div className="mb-8 text-right">
@@ -650,7 +650,7 @@ export default function DesignView() {
           <button 
             onClick={handleDownload}
             disabled={downloading || !getValidModelUrl()}
-            className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left disabled:opacity-50 disabled:cursor-not-allowed border border-white/5 hover:border-white/10 backdrop-blur-sm"
           >
             {downloading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -660,28 +660,28 @@ export default function DesignView() {
             <span className="font-medium">{downloading ? 'Downloading...' : 'Download Model'}</span>
           </button>
 
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
             </svg>
             <span className="font-medium">Creator's Zone</span>
           </button>
 
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
             </svg>
             <span className="font-medium">View Setting</span>
           </button>
 
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
             </svg>
             <span className="font-medium">Design Tips</span>
           </button>
 
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left">
+          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M20.5 7h-17C2.67 7 2 7.67 2 8.5v7C2 16.33 2.67 17 3.5 17h17c.83 0 1.5-.67 1.5-1.5v-7C22 7.67 21.33 7 20.5 7zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
             </svg>

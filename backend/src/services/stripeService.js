@@ -214,6 +214,14 @@ class StripeService {
             name: 'auto'
           }
         };
+
+        // Apply promotional coupon for Creator Plan monthly subscriptions
+        if (options.metadata?.planType === 'premium' && options.metadata?.interval === 'month') {
+          sessionConfig.discounts = [{
+            coupon: 'CREATOR_FIRST_MONTH'
+          }];
+          logger.info('Applying promotional coupon CREATOR_FIRST_MONTH for Creator Plan monthly subscription');
+        }
       } else {
         // Legacy one-time payment flow
         const lineItems = Array.isArray(options) ? options : options.lineItems;

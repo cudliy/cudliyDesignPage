@@ -63,7 +63,7 @@ export default function DesignPage() {
 		canGenerateImages, 
 		canGenerateModels, 
 		remainingImages
-	} = useUsageLimits(userId);
+	} = useUsageLimits(userId || '');
 
 
 	useEffect(() => {
@@ -562,10 +562,10 @@ export default function DesignPage() {
 				<button 
 					onClick={handleCreateClick}
 					disabled={!canGenerateImages}
-					className={`mt-4 px-6 py-2 w-[120px] h-[35px] rounded-[30px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 ${
+					className={`mt-4 px-6 py-2 w-[120px] h-[35px] rounded-[30px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 shadow-lg ${
 						!canGenerateImages
 							? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-							: 'bg-[#E70D57] hover:bg-[#d10c50] text-white'
+							: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white shadow-[#E70D57]/50'
 					} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 				>
 					Create
@@ -575,21 +575,21 @@ export default function DesignPage() {
 	};
 	
 	return (
-		<div className="w-screen h-screen bg-white overflow-hidden flex p-4 gap-4">
+		<div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
 			{/* Left Pane */}
-			<aside className={`flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden transition-all duration-1000 ease-out ${
+			<aside className={`flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] rounded-[40px] relative overflow-hidden transition-all duration-1000 ease-out shadow-2xl border border-white/5 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
 			}`}>
 				<div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex gap-2 z-10">
 					<button 
 						onClick={() => window.location.href = '/dashboard'}
-						className="text-sm text-white/70 hover:text-white transition-colors cursor-pointer"
+						className="px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg"
 					>
 						Dashboard
 					</button>
 					<button 
 						onClick={handleAdvancedClick}
-						className="text-sm text-white/70 hover:text-white transition-colors cursor-pointer"
+						className="px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-gradient-to-r from-[#E70D57]/20 to-[#F4900C]/20 hover:from-[#E70D57]/30 hover:to-[#F4900C]/30 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg"
 					>
 						{isAdvanced ? 'Basic' : 'Advanced'}
 					</button>
@@ -598,16 +598,16 @@ export default function DesignPage() {
 							{/* Brand and title area */}
 			<div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
 					{/* Mode selector */}
-					<div className={`mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-black/50 transition-all duration-700 delay-200 ease-out ${
+					<div className={`mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
-						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-colors hover:bg-white/10 font-medium">
+						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
 							Voice
 						</button>
-						<button className="flex-1 h-[22px] rounded-full text-xs bg-[#DFDFDF] text-black transition-colors font-medium shadow-sm">
+						<button className="flex-1 h-[22px] rounded-full text-xs bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
 							Chat
 						</button>
-						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-colors hover:bg-white/10 font-medium">
+						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
 							Draw
 						</button>
 					</div>
@@ -629,10 +629,10 @@ export default function DesignPage() {
 						placeholder="I want a toy camera"
 						value={prompt}
 						onChange={(e) => setPrompt(e.target.value)}
-						className={`mt-3 lg:mt-6 px-4 py-2 outline-none w-full max-w-[280px] h-[40px] rounded-[20px] border border-white/35 bg-white text-black text-[18px] transition-all duration-700 delay-500 ease-out ${
+						className={`mt-3 lg:mt-6 px-4 py-2 outline-none w-full max-w-[280px] h-[40px] rounded-[20px] border border-gray-200 bg-white text-black text-[18px] transition-all duration-700 delay-500 ease-out focus:border-[#E70D57] focus:ring-2 focus:ring-[#E70D57]/20 shadow-md hover:shadow-lg ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}
-						style={{ caretColor: "#000" }}
+						style={{ caretColor: "#E70D57" }}
 					/>
 
 					{/* Usage Limits Banner */}
@@ -700,16 +700,16 @@ export default function DesignPage() {
 					) : (
 						/* Basic Mode Content - Show Create button and Tour section */
 						<>
-							<button 
-								onClick={handleCreateClick}
-								disabled={!canGenerateImages}
-								className={`mt-3 lg:mt-6 px-5 py-2 w-[120px] h-[35px] rounded-[30px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 ${
-									!canGenerateImages
-										? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-										: 'bg-[#E70D57] text-white hover:bg-[#d10c50]'
-								} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}>
-								Create
-							</button>
+			<button 
+				onClick={handleCreateClick}
+				disabled={!canGenerateImages}
+				className={`mt-3 lg:mt-6 px-5 py-2 w-[120px] h-[35px] rounded-[30px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 shadow-lg ${
+					!canGenerateImages
+						? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+						: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white shadow-[#E70D57]/50'
+				} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}>
+				Create
+			</button>
 
 							{/* Tour section */}
 							<div className={`mt-[2rem] w-full max-w-[320px] flex flex-col items-center text-center flex-grow min-h-0 transition-all duration-700 delay-700 ease-out ${
@@ -808,25 +808,26 @@ export default function DesignPage() {
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full w-full">
 						{/* Grid items with staggered animation */}
 						{['/camera1.png', '/camera2.png', '/camera3.png'].map((src, index) => (
-							<div key={index} className={`bg-white border border-black/5 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-lg ${
+							<div key={index} className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: `${800 + index * 100}ms` }}>
-								<div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4">
+								<div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4 relative group">
+									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 									<img 
 										src={src} 
 										alt={`Toy camera design ${index + 1}`} 
-										className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105" 
+										className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
 									/>
 								</div>
 							</div>
 						))}
 						
-						{/* Fixed plus icon container - removed all potential interference */}
-						<div className={`bg-white border border-black/5 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-lg min-h-[200px] sm:min-h-0 ${
+						{/* Fixed plus icon container */}
+						<div className={`bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 min-h-[200px] sm:min-h-0 group ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 						}`}>
 							<div className="w-full h-full flex items-center justify-center">
-								<button className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-[#F2F2F2] text-[#9B9B9B] flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:bg-[#e8e8e8] hover:scale-110 border-0 outline-none m-0 p-0 leading-none">
+								<button className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:from-[#E70D57]/10 hover:to-[#F4900C]/10 hover:text-[#E70D57] hover:scale-110 border-0 outline-none m-0 p-0 leading-none shadow-lg group-hover:shadow-xl">
 									+
 								</button>
 							</div>
@@ -836,7 +837,7 @@ export default function DesignPage() {
 			</div>
 			
 			{/* Floating help button */}
-			<button className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-xl overflow-hidden transition-all duration-700 delay-1200 ease-out hover:scale-110 z-20 ${
+			<button className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-2xl overflow-hidden transition-all duration-700 delay-1200 ease-out hover:scale-110 z-20 border-2 border-white hover:border-[#E70D57] ${
 				isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 			}`}>
 				<img src="/icon.png" alt="Help" className="w-full h-full object-cover" />

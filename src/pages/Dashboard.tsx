@@ -45,7 +45,7 @@ export default function Dashboard() {
     canGenerateModels, 
     remainingImages, 
     remainingModels 
-  } = useUsageLimits(userId);
+  } = useUsageLimits(userId || '');
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -67,7 +67,7 @@ export default function Dashboard() {
         setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000);
       });
       
-      const apiPromise = apiService.getUserDesigns(userId, 1, 20);
+      const apiPromise = apiService.getUserDesigns(userId || '', 1, 20);
       const response = await Promise.race([apiPromise, timeoutPromise]) as any;
       
       console.log('Dashboard: API response:', response);
@@ -160,9 +160,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="w-full h-screen bg-gray-50 overflow-hidden flex p-2 sm:p-4">
+    <div className="w-full h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-2 sm:p-4">
       {/* Left Sidebar */}
-      <aside className={`bg-[#2B2B2B] ${
+      <aside className={`bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] shadow-2xl border border-white/5 ${
         isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
       } transition-all duration-500 relative flex-shrink-0`} 
       style={{ 
@@ -210,8 +210,8 @@ export default function Dashboard() {
                     <button
                       key={index}
                       onClick={() => setCurrentView(item.key)}
-                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left ${
-                        currentView === item.key ? 'bg-white/10 text-white' : ''
+                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
+                        currentView === item.key ? 'bg-white/10 text-white border-white/20' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -229,8 +229,8 @@ export default function Dashboard() {
                     <button
                       key={index}
                       onClick={() => setCurrentView(item.key)}
-                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left ${
-                        currentView === item.key ? 'bg-[#E91E63] text-white shadow-lg shadow-[#E91E63]/20' : ''
+                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
+                        currentView === item.key ? 'bg-gradient-to-r from-[#E91E63] to-[#d81b60] text-white shadow-lg shadow-[#E91E63]/30 border-[#E91E63]/50' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -254,8 +254,8 @@ export default function Dashboard() {
                           setCurrentView(item.key);
                         }
                       }}
-                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left ${
-                        currentView === item.key ? 'bg-white/10 text-white' : ''
+                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
+                        currentView === item.key ? 'bg-white/10 text-white border-white/20' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -270,7 +270,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4" 
+      <div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4 shadow-xl border border-gray-200/50" 
            style={{ borderRadius: 'clamp(20px, 4vw, 40px)' }}>
         {/* Usage Limits Banner */}
         {usageLimits && (!canGenerateImages || !canGenerateModels) && (
@@ -328,10 +328,10 @@ export default function Dashboard() {
             <button 
               onClick={() => navigate('/design')}
               disabled={!canGenerateImages && !canGenerateModels}
-              className={`px-3 sm:px-6 lg:px-8 py-1.5 sm:py-2 lg:py-3 rounded-full font-semibold transition-colors shadow-lg text-xs sm:text-sm lg:text-base ${
+              className={`px-3 sm:px-6 lg:px-8 py-1.5 sm:py-2 lg:py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-xs sm:text-sm lg:text-base ${
                 !canGenerateImages && !canGenerateModels
                   ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-[#E91E63] text-white hover:bg-[#d81b60]'
+                  : 'bg-gradient-to-r from-[#E91E63] to-[#d81b60] hover:from-[#d81b60] hover:to-[#E91E63] text-white shadow-[#E91E63]/50'
               }`}
             >
               New Design
@@ -370,7 +370,7 @@ export default function Dashboard() {
               <button 
                 onClick={() => fetchDesigns(true)}
                 disabled={refreshing}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+                className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm shadow-lg hover:shadow-xl hover:scale-105"
               >
                 {refreshing ? (
                   <>
@@ -389,10 +389,10 @@ export default function Dashboard() {
               <button 
                 onClick={() => navigate('/design')}
                 disabled={!canGenerateImages && !canGenerateModels}
-                className={`px-6 py-2 rounded-lg font-medium transition-colors text-sm ${
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-lg hover:shadow-xl hover:scale-105 ${
                   !canGenerateImages && !canGenerateModels
                     ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                    : 'bg-[#E70D57] text-white hover:bg-[#d10c50]'
+                    : 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white shadow-[#E70D57]/50'
                 }`}
               >
                 New Design
@@ -439,10 +439,10 @@ export default function Dashboard() {
                   <button 
                     onClick={() => navigate('/design')}
                     disabled={!canGenerateImages && !canGenerateModels}
-                    className={`px-6 py-2 font-medium rounded-full transition-colors ${
+                    className={`px-6 py-2 font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${
                       !canGenerateImages && !canGenerateModels
                         ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                        : 'bg-[#E70D57] hover:bg-[#d10c50] text-white'
+                        : 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white shadow-[#E70D57]/50'
                     }`}
                   >
                     Create Design
@@ -474,7 +474,7 @@ export default function Dashboard() {
             </div>
           ) : currentView === 'credits' ? (
             <div className="py-12">
-              <RateLimitTest userId={userId} />
+              <RateLimitTest userId={userId || ''} />
             </div>
           ) : currentView === 'edu' ? (
             <div className="py-12 text-center text-gray-600">
@@ -486,9 +486,9 @@ export default function Dashboard() {
                 <div
                   key={design.id}
                   onClick={() => handleDesignClick(design.id)}
-                  className={`bg-white border-2 ${getBorderColor(design)} rounded-2xl p-3 sm:p-4 lg:p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 ${
+                  className={`bg-gradient-to-br from-white via-gray-50 to-white border-2 ${getBorderColor(design)} rounded-2xl p-3 sm:p-4 lg:p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 backdrop-blur-sm ${
                     isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-                  } relative group cursor-pointer`}
+                  } relative group cursor-pointer hover:border-[#E91E63]/50`}
                   style={{ transitionDelay: `${index * 150}ms` }}
                 >
                   <div className="flex justify-end mb-2 sm:mb-3 lg:mb-4">
@@ -506,11 +506,12 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex justify-center mb-3 sm:mb-4 lg:mb-6">
-                    <div className="w-16 sm:w-20 lg:w-24 xl:w-32 h-16 sm:h-20 lg:h-24 xl:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <div className="w-16 sm:w-20 lg:w-24 xl:w-32 h-16 sm:h-20 lg:h-24 xl:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner relative group-hover:shadow-lg transition-shadow duration-300">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#E91E63]/5 to-[#d81b60]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <img
                         src={getDesignImage(design)}
                         alt={getDesignTitle(design)}
-                        className="w-14 sm:w-16 lg:w-20 xl:w-24 h-14 sm:h-16 lg:h-20 xl:h-24 object-contain"
+                        className="w-14 sm:w-16 lg:w-20 xl:w-24 h-14 sm:h-16 lg:h-20 xl:h-24 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110"
                       />
                     </div>
                   </div>
