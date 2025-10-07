@@ -297,11 +297,25 @@ class ApiService {
       console.log('Making API request to:', url);
       console.log('Request options:', options);
       
+      // Get JWT token from sessionStorage
+      const token = sessionStorage.getItem('token');
+      console.log('JWT Token from sessionStorage:', token ? 'Found' : 'Not found');
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+      
+      // Add Authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('Authorization header added');
+      } else {
+        console.log('No token found, request will not include Authorization header');
+      }
+      
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
         credentials: 'include',
         ...options,
       });
@@ -514,6 +528,35 @@ class ApiService {
     return this.request(`/payments/users/${userId}/usage/track`, {
       method: 'POST',
       body: JSON.stringify({ type, amount }),
+    });
+  }
+
+  // Subscription management
+  async createSubscription(userId: string, planType: string, interval: 'month' | 'year'): Promise<ApiResponse<{ subscriptionId: string; checkoutUrl: string; clientSecret?: string }>> {
+    return this.request('/payments/subscriptions', {
+      method: 'POST',
+      body: JSON.stringify({ userId, planType, interval }),
+    });
+  }
+
+  async getSubscription(subscriptionId: string): Promise<ApiResponse<any>> {
+    return this.request(`/payments/subscriptions/${subscriptionId}`);
+  }
+
+  async getUserSubscriptions(userId: string): Promise<ApiResponse<any>> {
+    return this.request(`/payments/users/${userId}/subscriptions`);
+  }
+
+  async cancelSubscription(subscriptionId: string): Promise<ApiResponse<any>> {
+    return this.request(`/payments/subscriptions/${subscriptionId}/cancel`, {
+      method: 'POST',
+    });
+  }
+
+  async updateSubscription(subscriptionId: string, updates: any): Promise<ApiResponse<any>> {
+    return this.request(`/payments/subscriptions/${subscriptionId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
     });
   }
 }

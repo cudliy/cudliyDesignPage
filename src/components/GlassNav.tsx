@@ -151,6 +151,11 @@ const GlassNav = () => {
                   variant="ghost" 
                   className="relative text-black hover:text-gray-700 font-manrope text-sm md:text-base px-3 sm:px-4 transform transition-all duration-300 hover:scale-105 group overflow-hidden"
                   onClick={() => {
+                    // Clear session data
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('user_id');
+                    sessionStorage.removeItem('user_name');
+                    sessionStorage.removeItem('guest_user_id');
                     toast.success("Signed out successfully!");
                     navigate("/");
                   }}
@@ -315,6 +320,11 @@ const GlassNav = () => {
                     className="relative text-black hover:text-gray-600 font-abril justify-start px-0 transform transition-all duration-300 hover:translate-x-2 group"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
+                      // Clear session data
+                      sessionStorage.removeItem('token');
+                      sessionStorage.removeItem('user_id');
+                      sessionStorage.removeItem('user_name');
+                      sessionStorage.removeItem('guest_user_id');
                       toast.success("Signed out successfully!");
                       navigate("/");
                     }}

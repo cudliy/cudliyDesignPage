@@ -7,6 +7,7 @@ import MaterialSelector from "../components/MaterialSelector";
 import DetailSelector from "../components/DetailSelector";
 import ImageGenerationWorkflow from "../components/ImageGenerationWorkflow";
 import { usePropertiesAggregator } from "../hooks/usePropertiesAggregator";
+import { useUsageLimits } from "../hooks/useUsageLimits";
 
 export default function DesignPage() {
 	const videoRef = useRef<HTMLVideoElement>(null);
@@ -41,6 +42,28 @@ export default function DesignPage() {
 		resetProperties,
 		hasProperties
 	} = usePropertiesAggregator();
+
+  // Get user ID for usage limits (authenticated users only)
+  const userId = sessionStorage.getItem('user_id');
+  const token = sessionStorage.getItem('token');
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!userId || !token) {
+      console.log('Missing authentication - redirecting to signin');
+      console.log('User ID:', userId);
+      console.log('Token:', token ? 'Present' : 'Missing');
+      window.location.href = '/signin';
+    }
+  }, [userId, token]);
+
+	// Usage limits and subscription status
+	const { 
+		usageLimits, 
+		canGenerateImages, 
+		canGenerateModels, 
+		remainingImages
+	} = useUsageLimits(userId);
 
 
 	useEffect(() => {
@@ -147,6 +170,13 @@ export default function DesignPage() {
 			setError('Please enter a prompt first');
 			return;
 		}
+
+		// Check usage limits before starting workflow
+		if (!canGenerateImages) {
+			setError(`You have reached your monthly image generation limit (${usageLimits?.limits.imagesPerMonth || 3} images). Please upgrade your plan to continue.`);
+			return;
+		}
+
 		setError(null);
 		setShowWorkflow(true);
 	};
@@ -531,9 +561,12 @@ export default function DesignPage() {
 
 				<button 
 					onClick={handleCreateClick}
-					className={`mt-4 px-6 py-2 w-[120px] h-[35px] rounded-[30px] bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 ${
-						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}
+					disabled={!canGenerateImages}
+					className={`mt-4 px-6 py-2 w-[120px] h-[35px] rounded-[30px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 ${
+						!canGenerateImages
+							? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+							: 'bg-[#E70D57] hover:bg-[#d10c50] text-white'
+					} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 				>
 					Create
 				</button>
@@ -602,6 +635,37 @@ export default function DesignPage() {
 						style={{ caretColor: "#000" }}
 					/>
 
+					{/* Usage Limits Banner */}
+					{usageLimits && (!canGenerateImages || !canGenerateModels) && (
+						<div className={`mt-3 w-full max-w-[280px] transition-all duration-700 delay-500 ease-out ${
+							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+						}`}>
+							<div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-3">
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+											<svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+											</svg>
+										</div>
+										<div>
+											<h4 className="text-xs font-semibold text-red-800">Limit Reached</h4>
+											<p className="text-xs text-red-600">
+												{!canGenerateImages && `Images: ${remainingImages}/${usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}`}
+											</p>
+										</div>
+									</div>
+									<button
+										onClick={() => window.location.href = '/pricing'}
+										className="px-3 py-1 bg-[#E70D57] hover:bg-[#d10c50] text-white text-xs font-medium rounded transition-colors"
+									>
+										Upgrade
+									</button>
+								</div>
+							</div>
+						</div>
+					)}
+
 					{/* Error Message */}
 					{error && (
 						<div className={`mt-2 text-red-400 text-sm transition-all duration-300 ${
@@ -638,9 +702,12 @@ export default function DesignPage() {
 						<>
 							<button 
 								onClick={handleCreateClick}
-								className={`mt-3 lg:mt-6 px-5 py-2 w-[120px] h-[35px] rounded-[30px] bg-[#E70D57] text-white font-medium text-sm transition-all duration-700 delay-600 ease-out hover:bg-[#d10c50] hover:scale-105 ${
-									isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-								}`}>
+								disabled={!canGenerateImages}
+								className={`mt-3 lg:mt-6 px-5 py-2 w-[120px] h-[35px] rounded-[30px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 ${
+									!canGenerateImages
+										? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+										: 'bg-[#E70D57] text-white hover:bg-[#d10c50]'
+								} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}>
 								Create
 							</button>
 

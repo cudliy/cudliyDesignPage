@@ -4,16 +4,74 @@ import GlassNav from "@/components/GlassNav";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
+import { apiService } from "../services/api";
 
 const PricingPage = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+
+  // Check authentication status
+  useEffect(() => {
+    const userId = sessionStorage.getItem('user_id');
+    const token = sessionStorage.getItem('token');
+    setIsAuthenticated(!!(userId && token));
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setIsVisible(true), 50);
     return () => clearTimeout(t);
   }, []);
+
+  const handleSubscriptionUpgrade = async (planName: string) => {
+    try {
+      // Check if user is logged in
+      const userId = sessionStorage.getItem('user_id');
+      if (!userId) {
+        // Redirect to signup if not logged in
+        navigate('/signup');
+        return;
+      }
+
+      // Map plan names to backend plan types
+      const planMapping: { [key: string]: string } = {
+        'Creator Plan': 'premium',
+        'Studio Plan': 'pro'
+      };
+
+      const planType = planMapping[planName];
+      if (!planType) {
+        console.error('Unknown plan:', planName);
+        return;
+      }
+
+      console.log('Creating subscription for user:', userId, 'plan:', planType);
+
+      // Create subscription via API
+      const response = await apiService.createSubscription(
+        userId,
+        planType,
+        isYearly ? 'year' : 'month'
+      );
+
+      if (response.success && response.data) {
+        if (response.data.checkoutUrl) {
+          // Redirect to Stripe Checkout
+          window.location.href = response.data.checkoutUrl;
+        } else {
+          console.error('No checkout URL returned');
+          alert('Subscription creation failed. Please try again.');
+        }
+      } else {
+        console.error('Subscription creation failed:', response.error);
+        alert(`Subscription creation failed: ${response.error}`);
+      }
+    } catch (error) {
+      console.error('Error upgrading subscription:', error);
+      alert('An error occurred while creating your subscription. Please try again.');
+    }
+  };
 
   const pricingPlans = [
     {
@@ -21,11 +79,11 @@ const PricingPage = () => {
       price: isYearly ? "$0" : "$0",
       period: isYearly ? "/year" : "/month",
       description: "Perfect for discovering the joy of making.",
-      buttonText: "Create a free account",
+      buttonText: isAuthenticated ? "Current Plan" : "Create a free account",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",
       features: [
-        "15 image prompts/month",
-        "3 model generations",
+        "3 image generations/month",
+        "1 model generation/month",
         "Text, voice, or sketch input",
         "3D viewer to explore your creations",
         "Save to personal gallery"
@@ -33,14 +91,14 @@ const PricingPage = () => {
     },
     {
       name: "Creator Plan",
-      price: isYearly ? "$12.99" : "$9.99",
-      period: isYearly ? "/month billed yearly" : "/1st month then $14.99/month",
+      price: isYearly ? "$12.99" : "$14.99",
+      period: isYearly ? "/month billed yearly ($155.88/year)" : "/month",
       description: "For everyday creators, who want to design with heart.",
-      buttonText: "Create a free account",
+      buttonText: isAuthenticated ? "Upgrade Now" : "Create a free account",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",
       features: [
-        "1500 image generations/month",
-        "75 model generations",
+        "100 image generations/month",
+        "50 model generations/month",
         "Custom textures & colors",
         "Private model library",
         "Advanced Editing Mode",
@@ -51,16 +109,16 @@ const PricingPage = () => {
     {
       name: "Studio Plan",
       price: isYearly ? "$59.99" : "$49.99",
-      period: isYearly ? "/month billed yearly" : "/month",
+      period: isYearly ? "/month billed yearly ($719.88/year)" : "/month",
       description: "Perfect for studios, and Professional who want to scale their work.",
-      buttonText: "Create a free account",
+      buttonText: isAuthenticated ? "Upgrade Now" : "Create a free account",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",
       isPopular: true,
       features: [
-        "Priority queue for faster results",
+        "Unlimited image generations/month",
         "200 model generations/month",
         "Advanced editing (resize, fine-tune)",
-        "Commercial license to sells",
+        "Commercial license to sell",
         "Analytics dashboard",
         "High-poly export options",
         "API access",
@@ -75,8 +133,8 @@ const PricingPage = () => {
       buttonText: "Contact Us",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",
       features: [
-        "Unlimited Image/month",
-        "Unlimited 3D generations/month",
+        "Unlimited image generations/month",
+        "Unlimited 3D model generations/month",
         "Safe Mode filtering",
         "Student galleries for collaboration",
         "Student badges & certificates",
@@ -88,11 +146,11 @@ const PricingPage = () => {
   const studentPlan = {
     name: "College Student Plan",
     offer: "Free for the first 3 months, then $7.99/month",
-      buttonText: "Get Access",
+      buttonText: isAuthenticated ? "Upgrade Now" : "Get Access",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",
     features: [
-      "Unlimited Image and model",
-      "Unlimited Model generation",
+      "Unlimited image generations",
+      "Unlimited model generations",
       "Collaboration Mode (share creations)",
       "Education license for distribution",
       "Portfolio mode (export collections)",
@@ -217,8 +275,18 @@ const PricingPage = () => {
                     opacity: 1
                   }}
                   onClick={() => {
-                    if ((plan.buttonText || '').toLowerCase().includes('create a free account')) {
+                    if (!isAuthenticated) {
+                      // Not logged in - redirect to signup
                       navigate('/signup');
+                    } else if (plan.name === 'Free Plan') {
+                      // Already on free plan - do nothing or show message
+                      alert('You are already on the Free Plan!');
+                    } else if (plan.name === 'Creator Plan' || plan.name === 'Studio Plan') {
+                      // Handle subscription upgrade
+                      handleSubscriptionUpgrade(plan.name);
+                    } else if (plan.name === 'Enterprise & EDU') {
+                      // Handle contact for enterprise
+                      window.location.href = 'mailto:sales@cudliy.com?subject=Enterprise Pricing Inquiry';
                     }
                   }}
                 >
@@ -260,7 +328,19 @@ const PricingPage = () => {
               <div className="lg:w-1/3 flex flex-col justify-center">
                 <h3 className="text-2xl font-bold text黑 mb-4">{studentPlan.name}</h3>
                 <p className="text-base text-gray-600 mb-6">{studentPlan.offer}</p>
-                <Button className="bg-black text-white px-9 py-4 rounded-2xl font-semibold text-sm" style={{width: '211.81px', height: '53.10px'}}>
+                <Button 
+                  className="bg-black text-white px-9 py-4 rounded-2xl font-semibold text-sm" 
+                  style={{width: '211.81px', height: '53.10px'}}
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      // Not logged in - redirect to signup
+                      navigate('/signup');
+                    } else {
+                      // Handle student plan upgrade
+                      alert('Student plan upgrade - please contact sales@cudliy.com for verification');
+                    }
+                  }}
+                >
                   {studentPlan.buttonText}
                 </Button>
               </div>

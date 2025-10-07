@@ -25,7 +25,20 @@ const SignIn = () => {
     
     try {
       const resp: any = await apiService.login(email, password);
+      console.log('Login response:', resp);
       const payload = (resp && (resp as any)) || {};
+      console.log('Login payload:', payload);
+      
+      // Store JWT token
+      const token = payload.token || payload.data?.token;
+      console.log('Extracted token:', token);
+      if (token) {
+        sessionStorage.setItem('token', token);
+        console.log('Token stored in sessionStorage');
+      } else {
+        console.log('No token found in login response');
+      }
+      
       const userObj = payload.data?.user || payload.user || payload.data;
       const userId = userObj?.id || userObj?._id || payload.userId;
       if (userId) {

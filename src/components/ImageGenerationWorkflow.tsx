@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
+import { useUsageLimits } from '../hooks/useUsageLimits';
 
 interface ImageGenerationWorkflowProps {
   prompt: string;
@@ -23,12 +24,42 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
   const [sessionId, setSessionId] = useState<string>('');
   const [creationId, setCreationId] = useState<string>('');
 
+    // Get user ID for usage limits (authenticated users only)
+    const userId = sessionStorage.getItem('user_id');
+    const token = sessionStorage.getItem('token');
+    
+    // Redirect to login if not authenticated
+    useEffect(() => {
+      if (!userId || !token) {
+        console.log('Missing authentication - redirecting to signin');
+        console.log('User ID:', userId);
+        console.log('Token:', token ? 'Present' : 'Missing');
+        window.location.href = '/signin';
+      }
+    }, [userId, token]);
+
+  const { 
+    canGenerateImages, 
+    canGenerateModels, 
+    remainingImages, 
+    remainingModels, 
+    usageLimits,
+    checkLimits 
+  } = useUsageLimits(userId);
+
   const generateImages = async () => {
+    console.log('Generating images for user ID:', userId);
     // Strategic Enhancement: Use enhanced prompt if available, otherwise fallback to original
     const finalPrompt = enhancedPrompt || prompt;
     
     if (!finalPrompt.trim()) {
       onError('Please enter a prompt first');
+      return;
+    }
+
+    // Check usage limits before generating images
+    if (!canGenerateImages) {
+      onError(`You have reached your monthly image generation limit (${usageLimits?.limits.imagesPerMonth || 3} images). Please upgrade your plan to continue.`);
       return;
     }
 
@@ -68,6 +99,16 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
       if (response.success && response.data) {
         setGeneratedImages(response.data.images);
         setSessionId(response.data.session_id);
+        
+        // Track usage after successful generation
+        try {
+          await apiService.trackUsage(userId, 'image', response.data.images.length);
+          // Refresh usage limits
+          await checkLimits();
+        } catch (trackingError) {
+          console.error('Failed to track usage:', trackingError);
+          // Don't fail the generation if tracking fails
+        }
       } else {
         throw new Error(response.error || 'Failed to generate images');
       }
@@ -86,6 +127,12 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
   const generate3DModel = async () => {
     if (selectedImageIndex === null) {
       onError('Please select an image first');
+      return;
+    }
+
+    // Check usage limits before generating 3D model
+    if (!canGenerateModels) {
+      onError(`You have reached your monthly model generation limit (${usageLimits?.limits.modelsPerMonth || 1} models). Please upgrade your plan to continue.`);
       return;
     }
 
@@ -128,6 +175,16 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
       const response = await apiService.generate3DModel(request);
       
       if (response.success && response.data) {
+        // Track usage after successful 3D model generation
+        try {
+          await apiService.trackUsage(userId, 'model', 1);
+          // Refresh usage limits
+          await checkLimits();
+        } catch (trackingError) {
+          console.error('Failed to track usage:', trackingError);
+          // Don't fail the generation if tracking fails
+        }
+        
         onComplete(response.data.design_id);
       } else {
         throw new Error(response.error || 'Failed to generate 3D model');
@@ -142,12 +199,39 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
 
   return (
     <div className="w-full max-w-4xl mx-auto">
+      {/* Usage Limits Display */}
+      {usageLimits && (
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+          <div className="flex justify-between items-center text-sm">
+            <span className="font-medium">Current Plan: {usageLimits.plan}</span>
+            <div className="flex gap-4">
+              <span className="text-gray-600">
+                Images: {remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}
+              </span>
+              <span className="text-gray-600">
+                Models: {remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth}
+              </span>
+            </div>
+          </div>
+          {(!canGenerateImages || !canGenerateModels) && (
+            <div className="mt-2 text-center">
+              <button
+                onClick={() => window.location.href = '/pricing'}
+                className="text-[#E70D57] hover:text-[#d10c50] font-medium text-sm underline"
+              >
+                Upgrade to continue generating
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Generate Images Button */}
       {generatedImages.length === 0 && (
         <div className="text-center">
           <button
             onClick={generateImages}
-            disabled={isGenerating}
+            disabled={isGenerating || !canGenerateImages}
             className="px-8 py-3 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGenerating ? 'Generating Images...' : 'Generate Images'}
@@ -208,7 +292,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
             <div className="text-center">
               <button
                 onClick={generate3DModel}
-                disabled={isCreating3D}
+                disabled={isCreating3D || !canGenerateModels}
                 className="px-8 py-3 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isCreating3D ? 'Creating 3D Model...' : 'Generate 3D Model'}

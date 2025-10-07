@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService, type Design } from '../services/api';
+import { useUsageLimits } from '../hooks/useUsageLimits';
+import RateLimitTest from '../components/RateLimitTest';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -11,7 +13,16 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [currentView, setCurrentView] = useState<'recent' | 'all' | 'orders' | 'trash' | 'tutorial' | 'community' | 'credits' | 'upgrade' | 'edu'>('recent');
   const [userId] = useState(() => {
-    return sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const userId = sessionStorage.getItem('user_id');
+    const token = sessionStorage.getItem('token');
+    if (!userId || !token) {
+      // Redirect to login if not authenticated
+      console.log('Missing authentication - redirecting to signin');
+      console.log('User ID:', userId);
+      console.log('Token:', token ? 'Present' : 'Missing');
+      window.location.href = '/signin';
+    }
+    return userId;
   });
 
   const userName = useMemo(() => sessionStorage.getItem('user_name') || '', []);
@@ -26,6 +37,15 @@ export default function Dashboard() {
     const last = (parts.length > 1 ? parts[parts.length - 1] : parts[0])?.[0] || '';
     return (first + last).toUpperCase();
   }, [userName, userId]);
+
+  // Usage limits and subscription status
+  const { 
+    usageLimits, 
+    canGenerateImages, 
+    canGenerateModels, 
+    remainingImages, 
+    remainingModels 
+  } = useUsageLimits(userId);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
@@ -252,14 +272,68 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4" 
            style={{ borderRadius: 'clamp(20px, 4vw, 40px)' }}>
+        {/* Usage Limits Banner */}
+        {usageLimits && (!canGenerateImages || !canGenerateModels) && (
+          <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 sm:mt-6 lg:mt-8 mb-2">
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-red-800">Usage Limit Reached</h3>
+                    <p className="text-xs text-red-600">
+                      {!canGenerateImages && `Images: ${remainingImages}/${usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}`}
+                      {!canGenerateImages && !canGenerateModels && ' • '}
+                      {!canGenerateModels && `Models: ${remainingModels}/${usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth}`}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/pricing')}
+                  className="px-4 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Upgrade Plan
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 lg:p-8 pb-2 sm:pb-4 flex-shrink-0">
-          <div></div>
+          <div className="flex items-center gap-4">
+            {/* Usage Status Display */}
+            {usageLimits && (
+              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-600">
+                <span className="px-2 py-1 bg-gray-100 rounded-full">
+                  {usageLimits.plan}
+                </span>
+                <span>
+                  {remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth} images
+                </span>
+                <span>
+                  {remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth} models
+                </span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
             <button className="px-2 sm:px-3 lg:px-4 py-1 sm:py-2 text-gray-500 hover:text-gray-700 transition-colors font-medium text-xs sm:text-sm lg:text-base">
               Design
             </button>
-            <button className="px-3 sm:px-6 lg:px-8 py-1.5 sm:py-2 lg:py-3 bg-[#E91E63] text-white rounded-full font-semibold hover:bg-[#d81b60] transition-colors shadow-lg text-xs sm:text-sm lg:text-base">
+            <button 
+              onClick={() => navigate('/design')}
+              disabled={!canGenerateImages && !canGenerateModels}
+              className={`px-3 sm:px-6 lg:px-8 py-1.5 sm:py-2 lg:py-3 rounded-full font-semibold transition-colors shadow-lg text-xs sm:text-sm lg:text-base ${
+                !canGenerateImages && !canGenerateModels
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  : 'bg-[#E91E63] text-white hover:bg-[#d81b60]'
+              }`}
+            >
               New Design
             </button>
           <div className="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 bg-[#FF9800] rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base lg:text-lg shadow-lg">
@@ -282,15 +356,6 @@ export default function Dashboard() {
               {currentView === 'credits' && 'Credit balance'}
               {currentView === 'edu' && 'EDU License'}
             </h2>
-            {/* Debug info - remove in production */}
-            {import.meta.env.DEV && (
-              <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
-                <div>User ID: {userId}</div>
-                <div>Loading: {loading ? 'Yes' : 'No'}</div>
-                <div>Error: {error || 'None'}</div>
-                <div>Designs: {designs.length}</div>
-              </div>
-            )}
           </div>
 
           <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -323,7 +388,12 @@ export default function Dashboard() {
               </button>
               <button 
                 onClick={() => navigate('/design')}
-                className="px-6 py-2 bg-[#E70D57] text-white rounded-lg font-medium hover:bg-[#d10c50] transition-colors text-sm"
+                disabled={!canGenerateImages && !canGenerateModels}
+                className={`px-6 py-2 rounded-lg font-medium transition-colors text-sm ${
+                  !canGenerateImages && !canGenerateModels
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-[#E70D57] text-white hover:bg-[#d10c50]'
+                }`}
               >
                 New Design
               </button>
@@ -368,7 +438,12 @@ export default function Dashboard() {
                 <div className="flex gap-2 justify-center">
                   <button 
                     onClick={() => navigate('/design')}
-                    className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
+                    disabled={!canGenerateImages && !canGenerateModels}
+                    className={`px-6 py-2 font-medium rounded-full transition-colors ${
+                      !canGenerateImages && !canGenerateModels
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-[#E70D57] hover:bg-[#d10c50] text-white'
+                    }`}
                   >
                     Create Design
                   </button>
@@ -398,8 +473,8 @@ export default function Dashboard() {
               Community features coming soon.
             </div>
           ) : currentView === 'credits' ? (
-            <div className="py-12 text-center text-gray-600">
-              Credit balance: 0 (mock).
+            <div className="py-12">
+              <RateLimitTest userId={userId} />
             </div>
           ) : currentView === 'edu' ? (
             <div className="py-12 text-center text-gray-600">
