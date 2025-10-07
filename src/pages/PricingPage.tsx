@@ -28,9 +28,14 @@ const PricingPage = () => {
     try {
       // Check if user is logged in
       const userId = sessionStorage.getItem('user_id');
-      if (!userId) {
-        // Redirect to signup if not logged in
-        navigate('/signup');
+      const token = sessionStorage.getItem('token');
+      
+      console.log('Authentication check:', { userId, hasToken: !!token, isAuthenticated });
+      
+      if (!userId || !token || !isAuthenticated) {
+        // Redirect to signin if not logged in
+        console.log('User not authenticated, redirecting to signin');
+        navigate('/signin');
         return;
       }
 
@@ -43,10 +48,11 @@ const PricingPage = () => {
       const planType = planMapping[planName];
       if (!planType) {
         console.error('Unknown plan:', planName);
+        alert('Invalid plan selected. Please try again.');
         return;
       }
 
-      console.log('Creating subscription for user:', userId, 'plan:', planType);
+      console.log('Creating subscription for user:', userId, 'plan:', planType, 'interval:', isYearly ? 'year' : 'month');
 
       // Create subscription via API
       const response = await apiService.createSubscription(
@@ -55,17 +61,20 @@ const PricingPage = () => {
         isYearly ? 'year' : 'month'
       );
 
+      console.log('Subscription creation response:', response);
+
       if (response.success && response.data) {
         if (response.data.checkoutUrl) {
           // Redirect to Stripe Checkout
+          console.log('Redirecting to Stripe Checkout:', response.data.checkoutUrl);
           window.location.href = response.data.checkoutUrl;
         } else {
-          console.error('No checkout URL returned');
+          console.error('No checkout URL returned:', response.data);
           alert('Subscription creation failed. Please try again.');
         }
       } else {
         console.error('Subscription creation failed:', response.error);
-        alert(`Subscription creation failed: ${response.error}`);
+        alert(`Subscription creation failed: ${response.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error upgrading subscription:', error);
@@ -276,11 +285,11 @@ const PricingPage = () => {
                   }}
                   onClick={() => {
                     if (!isAuthenticated) {
-                      // Not logged in - redirect to signup
-                      navigate('/signup');
+                      // Not logged in - redirect to signin
+                      navigate('/signin');
                     } else if (plan.name === 'Free Plan') {
-                      // Already on free plan - do nothing or show message
-                      alert('You are already on the Free Plan!');
+                      // Already on free plan - redirect to dashboard
+                      navigate('/dashboard');
                     } else if (plan.name === 'Creator Plan' || plan.name === 'Studio Plan') {
                       // Handle subscription upgrade
                       handleSubscriptionUpgrade(plan.name);
@@ -333,11 +342,11 @@ const PricingPage = () => {
                   style={{width: '211.81px', height: '53.10px'}}
                   onClick={() => {
                     if (!isAuthenticated) {
-                      // Not logged in - redirect to signup
-                      navigate('/signup');
+                      // Not logged in - redirect to signin
+                      navigate('/signin');
                     } else {
                       // Handle student plan upgrade
-                      alert('Student plan upgrade - please contact sales@cudliy.com for verification');
+                      alert('Student plan upgrade - please contact sales@cudliy.com with your .edu email for verification');
                     }
                   }}
                 >

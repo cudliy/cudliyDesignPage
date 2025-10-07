@@ -60,31 +60,60 @@ export default function Dashboard() {
         setLoading(true);
       }
       
+      if (!userId) {
+        console.error('Dashboard: No userId available');
+        setDesigns([]);
+        setError(null);
+        return;
+      }
+      
       console.log('Dashboard: Fetching designs for user:', userId);
       
       // Add timeout to prevent infinite loading
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout after 10 seconds')), 10000);
+        setTimeout(() => reject(new Error('Request timeout after 15 seconds')), 15000);
       });
       
-      const apiPromise = apiService.getUserDesigns(userId || '', 1, 20);
+      const apiPromise = apiService.getUserDesigns(userId, 1, 50);
       const response = await Promise.race([apiPromise, timeoutPromise]) as any;
       
       console.log('Dashboard: API response:', response);
       
       if (response.success && response.data) {
-        setDesigns(response.data.designs);
+        const fetchedDesigns = response.data.designs || [];
+        setDesigns(fetchedDesigns);
         setError(null);
-        console.log('Dashboard: Designs loaded:', response.data.designs);
+        console.log('Dashboard: Designs loaded successfully:', fetchedDesigns.length, 'designs');
+        
+        // Store in sessionStorage as cache (optional)
+        if (fetchedDesigns.length > 0) {
+          sessionStorage.setItem('cached_designs', JSON.stringify(fetchedDesigns));
+          sessionStorage.setItem('cached_designs_timestamp', Date.now().toString());
+        }
       } else {
         throw new Error(response.error || 'Failed to fetch designs');
       }
     } catch (err) {
       console.error('Dashboard: Error fetching designs:', err);
       
-      // If it's a network error or backend is not available, show empty state instead of error
+      // If it's a network error or backend is not available, try to load from cache
       if (err instanceof Error && (err.message.includes('timeout') || err.message.includes('Failed to fetch') || err.message.includes('Network'))) {
-        console.log('Dashboard: Backend not available, showing empty state');
+        console.log('Dashboard: Backend not available, checking cache...');
+        
+        // Try to load from cache if available and recent (less than 5 minutes old)
+        const cachedDesigns = sessionStorage.getItem('cached_designs');
+        const cachedTimestamp = sessionStorage.getItem('cached_designs_timestamp');
+        
+        if (cachedDesigns && cachedTimestamp) {
+          const cacheAge = Date.now() - parseInt(cachedTimestamp);
+          if (cacheAge < 5 * 60 * 1000) { // 5 minutes
+            console.log('Dashboard: Loading from cache');
+            setDesigns(JSON.parse(cachedDesigns));
+            setError(null);
+            return;
+          }
+        }
+        
         setDesigns([]);
         setError(null);
       } else {
@@ -97,17 +126,24 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchDesigns();
+    if (userId) {
+      fetchDesigns();
+    }
   }, [userId]);
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 60 seconds (only if user is on recent/all view)
   useEffect(() => {
+    if (!userId) return;
+    
     const interval = setInterval(() => {
-      fetchDesigns(true);
-    }, 30000);
+      if (currentView === 'recent' || currentView === 'all') {
+        console.log('Dashboard: Auto-refreshing designs...');
+        fetchDesigns(true);
+      }
+    }, 60000); // 60 seconds
 
     return () => clearInterval(interval);
-  }, [userId]);
+  }, [userId, currentView]);
 
   const handleDesignClick = (designId: string) => {
     navigate(`/design/${designId}`);
