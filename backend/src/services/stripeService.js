@@ -535,12 +535,105 @@ class StripeService {
   // Webhook Handlers
   async handleCheckoutSessionCompleted(session) {
     try {
-      // Import the handler function dynamically to avoid circular imports
-      const { handleCheckoutSessionCompleted } = await import('../controllers/checkoutController.js');
-      await handleCheckoutSessionCompleted(session);
-      logger.info(`Checkout session completed: ${session.id}`);
+      logger.info(`Processing checkout session: ${session.id}, mode: ${session.mode}`);
+      
+      // Handle subscription checkout
+      if (session.mode === 'subscription') {
+        const { userId, planType } = session.metadata || {};
+        
+        if (!userId) {
+          logger.error(`No userId in session metadata: ${session.id}`);
+          return;
+        }
+
+        // Retrieve the subscription from Stripe
+        const stripeSubscription = await this.stripe.subscriptions.retrieve(session.subscription);
+        
+        // Get price and product details
+        const priceId = stripeSubscription.items.data[0].price.id;
+        const price = await this.stripe.prices.retrieve(priceId);
+        const product = await this.stripe.products.retrieve(price.product);
+        
+        // Determine plan type from metadata or product
+        const actualPlanType = planType || product.metadata?.planType || product.metadata?.type || 'premium';
+        
+        logger.info(`Creating subscription for user ${userId}, plan: ${actualPlanType}`);
+        
+        // Check if subscription already exists
+        let subscriptionRecord = await Subscription.findOne({ 
+          stripeSubscriptionId: stripeSubscription.id 
+        });
+        
+        if (subscriptionRecord) {
+          logger.info(`Subscription already exists, updating: ${stripeSubscription.id}`);
+          subscriptionRecord.status = stripeSubscription.status;
+          subscriptionRecord.billing = {
+            currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+            trialStart: stripeSubscription.trial_start ? new Date(stripeSubscription.trial_start * 1000) : null,
+            trialEnd: stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000) : null,
+            cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end || false
+          };
+          await subscriptionRecord.save();
+        } else {
+          // Create new subscription record
+          subscriptionRecord = new Subscription({
+            userId: userId,
+            stripeSubscriptionId: stripeSubscription.id,
+            stripeCustomerId: session.customer,
+            stripePriceId: priceId,
+            productId: product.id,
+            status: stripeSubscription.status,
+            plan: {
+              name: product.name,
+              type: this.getPlanType(actualPlanType),
+              price: {
+                amount: price.unit_amount / 100,
+                currency: price.currency,
+                interval: price.recurring?.interval,
+                intervalCount: price.recurring?.interval_count || 1
+              },
+              features: this.getPlanFeatures(actualPlanType),
+              limits: this.getPlanLimits(actualPlanType)
+            },
+            billing: {
+              currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
+              currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+              trialStart: stripeSubscription.trial_start ? new Date(stripeSubscription.trial_start * 1000) : null,
+              trialEnd: stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000) : null,
+              cancelAtPeriodEnd: false
+            },
+            metadata: {
+              source: 'web',
+              referrer: session.metadata?.referrer || '',
+              campaign: session.metadata?.campaign || ''
+            }
+          });
+          await subscriptionRecord.save();
+          logger.info(`Subscription record created: ${subscriptionRecord.id}`);
+        }
+        
+        // Update user subscription status
+        await User.findOneAndUpdate(
+          { id: userId },
+          {
+            'subscription.type': subscriptionRecord.plan.type,
+            'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
+            'subscription.features': subscriptionRecord.plan.features
+          }
+        );
+        
+        logger.info(`User ${userId} subscription updated to ${subscriptionRecord.plan.type}`);
+        logger.info(`Subscription checkout completed: ${session.id}`);
+      } else {
+        // Handle one-time payment checkout (physical products)
+        const { handleCheckoutSessionCompleted } = await import('../controllers/checkoutController.js');
+        await handleCheckoutSessionCompleted(session);
+        logger.info(`Order checkout completed: ${session.id}`);
+      }
     } catch (error) {
       logger.error('Handle Checkout Session Completed Error:', error);
+      logger.error('Error details:', error.message);
     }
   }
 
@@ -582,32 +675,122 @@ class StripeService {
 
   async handleSubscriptionCreated(subscription) {
     try {
-      // Update subscription status
-      await Subscription.findOneAndUpdate(
-        { stripeSubscriptionId: subscription.id },
-        { status: subscription.status }
-      );
-
-      logger.info(`Subscription created: ${subscription.id}`);
+      // Check if subscription already exists
+      let subscriptionRecord = await Subscription.findOne({ 
+        stripeSubscriptionId: subscription.id 
+      });
+      
+      if (subscriptionRecord) {
+        // Update existing subscription status
+        subscriptionRecord.status = subscription.status;
+        subscriptionRecord.billing = {
+          currentPeriodStart: new Date(subscription.current_period_start * 1000),
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          trialStart: subscription.trial_start ? new Date(subscription.trial_start * 1000) : null,
+          trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end || false
+        };
+        await subscriptionRecord.save();
+        logger.info(`Subscription updated: ${subscription.id}`);
+      } else {
+        // Create new subscription if it doesn't exist (webhook arrived before checkout.session.completed)
+        logger.info(`Subscription not found, creating from webhook: ${subscription.id}`);
+        
+        // Get price and product details
+        const priceId = subscription.items.data[0].price.id;
+        const price = await this.stripe.prices.retrieve(priceId);
+        const product = await this.stripe.products.retrieve(price.product);
+        
+        const planType = product.metadata?.planType || product.metadata?.type || 'premium';
+        
+        // Try to get userId from subscription metadata
+        const userId = subscription.metadata?.userId;
+        if (!userId) {
+          logger.error(`No userId in subscription metadata: ${subscription.id}`);
+          return;
+        }
+        
+        subscriptionRecord = new Subscription({
+          userId: userId,
+          stripeSubscriptionId: subscription.id,
+          stripeCustomerId: subscription.customer,
+          stripePriceId: priceId,
+          productId: product.id,
+          status: subscription.status,
+          plan: {
+            name: product.name,
+            type: this.getPlanType(planType),
+            price: {
+              amount: price.unit_amount / 100,
+              currency: price.currency,
+              interval: price.recurring?.interval,
+              intervalCount: price.recurring?.interval_count || 1
+            },
+            features: this.getPlanFeatures(planType),
+            limits: this.getPlanLimits(planType)
+          },
+          billing: {
+            currentPeriodStart: new Date(subscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            trialStart: subscription.trial_start ? new Date(subscription.trial_start * 1000) : null,
+            trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
+            cancelAtPeriodEnd: false
+          },
+          metadata: {
+            source: subscription.metadata?.source || 'web'
+          }
+        });
+        await subscriptionRecord.save();
+        
+        // Update user subscription status
+        await User.findOneAndUpdate(
+          { id: userId },
+          {
+            'subscription.type': subscriptionRecord.plan.type,
+            'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
+            'subscription.features': subscriptionRecord.plan.features
+          }
+        );
+        
+        logger.info(`Subscription created from webhook: ${subscription.id}`);
+      }
     } catch (error) {
       logger.error('Handle Subscription Created Error:', error);
+      logger.error('Error details:', error.message);
     }
   }
 
   async handleSubscriptionUpdated(subscription) {
     try {
-      await Subscription.findOneAndUpdate(
+      const subscriptionRecord = await Subscription.findOneAndUpdate(
         { stripeSubscriptionId: subscription.id },
         {
           status: subscription.status,
+          'billing.currentPeriodStart': new Date(subscription.current_period_start * 1000),
+          'billing.currentPeriodEnd': new Date(subscription.current_period_end * 1000),
           'billing.cancelAtPeriodEnd': subscription.cancel_at_period_end,
           'billing.canceledAt': subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null
-        }
+        },
+        { new: true }
       );
+      
+      // Update user subscription if the subscription is still active
+      if (subscriptionRecord && (subscription.status === 'active' || subscription.status === 'trialing')) {
+        await User.findOneAndUpdate(
+          { id: subscriptionRecord.userId },
+          {
+            'subscription.type': subscriptionRecord.plan.type,
+            'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
+            'subscription.features': subscriptionRecord.plan.features
+          }
+        );
+        logger.info(`User ${subscriptionRecord.userId} subscription updated`);
+      }
 
-      logger.info(`Subscription updated: ${subscription.id}`);
+      logger.info(`Subscription updated: ${subscription.id}, status: ${subscription.status}`);
     } catch (error) {
       logger.error('Handle Subscription Updated Error:', error);
+      logger.error('Error details:', error.message);
     }
   }
 
@@ -642,17 +825,38 @@ class StripeService {
 
   async handleInvoicePaymentSucceeded(invoice) {
     try {
-      // Update subscription status
+      // Update subscription status and billing period
       if (invoice.subscription) {
-        await Subscription.findOneAndUpdate(
+        const stripeSubscription = await this.stripe.subscriptions.retrieve(invoice.subscription);
+        
+        const subscriptionRecord = await Subscription.findOneAndUpdate(
           { stripeSubscriptionId: invoice.subscription },
-          { status: 'active' }
+          { 
+            status: 'active',
+            'billing.currentPeriodStart': new Date(stripeSubscription.current_period_start * 1000),
+            'billing.currentPeriodEnd': new Date(stripeSubscription.current_period_end * 1000)
+          },
+          { new: true }
         );
+        
+        // Update user subscription expiration
+        if (subscriptionRecord) {
+          await User.findOneAndUpdate(
+            { id: subscriptionRecord.userId },
+            {
+              'subscription.type': subscriptionRecord.plan.type,
+              'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
+              'subscription.features': subscriptionRecord.plan.features
+            }
+          );
+          logger.info(`User ${subscriptionRecord.userId} subscription extended to ${subscriptionRecord.billing.currentPeriodEnd}`);
+        }
       }
 
       logger.info(`Invoice payment succeeded: ${invoice.id}`);
     } catch (error) {
       logger.error('Handle Invoice Payment Succeeded Error:', error);
+      logger.error('Error details:', error.message);
     }
   }
 
