@@ -9,6 +9,7 @@
         "dev": "nodemon index.js",
         "test": "jest",
         "test:connection": "node test-connection.js",
+        "test:webhook": "node test-subscription-webhook.js",
         "build": "echo 'No build step required for Node.js'",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",

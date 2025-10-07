@@ -131,6 +131,60 @@ export default function Dashboard() {
     }
   }, [userId]);
 
+  // Handle Stripe checkout success
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    if (sessionId && userId) {
+      console.log('Stripe checkout session detected:', sessionId);
+      
+      // Poll for subscription creation (webhook might take time)
+      const pollForSubscription = async (retries = 10) => {
+        try {
+          console.log(`Checking for subscription... (attempt ${11 - retries}/10)`);
+          
+          // Fetch fresh subscriptions data
+          const response = await apiService.getUserSubscriptions(userId);
+          console.log('User subscriptions response:', response);
+          
+          if (response.success && response.data?.subscriptions?.length > 0) {
+            const activeSubscription = response.data.subscriptions.find(
+              (sub: any) => sub.status === 'active' || sub.status === 'trialing'
+            );
+            
+            if (activeSubscription) {
+              console.log('✅ Active subscription found!', activeSubscription);
+              // Remove session_id from URL and reload to refresh all data
+              window.history.replaceState({}, document.title, '/dashboard');
+              window.location.reload();
+              return;
+            }
+          }
+          
+          // If no active subscription found and retries left, try again
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await pollForSubscription(retries - 1);
+          } else {
+            console.warn('⚠️ No active subscription found after 10 attempts. Webhook may have failed.');
+            // Remove session_id and reload anyway to show current state
+            window.history.replaceState({}, document.title, '/dashboard');
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await pollForSubscription(retries - 1);
+          }
+        }
+      };
+      
+      pollForSubscription();
+    }
+  }, [userId]);
+
   // Auto-refresh every 60 seconds (only if user is on recent/all view)
   useEffect(() => {
     if (!userId) return;
