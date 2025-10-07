@@ -25,7 +25,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
   const [creationId, setCreationId] = useState<string>('');
 
     // Get user ID for usage limits (authenticated users only)
-    const userId = sessionStorage.getItem('user_id');
+    const userId = sessionStorage.getItem('user_id') || '';
     const token = sessionStorage.getItem('token');
     
     // Redirect to login if not authenticated
