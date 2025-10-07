@@ -107,7 +107,11 @@ app.use((req, res, next) => {
 app.use(compression());
 app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
 
-// Body parsing middleware
+// CRITICAL: Stripe webhooks MUST be registered BEFORE body parsing middleware
+// Webhooks need raw body to verify signature
+app.use('/api/webhooks', webhookRoutes);
+
+// Body parsing middleware (applied AFTER webhook routes)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -304,14 +308,13 @@ app.options('/api/designs/*', (req, res) => {
   }
 });
 
-// API Routes
+// API Routes (webhooks already registered above before body parsing)
 app.use('/api/designs', designRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/session', sessionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/checkout', checkoutRoutes);
-app.use('/api/webhooks', webhookRoutes);
 app.use('/api/slant3d', slant3dRoutes);
 
 // Error handling middleware

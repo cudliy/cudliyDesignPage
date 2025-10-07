@@ -535,19 +535,24 @@ class StripeService {
   // Webhook Handlers
   async handleCheckoutSessionCompleted(session) {
     try {
-      logger.info(`Processing checkout session: ${session.id}, mode: ${session.mode}`);
+      logger.info(`🔔 Processing checkout session: ${session.id}, mode: ${session.mode}`);
+      logger.info(`Session metadata: ${JSON.stringify(session.metadata)}`);
       
       // Handle subscription checkout
       if (session.mode === 'subscription') {
-        const { userId, planType } = session.metadata || {};
+        const { userId, planType, interval } = session.metadata || {};
         
         if (!userId) {
-          logger.error(`No userId in session metadata: ${session.id}`);
+          logger.error(`❌ CRITICAL: No userId in session metadata for session: ${session.id}`);
+          logger.error(`Available metadata: ${JSON.stringify(session.metadata)}`);
           return;
         }
 
+        logger.info(`✅ Found userId in metadata: ${userId}`);
+
         // Retrieve the subscription from Stripe
         const stripeSubscription = await this.stripe.subscriptions.retrieve(session.subscription);
+        logger.info(`Stripe subscription retrieved: ${stripeSubscription.id}, status: ${stripeSubscription.status}`);
         
         // Get price and product details
         const priceId = stripeSubscription.items.data[0].price.id;
@@ -557,7 +562,8 @@ class StripeService {
         // Determine plan type from metadata or product
         const actualPlanType = planType || product.metadata?.planType || product.metadata?.type || 'premium';
         
-        logger.info(`Creating subscription for user ${userId}, plan: ${actualPlanType}`);
+        logger.info(`📦 Product details - Name: ${product.name}, Plan Type: ${actualPlanType}`);
+        logger.info(`💰 Price details - Amount: ${price.unit_amount / 100} ${price.currency}, Interval: ${price.recurring?.interval}`);
         
         // Check if subscription already exists
         let subscriptionRecord = await Subscription.findOne({ 
@@ -575,9 +581,10 @@ class StripeService {
             cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end || false
           };
           await subscriptionRecord.save();
+          logger.info(`✅ Subscription record updated successfully`);
         } else {
           // Create new subscription record
-          subscriptionRecord = new Subscription({
+          const newSubscriptionData = {
             userId: userId,
             stripeSubscriptionId: stripeSubscription.id,
             stripeCustomerId: session.customer,
@@ -606,25 +613,40 @@ class StripeService {
             metadata: {
               source: 'web',
               referrer: session.metadata?.referrer || '',
-              campaign: session.metadata?.campaign || ''
+              campaign: session.metadata?.campaign || '',
+              interval: interval || price.recurring?.interval
             }
-          });
+          };
+          
+          logger.info(`Creating new subscription record with data: ${JSON.stringify(newSubscriptionData)}`);
+          subscriptionRecord = new Subscription(newSubscriptionData);
           await subscriptionRecord.save();
-          logger.info(`Subscription record created: ${subscriptionRecord.id}`);
+          logger.info(`✅ Subscription record created successfully with ID: ${subscriptionRecord._id}`);
         }
         
         // Update user subscription status
-        await User.findOneAndUpdate(
+        const userUpdateData = {
+          'subscription.type': subscriptionRecord.plan.type,
+          'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
+          'subscription.features': subscriptionRecord.plan.features
+        };
+        
+        logger.info(`Updating user ${userId} with: ${JSON.stringify(userUpdateData)}`);
+        
+        const updatedUser = await User.findOneAndUpdate(
           { id: userId },
-          {
-            'subscription.type': subscriptionRecord.plan.type,
-            'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
-            'subscription.features': subscriptionRecord.plan.features
-          }
+          userUpdateData,
+          { new: true }
         );
         
-        logger.info(`User ${userId} subscription updated to ${subscriptionRecord.plan.type}`);
-        logger.info(`Subscription checkout completed: ${session.id}`);
+        if (updatedUser) {
+          logger.info(`✅ User ${userId} subscription updated to ${subscriptionRecord.plan.type}`);
+          logger.info(`User subscription data: ${JSON.stringify(updatedUser.subscription)}`);
+        } else {
+          logger.error(`❌ Failed to update user ${userId} - user not found`);
+        }
+        
+        logger.info(`✅ Subscription checkout completed successfully: ${session.id}`);
       } else {
         // Handle one-time payment checkout (physical products)
         const { handleCheckoutSessionCompleted } = await import('../controllers/checkoutController.js');
@@ -632,8 +654,13 @@ class StripeService {
         logger.info(`Order checkout completed: ${session.id}`);
       }
     } catch (error) {
-      logger.error('Handle Checkout Session Completed Error:', error);
-      logger.error('Error details:', error.message);
+      logger.error('❌ Handle Checkout Session Completed Error:', error);
+      logger.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        sessionId: session?.id,
+        metadata: session?.metadata
+      });
     }
   }
 

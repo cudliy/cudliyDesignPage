@@ -202,8 +202,11 @@ export const createSubscription = async (req, res, next) => {
   try {
     const { userId, planType, interval, metadata = {} } = req.body;
 
+    logger.info(`Creating subscription checkout for user: ${userId}, plan: ${planType}, interval: ${interval}`);
+
     // Get or create customer
     const customer = await stripeService.getCustomer(userId);
+    logger.info(`Customer retrieved/created: ${customer.id}`);
     
     // Get products to find the correct price ID
     const products = await stripeService.getProducts();
@@ -219,12 +222,14 @@ export const createSubscription = async (req, res, next) => {
         );
         if (targetPrice) {
           targetPriceId = targetPrice.id;
+          logger.info(`Found price ID: ${targetPriceId} for plan: ${planType}, interval: ${interval}`);
           break;
         }
       }
     }
 
     if (!targetPriceId) {
+      logger.error(`No price found for plan type: ${planType} with interval: ${interval}`);
       return next(new AppError(`No price found for plan type: ${planType} with interval: ${interval}`, 400));
     }
 
@@ -244,6 +249,9 @@ export const createSubscription = async (req, res, next) => {
       }
     });
 
+    logger.info(`Checkout session created: ${checkoutSession.id} for user: ${userId}`);
+    logger.info(`Metadata attached: ${JSON.stringify({ userId, planType, interval })}`);
+
     res.json({
       success: true,
       data: {
@@ -253,6 +261,7 @@ export const createSubscription = async (req, res, next) => {
     });
   } catch (error) {
     logger.error('Create Subscription Error:', error);
+    logger.error('Error details:', { userId: req.body?.userId, planType: req.body?.planType, error: error.message });
     next(new AppError(error.message || 'Failed to create subscription', 500));
   }
 };
