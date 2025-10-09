@@ -38,8 +38,8 @@ const DEFAULT_FREE_LIMITS: UsageLimits = {
   }
 };
 
-// Cache duration: 30 seconds
-const CACHE_DURATION = 30 * 1000;
+// Cache duration: 10 seconds (shorter to ensure fresher data)
+const CACHE_DURATION = 10 * 1000;
 
 export const useSubscriptionStore = create<SubscriptionState>()(
   persist(
@@ -56,7 +56,10 @@ export const useSubscriptionStore = create<SubscriptionState>()(
       setError: (error) => set({ error }),
 
       checkLimits: async (userId: string, force = false) => {
-        if (!userId) return;
+        if (!userId) {
+          console.log('⚠️ No userId provided to checkLimits');
+          return;
+        }
 
         const state = get();
         
@@ -64,25 +67,35 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         if (!force && state.usageLimits && state.lastFetched) {
           const cacheAge = Date.now() - state.lastFetched;
           if (cacheAge < CACHE_DURATION) {
-            console.log('📦 Using cached subscription data (age:', cacheAge, 'ms)');
+            console.log('📦 Using cached subscription data (age:', cacheAge, 'ms)', state.usageLimits);
             return;
           }
         }
 
         try {
           set({ loading: true, error: null });
-          console.log('🔄 Fetching fresh subscription data for user:', userId);
+          console.log('🔄 Fetching fresh subscription data for user:', userId, force ? '(FORCED)' : '(normal)');
 
           const response = await apiService.checkUsageLimits(userId);
+          console.log('📡 API Response:', response);
 
           if (response.success && response.data) {
-            console.log('✅ Subscription data updated:', response.data);
+            console.log('✅ Subscription data received:', {
+              plan: response.data.plan,
+              limits: response.data.limits,
+              usage: response.data.usage,
+              remaining: response.data.remaining,
+              subscription: response.data.subscription
+            });
+            
             set({ 
               usageLimits: response.data, 
               loading: false,
               error: null,
               lastFetched: Date.now()
             });
+            
+            console.log('💾 Subscription data saved to Zustand store');
           } else {
             throw new Error(response.error || 'Failed to check usage limits');
           }
@@ -100,6 +113,7 @@ export const useSubscriptionStore = create<SubscriptionState>()(
               lastFetched: Date.now()
             });
           } else {
+            console.log('⚠️ Keeping existing subscription data due to error');
             set({
               error: errorMessage,
               loading: false

@@ -27,9 +27,11 @@ export const useUsageLimits = (userId: string): UseUsageLimitsReturn => {
   }, [userId, storeCheckLimits]);
 
   useEffect(() => {
-    // Fetch limits on mount
-    checkLimits();
-  }, [userId]);
+    // Always force fetch on mount to ensure fresh data
+    if (userId) {
+      storeCheckLimits(userId, true);
+    }
+  }, [userId, storeCheckLimits]);
 
   const canGenerateImages = usageLimits ? 
     (usageLimits.remaining.images > 0 || usageLimits.limits.imagesPerMonth === -1) : 

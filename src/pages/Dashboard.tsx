@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiService, type Design } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
 import RateLimitTest from '../components/RateLimitTest';
+import SubscriptionDebug from '../components/SubscriptionDebug';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -140,6 +141,10 @@ export default function Dashboard() {
     if (sessionId && userId) {
       console.log('🔔 Stripe checkout session detected:', sessionId);
       
+      // Clear any cached subscription data to ensure fresh fetch
+      console.log('🗑️ Clearing cached subscription data...');
+      sessionStorage.removeItem('subscription-storage');
+      
       // Poll for subscription creation (webhook might take time)
       const pollForSubscription = async (retries = 15) => {
         try {
@@ -177,15 +182,18 @@ export default function Dashboard() {
           
           // If no active subscription found and retries left, try again
           if (retries > 0) {
-            console.log(`⏳ Waiting 3 seconds before next check... (${retries} retries left)`);
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            console.log(`⏳ Waiting 4 seconds before next check... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, 4000));
             await pollForSubscription(retries - 1);
           } else {
-            console.warn('⚠️ No active subscription found after 15 attempts. Webhook may still be processing.');
-            console.log('💡 Try refreshing manually or wait a few moments.');
+            console.warn('⚠️ No active subscription found after 15 attempts.');
+            console.log('💡 Webhook may still be processing. Please refresh the page manually.');
             // Remove session_id and do final refresh
             window.history.replaceState({}, document.title, '/dashboard');
             await checkLimits(true); // Force refresh to get latest state
+            
+            // Show alert to user
+            alert('Subscription payment received! If your plan hasn\'t updated yet, please refresh the page in a few moments. The backend may still be processing your payment.');
           }
         } catch (error) {
           console.error('❌ Error checking subscription:', error);
@@ -201,9 +209,9 @@ export default function Dashboard() {
         }
       };
       
-      // Start polling with a slight delay to allow webhook to process
-      console.log('⏳ Starting subscription polling in 2 seconds...');
-      setTimeout(() => pollForSubscription(), 2000);
+      // Start polling with a delay to allow webhook to process
+      console.log('⏳ Starting subscription polling in 5 seconds to allow webhook processing...');
+      setTimeout(() => pollForSubscription(), 5000);
     }
   }, [userId, checkLimits]);
 
@@ -436,6 +444,15 @@ export default function Dashboard() {
                 <span>
                   {remainingModels === -1 ? '∞' : remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth} models
                 </span>
+                <button
+                  onClick={() => checkLimits(true)}
+                  className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors"
+                  title="Refresh subscription status"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
               </div>
             )}
           </div>
@@ -591,8 +608,9 @@ export default function Dashboard() {
               Community features coming soon.
             </div>
           ) : currentView === 'credits' ? (
-            <div className="py-12">
+            <div className="py-12 space-y-8">
               <RateLimitTest userId={userId || ''} />
+              <SubscriptionDebug userId={userId || ''} />
             </div>
           ) : currentView === 'edu' ? (
             <div className="py-12 text-center text-gray-600">
