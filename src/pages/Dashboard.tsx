@@ -44,7 +44,8 @@ export default function Dashboard() {
     canGenerateImages, 
     canGenerateModels, 
     remainingImages, 
-    remainingModels 
+    remainingModels,
+    checkLimits 
   } = useUsageLimits(userId || '');
 
   useEffect(() => {
@@ -155,6 +156,11 @@ export default function Dashboard() {
             
             if (activeSubscription) {
               console.log('✅ Active subscription found!', activeSubscription);
+              
+              // Refresh usage limits before reloading
+              console.log('🔄 Refreshing usage limits...');
+              await checkLimits();
+              
               // Remove session_id from URL and reload to refresh all data
               window.history.replaceState({}, document.title, '/dashboard');
               window.location.reload();
@@ -183,7 +189,7 @@ export default function Dashboard() {
       
       pollForSubscription();
     }
-  }, [userId]);
+  }, [userId, checkLimits]);
 
   // Auto-refresh every 60 seconds (only if user is on recent/all view)
   useEffect(() => {
@@ -399,14 +405,20 @@ export default function Dashboard() {
             {/* Usage Status Display */}
             {usageLimits && (
               <div className="hidden sm:flex items-center gap-2 text-xs text-gray-600">
-                <span className="px-2 py-1 bg-gray-100 rounded-full">
-                  {usageLimits.plan}
+                <span className={`px-2 py-1 rounded-full ${
+                  usageLimits.plan === 'pro' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
+                  usageLimits.plan === 'premium' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' :
+                  'bg-gray-100'
+                }`}>
+                  {usageLimits.plan === 'pro' ? 'Studio Plan' : 
+                   usageLimits.plan === 'premium' ? 'Creator Plan' : 
+                   'Free Plan'}
                 </span>
                 <span>
-                  {remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth} images
+                  {remainingImages === -1 ? '∞' : remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth} images
                 </span>
                 <span>
-                  {remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth} models
+                  {remainingModels === -1 ? '∞' : remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth} models
                 </span>
               </div>
             )}

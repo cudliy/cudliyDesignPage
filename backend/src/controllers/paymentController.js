@@ -521,18 +521,30 @@ export const checkUsageLimits = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
+    logger.info(`Checking usage limits for user: ${userId}`);
+
     const subscription = await Subscription.findOne({ 
       userId, 
       status: { $in: ['active', 'trialing'] } 
-    });
+    }).sort({ createdAt: -1 }); // Get the most recent active subscription
 
     if (!subscription) {
       // Free tier limits
       const user = await User.findOne({ id: userId });
+      if (!user) {
+        return next(new AppError('User not found', 404));
+      }
+
       const freeLimits = {
         imagesPerMonth: 3,
-        modelsPerMonth: 1
+        modelsPerMonth: 1,
+        storageGB: 1,
+        prioritySupport: false,
+        customBranding: false,
+        apiAccess: false
       };
+
+      logger.info(`User ${userId} is on free tier. Usage: ${JSON.stringify(user.usage)}`);
 
       return res.json({
         success: true,
@@ -550,6 +562,8 @@ export const checkUsageLimits = async (req, res, next) => {
 
     const limits = subscription.plan.limits;
     const usage = subscription.usage;
+
+    logger.info(`User ${userId} has ${subscription.plan.type} subscription. Limits: ${JSON.stringify(limits)}, Usage: ${JSON.stringify(usage)}`);
 
     res.json({
       success: true,
