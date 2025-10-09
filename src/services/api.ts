@@ -268,6 +268,12 @@ interface Order {
 
 interface UsageLimits {
   plan: string;
+  subscription?: {
+    id: string;
+    status: string;
+    currentPeriodEnd: Date;
+    planName: string;
+  } | null;
   limits: {
     imagesPerMonth: number;
     modelsPerMonth: number;
