@@ -80,7 +80,6 @@ export default function CheckoutPage() {
         const originalModelUrl = location.state?.originalModelUrl || storedOriginalModelUrl;
         
         if (originalModelUrl) {
-          console.log('CheckoutPage: Original model URL for Slant3D:', originalModelUrl);
           // Store the original URL for use in Slant3D operations
           sessionStorage.setItem('slant3d_original_model_url', originalModelUrl);
         }
@@ -98,7 +97,6 @@ export default function CheckoutPage() {
           throw new Error('Failed to create checkout');
         }
       } catch (err) {
-        console.error('Checkout initialization error:', err);
         const errorMessage = err instanceof Error ? err.message : 'Failed to initialize checkout';
         setError(`Checkout Error: ${errorMessage}`);
       } finally {
@@ -131,14 +129,11 @@ export default function CheckoutPage() {
     
     // If no original URL in session storage, try to find a valid HTTP URL from various sources
     if (!originalModelUrl || originalModelUrl.startsWith('blob:')) {
-      console.warn('CheckoutPage: No valid original URL in session storage, searching for HTTP URL...');
-      
       // Try to get from location state first
       const stateOriginalUrl = location.state?.originalModelUrl;
       if (stateOriginalUrl && !stateOriginalUrl.startsWith('blob:') && 
           (stateOriginalUrl.startsWith('http://') || stateOriginalUrl.startsWith('https://'))) {
         originalModelUrl = stateOriginalUrl;
-        console.log('CheckoutPage: Using original URL from location state:', originalModelUrl);
       } else {
         // Try to get from design data
         const designOriginalUrl = location.state?.design?.modelFiles?.storedModelUrl || 
@@ -147,13 +142,11 @@ export default function CheckoutPage() {
         if (designOriginalUrl && !designOriginalUrl.startsWith('blob:') && 
             (designOriginalUrl.startsWith('http://') || designOriginalUrl.startsWith('https://'))) {
           originalModelUrl = designOriginalUrl;
-          console.log('CheckoutPage: Using original URL from design data:', originalModelUrl);
         } else {
           // Last resort: try to get from the current modelUrl if it's not a blob
           if (modelUrl && !modelUrl.startsWith('blob:') && 
               (modelUrl.startsWith('http://') || modelUrl.startsWith('https://'))) {
             originalModelUrl = modelUrl;
-            console.log('CheckoutPage: Using current modelUrl as original URL:', originalModelUrl);
           } else {
             throw new Error('No valid HTTP URL found for Slant3D. Please try regenerating the model or contact support.');
           }
@@ -162,12 +155,6 @@ export default function CheckoutPage() {
     }
     
     try {
-      console.log('CheckoutPage: About to upload model:', originalModelUrl);
-      console.log('CheckoutPage: Model URL type:', typeof originalModelUrl);
-      console.log('CheckoutPage: Model URL value:', originalModelUrl);
-      console.log('CheckoutPage: Slant3D pricing:', slant3DPricing);
-      console.log('CheckoutPage: Using original URL instead of blob URL for Slant3D');
-      
       // Final validation: Ensure we never send blob URLs to Slant3D
       if (!originalModelUrl) {
         throw new Error('No model URL available for Slant3D. Please try regenerating the model.');
@@ -186,8 +173,6 @@ export default function CheckoutPage() {
         material: slant3DPricing.material,
         quantity: slant3DPricing.quantity
       });
-
-      console.log('Upload result:', uploadResult);
 
       // Create order with Slant3D using original HTTP URL
       const orderResult = await slant3DService.createOrder(
@@ -211,7 +196,6 @@ export default function CheckoutPage() {
 
       return orderResult;
     } catch (error) {
-      console.error('Slant3D order processing error:', error);
       throw error;
     }
   };
@@ -238,7 +222,6 @@ export default function CheckoutPage() {
 
       // Check if this is a mock checkout
       if (checkoutData.mock) {
-        console.log('Mock checkout detected:', checkoutData.message);
         // For mock checkout, redirect to success page
         navigate(`/order-success?session_id=mock_${Date.now()}&order_id=${slant3DOrder.order_id}`);
       } else {
@@ -248,8 +231,6 @@ export default function CheckoutPage() {
         }
       }
     } catch (err) {
-      console.error('Order processing error:', err);
-      
       // Handle specific error types with user-friendly messages
       let errorMessage = 'Order processing failed';
       if (err instanceof Error) {

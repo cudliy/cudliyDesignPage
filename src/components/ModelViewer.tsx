@@ -32,12 +32,7 @@ export default function ModelViewer({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    console.log('ModelViewer: modelUrl received:', modelUrl);
-    console.log('ModelViewer: modelUrl type:', typeof modelUrl);
-    console.log('ModelViewer: modelUrl length:', modelUrl?.length);
-    
     if (!modelUrl) {
-      console.warn('ModelViewer: Missing model URL');
       setLoadingState('error');
       setErrorMessage('Missing model URL');
       onError?.('Missing model URL');
@@ -47,9 +42,7 @@ export default function ModelViewer({
     // Validate URL format
     try {
       new URL(modelUrl);
-      console.log('ModelViewer: URL is valid');
     } catch (error) {
-      console.error('ModelViewer: Invalid URL format:', error);
       setLoadingState('error');
       setErrorMessage('Invalid model URL format');
       onError?.('Invalid model URL format');
@@ -78,26 +71,19 @@ export default function ModelViewer({
     }, 45000);
 
     const createModelViewer = () => {
-      console.log('ModelViewer: createModelViewer called');
-      console.log('ModelViewer: modelViewerRef.current:', modelViewerRef.current);
-      console.log('ModelViewer: modelUrl:', modelUrl);
-      
       // Check if model-viewer custom element is available
       if (typeof customElements !== 'undefined' && !customElements.get('model-viewer')) {
-        console.warn('ModelViewer: model-viewer custom element not available yet');
         // Wait a bit and try again
         setTimeout(createModelViewer, 100);
         return;
       }
       
       if (modelViewerRef.current && modelUrl) {
-        console.log('ModelViewer: Creating model-viewer element');
         // Clear existing content
         modelViewerRef.current.innerHTML = '';
         
         // Create model-viewer element
         const modelViewer = document.createElement('model-viewer');
-        console.log('ModelViewer: Setting src attribute to:', modelUrl);
         
         // Basic attributes
         modelViewer.setAttribute('src', modelUrl);
@@ -151,13 +137,6 @@ export default function ModelViewer({
         
         // Add event listeners
         modelViewer.addEventListener('load', (event) => {
-          console.log('ModelViewer: Model loaded successfully:', event);
-          console.log('ModelViewer: Model URL:', modelUrl);
-          console.log('ModelViewer: Model element:', modelViewer);
-          console.log('ModelViewer: Model dimensions:', {
-            width: modelViewer.offsetWidth,
-            height: modelViewer.offsetHeight
-          });
           handleLoad();
         });
         

@@ -66,8 +66,6 @@ const SignUp = () => {
       toast.success("Account created successfully! Please sign in.");
       navigate("/signin");
     } catch (error: any) {
-      console.error('Signup error:', error);
-      
       // Parse specific error messages
       let errorMessage = "An unexpected error occurred";
       

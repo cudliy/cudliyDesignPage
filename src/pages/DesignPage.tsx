@@ -50,9 +50,6 @@ export default function DesignPage() {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!userId || !token) {
-      console.log('Missing authentication - redirecting to signin');
-      console.log('User ID:', userId);
-      console.log('Token:', token ? 'Present' : 'Missing');
       window.location.href = '/signin';
     }
   }, [userId, token]);
@@ -76,7 +73,6 @@ export default function DesignPage() {
 		// Initialize with default size selection if not already set
 		if (selectedSize === 'M' && !hasProperties()) {
 			addSize(selectedSize, customWidth, customHeight);
-			console.log('Initialized with default size:', selectedSize);
 		}
 	}, [selectedSize, customWidth, customHeight, addSize, hasProperties]);
 
@@ -130,7 +126,6 @@ export default function DesignPage() {
 		setSelectedSize(size);
 		// Strategic Enhancement: Add size to properties aggregator
 		addSize(size, customWidth, customHeight);
-		console.log('Size changed to:', size, 'Properties:', getProperties());
 	};
 
 	const handleCustomSizeChange = (width: string, height: string) => {
@@ -150,7 +145,6 @@ export default function DesignPage() {
 		setSelectedStyle(style);
 		// Strategic Enhancement: Add style to properties aggregator
 		addStyle(style);
-		console.log('Style changed to:', style, 'Properties:', getProperties());
 	};
 
 	const handleMaterialChange = (material: string) => {
@@ -200,7 +194,6 @@ export default function DesignPage() {
 	const handleColorChange = (color: string) => {
 		// Strategic Enhancement: Add color to properties aggregator
 		addColor(color);
-		console.log('Color changed to:', color);
 	};
 
 	const handleReset = () => {

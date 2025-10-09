@@ -66,22 +66,12 @@ export default function DesignView() {
   
   // Check if model-viewer is available and test API connection
   useEffect(() => {
-    console.log('DesignView: Checking model-viewer availability');
-    console.log('DesignView: model-viewer defined:', typeof modelViewer !== 'undefined');
-    console.log('DesignView: customElements defined:', typeof customElements !== 'undefined');
-    if (typeof customElements !== 'undefined') {
-      console.log('DesignView: model-viewer custom element defined:', customElements.get('model-viewer'));
-    }
-    
     // Test API connection
-    testApiConnection().then(result => {
-      console.log('DesignView: API connection test result:', result);
-    });
+    testApiConnection();
   }, []);
 
   // Memoized event handlers to prevent unnecessary re-renders
   const handleModelError = useCallback((error) => {
-    console.error('Model loading error:', error);
     setModelLoadError(error);
   }, []);
 
@@ -176,7 +166,6 @@ export default function DesignView() {
         throw new Error(response.error || 'Failed to regenerate 3D model');
       }
     } catch (err) {
-      console.error('Error regenerating 3D model:', err);
       setError(err instanceof Error ? err.message : 'Failed to regenerate 3D model');
     } finally {
       setRegenerating(false);
@@ -187,7 +176,6 @@ export default function DesignView() {
   // Memoized make order function
   const handleMakeOrder = useCallback(async () => {
     if (!designId || !testModelUrl) {
-      console.error('Missing designId or modelUrl', { designId, testModelUrl });
       return;
     }
 
@@ -207,7 +195,6 @@ export default function DesignView() {
         }
       });
     } catch (error) {
-      console.error('Error preparing order:', error);
       setError('Failed to prepare order. Please try again.');
     }
   }, [designId, testModelUrl, modelUrl, design, navigate]);
@@ -227,13 +214,10 @@ export default function DesignView() {
         
         // Download the 3D model
         await download3DModel(modelUrl, design.id || designId, fileType);
-        
-        console.log('Download completed successfully');
       } else {
         throw new Error('No valid model URL available for download');
       }
     } catch (error) {
-      console.error('Download failed:', error);
       setError(`Download failed: ${error.message}`);
     } finally {
       setDownloading(false);

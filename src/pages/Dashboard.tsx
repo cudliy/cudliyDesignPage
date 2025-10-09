@@ -18,9 +18,6 @@ export default function Dashboard() {
     const token = sessionStorage.getItem('token');
     if (!userId || !token) {
       // Redirect to login if not authenticated
-      console.log('Missing authentication - redirecting to signin');
-      console.log('User ID:', userId);
-      console.log('Token:', token ? 'Present' : 'Missing');
       window.location.href = '/signin';
     }
     return userId;
@@ -63,13 +60,10 @@ export default function Dashboard() {
       }
       
       if (!userId) {
-        console.error('Dashboard: No userId available');
         setDesigns([]);
         setError(null);
         return;
       }
-      
-      console.log('Dashboard: Fetching designs for user:', userId);
       
       // Add timeout to prevent infinite loading
       const timeoutPromise = new Promise((_, reject) => {
@@ -79,13 +73,10 @@ export default function Dashboard() {
       const apiPromise = apiService.getUserDesigns(userId, 1, 50);
       const response = await Promise.race([apiPromise, timeoutPromise]) as any;
       
-      console.log('Dashboard: API response:', response);
-      
       if (response.success && response.data) {
         const fetchedDesigns = response.data.designs || [];
         setDesigns(fetchedDesigns);
         setError(null);
-        console.log('Dashboard: Designs loaded successfully:', fetchedDesigns.length, 'designs');
         
         // Store in sessionStorage as cache (optional)
         if (fetchedDesigns.length > 0) {
@@ -96,12 +87,8 @@ export default function Dashboard() {
         throw new Error(response.error || 'Failed to fetch designs');
       }
     } catch (err) {
-      console.error('Dashboard: Error fetching designs:', err);
-      
       // If it's a network error or backend is not available, try to load from cache
       if (err instanceof Error && (err.message.includes('timeout') || err.message.includes('Failed to fetch') || err.message.includes('Network'))) {
-        console.log('Dashboard: Backend not available, checking cache...');
-        
         // Try to load from cache if available and recent (less than 5 minutes old)
         const cachedDesigns = sessionStorage.getItem('cached_designs');
         const cachedTimestamp = sessionStorage.getItem('cached_designs_timestamp');
@@ -109,7 +96,6 @@ export default function Dashboard() {
         if (cachedDesigns && cachedTimestamp) {
           const cacheAge = Date.now() - parseInt(cachedTimestamp);
           if (cacheAge < 5 * 60 * 1000) { // 5 minutes
-            console.log('Dashboard: Loading from cache');
             setDesigns(JSON.parse(cachedDesigns));
             setError(null);
             return;
@@ -139,27 +125,17 @@ export default function Dashboard() {
     const sessionId = urlParams.get('session_id');
     
     if (sessionId && userId) {
-      console.log('🔔 Stripe checkout session detected:', sessionId);
-      
       // Clear any cached subscription data to ensure fresh fetch
-      console.log('🗑️ Clearing cached subscription data...');
       sessionStorage.removeItem('subscription-storage');
       
       // Poll for subscription creation (webhook might take time)
       const pollForSubscription = async (retries = 15) => {
         try {
-          console.log(`🔍 Checking for subscription... (attempt ${16 - retries}/15)`);
-          
           // Fetch fresh subscriptions data
           const subscriptionResponse = await apiService.getUserSubscriptions(userId);
-          console.log('📦 User subscriptions response:', subscriptionResponse);
-          console.log('📦 Subscriptions array:', subscriptionResponse.data?.subscriptions);
           
           // Also check usage limits which includes subscription info
           const limitsResponse = await apiService.checkUsageLimits(userId);
-          console.log('📊 Usage limits response:', limitsResponse);
-          console.log('📊 Plan type:', limitsResponse.data?.plan);
-          console.log('📊 Subscription object:', limitsResponse.data?.subscription);
           
           // Check both responses for subscription
           const hasActiveSubscription = 
@@ -169,56 +145,41 @@ export default function Dashboard() {
             (limitsResponse.success && limitsResponse.data?.plan !== 'free');
           
           if (hasActiveSubscription) {
-            console.log('✅ Active subscription found!');
-            console.log('Subscription data:', subscriptionResponse.data);
-            console.log('Limits data:', limitsResponse.data);
-            
             // Force refresh usage limits (bypasses cache)
-            console.log('🔄 Force refreshing usage limits with Zustand store...');
             await checkLimits(true); // Force refresh
             
             // Remove session_id from URL (no page reload needed - Zustand handles state)
-            console.log('✨ Subscription state updated successfully!');
             window.history.replaceState({}, document.title, '/dashboard');
             return;
           }
           
           // If no active subscription found and retries left, try again
           if (retries > 0) {
-            console.log(`⏳ Waiting 4 seconds before next check... (${retries} retries left)`);
             await new Promise(resolve => setTimeout(resolve, 4000));
             await pollForSubscription(retries - 1);
           } else {
-            console.warn('⚠️ No active subscription found after 15 attempts.');
-            console.log('🔧 Attempting manual subscription sync...');
-            
             // Try manual sync as fallback
             try {
               const syncResponse = await apiService.syncSubscription(userId, sessionId);
-              console.log('🔧 Manual sync response:', syncResponse);
               
               if (syncResponse.success) {
-                console.log('✅ Manual sync successful! Refreshing subscription data...');
                 await checkLimits(true);
                 window.history.replaceState({}, document.title, '/dashboard');
                 alert('Subscription activated successfully!');
                 return;
               }
             } catch (syncError) {
-              console.error('❌ Manual sync failed:', syncError);
+              // Sync failed, continue
             }
             
             // If manual sync also failed
-            console.log('💡 Please wait a few moments and manually refresh the page.');
             window.history.replaceState({}, document.title, '/dashboard');
             await checkLimits(true);
             
             alert('Subscription payment received! The system is still processing your subscription. Please refresh the page in a few moments to see your updated plan.');
           }
         } catch (error) {
-          console.error('❌ Error checking subscription:', error);
           if (retries > 0) {
-            console.log(`🔄 Retrying after error... (${retries} retries left)`);
             await new Promise(resolve => setTimeout(resolve, 3000));
             await pollForSubscription(retries - 1);
           } else {
@@ -230,7 +191,6 @@ export default function Dashboard() {
       };
       
       // Start polling with a delay to allow webhook to process
-      console.log('⏳ Starting subscription polling in 5 seconds to allow webhook processing...');
       setTimeout(() => pollForSubscription(), 5000);
     }
   }, [userId, checkLimits]);
@@ -241,7 +201,6 @@ export default function Dashboard() {
     
     const interval = setInterval(() => {
       if (currentView === 'recent' || currentView === 'all') {
-        console.log('Dashboard: Auto-refreshing designs...');
         fetchDesigns(true);
       }
     }, 60000); // 60 seconds

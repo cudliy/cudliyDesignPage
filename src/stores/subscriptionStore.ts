@@ -57,7 +57,6 @@ export const useSubscriptionStore = create<SubscriptionState>()(
 
       checkLimits: async (userId: string, force = false) => {
         if (!userId) {
-          console.log('⚠️ No userId provided to checkLimits');
           return;
         }
 
@@ -67,45 +66,30 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         if (!force && state.usageLimits && state.lastFetched) {
           const cacheAge = Date.now() - state.lastFetched;
           if (cacheAge < CACHE_DURATION) {
-            console.log('📦 Using cached subscription data (age:', cacheAge, 'ms)', state.usageLimits);
             return;
           }
         }
 
         try {
           set({ loading: true, error: null });
-          console.log('🔄 Fetching fresh subscription data for user:', userId, force ? '(FORCED)' : '(normal)');
 
           const response = await apiService.checkUsageLimits(userId);
-          console.log('📡 API Response:', response);
 
           if (response.success && response.data) {
-            console.log('✅ Subscription data received:', {
-              plan: response.data.plan,
-              limits: response.data.limits,
-              usage: response.data.usage,
-              remaining: response.data.remaining,
-              subscription: response.data.subscription
-            });
-            
             set({ 
               usageLimits: response.data, 
               loading: false,
               error: null,
               lastFetched: Date.now()
             });
-            
-            console.log('💾 Subscription data saved to Zustand store');
           } else {
             throw new Error(response.error || 'Failed to check usage limits');
           }
         } catch (err) {
-          console.error('❌ Error checking usage limits:', err);
           const errorMessage = err instanceof Error ? err.message : 'Failed to check usage limits';
           
           // Set default free limits on error (but keep existing data if available)
           if (!state.usageLimits) {
-            console.log('⚠️ Setting default free limits due to error');
             set({
               usageLimits: DEFAULT_FREE_LIMITS,
               error: errorMessage,
@@ -113,7 +97,6 @@ export const useSubscriptionStore = create<SubscriptionState>()(
               lastFetched: Date.now()
             });
           } else {
-            console.log('⚠️ Keeping existing subscription data due to error');
             set({
               error: errorMessage,
               loading: false

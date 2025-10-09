@@ -195,7 +195,7 @@ export const createStripeCheckout = async (req, res, next) => {
     ];
 
     // Create Stripe Checkout Session
-    const frontendUrl = process.env.FRONTEND_URL || 'https://cudliy-design-page.vercel.app';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://www.cudliy.com';
     let session;
     try {
       session = await stripeService.createCheckoutSession(

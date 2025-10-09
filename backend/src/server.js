@@ -59,21 +59,15 @@ const corsOptions = {
     const allowedOrigins = process.env.CORS_ORIGINS ? 
       process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
       [
-        'https://cudliy-design-page.vercel.app',
-        'https://www.cudliy-design-page.vercel.app',
-        'https://cudliy-design-page-git-main.vercel.app',
-        'https://cudliy-design-page-git-main-cudliy.vercel.app',
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://localhost:3000',
-        'http://localhost:4173'
+        'https://www.cudliy.com',
+        'https://cudliy.com'
       ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Allow all Vercel preview deployments
-    if (origin && origin.includes('vercel.app')) {
+    // Allow cudliy.com domains
+    if (origin && origin.includes('cudliy.com')) {
       return callback(null, true);
     }
     
@@ -127,20 +121,14 @@ app.options('*', (req, res) => {
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
-      'https://cudliy-design-page.vercel.app',
-      'https://www.cudliy-design-page.vercel.app',
-      'https://cudliy-design-page-git-main.vercel.app',
-      'https://cudliy-design-page-git-main-cudliy.vercel.app',
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:3000',
-      'http://localhost:4173'
+      'https://www.cudliy.com',
+      'https://cudliy.com'
     ];
   
   console.log('Allowed origins:', allowedOrigins);
   
-  // Allow all Vercel preview deployments
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('vercel.app'));
+  // Allow cudliy.com domains
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com'));
   
   console.log('Is origin allowed?', isAllowed);
   
@@ -160,8 +148,8 @@ app.options('*', (req, res) => {
 
 // Set default values for missing environment variables
 if (!process.env.FRONTEND_URL) {
-  process.env.FRONTEND_URL = 'https://cudliy-design-page.vercel.app';
-  logger.warn('FRONTEND_URL not set, using default: https://cudliy-design-page.vercel.app');
+  process.env.FRONTEND_URL = 'https://www.cudliy.com';
+  logger.warn('FRONTEND_URL not set, using default: https://www.cudliy.com');
 }
 
 // Validate critical environment variables
@@ -251,17 +239,12 @@ app.use('/api/designs', (req, res, next) => {
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
-      'https://cudliy-design-page.vercel.app',
-      'https://www.cudliy-design-page.vercel.app',
-      'https://cudliy-design-page-git-main.vercel.app',
-      'https://cudliy-design-page-git-main-cudliy.vercel.app',
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:4173'
+      'https://www.cudliy.com',
+      'https://cudliy.com'
     ];
   
   // Set CORS headers for all requests to designs route
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('vercel.app'));
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com'));
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
@@ -283,16 +266,11 @@ app.options('/api/designs/*', (req, res) => {
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
-      'https://cudliy-design-page.vercel.app',
-      'https://www.cudliy-design-page.vercel.app',
-      'https://cudliy-design-page-git-main.vercel.app',
-      'https://cudliy-design-page-git-main-cudliy.vercel.app',
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:4173'
+      'https://www.cudliy.com',
+      'https://cudliy.com'
     ];
   
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('vercel.app'));
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com'));
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');

@@ -31,9 +31,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
     // Redirect to login if not authenticated
     useEffect(() => {
       if (!userId || !token) {
-        console.log('Missing authentication - redirecting to signin');
-        console.log('User ID:', userId);
-        console.log('Token:', token ? 'Present' : 'Missing');
         window.location.href = '/signin';
       }
     }, [userId, token]);
@@ -48,7 +45,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
   } = useUsageLimits(userId);
 
   const generateImages = async () => {
-    console.log('Generating images for user ID:', userId);
     // Strategic Enhancement: Use enhanced prompt if available, otherwise fallback to original
     const finalPrompt = enhancedPrompt || prompt;
     
@@ -71,8 +67,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
       // Generate a unique creation ID
       const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       setCreationId(newCreationId);
-
-      console.log('🚀 Strategic Enhancement: Using enhanced prompt:', finalPrompt);
       
       const request: GenerateImagesRequest = {
         text: finalPrompt, // Strategic Enhancement: Send enhanced prompt to backend
@@ -106,14 +100,12 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
           // Force refresh usage limits to get updated counts immediately
           await checkLimits(true);
         } catch (trackingError) {
-          console.error('Failed to track usage:', trackingError);
           // Don't fail the generation if tracking fails
         }
       } else {
         throw new Error(response.error || 'Failed to generate images');
       }
     } catch (error) {
-      console.error('Image generation error:', error);
       onError(error instanceof Error ? error.message : 'Failed to generate images');
     } finally {
       setIsGenerating(false);
@@ -181,7 +173,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
           // Force refresh usage limits to get updated counts immediately
           await checkLimits(true);
         } catch (trackingError) {
-          console.error('Failed to track usage:', trackingError);
           // Don't fail the generation if tracking fails
         }
         
@@ -190,7 +181,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
         throw new Error(response.error || 'Failed to generate 3D model');
       }
     } catch (error) {
-      console.error('3D model generation error:', error);
       onError(error instanceof Error ? error.message : 'Failed to generate 3D model');
     } finally {
       setIsCreating3D(false);

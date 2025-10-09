@@ -1,9 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001/api' : 'https://cudliydesign-production.up.railway.app/api');
+import { getUserFriendlyError } from '../utils/errorMapper';
 
-// Debug logging for API URL
-console.log('API_BASE_URL:', API_BASE_URL);
-console.log('Environment:', import.meta.env.MODE);
-console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001/api' : 'https://cudliydesign-production.up.railway.app/api');
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -300,12 +297,9 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
-      console.log('Making API request to:', url);
-      console.log('Request options:', options);
       
       // Get JWT token from sessionStorage
       const token = sessionStorage.getItem('token');
-      console.log('JWT Token from sessionStorage:', token ? 'Found' : 'Not found');
       
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -315,9 +309,6 @@ class ApiService {
       // Add Authorization header if token exists
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
-        console.log('Authorization header added');
-      } else {
-        console.log('No token found, request will not include Authorization header');
       }
       
       const response = await fetch(url, {
@@ -326,25 +317,21 @@ class ApiService {
         ...options,
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
       const data = await response.json();
 
       if (!response.ok) {
         const errorMessage = data.error || data.message || `HTTP ${response.status}`;
-        console.error('API Error Response:', errorMessage);
-        throw new Error(errorMessage);
+        const friendlyError = getUserFriendlyError(errorMessage);
+        throw new Error(friendlyError);
       }
 
       return data;
     } catch (error) {
-      console.error('API request failed:', error);
-      console.error('Request URL:', `${API_BASE_URL}${endpoint}`);
       if (error instanceof Error) {
-        throw new Error(`API Error: ${error.message}`);
+        const friendlyError = getUserFriendlyError(error.message);
+        throw new Error(friendlyError);
       }
-      throw new Error('API request failed');
+      throw new Error('Unable to connect to the server. Please try again.');
     }
   }
 
@@ -400,13 +387,17 @@ class ApiService {
 
       if (!response.ok) {
         const errorMessage = data.error || data.message || `HTTP ${response.status}`;
-        throw new Error(errorMessage);
+        const friendlyError = getUserFriendlyError(errorMessage);
+        throw new Error(friendlyError);
       }
 
       return data;
     } catch (error) {
-      console.error('Upload failed:', error);
-      throw error;
+      if (error instanceof Error) {
+        const friendlyError = getUserFriendlyError(error.message);
+        throw new Error(friendlyError);
+      }
+      throw new Error('Failed to upload your file. Please try again.');
     }
   }
 

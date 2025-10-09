@@ -30,11 +30,8 @@ const PricingPage = () => {
       const userId = sessionStorage.getItem('user_id');
       const token = sessionStorage.getItem('token');
       
-      console.log('Authentication check:', { userId, hasToken: !!token, isAuthenticated });
-      
       if (!userId || !token || !isAuthenticated) {
         // Redirect to signin if not logged in
-        console.log('User not authenticated, redirecting to signin');
         navigate('/signin');
         return;
       }
@@ -47,12 +44,9 @@ const PricingPage = () => {
 
       const planType = planMapping[planName];
       if (!planType) {
-        console.error('Unknown plan:', planName);
         alert('Invalid plan selected. Please try again.');
         return;
       }
-
-      console.log('Creating subscription for user:', userId, 'plan:', planType, 'interval:', isYearly ? 'year' : 'month');
 
       // Create subscription via API
       const response = await apiService.createSubscription(
@@ -61,23 +55,17 @@ const PricingPage = () => {
         isYearly ? 'year' : 'month'
       );
 
-      console.log('Subscription creation response:', response);
-
       if (response.success && response.data) {
         if (response.data.checkoutUrl) {
           // Redirect to Stripe Checkout
-          console.log('Redirecting to Stripe Checkout:', response.data.checkoutUrl);
           window.location.href = response.data.checkoutUrl;
         } else {
-          console.error('No checkout URL returned:', response.data);
           alert('Subscription creation failed. Please try again.');
         }
       } else {
-        console.error('Subscription creation failed:', response.error);
         alert(`Subscription creation failed: ${response.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error upgrading subscription:', error);
       alert('An error occurred while creating your subscription. Please try again.');
     }
   };
