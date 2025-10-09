@@ -157,19 +157,23 @@ const HeroSection = () => {
                 isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
               }`}
               style={{ transitionDelay: "1000ms" }}>
+                
+                {/* Orange platform background - positioned absolutely to extend beyond iPad */}
+                <div 
+                  className="absolute z-0 left-1/2 transform -translate-x-1/2"
+                  style={{
+                    width: "clamp(350px, 100vw, 1396px)",
+                    maxWidth: "90vw",
+                    height: "clamp(100px, 20vw, 258px)",
+                    background: "#FBB871",
+                    borderTopLeftRadius: "clamp(20px, 3vw, 40px)",
+                    borderTopRightRadius: "clamp(20px, 3vw, 40px)",
+                    opacity: 1,
+                    bottom: "0",
+                  }}
+                />
       
-                <div className="relative w-full max-w-[300px] sm:max-w-[500px] md:max-w-[650px] lg:max-w-[800px] xl:max-w-[950px] group hover:scale-105 transition-transform duration-500 ease-out animate-gentle-float">
-                <div className="absolute z-0 left-1/2 transform -translate-x-1/2"
-          style={{
-            width: "clamp(250px, 95%, 1396px)",
-            height: "clamp(80px, 15vw, 258px)",
-            background: "#FBB871",
-            borderTopLeftRadius: "20px",
-            borderTopRightRadius: "20px",
-            opacity: 1,
-            bottom: "0",
-          }}
-        />
+                <div className="relative w-full max-w-[300px] sm:max-w-[500px] md:max-w-[650px] lg:max-w-[800px] xl:max-w-[950px] group hover:scale-105 transition-transform duration-500 ease-out animate-gentle-float z-10">
                   <img
                     src="/iPad%20Pro.png"
                     alt="iPad Pro frame"
