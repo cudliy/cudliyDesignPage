@@ -169,7 +169,7 @@ export default function CheckoutPage() {
       }
       
       // Upload model to Slant3D using original HTTP URL
-      const uploadResult = await slant3DService.uploadModel(originalModelUrl, {
+      await slant3DService.uploadModel(originalModelUrl, {
         material: slant3DPricing.material,
         quantity: slant3DPricing.quantity
       });

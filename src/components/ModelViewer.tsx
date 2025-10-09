@@ -136,7 +136,7 @@ export default function ModelViewer({
         modelViewer.style.backgroundColor = 'transparent';
         
         // Add event listeners
-        modelViewer.addEventListener('load', (event) => {
+        modelViewer.addEventListener('load', () => {
           handleLoad();
         });
         
