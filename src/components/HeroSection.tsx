@@ -169,7 +169,7 @@ const HeroSection = () => {
                     borderTopLeftRadius: "clamp(20px, 3vw, 40px)",
                     borderTopRightRadius: "clamp(20px, 3vw, 40px)",
                     opacity: 1,
-                    bottom: "0",
+                    bottom: "16%",
                   }}
                 />
       
