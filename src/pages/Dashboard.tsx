@@ -165,14 +165,13 @@ export default function Dashboard() {
             console.log('Subscription data:', subscriptionResponse.data);
             console.log('Limits data:', limitsResponse.data);
             
-            // Refresh usage limits before reloading
-            console.log('🔄 Refreshing usage limits...');
-            await checkLimits();
+            // Force refresh usage limits (bypasses cache)
+            console.log('🔄 Force refreshing usage limits with Zustand store...');
+            await checkLimits(true); // Force refresh
             
-            // Remove session_id from URL and reload to refresh all data
-            console.log('🔃 Reloading page with updated subscription...');
+            // Remove session_id from URL (no page reload needed - Zustand handles state)
+            console.log('✨ Subscription state updated successfully!');
             window.history.replaceState({}, document.title, '/dashboard');
-            window.location.reload();
             return;
           }
           
@@ -183,12 +182,10 @@ export default function Dashboard() {
             await pollForSubscription(retries - 1);
           } else {
             console.warn('⚠️ No active subscription found after 15 attempts. Webhook may still be processing.');
-            console.log('💡 Try refreshing the page manually in a few moments.');
-            // Remove session_id and reload anyway to show current state
+            console.log('💡 Try refreshing manually or wait a few moments.');
+            // Remove session_id and do final refresh
             window.history.replaceState({}, document.title, '/dashboard');
-            // Final attempt to refresh limits
-            await checkLimits();
-            window.location.reload();
+            await checkLimits(true); // Force refresh to get latest state
           }
         } catch (error) {
           console.error('❌ Error checking subscription:', error);
@@ -199,7 +196,7 @@ export default function Dashboard() {
           } else {
             // Remove session_id on final failure
             window.history.replaceState({}, document.title, '/dashboard');
-            window.location.reload();
+            await checkLimits(true); // Force refresh anyway
           }
         }
       };

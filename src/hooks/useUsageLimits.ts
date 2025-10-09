@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { apiService } from '../services/api';
+import { useEffect, useCallback } from 'react';
+import { useSubscriptionStore } from '../stores/subscriptionStore';
 import type { UsageLimits } from '../services/api';
 
 interface UseUsageLimitsReturn {
   usageLimits: UsageLimits | null;
   loading: boolean;
   error: string | null;
-  checkLimits: () => Promise<void>;
+  checkLimits: (force?: boolean) => Promise<void>;
   canGenerateImages: boolean;
   canGenerateModels: boolean;
   remainingImages: number;
@@ -14,54 +14,20 @@ interface UseUsageLimitsReturn {
 }
 
 export const useUsageLimits = (userId: string): UseUsageLimitsReturn => {
-  const [usageLimits, setUsageLimits] = useState<UsageLimits | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { 
+    usageLimits, 
+    loading, 
+    error, 
+    checkLimits: storeCheckLimits 
+  } = useSubscriptionStore();
 
-  const checkLimits = async () => {
+  const checkLimits = useCallback(async (force = false) => {
     if (!userId) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await apiService.checkUsageLimits(userId);
-      
-      if (response.success && response.data) {
-        setUsageLimits(response.data);
-      } else {
-        throw new Error(response.error || 'Failed to check usage limits');
-      }
-    } catch (err) {
-      console.error('Error checking usage limits:', err);
-      setError(err instanceof Error ? err.message : 'Failed to check usage limits');
-      // Set default limits for free users if API fails
-      setUsageLimits({
-        plan: 'free',
-        limits: {
-          imagesPerMonth: 3,
-          modelsPerMonth: 1,
-          storageGB: 1,
-          prioritySupport: false,
-          customBranding: false,
-          apiAccess: false
-        },
-        usage: {
-          imagesGenerated: 0,
-          modelsGenerated: 0,
-          storageUsed: 0
-        },
-        remaining: {
-          images: 3,
-          models: 1
-        }
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    await storeCheckLimits(userId, force);
+  }, [userId, storeCheckLimits]);
 
   useEffect(() => {
+    // Fetch limits on mount
     checkLimits();
   }, [userId]);
 

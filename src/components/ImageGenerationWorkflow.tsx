@@ -103,8 +103,8 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
         // Track usage after successful generation
         try {
           await apiService.trackUsage(userId, 'image', response.data.images.length);
-          // Refresh usage limits
-          await checkLimits();
+          // Force refresh usage limits to get updated counts immediately
+          await checkLimits(true);
         } catch (trackingError) {
           console.error('Failed to track usage:', trackingError);
           // Don't fail the generation if tracking fails
@@ -178,8 +178,8 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
         // Track usage after successful 3D model generation
         try {
           await apiService.trackUsage(userId, 'model', 1);
-          // Refresh usage limits
-          await checkLimits();
+          // Force refresh usage limits to get updated counts immediately
+          await checkLimits(true);
         } catch (trackingError) {
           console.error('Failed to track usage:', trackingError);
           // Don't fail the generation if tracking fails
