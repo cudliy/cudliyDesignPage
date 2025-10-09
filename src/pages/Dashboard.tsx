@@ -4,6 +4,7 @@ import { apiService, type Design } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
 import RateLimitTest from '../components/RateLimitTest';
 import SubscriptionDebug from '../components/SubscriptionDebug';
+import SEO from '@/components/SEO';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -259,7 +260,14 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-2 sm:p-4">
+    <>
+      <SEO 
+        title="Dashboard - Manage Your Toy Designs"
+        description="Access your personal dashboard to view, manage, and organize your custom toy designs. Track your creations and continue your creative journey."
+        keywords="dashboard, my designs, toy management, design gallery, user dashboard, creative workspace"
+        url="/dashboard"
+      />
+      <div className="w-full h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-2 sm:p-4">
       {/* Left Sidebar */}
       <aside className={`bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] shadow-2xl border border-white/5 ${
         isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
@@ -670,6 +678,7 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

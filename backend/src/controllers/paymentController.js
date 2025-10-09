@@ -475,6 +475,17 @@ export const trackUsage = async (req, res, next) => {
 
     if (subscription) {
       const limits = subscription.plan.limits;
+      
+      // Ensure usage object exists (fix for Studio plan not tracking usage)
+      if (!subscription.usage) {
+        subscription.usage = {
+          imagesGenerated: 0,
+          modelsGenerated: 0,
+          storageUsed: 0,
+          lastReset: new Date()
+        };
+      }
+      
       const usage = subscription.usage;
 
       if (type === 'image') {

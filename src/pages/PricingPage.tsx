@@ -5,6 +5,7 @@ import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "../services/api";
+import SEO from "@/components/SEO";
 
 const PricingPage = () => {
   const [isYearly, setIsYearly] = useState(false);
@@ -159,8 +160,15 @@ const PricingPage = () => {
 
 
   return (
-    <div className="min-h-screen bg-white">
-      <GlassNav />
+    <>
+      <SEO 
+        title="Pricing Plans - Choose Your Creative Journey"
+        description="Explore Cudliy's flexible pricing plans. From free basic access to professional studio plans. Start creating custom 3D toys today with plans starting at just $9.99/month."
+        keywords="pricing, subscription plans, toy design pricing, 3D printing plans, creator plan, studio plan, student discount, enterprise pricing"
+        url="/pricing"
+      />
+      <div className="min-h-screen bg-white">
+        <GlassNav />
       {/* Hero Section */}
       <section className="pt-32 md:pt-40 pb-16 md:pb-24 px-4 md:px-8">
         <div className="max-w-6xl mx-auto text-center">
@@ -396,7 +404,8 @@ const PricingPage = () => {
       
       {/* Footer */}
       <Footer />
-    </div>
+      </div>
+    </>
   );
 };
 

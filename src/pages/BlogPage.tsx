@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Search, ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
 import GlassNav from "@/components/GlassNav";
+import SEO from "@/components/SEO";
 
 const BlogPage = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -100,8 +101,15 @@ const BlogPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white">
-      <GlassNav />
+    <>
+      <SEO 
+        title="Blog - Design Inspiration & Creative Ideas"
+        description="Discover creative inspiration, design tips, and the latest features in Cudliy's playground. Learn how to bring your toy ideas to life with our AI-powered platform."
+        keywords="design blog, toy design inspiration, 3D printing tips, creative ideas, playground features, design tutorials"
+        url="/blog"
+      />
+      <div className="min-h-screen bg-white">
+        <GlassNav />
 
       {/* Hero Section */}
       <div className="relative bg-white pt-32 md:pt-40 pb-16">
@@ -286,7 +294,8 @@ const BlogPage = () => {
 
       {/* Footer */}
       <Footer />
-    </div>
+      </div>
+    </>
   );
 };
 

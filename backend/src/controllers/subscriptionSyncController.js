@@ -97,6 +97,12 @@ export const syncSubscriptionFromStripe = async (req, res, next) => {
               currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
               currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
               cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end
+            },
+            usage: {
+              imagesGenerated: 0,
+              modelsGenerated: 0,
+              storageUsed: 0,
+              lastReset: new Date()
             }
           });
 
@@ -196,6 +202,12 @@ export const syncSubscriptionFromStripe = async (req, res, next) => {
             currentPeriodStart: new Date(stripeSub.current_period_start * 1000),
             currentPeriodEnd: new Date(stripeSub.current_period_end * 1000),
             cancelAtPeriodEnd: stripeSub.cancel_at_period_end
+          },
+          usage: {
+            imagesGenerated: 0,
+            modelsGenerated: 0,
+            storageUsed: 0,
+            lastReset: new Date()
           }
         });
 

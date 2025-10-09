@@ -8,6 +8,7 @@ import DetailSelector from "../components/DetailSelector";
 import ImageGenerationWorkflow from "../components/ImageGenerationWorkflow";
 import { usePropertiesAggregator } from "../hooks/usePropertiesAggregator";
 import { useUsageLimits } from "../hooks/useUsageLimits";
+import SEO from "@/components/SEO";
 
 export default function DesignPage() {
 	const videoRef = useRef<HTMLVideoElement>(null);
@@ -568,7 +569,14 @@ export default function DesignPage() {
 	};
 	
 	return (
-		<div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
+		<>
+			<SEO 
+				title="Design Playground - Create Your Toy"
+				description="Use our AI-powered playground to design custom 3D toys. Choose colors, materials, styles and bring your imagination to life with advanced or basic mode."
+				keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
+				url="/design"
+			/>
+			<div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
 			{/* Left Pane */}
 			<aside className={`flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] rounded-[40px] relative overflow-hidden transition-all duration-1000 ease-out shadow-2xl border border-white/5 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
@@ -986,6 +994,7 @@ export default function DesignPage() {
 					}
 				}
 			`}</style>
-		</div>
+			</div>
+		</>
 	);
 }
