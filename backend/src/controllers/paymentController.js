@@ -523,18 +523,20 @@ export const checkUsageLimits = async (req, res, next) => {
 
     logger.info(`Checking usage limits for user: ${userId}`);
 
+    // Check for active subscription
     const subscription = await Subscription.findOne({ 
       userId, 
       status: { $in: ['active', 'trialing'] } 
     }).sort({ createdAt: -1 }); // Get the most recent active subscription
 
+    // Also get user data
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
     if (!subscription) {
       // Free tier limits
-      const user = await User.findOne({ id: userId });
-      if (!user) {
-        return next(new AppError('User not found', 404));
-      }
-
       const freeLimits = {
         imagesPerMonth: 3,
         modelsPerMonth: 1,
@@ -550,25 +552,38 @@ export const checkUsageLimits = async (req, res, next) => {
         success: true,
         data: {
           plan: 'free',
+          subscription: null,
           limits: freeLimits,
-          usage: user.usage,
+          usage: {
+            imagesGenerated: user.usage.imagesGenerated || 0,
+            modelsGenerated: user.usage.modelsGenerated || 0,
+            storageUsed: 0
+          },
           remaining: {
-            images: Math.max(0, freeLimits.imagesPerMonth - user.usage.imagesGenerated),
-            models: Math.max(0, freeLimits.modelsPerMonth - user.usage.modelsGenerated)
+            images: Math.max(0, freeLimits.imagesPerMonth - (user.usage.imagesGenerated || 0)),
+            models: Math.max(0, freeLimits.modelsPerMonth - (user.usage.modelsGenerated || 0))
           }
         }
       });
     }
 
+    // User has active subscription
     const limits = subscription.plan.limits;
-    const usage = subscription.usage;
+    const usage = subscription.usage || { imagesGenerated: 0, modelsGenerated: 0, storageUsed: 0 };
 
     logger.info(`User ${userId} has ${subscription.plan.type} subscription. Limits: ${JSON.stringify(limits)}, Usage: ${JSON.stringify(usage)}`);
+    logger.info(`User subscription in User model: ${JSON.stringify(user.subscription)}`);
 
     res.json({
       success: true,
       data: {
         plan: subscription.plan.type,
+        subscription: {
+          id: subscription.id,
+          status: subscription.status,
+          currentPeriodEnd: subscription.billing.currentPeriodEnd,
+          planName: subscription.plan.name
+        },
         limits,
         usage,
         remaining: {

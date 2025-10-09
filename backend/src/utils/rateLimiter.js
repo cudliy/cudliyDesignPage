@@ -40,6 +40,6 @@ export const uploadLimiter = createRateLimiter(
 
 export const paymentLimiter = createRateLimiter(
   15 * 60 * 1000, // 15 minutes
-  30, // limit each IP to 30 payment requests per 15 minutes
+  process.env.NODE_ENV === 'production' ? 50 : 200, // More permissive in development
   'Too many payment requests, please try again later.'
 );

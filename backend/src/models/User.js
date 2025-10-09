@@ -41,11 +41,13 @@ const userSchema = new mongoose.Schema({
   subscription: {
     type: {
       type: String,
-      enum: ['free', 'premium', 'pro'],
+      enum: ['free', 'premium', 'pro', 'enterprise'],
       default: 'free'
     },
     expiresAt: Date,
-    features: [String]
+    features: [String],
+    stripeSubscriptionId: String,
+    status: String
   },
   usage: {
     imagesGenerated: { type: Number, default: 0 },

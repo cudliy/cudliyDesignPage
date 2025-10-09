@@ -138,56 +138,75 @@ export default function Dashboard() {
     const sessionId = urlParams.get('session_id');
     
     if (sessionId && userId) {
-      console.log('Stripe checkout session detected:', sessionId);
+      console.log('🔔 Stripe checkout session detected:', sessionId);
       
       // Poll for subscription creation (webhook might take time)
-      const pollForSubscription = async (retries = 10) => {
+      const pollForSubscription = async (retries = 15) => {
         try {
-          console.log(`Checking for subscription... (attempt ${11 - retries}/10)`);
+          console.log(`🔍 Checking for subscription... (attempt ${16 - retries}/15)`);
           
           // Fetch fresh subscriptions data
-          const response = await apiService.getUserSubscriptions(userId);
-          console.log('User subscriptions response:', response);
+          const subscriptionResponse = await apiService.getUserSubscriptions(userId);
+          console.log('📦 User subscriptions response:', subscriptionResponse);
           
-          if (response.success && response.data?.subscriptions?.length > 0) {
-            const activeSubscription = response.data.subscriptions.find(
+          // Also check usage limits which includes subscription info
+          const limitsResponse = await apiService.checkUsageLimits(userId);
+          console.log('📊 Usage limits response:', limitsResponse);
+          
+          // Check both responses for subscription
+          const hasActiveSubscription = 
+            (subscriptionResponse.success && subscriptionResponse.data?.subscriptions?.some(
               (sub: any) => sub.status === 'active' || sub.status === 'trialing'
-            );
+            )) ||
+            (limitsResponse.success && limitsResponse.data?.plan !== 'free');
+          
+          if (hasActiveSubscription) {
+            console.log('✅ Active subscription found!');
+            console.log('Subscription data:', subscriptionResponse.data);
+            console.log('Limits data:', limitsResponse.data);
             
-            if (activeSubscription) {
-              console.log('✅ Active subscription found!', activeSubscription);
-              
-              // Refresh usage limits before reloading
-              console.log('🔄 Refreshing usage limits...');
-              await checkLimits();
-              
-              // Remove session_id from URL and reload to refresh all data
-              window.history.replaceState({}, document.title, '/dashboard');
-              window.location.reload();
-              return;
-            }
+            // Refresh usage limits before reloading
+            console.log('🔄 Refreshing usage limits...');
+            await checkLimits();
+            
+            // Remove session_id from URL and reload to refresh all data
+            console.log('🔃 Reloading page with updated subscription...');
+            window.history.replaceState({}, document.title, '/dashboard');
+            window.location.reload();
+            return;
           }
           
           // If no active subscription found and retries left, try again
           if (retries > 0) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log(`⏳ Waiting 3 seconds before next check... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
             await pollForSubscription(retries - 1);
           } else {
-            console.warn('⚠️ No active subscription found after 10 attempts. Webhook may have failed.');
+            console.warn('⚠️ No active subscription found after 15 attempts. Webhook may still be processing.');
+            console.log('💡 Try refreshing the page manually in a few moments.');
             // Remove session_id and reload anyway to show current state
             window.history.replaceState({}, document.title, '/dashboard');
+            // Final attempt to refresh limits
+            await checkLimits();
             window.location.reload();
           }
         } catch (error) {
-          console.error('Error checking subscription:', error);
+          console.error('❌ Error checking subscription:', error);
           if (retries > 0) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log(`🔄 Retrying after error... (${retries} retries left)`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
             await pollForSubscription(retries - 1);
+          } else {
+            // Remove session_id on final failure
+            window.history.replaceState({}, document.title, '/dashboard');
+            window.location.reload();
           }
         }
       };
       
-      pollForSubscription();
+      // Start polling with a slight delay to allow webhook to process
+      console.log('⏳ Starting subscription polling in 2 seconds...');
+      setTimeout(() => pollForSubscription(), 2000);
     }
   }, [userId, checkLimits]);
 

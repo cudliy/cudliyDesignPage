@@ -628,7 +628,9 @@ class StripeService {
         const userUpdateData = {
           'subscription.type': subscriptionRecord.plan.type,
           'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
-          'subscription.features': subscriptionRecord.plan.features
+          'subscription.features': subscriptionRecord.plan.features,
+          'subscription.stripeSubscriptionId': stripeSubscription.id,
+          'subscription.status': stripeSubscription.status
         };
         
         logger.info(`Updating user ${userId} with: ${JSON.stringify(userUpdateData)}`);
@@ -636,14 +638,29 @@ class StripeService {
         const updatedUser = await User.findOneAndUpdate(
           { id: userId },
           userUpdateData,
-          { new: true }
+          { new: true, runValidators: false }
         );
         
         if (updatedUser) {
           logger.info(`✅ User ${userId} subscription updated to ${subscriptionRecord.plan.type}`);
-          logger.info(`User subscription data: ${JSON.stringify(updatedUser.subscription)}`);
+          logger.info(`User subscription data: type=${updatedUser.subscription.type}, expires=${updatedUser.subscription.expiresAt}, status=${updatedUser.subscription.status}`);
         } else {
-          logger.error(`❌ Failed to update user ${userId} - user not found`);
+          logger.error(`❌ CRITICAL: Failed to update user ${userId} - user not found`);
+          logger.error(`Attempting to find user with id: ${userId}`);
+          const userCheck = await User.findOne({ id: userId });
+          if (userCheck) {
+            logger.error(`⚠️ User exists but update failed. Current subscription: ${JSON.stringify(userCheck.subscription)}`);
+            // Try direct update
+            userCheck.subscription.type = subscriptionRecord.plan.type;
+            userCheck.subscription.expiresAt = subscriptionRecord.billing.currentPeriodEnd;
+            userCheck.subscription.features = subscriptionRecord.plan.features;
+            userCheck.subscription.stripeSubscriptionId = stripeSubscription.id;
+            userCheck.subscription.status = stripeSubscription.status;
+            await userCheck.save();
+            logger.info(`✅ User updated via direct save method`);
+          } else {
+            logger.error(`❌ User truly not found in database. Cannot proceed with subscription activation.`);
+          }
         }
         
         logger.info(`✅ Subscription checkout completed successfully: ${session.id}`);
@@ -770,15 +787,21 @@ class StripeService {
         await subscriptionRecord.save();
         
         // Update user subscription status
-        await User.findOneAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { id: userId },
           {
             'subscription.type': subscriptionRecord.plan.type,
             'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
-            'subscription.features': subscriptionRecord.plan.features
-          }
+            'subscription.features': subscriptionRecord.plan.features,
+            'subscription.stripeSubscriptionId': subscription.id,
+            'subscription.status': subscription.status
+          },
+          { new: true, runValidators: false }
         );
         
+        if (updatedUser) {
+          logger.info(`✅ User ${userId} subscription updated in webhook handler`);
+        }
         logger.info(`Subscription created from webhook: ${subscription.id}`);
       }
     } catch (error) {
@@ -808,10 +831,25 @@ class StripeService {
           {
             'subscription.type': subscriptionRecord.plan.type,
             'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
-            'subscription.features': subscriptionRecord.plan.features
-          }
+            'subscription.features': subscriptionRecord.plan.features,
+            'subscription.stripeSubscriptionId': subscription.id,
+            'subscription.status': subscription.status
+          },
+          { new: true, runValidators: false }
         );
-        logger.info(`User ${subscriptionRecord.userId} subscription updated`);
+        logger.info(`User ${subscriptionRecord.userId} subscription updated to ${subscription.status}`);
+      } else if (subscriptionRecord && (subscription.status === 'canceled' || subscription.status === 'past_due' || subscription.status === 'unpaid')) {
+        // Update user to free plan if subscription is no longer active
+        await User.findOneAndUpdate(
+          { id: subscriptionRecord.userId },
+          {
+            'subscription.type': 'free',
+            'subscription.status': subscription.status,
+            'subscription.stripeSubscriptionId': subscription.id
+          },
+          { new: true, runValidators: false }
+        );
+        logger.info(`User ${subscriptionRecord.userId} subscription set to free due to status: ${subscription.status}`);
       }
 
       logger.info(`Subscription updated: ${subscription.id}, status: ${subscription.status}`);
@@ -873,10 +911,13 @@ class StripeService {
             {
               'subscription.type': subscriptionRecord.plan.type,
               'subscription.expiresAt': subscriptionRecord.billing.currentPeriodEnd,
-              'subscription.features': subscriptionRecord.plan.features
-            }
+              'subscription.features': subscriptionRecord.plan.features,
+              'subscription.stripeSubscriptionId': invoice.subscription,
+              'subscription.status': 'active'
+            },
+            { new: true, runValidators: false }
           );
-          logger.info(`User ${subscriptionRecord.userId} subscription extended to ${subscriptionRecord.billing.currentPeriodEnd}`);
+          logger.info(`✅ User ${subscriptionRecord.userId} subscription extended to ${subscriptionRecord.billing.currentPeriodEnd}`);
         }
       }
 
