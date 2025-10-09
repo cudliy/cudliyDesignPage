@@ -117,4 +117,8 @@ router.post('/users/:userId/usage/track',
 );
 router.get('/users/:userId/usage/limits', verifyPaymentAuth, checkUsageLimits);
 
+// Manual subscription sync (workaround for webhook issues)
+import { syncSubscriptionFromStripe } from '../controllers/subscriptionSyncController.js';
+router.post('/sync-subscription', syncSubscriptionFromStripe);
+
 export default router;

@@ -153,10 +153,13 @@ export default function Dashboard() {
           // Fetch fresh subscriptions data
           const subscriptionResponse = await apiService.getUserSubscriptions(userId);
           console.log('📦 User subscriptions response:', subscriptionResponse);
+          console.log('📦 Subscriptions array:', subscriptionResponse.data?.subscriptions);
           
           // Also check usage limits which includes subscription info
           const limitsResponse = await apiService.checkUsageLimits(userId);
           console.log('📊 Usage limits response:', limitsResponse);
+          console.log('📊 Plan type:', limitsResponse.data?.plan);
+          console.log('📊 Subscription object:', limitsResponse.data?.subscription);
           
           // Check both responses for subscription
           const hasActiveSubscription = 
@@ -187,13 +190,30 @@ export default function Dashboard() {
             await pollForSubscription(retries - 1);
           } else {
             console.warn('⚠️ No active subscription found after 15 attempts.');
-            console.log('💡 Webhook may still be processing. Please refresh the page manually.');
-            // Remove session_id and do final refresh
-            window.history.replaceState({}, document.title, '/dashboard');
-            await checkLimits(true); // Force refresh to get latest state
+            console.log('🔧 Attempting manual subscription sync...');
             
-            // Show alert to user
-            alert('Subscription payment received! If your plan hasn\'t updated yet, please refresh the page in a few moments. The backend may still be processing your payment.');
+            // Try manual sync as fallback
+            try {
+              const syncResponse = await apiService.syncSubscription(userId, sessionId);
+              console.log('🔧 Manual sync response:', syncResponse);
+              
+              if (syncResponse.success) {
+                console.log('✅ Manual sync successful! Refreshing subscription data...');
+                await checkLimits(true);
+                window.history.replaceState({}, document.title, '/dashboard');
+                alert('Subscription activated successfully!');
+                return;
+              }
+            } catch (syncError) {
+              console.error('❌ Manual sync failed:', syncError);
+            }
+            
+            // If manual sync also failed
+            console.log('💡 Please wait a few moments and manually refresh the page.');
+            window.history.replaceState({}, document.title, '/dashboard');
+            await checkLimits(true);
+            
+            alert('Subscription payment received! The system is still processing your subscription. Please refresh the page in a few moments to see your updated plan.');
           }
         } catch (error) {
           console.error('❌ Error checking subscription:', error);

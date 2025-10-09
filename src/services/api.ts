@@ -531,6 +531,14 @@ class ApiService {
     });
   }
 
+  // Manual subscription sync (workaround for webhook issues)
+  async syncSubscription(userId: string, sessionId?: string): Promise<ApiResponse<{ subscriptions: any[] }>> {
+    return this.request(`/payments/sync-subscription`, {
+      method: 'POST',
+      body: JSON.stringify({ userId, sessionId }),
+    });
+  }
+
   // Subscription management
   async createSubscription(userId: string, planType: string, interval: 'month' | 'year'): Promise<ApiResponse<{ subscriptionId: string; checkoutUrl: string; clientSecret?: string }>> {
     return this.request('/payments/subscriptions', {
