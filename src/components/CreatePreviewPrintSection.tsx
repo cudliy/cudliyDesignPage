@@ -87,36 +87,34 @@ const CreatePreviewPrintSection = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8" id="create-preview-print">
+    <section className="py-12 sm:py-16 md:py-20 mt-16 md:mt-24 lg:mt-32 px-4 sm:px-6 md:px-8" id="create-preview-print">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           
-          {/* Left side - 3D Interactive Image */}
+          {/* Left side - Video Preview */}
           <div className="flex justify-center lg:justify-start">
-            <div className="relative" style={{ transformStyle: 'preserve-3d' }}>
-              <img
-                ref={imageRef}
-                src="/Lummi Doodle 7.png"
-                alt="3D Preview"
-                className="cursor-grab active:cursor-grabbing w-full max-w-lg lg:max-w-xl transition-transform duration-100"
+            <div className="relative">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full max-w-lg lg:max-w-xl transition-transform duration-300 hover:scale-105"
                 style={{ 
                   aspectRatio: "858/536",
                   borderRadius: "30px",
                   backgroundColor: "#ffffff",
                   border: "2px solid #e5e7eb",
                   boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
-                  objectFit: "contain",
+                  objectFit: "cover",
                   objectPosition: "center",
-                  transformOrigin: 'center center',
-                  backfaceVisibility: 'visible',
                   position: "relative",
                   zIndex: 10,
                 }}
-                onMouseDown={handleRotationStart}
-                onTouchStart={handleRotationStart}
-                onContextMenu={(e) => e.preventDefault()}
-                draggable={false}
-              />
+              >
+                <source src="/GIFS/Untitled video - Made with Clipchamp (1).mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
               
               {/* Professional instruction tooltip */}
               <div 
