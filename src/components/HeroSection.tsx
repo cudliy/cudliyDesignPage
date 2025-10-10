@@ -489,17 +489,17 @@ const HeroSection = () => {
             </div>
             
             {/* Main Content - Two Column Layout */}
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 max-w-5xl mx-auto">
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-24 lg:gap-36 max-w-5xl mx-auto">
               {/* Left Side - Color Picker Interface */}
               <div className="flex-shrink-0 group hover:scale-105 transition-transform duration-500 ease-out">
                 <img
                   src="/GIFS/Color-wheel.gif"
                   alt="Color Picker Interface"
-                  className="object-contain transition-all duration-300 group-hover:shadow-2xl animate-gentle-float"
+                  className=" ml-[20px]object-contain transition-all duration-300 group-hover:shadow-2xl animate-gentle-float"
                   style={{
                     width: "450px",
                     height: "380px",
-                    borderRadius: "30px",
+                    borderRadius: "20px",
                     opacity: 1,
                     maxWidth: "100%",
                   }}

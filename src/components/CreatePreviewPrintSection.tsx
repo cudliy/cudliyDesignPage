@@ -87,7 +87,7 @@ const CreatePreviewPrintSection = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 mt-16 md:mt-24 lg:mt-32 px-4 sm:px-6 md:px-8" id="create-preview-print">
+    <section className="py-12 sm:py-16 gap-36 md:gap-40 lg:gap-48 md:py-20 mt-16 md:mt-24 lg:mt-32 px-4 sm:px-6 md:px-8" id="create-preview-print">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           
@@ -99,7 +99,9 @@ const CreatePreviewPrintSection = () => {
                 loop
                 muted
                 playsInline
-                className="w-full max-w-lg lg:max-w-xl transition-transform duration-300 hover:scale-105"
+                onMouseDown={handleRotationStart}
+                onTouchStart={handleRotationStart}
+                className="w-full ml-20 max-w-lg lg:max-w-xl transition-transform duration-300 hover:scale-105"
                 style={{ 
                   aspectRatio: "858/536",
                   borderRadius: "30px",
@@ -148,7 +150,7 @@ const CreatePreviewPrintSection = () => {
           </div>
 
           {/* Right side - Text Content */}
-          <div className="text-center lg:text-left space-y-6 lg:space-y-8">
+          <div className="ml-16 text-center lg:text-left space-y-6 lg:space-y-8">
             <div className="space-y-2 lg:space-y-4">
               <h3 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-normal text-gray-300 leading-none font-abril tracking-tight">
                 Create
