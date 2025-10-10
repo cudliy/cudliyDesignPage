@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Upload, Download, Loader2 } from 'lucide-react';
 import { testApiConnection } from '../utils/testApiConnection';
-import { downloadAllDesignFiles, download3DModel, getFileExtension } from '../utils/downloadUtils';
 
 // Lazy load ModelViewer to improve initial load time
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
@@ -14,7 +13,6 @@ export default function DesignView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [regenerating, setRegenerating] = useState(false);
-  const [downloading, setDownloading] = useState(false);
   const navigate = useNavigate();
   
   // Control states - matching the image positions
@@ -199,30 +197,25 @@ export default function DesignView() {
     }
   }, [designId, testModelUrl, modelUrl, design, navigate]);
 
-  // Memoized download function
-  const handleDownload = useCallback(async () => {
-    if (!design || downloading) return;
+  // Memoized download function - navigate to download page
+  const handleDownload = useCallback(() => {
+    if (!design) return;
 
-    setDownloading(true);
-    try {
-      // Get the best available model URL
-      const modelUrl = getValidModelUrl();
-      
-      if (modelUrl) {
-        // Determine file type from URL
-        const fileType = getFileExtension(modelUrl);
-        
-        // Download the 3D model
-        await download3DModel(modelUrl, design.id || designId, fileType);
-      } else {
-        throw new Error('No valid model URL available for download');
-      }
-    } catch (error) {
-      setError(`Download failed: ${error.message}`);
-    } finally {
-      setDownloading(false);
+    // Get the best available model URL
+    const modelUrl = getValidModelUrl();
+    
+    if (modelUrl) {
+      // Navigate to download page with model URL
+      navigate(`/download/${designId}`, {
+        state: {
+          modelUrl: modelUrl,
+          design: design
+        }
+      });
+    } else {
+      setError('No valid model URL available for download');
     }
-  }, [design, designId, downloading, getValidModelUrl]);
+  }, [design, designId, getValidModelUrl, navigate]);
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
@@ -585,20 +578,11 @@ export default function DesignView() {
           <div className="flex justify-center gap-4">
             <button 
               onClick={handleDownload}
-              disabled={downloading || !getValidModelUrl()}
+              disabled={!getValidModelUrl()}
               className="px-8 py-3 bg-gradient-to-r from-black to-gray-800 text-white rounded-lg font-medium hover:from-gray-800 hover:to-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105"
             >
-              {downloading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Downloading...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  Download
-                </>
-              )}
+              <Download className="w-4 h-4" />
+              Download
             </button>
             <button 
               onClick={handleMakeOrder}
@@ -633,15 +617,11 @@ export default function DesignView() {
         <div className="space-y-2 flex-1">
           <button 
             onClick={handleDownload}
-            disabled={downloading || !getValidModelUrl()}
+            disabled={!getValidModelUrl()}
             className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left disabled:opacity-50 disabled:cursor-not-allowed border border-white/5 hover:border-white/10 backdrop-blur-sm"
           >
-            {downloading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Download className="w-5 h-5" />
-            )}
-            <span className="font-medium">{downloading ? 'Downloading...' : 'Download Model'}</span>
+            <Download className="w-5 h-5" />
+            <span className="font-medium">Download Model</span>
           </button>
 
           <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">

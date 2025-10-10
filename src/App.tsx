@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import DesignPage from './pages/DesignPage'
 // @ts-ignore
 import DesignView from './pages/DesignView'
+import DownloadPage from './pages/DownloadPage'
 import Dashboard from './pages/Dashboard'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
@@ -24,6 +25,7 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/design" element={<DesignPage />} />
           <Route path="/design/:designId" element={<DesignView />} />
+          <Route path="/download/:designId" element={<DownloadPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checkout/:designId" element={<CheckoutPage />} />
           <Route path="/order-success" element={<OrderSuccessPage />} />

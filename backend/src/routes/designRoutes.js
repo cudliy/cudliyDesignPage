@@ -6,7 +6,8 @@ import {
   getDesign, 
   getUserDesigns, 
   deleteDesign, 
-  updateDesign 
+  updateDesign,
+  getDesignProgress
 } from '../controllers/designController.js';
 // Rate limiting and validation removed for guest access
 import { AppError } from '../utils/errorHandler.js';
@@ -46,6 +47,7 @@ router.post('/generate-images', generateImages);
 router.post('/generate-3d-model', generate3DModel);
 
 router.get('/:designId', getDesign);
+router.get('/:designId/progress', getDesignProgress);
 router.get('/user/:userId/designs', getUserDesigns);
 router.delete('/:designId', deleteDesign);
 router.patch('/:designId', updateDesign);

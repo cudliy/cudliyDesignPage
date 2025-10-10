@@ -339,6 +339,74 @@ export const generate3DModel = async (req, res, next) => {
   }
 };
 
+// Get design progress
+export const getDesignProgress = async (req, res, next) => {
+  try {
+    const { designId } = req.params;
+
+    logger.info(`Getting progress for design: ${designId}`);
+
+    const design = await Design.findOne({ id: designId });
+
+    if (!design) {
+      return next(new AppError('Design not found', 404));
+    }
+
+    // Calculate progress based on design status and model files
+    let progress = 0;
+    let status = 'pending';
+    let message = 'Initializing...';
+
+    // Check if we have model files (processing complete)
+    if (design.modelFiles?.storedModelUrl || design.modelFiles?.modelFile) {
+      progress = 100;
+      status = 'completed';
+      message = 'Processing complete!';
+    } else if (design.status === 'completed') {
+      // Design marked as completed but no model files yet
+      progress = 95;
+      status = 'processing';
+      message = 'Finalizing 3D model...';
+    } else if (design.images && design.images.length > 0) {
+      // We have images, so 3D generation has started
+      progress = 60;
+      status = 'processing';
+      message = 'Generating 3D model from images...';
+    } else if (design.status === 'processing') {
+      // Design is being processed
+      progress = 30;
+      status = 'processing';
+      message = 'Processing your design...';
+    } else {
+      // Default state
+      progress = 10;
+      status = 'pending';
+      message = 'Initializing 3D model generation...';
+    }
+
+    // Add some randomness to make it feel more realistic
+    if (status === 'processing') {
+      const randomVariation = Math.random() * 5; // ±5% variation
+      progress = Math.min(Math.max(progress + randomVariation, 0), 95);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        progress: Math.round(progress),
+        status,
+        message,
+        designId,
+        hasModel: !!(design.modelFiles?.storedModelUrl || design.modelFiles?.modelFile),
+        lastUpdated: design.updatedAt
+      }
+    });
+  } catch (error) {
+    logger.error('Error getting design progress:', error);
+    next(new AppError('Failed to get design progress', 500));
+  }
+};
+
 // Get Design Details
 export const getDesign = async (req, res, next) => {
   try {
