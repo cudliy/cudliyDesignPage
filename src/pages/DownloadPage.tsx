@@ -20,6 +20,7 @@ export default function DownloadPage() {
   const [selectedFormat, setSelectedFormat] = useState('STL');
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
+  const [autoDownloadTriggered, setAutoDownloadTriggered] = useState(false);
   
   // Available formats
   const availableFormats = ['STL', 'GLB', 'PLY', 'OBJ'];
@@ -58,6 +59,11 @@ export default function DownloadPage() {
             setProgress(100);
             setIsProcessing(false);
             setModelUrl(modelUrl);
+            // Start downloading immediately if model is already available
+            if (!autoDownloadTriggered && !downloading) {
+              setAutoDownloadTriggered(true);
+              setTimeout(() => handleDownload(), 500);
+            }
           }
         } else {
           setError('Failed to load design');
@@ -72,11 +78,43 @@ export default function DownloadPage() {
     fetchDesign();
   }, [designId]);
 
+  // Handle download
+  const handleDownload = useCallback(async () => {
+    if (!modelUrl || downloading) return;
+
+    setDownloading(true);
+    try {
+      // Import download utilities
+      const { download3DModel } = await import('../utils/downloadUtils');
+      
+      // Use selected format for download
+      const fileType = selectedFormat.toLowerCase();
+      
+      // Download the 3D model
+      await download3DModel(modelUrl, design?.id || designId || 'model', fileType);
+    } catch (error) {
+      setError(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setDownloading(false);
+    }
+  }, [modelUrl, downloading, selectedFormat, design?.id, designId]);
+
   // Update model URL when design changes
   useEffect(() => {
     const url = getModelUrl();
     setModelUrl(url);
   }, [getModelUrl]);
+
+  // Start download immediately when model URL is available
+  useEffect(() => {
+    if (modelUrl && !autoDownloadTriggered && !downloading) {
+      console.log('Model URL available, starting background download...');
+      setAutoDownloadTriggered(true);
+      
+      // Start download immediately
+      handleDownload();
+    }
+  }, [modelUrl, autoDownloadTriggered, downloading, handleDownload]);
 
   // Real-time progress tracking
   useEffect(() => {
@@ -226,27 +264,6 @@ export default function DownloadPage() {
     return () => clearInterval(progressInterval);
   }, [isProcessing]);
 
-  // Handle download
-  const handleDownload = useCallback(async () => {
-    if (!modelUrl || downloading) return;
-
-    setDownloading(true);
-    try {
-      // Import download utilities
-      const { download3DModel } = await import('../utils/downloadUtils');
-      
-      // Use selected format for download
-      const fileType = selectedFormat.toLowerCase();
-      
-      // Download the 3D model
-      await download3DModel(modelUrl, design?.id || designId || 'model', fileType);
-    } catch (error) {
-      setError(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setDownloading(false);
-    }
-  }, [modelUrl, downloading, selectedFormat, design?.id, designId]);
-
   // Handle social sharing
   const handleSocialShare = useCallback((platform: string) => {
     const shareUrl = window.location.origin + `/design/${designId}`;
@@ -342,7 +359,9 @@ export default function DownloadPage() {
             <div className="text-8xl font-bold text-[#E70D57] mb-4">
               {Math.round(progress)}%
             </div>
-            <p className="text-gray-600 text-lg mb-4">Processing your 3D model</p>
+            <p className="text-gray-600 text-lg mb-4">
+              {downloading ? 'Downloading your 3D model...' : 'Processing your 3D model'}
+            </p>
             
             {/* Progress Bar */}
             <div className="w-full max-w-sm mx-auto">
@@ -392,21 +411,23 @@ export default function DownloadPage() {
             ) : (
               <>
                 <Download className="w-5 h-5" />
-                Download
+                Download Now
               </>
             )}
           </button>
 
           {/* Progress Message */}
-          {isProcessing && (
+          {downloading ? (
+            <p className="text-sm text-blue-600 text-center max-w-sm">
+              📥 Downloading your file in the background...
+            </p>
+          ) : isProcessing ? (
             <p className="text-sm text-gray-500 text-center max-w-sm">
               {getProgressMessage(progress)}
             </p>
-          )}
-          
-          {!isProcessing && progress === 100 && (
+          ) : (
             <p className="text-sm text-green-600 text-center max-w-sm">
-              ✅ Your 3D model is ready for download!
+              ✅ Your 3D model is ready!
             </p>
           )}
         </div>
