@@ -1,90 +1,4 @@
-import { useEffect, useState, useRef } from "react";
-
 const CreatePreviewPrintSection = () => {
-  const imageRef = useRef<HTMLImageElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-  const [isRotating, setIsRotating] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-  // Rotation values are applied directly to style; no need to keep in state
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isRotating || !imageRef.current) return;
-      
-      const deltaX = (e.clientX - startPosition.x) * 0.5;
-      const deltaY = (e.clientY - startPosition.y) * 0.5;
-      
-      imageRef.current.style.transform = `perspective(1000px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg)`;
-    };
-
-    const handleMouseUp = () => {
-      if (!isRotating) return;
-      
-      setIsRotating(false);
-      
-      if (imageRef.current) {
-        imageRef.current.style.cursor = 'grab';
-        imageRef.current.style.transition = 'transform 0.5s ease-out';
-        imageRef.current.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
-      }
-      
-      // Show tooltip again after interaction
-      setTimeout(() => {
-        if (tooltipRef.current) {
-          tooltipRef.current.style.opacity = '1';
-        }
-        if (imageRef.current) {
-          imageRef.current.style.transition = 'transform 0.1s';
-        }
-      }, 500);
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isRotating || !imageRef.current) return;
-      
-      const deltaX = (e.touches[0].clientX - startPosition.x) * 0.5;
-      const deltaY = (e.touches[0].clientY - startPosition.y) * 0.5;
-      
-      imageRef.current.style.transform = `perspective(1000px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg)`;
-    };
-
-    const handleTouchEnd = () => {
-      handleMouseUp();
-    };
-
-    if (isRotating) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleTouchMove);
-      document.addEventListener('touchend', handleTouchEnd);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [isRotating, startPosition]);
-
-  const handleRotationStart = (e: React.MouseEvent<HTMLImageElement> | React.TouchEvent<HTMLImageElement>) => {
-    e.preventDefault();
-    setIsRotating(true);
-    
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
-    setStartPosition({ x: clientX, y: clientY });
-    
-    if (imageRef.current) {
-      imageRef.current.style.cursor = 'grabbing';
-    }
-    
-    // Hide tooltip when interacting
-    if (tooltipRef.current) {
-      tooltipRef.current.style.opacity = '0';
-    }
-  };
 
   return (
     <section className="py-12 sm:py-16 gap-36 md:gap-40 lg:gap-48 md:py-20 mt-16 md:mt-24 lg:mt-32 px-4 sm:px-6 md:px-8" id="create-preview-print">
@@ -99,8 +13,6 @@ const CreatePreviewPrintSection = () => {
                 loop
                 muted
                 playsInline
-                onMouseDown={handleRotationStart}
-                onTouchStart={handleRotationStart}
                 className="w-full ml-20 max-w-lg lg:max-w-xl transition-transform duration-300 hover:scale-105"
                 style={{ 
                   aspectRatio: "858/536",
@@ -118,19 +30,6 @@ const CreatePreviewPrintSection = () => {
                 Your browser does not support the video tag.
               </video>
               
-              {/* Professional instruction tooltip */}
-              <div 
-                ref={tooltipRef}
-                className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-gray-800 text-sm px-4 py-3 rounded-lg shadow-lg border border-gray-200 flex items-center gap-3 transition-opacity duration-300 font-medium"
-              >
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  <span className="font-semibold">Click to rotate</span>
-                </div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-              </div>
               
               {/* 3D effect particles */}
               <div 
