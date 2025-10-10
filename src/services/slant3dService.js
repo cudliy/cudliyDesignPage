@@ -2,7 +2,7 @@
 // Uses backend proxy to avoid CORS issues
 // Based on official Slant3D API documentation: https://api-fe-two.vercel.app/Docs
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001/api' : 'https://cudliy.onrender.com/api');
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001/api' : 'https://cudliydesign-production.up.railway.app/api');
 
 // Debug logging for Slant3D service
 console.log('Slant3D API_BASE_URL:', API_BASE_URL);

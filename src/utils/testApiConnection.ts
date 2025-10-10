@@ -1,6 +1,6 @@
 // Test API connection utility
 export const testApiConnection = async () => {
-  const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://cudliy.onrender.com/api');
+  const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : 'https://cudliydesign-production.up.railway.app/api');
   
   console.log('Testing API connection to:', API_BASE_URL);
   

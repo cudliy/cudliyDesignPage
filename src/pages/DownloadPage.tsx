@@ -3,8 +3,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Download, ArrowLeft, Instagram, Linkedin, Twitter, Facebook } from 'lucide-react';
 
-// Lazy load ModelViewer from DesignView
-const ModelViewer = lazy(() => import('../components/ModelViewer'));
+// Import ModelViewer directly to avoid lazy loading issues
+import ModelViewer from '../components/ModelViewer';
 
 export default function DownloadPage() {
   const { designId } = useParams();
