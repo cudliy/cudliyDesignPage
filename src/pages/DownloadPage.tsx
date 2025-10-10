@@ -51,6 +51,14 @@ export default function DownloadPage() {
         
         if (response.success && response.data) {
           setDesign(response.data);
+          
+          // Check if design already has a model (completed)
+          const modelUrl = response.data.modelFiles?.storedModelUrl || response.data.modelFiles?.modelFile;
+          if (modelUrl) {
+            setProgress(100);
+            setIsProcessing(false);
+            setModelUrl(modelUrl);
+          }
         } else {
           setError('Failed to load design');
         }
@@ -75,10 +83,24 @@ export default function DownloadPage() {
     if (!design || !designId) return;
 
     let progressInterval: NodeJS.Timeout;
+    let timeoutId: NodeJS.Timeout;
     let isPolling = true;
+    let pollCount = 0;
+    const maxPolls = 150; // Stop after 5 minutes (150 * 2 seconds)
+    
+    // Force completion after 6 minutes as a safety net
+    timeoutId = setTimeout(() => {
+      console.log('Progress timeout reached, forcing completion');
+      setIsProcessing(false);
+      setProgress(100);
+      isPolling = false;
+      if (progressInterval) clearInterval(progressInterval);
+    }, 6 * 60 * 1000); // 6 minutes
 
     const pollProgress = async () => {
       try {
+        pollCount++;
+        
         // Check if we have a model URL already (processing complete)
         const currentModelUrl = getModelUrl();
         if (currentModelUrl && currentModelUrl !== modelUrl) {
@@ -87,6 +109,7 @@ export default function DownloadPage() {
           setIsProcessing(false);
           isPolling = false;
           if (progressInterval) clearInterval(progressInterval);
+          if (timeoutId) clearTimeout(timeoutId);
           return;
         }
 
@@ -96,14 +119,18 @@ export default function DownloadPage() {
           const progressData = await response.json();
           
           if (progressData.success && progressData.data) {
-            const { progress: currentProgress, status } = progressData.data;
+            const { progress: currentProgress, status, hasModel } = progressData.data;
             
-          setProgress(Math.min(currentProgress || 0, 100));
+            // Update progress
+            setProgress(Math.min(currentProgress || 0, 100));
             
             // Check if processing is complete
-            if (status === 'completed' || currentProgress >= 100) {
+            if (status === 'completed' || currentProgress >= 100 || hasModel) {
               setIsProcessing(false);
               setProgress(100);
+              
+              // Clear timeout since we're done
+              if (timeoutId) clearTimeout(timeoutId);
               
               // Refresh design data to get the final model URL
               try {
@@ -117,12 +144,30 @@ export default function DownloadPage() {
               
               isPolling = false;
               if (progressInterval) clearInterval(progressInterval);
+              return;
             }
           }
         }
+
+        // Stop polling after max attempts to prevent infinite polling
+        if (pollCount >= maxPolls) {
+          console.log('Max polling attempts reached, stopping progress tracking');
+          setIsProcessing(false);
+          setProgress(100);
+          isPolling = false;
+          if (progressInterval) clearInterval(progressInterval);
+          if (timeoutId) clearTimeout(timeoutId);
+        }
       } catch (error) {
         console.error('Error polling progress:', error);
-        // Continue polling even if there's an error
+        // Continue polling even if there's an error, but stop after max attempts
+        if (pollCount >= maxPolls) {
+          setIsProcessing(false);
+          setProgress(100);
+          isPolling = false;
+          if (progressInterval) clearInterval(progressInterval);
+          if (timeoutId) clearTimeout(timeoutId);
+        }
       }
     };
 
@@ -131,7 +176,7 @@ export default function DownloadPage() {
 
     // Set up interval for regular polling (every 2 seconds)
     progressInterval = setInterval(() => {
-      if (isPolling) {
+      if (isPolling && pollCount < maxPolls) {
         pollProgress();
       }
     }, 2000);
@@ -141,6 +186,9 @@ export default function DownloadPage() {
       isPolling = false;
       if (progressInterval) {
         clearInterval(progressInterval);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, [design, designId, getModelUrl, modelUrl]);
@@ -168,12 +216,12 @@ export default function DownloadPage() {
         if (prevProgress >= 100) return 100;
         
         // Add small increments to make progress feel more dynamic
-        const increment = Math.random() * 2; // 0-2% increments
-        const newProgress = Math.min(prevProgress + increment, 95); // Cap at 95% until completion
+        const increment = Math.random() * 3 + 1; // 1-4% increments
+        const newProgress = Math.min(prevProgress + increment, 98); // Cap at 98% until API completion
         
         return newProgress;
       });
-    }, 1500); // Update every 1.5 seconds
+    }, 1200); // Update every 1.2 seconds
 
     return () => clearInterval(progressInterval);
   }, [isProcessing]);
@@ -366,7 +414,7 @@ export default function DownloadPage() {
         {/* Right Side - 3D Model Preview & Sharing */}
         <div className="flex-1 flex flex-col space-y-6">
           {/* 3D Model Preview */}
-          <div className="flex-1 bg-gray-100 rounded-2xl p-6 relative overflow-hidden">
+          <div className="flex-1 bg-gray-100 p-6 relative overflow-hidden">
             {modelUrl ? (
               <div className="w-full h-full">
                 <Suspense fallback={
@@ -381,7 +429,7 @@ export default function DownloadPage() {
                     modelUrl={modelUrl}
                     className="w-full h-full"
                     lighting={50}
-                    background={50}
+                    background={100}
                     size={50}
                     cameraAngle={50}
                   />

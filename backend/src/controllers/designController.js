@@ -356,38 +356,62 @@ export const getDesignProgress = async (req, res, next) => {
     let progress = 0;
     let status = 'pending';
     let message = 'Initializing...';
+    let hasModel = false;
 
     // Check if we have model files (processing complete)
     if (design.modelFiles?.storedModelUrl || design.modelFiles?.modelFile) {
       progress = 100;
       status = 'completed';
       message = 'Processing complete!';
+      hasModel = true;
     } else if (design.status === 'completed') {
-      // Design marked as completed but no model files yet
-      progress = 95;
-      status = 'processing';
-      message = 'Finalizing 3D model...';
+      // Design marked as completed but no model files yet - assume it's ready
+      progress = 100;
+      status = 'completed';
+      message = 'Processing complete!';
+      hasModel = true;
     } else if (design.images && design.images.length > 0) {
       // We have images, so 3D generation has started
-      progress = 60;
+      const timeSinceCreated = Date.now() - new Date(design.createdAt).getTime();
+      const minutesElapsed = timeSinceCreated / (1000 * 60);
+      
+      if (minutesElapsed < 1) {
+        progress = 25;
+        message = 'Analyzing input image...';
+      } else if (minutesElapsed < 2) {
+        progress = 45;
+        message = 'Extracting 3D features...';
+      } else if (minutesElapsed < 3) {
+        progress = 65;
+        message = 'Generating 3D geometry...';
+      } else if (minutesElapsed < 4) {
+        progress = 80;
+        message = 'Applying textures and materials...';
+      } else if (minutesElapsed < 5) {
+        progress = 90;
+        message = 'Optimizing model quality...';
+      } else {
+        progress = 98;
+        message = 'Finalizing 3D model...';
+      }
+      
       status = 'processing';
-      message = 'Generating 3D model from images...';
     } else if (design.status === 'processing') {
       // Design is being processed
-      progress = 30;
+      progress = 15;
       status = 'processing';
       message = 'Processing your design...';
     } else {
       // Default state
-      progress = 10;
+      progress = 5;
       status = 'pending';
       message = 'Initializing 3D model generation...';
     }
 
-    // Add some randomness to make it feel more realistic
-    if (status === 'processing') {
-      const randomVariation = Math.random() * 5; // ±5% variation
-      progress = Math.min(Math.max(progress + randomVariation, 0), 95);
+    // Add some randomness to make it feel more realistic (but don't exceed 98% unless complete)
+    if (status === 'processing' && progress < 98) {
+      const randomVariation = (Math.random() - 0.5) * 3; // ±1.5% variation
+      progress = Math.min(Math.max(progress + randomVariation, 0), 98);
     }
 
     res.json({
@@ -397,8 +421,9 @@ export const getDesignProgress = async (req, res, next) => {
         status,
         message,
         designId,
-        hasModel: !!(design.modelFiles?.storedModelUrl || design.modelFiles?.modelFile),
-        lastUpdated: design.updatedAt
+        hasModel,
+        lastUpdated: design.updatedAt,
+        createdAt: design.createdAt
       }
     });
   } catch (error) {

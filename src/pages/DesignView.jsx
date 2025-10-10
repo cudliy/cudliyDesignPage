@@ -17,7 +17,7 @@ export default function DesignView() {
   
   // Control states - matching the image positions
   const [lighting, setLighting] = useState(30);
-  const [background, setBackground] = useState(45);
+  const [background, setBackground] = useState(100);
   const [size, setSize] = useState(50);
   const [cameraAngle, setCameraAngle] = useState(50);
   
@@ -467,7 +467,7 @@ export default function DesignView() {
       </aside>
 
       {/* Center Panel - 3D Model */}
-      <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden shadow-xl border border-gray-200/50">
+      <div className="flex-1 bg-white flex flex-col overflow-hidden shadow-xl border border-gray-200/50">
         {/* 3D Model Area */}
         <div className="flex-1 flex items-center justify-center p-8 relative">
           {testModelUrl && !modelLoadError ? (
