@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Download, ArrowLeft, Instagram, Linkedin, Twitter, Facebook } from 'lucide-react';
