@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "@/services/api";
 import { toast } from "@/lib/sonner";
-import ImageCarousel from "@/components/ImageCarousel";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -16,33 +15,6 @@ const SignIn = () => {
   const signInWithApple = async () => ({ error: null as any });
   const navigate = useNavigate();
 
-  // Carousel images showcasing different works created on Cudliy
-  const carouselImages = [
-    {
-      src: "/Rectangle 346240796.png",
-      alt: "Toy Camera Design",
-      creator: "Danny",
-      designer: "Shany"
-    },
-    {
-      src: "/camera1.png",
-      alt: "Vintage Camera Toy",
-      creator: "Alex",
-      designer: "Maya"
-    },
-    {
-      src: "/camera2.png",
-      alt: "Modern Camera Design",
-      creator: "Sam",
-      designer: "Jordan"
-    },
-    {
-      src: "/camera3.png",
-      alt: "Retro Camera Toy",
-      creator: "Taylor",
-      designer: "Casey"
-    }
-  ];
 
   useEffect(() => {
     setIsVisible(true);
@@ -290,12 +262,77 @@ const SignIn = () => {
         </div>
       </div>
 
-      {/* Right Section - Image Carousel */}
+      {/* Right Section - Dog Image */}
       <div 
         className={`hidden lg:flex lg:w-1/2 relative overflow-hidden transform transition-all duration-1000 ease-out ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}
         style={{ backgroundColor: '#F5F5DC' }}
       >
-        <ImageCarousel images={carouselImages} autoPlayInterval={4000} />
+        {/* Central Image - Rectangle 346240796 */}
+        <div className={`absolute inset-0 flex items-center justify-center transform transition-all duration-1000 delay-300 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
+          <img
+            src="/Rectangle 346240796.png"
+            alt="Rectangle 346240796"
+            className="object-cover w-full h-full"
+            style={{
+              borderRadius: '30px'
+            }}
+          />
+        </div>
+
+        {/* Attribution */}
+        <div className={`absolute bottom-8 right-8 z-10 transform transition-all duration-1000 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <div className="text-black font-bold text-lg">Danny</div>
+          <div className="text-black text-sm">Designed by Shany</div>
+        </div>
+
+        {/* Pagination Indicators */}
+        <div className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex space-x-2 transform transition-all duration-1000 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <div 
+            className="bg-gray-400"
+            style={{
+              width: '110px',
+              height: '8px',
+              borderRadius: '20px',
+              opacity: 1
+            }}
+          ></div>
+          <div 
+            className="bg-gray-400"
+            style={{
+              width: '110px',
+              height: '8px',
+              borderRadius: '20px',
+              opacity: 1
+            }}
+          ></div>
+          <div 
+            className="bg-white"
+            style={{
+              width: '110px',
+              height: '8px',
+              borderRadius: '20px',
+              opacity: 1
+            }}
+          ></div>
+          <div 
+            className="bg-gray-400"
+            style={{
+              width: '110px',
+              height: '8px',
+              borderRadius: '20px',
+              opacity: 1
+            }}
+          ></div>
+          <div 
+            className="bg-gray-400"
+            style={{
+              width: '110px',
+              height: '8px',
+              borderRadius: '20px',
+              opacity: 1
+            }}
+          ></div>
+        </div>
       </div>
     </div>
   );
