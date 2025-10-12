@@ -5,6 +5,7 @@ import ProductionSelector from "../components/ProductionSelector";
 import StyleSelector from "../components/StyleSelector";
 import MaterialSelector from "../components/MaterialSelector";
 import DetailSelector from "../components/DetailSelector";
+import QualitySelector from "../components/QualitySelector";
 import ImageGenerationWorkflow from "../components/ImageGenerationWorkflow";
 import { usePropertiesAggregator } from "../hooks/usePropertiesAggregator";
 import { useUsageLimits } from "../hooks/useUsageLimits";
@@ -25,6 +26,7 @@ export default function DesignPage() {
 	const [selectedStyle, setSelectedStyle] = useState('');
 	const [selectedMaterial, setSelectedMaterial] = useState('');
 	const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
+	const [selectedQuality, setSelectedQuality] = useState('balanced');
 	const [prompt, setPrompt] = useState('');
 	const [showWorkflow, setShowWorkflow] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -174,6 +176,11 @@ export default function DesignPage() {
 
 		setError(null);
 		setShowWorkflow(true);
+		
+		// Auto-start generation immediately
+		setTimeout(() => {
+			// This will trigger the ImageGenerationWorkflow to start automatically
+		}, 100);
 	};
 
 	const handleWorkflowComplete = (designId: string) => {
@@ -195,6 +202,10 @@ export default function DesignPage() {
 	const handleColorChange = (color: string) => {
 		// Strategic Enhancement: Add color to properties aggregator
 		addColor(color);
+	};
+
+	const handleQualityChange = (quality: string) => {
+		setSelectedQuality(quality);
 	};
 
 	const handleReset = () => {
@@ -231,6 +242,10 @@ export default function DesignPage() {
 		detail: {
 			title: 'Detail',
 			icon: '/advancedIcon6.png'
+		},
+		quality: {
+			title: 'Quality',
+			icon: '/advancedIcon1.png' // Reuse icon for now
 		}
 	};
 
@@ -477,6 +492,46 @@ export default function DesignPage() {
 		);
 	};
 
+	const renderQualitySelector = () => {
+		return (
+			<div className="flex flex-col items-center text-center w-full">
+				{/* Breadcrumb Navigation */}
+				<div className={`mb-4 flex items-center gap-2 text-sm transition-all duration-700 delay-200 ease-out ${
+					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+				}`}>
+					<button 
+						onClick={handleBackToCategories}
+						className="text-white/70 hover:text-white transition-colors cursor-pointer"
+					>
+						Quality
+					</button>
+					<span className="text-white/30">{'>'}</span>
+					<span className="text-white/90">Select Quality</span>
+				</div>
+
+				{/* Quality Selector */}
+				<div className={`transition-all duration-700 delay-300 ease-out ${
+					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+				}`}>
+					<QualitySelector
+						selectedQuality={selectedQuality}
+						onQualityChange={handleQualityChange}
+					/>
+				</div>
+
+				{/* Select Button */}
+				<button 
+					onClick={handleSelectAndReturn}
+					className={`w-[133px] h-[39px] rounded-[40px] bg-[#575757] hover:bg-[#676767] text-white font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+					}`}
+				>
+					Select
+				</button>
+			</div>
+		);
+	};
+
 	const renderAdvancedCategories = () => {
 		// Check which categories have selections
 		const properties = getProperties();
@@ -486,6 +541,7 @@ export default function DesignPage() {
 		const hasStyleSelection = !!properties.style;
 		const hasMaterialSelection = !!properties.material;
 		const hasDetailSelection = !!properties.details && Object.keys(properties.details).some(key => properties.details![key as keyof typeof properties.details]?.length);
+		const hasQualitySelection = !!selectedQuality;
 
 		const categoryStatus = {
 			color: hasColorSelection,
@@ -493,13 +549,14 @@ export default function DesignPage() {
 			production: hasProductionSelection,
 			style: hasStyleSelection,
 			material: hasMaterialSelection,
-			detail: hasDetailSelection
+			detail: hasDetailSelection,
+			quality: hasQualitySelection
 		};
 
 		return (
 			<div className="flex flex-col items-center text-center h-full">
 				
-				<div className={`grid grid-cols-3 gap-3 w-full max-w-[280px] transition-all duration-700 delay-300 ease-out ${
+				<div className={`grid grid-cols-3 gap-4 w-full max-w-[320px] transition-all duration-700 delay-300 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
 					{Object.entries(sections).map(([key, section], index) => {
@@ -523,10 +580,10 @@ export default function DesignPage() {
 								<img 
 									src={section.icon} 
 									alt={section.title} 
-									className="w-[45px] h-[45px] object-contain" 
+									className="w-[50px] h-[50px] object-contain mx-auto" 
 									style={{
-										width: '45px',
-										height: '45px',
+										width: '50px',
+										height: '50px',
 										transform: 'rotate(0deg)',
 										opacity: isSelected ? 1 : 0.8
 									}}
@@ -694,6 +751,8 @@ export default function DesignPage() {
 								renderMaterialSelector()
 							) : selectedCategory === 'detail' ? (
 								renderDetailSelector()
+							) : selectedCategory === 'quality' ? (
+								renderQualitySelector()
 							) : (
 								renderAdvancedCategories()
 							)}
@@ -805,33 +864,52 @@ export default function DesignPage() {
 						</div>
 					</div>
 				) : (
-					/* Default Grid Display */
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full w-full">
-						{/* Grid items with staggered animation */}
-						{['/camera1.png', '/camera2.png', '/camera3.png'].map((src, index) => (
-							<div key={index} className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: `${800 + index * 100}ms` }}>
-								<div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4 relative group">
-									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+					/* Full Screen Image Display */
+					<div className="h-full w-full relative">
+						{/* Main Image Display - Full Screen */}
+						<div className="absolute inset-0 bg-white rounded-[40px] overflow-hidden">
+							{['/camera1.png', '/camera2.png', '/camera3.png'].map((src, index) => (
+								<div 
+									key={index} 
+									className={`absolute inset-0 transition-all duration-700 ease-out ${
+										index === 0 ? 'opacity-100' : 'opacity-0'
+									} ${isLoaded ? 'transform translate-y-0' : 'transform translate-y-8'}`} 
+									style={{ transitionDelay: `${800 + index * 100}ms` }}
+								>
 									<img 
 										src={src} 
 										alt={`Toy camera design ${index + 1}`} 
-										className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
+										className="w-full h-full object-cover" 
 									/>
+									
+									{/* Overlay Generate 3D Button */}
+									<div className="absolute inset-0 flex items-center justify-center">
+										<button 
+											onClick={handleCreateClick}
+											disabled={!canGenerateImages}
+											className={`px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-2xl backdrop-blur-sm border-2 ${
+												!canGenerateImages
+													? 'bg-gray-400/80 text-gray-200 cursor-not-allowed border-gray-300'
+													: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white border-white/30 shadow-[#E70D57]/50'
+											}`}
+										>
+											Generate 3D
+										</button>
+									</div>
 								</div>
-							</div>
-						))}
+							))}
+						</div>
 						
-						{/* Fixed plus icon container */}
-						<div className={`bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 min-h-[200px] sm:min-h-0 group ${
-							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-						}`}>
-							<div className="w-full h-full flex items-center justify-center">
-								<button className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:from-[#E70D57]/10 hover:to-[#F4900C]/10 hover:text-[#E70D57] hover:scale-110 border-0 outline-none m-0 p-0 leading-none shadow-lg group-hover:shadow-xl">
-									+
-								</button>
-							</div>
+						{/* Image Navigation Dots */}
+						<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
+							{['/camera1.png', '/camera2.png', '/camera3.png'].map((_, index) => (
+								<button
+									key={index}
+									className={`w-3 h-3 rounded-full transition-all duration-300 ${
+										index === 0 ? 'bg-white' : 'bg-white/50'
+									}`}
+								/>
+							))}
 						</div>
 					</div>
 				)}

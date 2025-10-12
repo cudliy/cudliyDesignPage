@@ -26,18 +26,31 @@ export default function DesignView() {
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
 
-  // Memoized helper function to get valid model URL
+  // Memoized helper function to get valid model URL - prioritize GLB files
   const getValidModelUrl = useCallback(() => {
     if (!design) return null;
     
+    // Prioritize GLB files first, then other formats
     const urls = [
       design.modelFiles?.storedModelUrl,
       design.modelFiles?.modelFile,
-      design.modelFiles?.gaussianPly
+      design.modelFiles?.gaussianPly,
+      // Look for GLB files specifically
+      design.modelFiles?.glb,
+      design.modelFiles?.gltf
     ].filter(Boolean);
     
+    // Sort URLs to prioritize GLB files
+    const sortedUrls = urls.sort((a, b) => {
+      const aIsGlb = a.toLowerCase().includes('.glb');
+      const bIsGlb = b.toLowerCase().includes('.glb');
+      if (aIsGlb && !bIsGlb) return -1;
+      if (!aIsGlb && bIsGlb) return 1;
+      return 0;
+    });
+    
     // Find the first valid URL
-    for (const url of urls) {
+    for (const url of sortedUrls) {
       if (url && typeof url === 'string' && url.trim() !== '') {
         try {
           new URL(url);
@@ -85,7 +98,7 @@ export default function DesignView() {
     }
   }, [retryCount, maxRetries]);
 
-  // Optimized data fetching with better error handling
+  // Optimized data fetching with better error handling and caching
   useEffect(() => {
     if (!designId) return;
 
@@ -96,11 +109,29 @@ export default function DesignView() {
         setLoading(true);
         setError(null);
         
+        // Check cache first
+        const cacheKey = `design_${designId}`;
+        const cachedDesign = sessionStorage.getItem(cacheKey);
+        const cacheTimestamp = sessionStorage.getItem(`${cacheKey}_timestamp`);
+        
+        // Use cache if less than 5 minutes old
+        if (cachedDesign && cacheTimestamp) {
+          const cacheAge = Date.now() - parseInt(cacheTimestamp);
+          if (cacheAge < 5 * 60 * 1000) {
+            setDesign(JSON.parse(cachedDesign));
+            setLoading(false);
+            return;
+          }
+        }
+        
         const response = await apiService.getDesign(designId);
         
         if (!isCancelled) {
           if (response.success && response.data) {
             setDesign(response.data);
+            // Cache the result
+            sessionStorage.setItem(cacheKey, JSON.stringify(response.data));
+            sessionStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
           } else {
             setError('Failed to load design');
           }
@@ -471,8 +502,7 @@ export default function DesignView() {
         {/* 3D Model Area */}
         <div className="flex-1 flex items-center justify-center p-8 relative">
           {testModelUrl && !modelLoadError ? (
-            <div className="w-full h-full max-w-full max-h-full">
-              <ModelViewer
+            <div className="w-full h-full max-w-full max-h-full">              <ModelViewer
                 modelUrl={testModelUrl}
                 className="w-full h-full"
                 lighting={lighting}

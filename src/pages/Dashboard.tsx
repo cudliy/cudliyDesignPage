@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService, type Design } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
-import RateLimitTest from '../components/RateLimitTest';
 import SubscriptionDebug from '../components/SubscriptionDebug';
 import SEO from '@/components/SEO';
 
@@ -278,23 +277,6 @@ export default function Dashboard() {
         minHeight: '0'
       }}>
         
-        {/* Vertical CUDLIY Brand Text */}
-        <div className="absolute left-4 bottom-2 z-50 pointer-events-none">
-          <div className="transform -rotate-90 origin-top-left whitespace-nowrap">
-            <span className="font-['Manrope'] font-extrabold" style={{
-              width: '305px',
-              height: '131px',
-              fontSize: '96px',
-              lineHeight: '100%',
-              letterSpacing: '0%',
-              color: 'transparent',
-              WebkitTextStroke: '1px #686868',
-              opacity: 1
-            }}>
-              CUDLIY
-            </span>
-          </div>
-        </div>
 
         {/* Main Sidebar Content */}
         <div className="relative h-full flex flex-col text-white overflow-hidden">
@@ -302,7 +284,7 @@ export default function Dashboard() {
           <div className="px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 lg:pt-12 pb-4 sm:pb-6">
             <h1 className="font-['Georgia'] leading-tight text-left font-normal" 
                 style={{ fontSize: 'clamp(24px, 4vw, 36px)' }}>
-              Design<br />Dashboard
+              Cudliy
             </h1>
           </div>
 
@@ -444,9 +426,6 @@ export default function Dashboard() {
             )}
           </div>
           <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
-            <button className="px-2 sm:px-3 lg:px-4 py-1 sm:py-2 text-gray-500 hover:text-gray-700 transition-colors font-medium text-xs sm:text-sm lg:text-base">
-              Design
-            </button>
             <button 
               onClick={() => navigate('/design')}
               disabled={!canGenerateImages && !canGenerateModels}
@@ -493,31 +472,15 @@ export default function Dashboard() {
                 onClick={() => fetchDesigns(true)}
                 disabled={refreshing}
                 className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm shadow-lg hover:shadow-xl hover:scale-105"
+                title="Refresh designs"
               >
                 {refreshing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Refreshing...
-                  </>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Refresh
-                  </>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
                 )}
-              </button>
-              <button 
-                onClick={() => navigate('/design')}
-                disabled={!canGenerateImages && !canGenerateModels}
-                className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-lg hover:shadow-xl hover:scale-105 ${
-                  !canGenerateImages && !canGenerateModels
-                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white shadow-[#E70D57]/50'
-                }`}
-              >
-                New Design
               </button>
             </div>
           </div>
@@ -596,7 +559,6 @@ export default function Dashboard() {
             </div>
           ) : currentView === 'credits' ? (
             <div className="py-12 space-y-8">
-              <RateLimitTest userId={userId || ''} />
               <SubscriptionDebug userId={userId || ''} />
             </div>
           ) : currentView === 'edu' ? (

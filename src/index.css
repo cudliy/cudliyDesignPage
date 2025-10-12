@@ -17,9 +17,15 @@
   font-display: swap;
 }
 
-/* Apply trademark font to headings by default */
-h1, h2, h3, .heading {
+/* Apply trademark font only to large titles (h1) */
+h1, .heading-large {
   font-family: "CudliyTrademark", "Abril Fatface", "Playfair Display", serif;
+}
+
+/* Apply Manrope Bold to smaller titles */
+h2, h3, h4, h5, h6, .heading {
+  font-family: "Manrope", sans-serif;
+  font-weight: 800;
 }
 
 @layer utilities {
@@ -37,11 +43,16 @@ h1, h2, h3, .heading {
   font-style: normal;
 }
 
-.font-manrope-bold {
-  font-family: "Manrope", "Arial", sans-serif;
-  font-weight: 800;
-  font-style: normal;
-}
+  .font-manrope-bold {
+    font-family: "Manrope", "Arial", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+  }
+  .font-manrope-extrabold {
+    font-family: "Manrope", "Arial", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+  }
 
 /* iro.js Color Picker Custom Styles */
 .IroWheel {
