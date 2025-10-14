@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "@/services/api";
 import { toast } from "@/lib/sonner";
+ 
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const SignIn = () => {
   const signInWithApple = async () => ({ error: null as any });
   const navigate = useNavigate();
 
-
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);

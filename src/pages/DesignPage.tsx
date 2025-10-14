@@ -864,52 +864,33 @@ export default function DesignPage() {
 						</div>
 					</div>
 				) : (
-					/* Full Screen Image Display */
-					<div className="h-full w-full relative">
-						{/* Main Image Display - Full Screen */}
-						<div className="absolute inset-0 bg-white rounded-[40px] overflow-hidden">
-							{['/camera1.png', '/camera2.png', '/camera3.png'].map((src, index) => (
-								<div 
-									key={index} 
-									className={`absolute inset-0 transition-all duration-700 ease-out ${
-										index === 0 ? 'opacity-100' : 'opacity-0'
-									} ${isLoaded ? 'transform translate-y-0' : 'transform translate-y-8'}`} 
-									style={{ transitionDelay: `${800 + index * 100}ms` }}
-								>
+					/* Default Grid Display */
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full w-full">
+						{/* Grid items with staggered animation */}
+						{['/camera1.png', '/camera2.png', '/camera3.png'].map((src, index) => (
+							<div key={index} className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+							}`} style={{ transitionDelay: `${800 + index * 100}ms` }}>
+								<div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4 relative group">
+									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 									<img 
 										src={src} 
 										alt={`Toy camera design ${index + 1}`} 
-										className="w-full h-full object-cover" 
+										className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
 									/>
-									
-									{/* Overlay Generate 3D Button */}
-									<div className="absolute inset-0 flex items-center justify-center">
-										<button 
-											onClick={handleCreateClick}
-											disabled={!canGenerateImages}
-											className={`px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-2xl backdrop-blur-sm border-2 ${
-												!canGenerateImages
-													? 'bg-gray-400/80 text-gray-200 cursor-not-allowed border-gray-300'
-													: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white border-white/30 shadow-[#E70D57]/50'
-											}`}
-										>
-											Generate 3D
-										</button>
-									</div>
 								</div>
-							))}
-						</div>
-						
-						{/* Image Navigation Dots */}
-						<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
-							{['/camera1.png', '/camera2.png', '/camera3.png'].map((_, index) => (
-								<button
-									key={index}
-									className={`w-3 h-3 rounded-full transition-all duration-300 ${
-										index === 0 ? 'bg-white' : 'bg-white/50'
-									}`}
-								/>
-							))}
+							</div>
+						))}
+
+						{/* Fixed plus icon container */}
+						<div className={`bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 min-h-[200px] sm:min-h-0 group ${
+							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+						}`}>
+							<div className="w-full h-full flex items-center justify-center">
+								<button className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:from-[#E70D57]/10 hover:to-[#F4900C]/10 hover:text-[#E70D57] hover:scale-110 border-0 outline-none m-0 p-0 leading-none shadow-lg group-hover:shadow-xl">
+									+
+								</button>
+							</div>
 						</div>
 					</div>
 				)}
