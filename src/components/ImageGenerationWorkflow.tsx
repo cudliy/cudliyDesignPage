@@ -6,6 +6,7 @@ import { useUsageLimits } from '../hooks/useUsageLimits';
 interface ImageGenerationWorkflowProps {
   prompt: string;
   enhancedPrompt?: string; // Strategic Enhancement: Accept enhanced prompt
+  quality?: 'fast' | 'medium' | 'good'; // Quality setting for 3D generation
   onComplete: (designId: string) => void;
   onError: (error: string) => void;
 }
@@ -16,7 +17,7 @@ interface GeneratedImage {
   index: number;
 }
 
-export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComplete, onError }: ImageGenerationWorkflowProps) {
+export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, quality = 'medium', onComplete, onError }: ImageGenerationWorkflowProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImageIndex, setIsSelectedImageIndex] = useState<number | null>(null);
@@ -35,14 +36,62 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
       }
     }, [userId, token]);
 
-  const { 
-    canGenerateImages, 
-    canGenerateModels, 
-    remainingImages, 
-    remainingModels, 
+  const {
+    canGenerateImages,
+    canGenerateModels,
+    remainingImages,
+    remainingModels,
     usageLimits,
-    checkLimits 
+    checkLimits
   } = useUsageLimits(userId);
+
+  // Get 3D generation options based on quality setting
+  const get3DOptions = (quality: 'fast' | 'medium' | 'good') => {
+    switch (quality) {
+      case 'fast':
+        return {
+          // Fast: fal.ai Hunyuan3D v2 mini/turbo
+          texture_size: 1024,
+          mesh_simplify: 0.3,
+          ss_sampling_steps: 15,
+          slat_sampling_steps: 4,
+          ss_guidance_strength: 7.5,
+          slat_guidance_strength: 3,
+          octree_resolution: 128
+        };
+      case 'medium':
+        return {
+          // Medium: fal.ai TripoSR
+          mesh_resolution: "medium",
+          texture_resolution: "medium",
+          mesh_simplification: 0.2,
+          num_inference_steps: 30,
+          guidance_scale: 7.5,
+          enable_quality_enhancement: true
+        };
+      case 'good':
+        return {
+          // Good: Replicate Trellis (highest quality)
+          texture_size: 4096,
+          mesh_simplify: 0.1,
+          generate_normal: true,
+          save_gaussian_ply: true,
+          ss_sampling_steps: 50,
+          slat_sampling_steps: 25,
+          ss_guidance_strength: 7.5,
+          slat_guidance_strength: 3,
+          return_no_background: true,
+          preserve_colors: true,
+          enhance_colors: true,
+          color_accuracy: "high"
+        };
+      default:
+        return {
+          texture_size: 2048,
+          mesh_simplify: 0.2
+        };
+    }
+  };
 
   const generateImages = async () => {
     // Strategic Enhancement: Use enhanced prompt if available, otherwise fallback to original
@@ -144,23 +193,11 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, onComp
         user_id: userId,
         creation_id: creationId,
         options: {
-          texture_size: 4096, // Increased from 2048 for higher quality
           generate_color: true,
           generate_model: true,
           randomize_seed: true,
-          // Advanced quality settings
-          mesh_simplify: 0.1, // Lower = higher quality (90% detail retention)
-          generate_normal: true, // Enable normal maps for better lighting
-          save_gaussian_ply: true, // Enable high-quality point cloud
-          ss_sampling_steps: 50, // Increased from default for better quality
-          slat_sampling_steps: 25, // Increased from default for better quality
-          ss_guidance_strength: 7.5, // Optimized guidance strength
-          slat_guidance_strength: 3.0, // Optimized guidance strength
-          return_no_background: true, // Remove background for cleaner models
-          // Ensure color preservation
-          preserve_colors: true,
-          enhance_colors: true,
-          color_accuracy: "high"
+          // Use quality-based options
+          ...get3DOptions(quality)
         }
       };
 

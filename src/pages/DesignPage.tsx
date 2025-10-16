@@ -639,24 +639,18 @@ export default function DesignPage() {
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
 			}`}>
 				<div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex gap-2 z-10">
-					<button 
+					<button
 						onClick={() => window.location.href = '/dashboard'}
 						className="px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg"
 					>
 						Dashboard
-					</button>
-					<button 
-						onClick={handleAdvancedClick}
-						className="px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-gradient-to-r from-[#E70D57]/20 to-[#F4900C]/20 hover:from-[#E70D57]/30 hover:to-[#F4900C]/30 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg"
-					>
-						{isAdvanced ? 'Basic' : 'Advanced'}
 					</button>
 				</div>
 				
 							{/* Brand and title area */}
 			<div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
 					{/* Mode selector */}
-					<div className={`mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
+					<div className={`mb-2 flex items-center px-1 gap-1 w-full max-w-[280px] h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
 						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
@@ -667,6 +661,16 @@ export default function DesignPage() {
 						</button>
 						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
 							Draw
+						</button>
+						<button
+							onClick={handleAdvancedClick}
+							className={`px-2 h-[22px] rounded-full text-xs transition-all duration-300 font-medium ${
+								isAdvanced
+									? 'bg-gradient-to-r from-[#E70D57] to-[#F4900C] text-white shadow-lg'
+									: 'text-white/90 hover:bg-white/10'
+							}`}
+						>
+							{isAdvanced ? 'Pro' : 'Basic'}
 						</button>
 					</div>
 					
@@ -832,6 +836,7 @@ export default function DesignPage() {
 						<ImageGenerationWorkflow
 							prompt={prompt}
 							enhancedPrompt={hasProperties() ? generateEnhancedPrompt(prompt) : undefined}
+							quality={selectedQuality as 'fast' | 'medium' | 'good'}
 							onComplete={handleWorkflowComplete}
 							onError={handleWorkflowError}
 						/>

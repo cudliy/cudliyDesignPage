@@ -11,15 +11,21 @@ const QualitySelector: React.FC<QualitySelectorProps> = ({
 }) => {
   const qualityOptions = [
     {
-      id: 'balanced',
-      name: 'Balanced',
-      description: 'Good quality with faster generation',
+      id: 'fast',
+      name: 'Fast',
+      description: 'Quick generation with good quality',
+      icon: '⚡'
+    },
+    {
+      id: 'medium',
+      name: 'Medium',
+      description: 'Balanced quality and speed',
       icon: '⚖️'
     },
     {
-      id: 'high_detail',
-      name: 'High Detail',
-      description: 'Maximum quality with detailed results',
+      id: 'good',
+      name: 'Good',
+      description: 'Highest quality with detailed results',
       icon: '✨'
     }
   ];
