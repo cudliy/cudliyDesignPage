@@ -646,6 +646,28 @@ export default function DesignPage() {
 						Dashboard
 					</button>
 				</div>
+
+				{/* Plan Sticker */}
+				{usageLimits && (
+					<div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
+						<div className="px-3 py-1.5 bg-gradient-to-r from-[#E70D57]/20 to-[#F4900C]/20 backdrop-blur-sm rounded-full border border-white/20 shadow-lg">
+							<div className="flex items-center gap-2">
+								<div className="w-2 h-2 bg-[#E70D57] rounded-full animate-pulse"></div>
+								<span className="text-white/90 text-xs font-medium">
+									{usageLimits.plan}
+								</span>
+								{(!canGenerateImages || !canGenerateModels) && (
+									<button
+										onClick={() => window.location.href = '/pricing'}
+										className="text-[#E70D57] hover:text-white text-xs font-medium transition-colors"
+									>
+										Upgrade
+									</button>
+								)}
+							</div>
+						</div>
+					</div>
+				)}
 				
 							{/* Brand and title area */}
 			<div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">

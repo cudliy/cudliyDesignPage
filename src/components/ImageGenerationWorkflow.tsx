@@ -225,32 +225,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Usage Limits Display */}
-      {usageLimits && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
-          <div className="flex justify-between items-center text-sm">
-            <span className="font-medium">Current Plan: {usageLimits.plan}</span>
-            <div className="flex gap-4">
-              <span className="text-gray-600">
-                Images: {remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}
-              </span>
-              <span className="text-gray-600">
-                Models: {remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth}
-              </span>
-            </div>
-          </div>
-          {(!canGenerateImages || !canGenerateModels) && (
-            <div className="mt-2 text-center">
-              <button
-                onClick={() => window.location.href = '/pricing'}
-                className="text-[#E70D57] hover:text-[#d10c50] font-medium text-sm underline"
-              >
-                Upgrade to continue generating
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Generate Images Button */}
       {generatedImages.length === 0 && (
@@ -276,7 +250,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
             {generatedImages.map((image, index) => (
               <div
                 key={index}
-                className={`bg-white border border-black/5 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-lg cursor-pointer ${
+                className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
                   selectedImageIndex === index 
                     ? 'ring-4 ring-[#E70D57] shadow-lg' 
                     : 'hover:border-gray-300'
@@ -284,14 +258,15 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                 onClick={() => selectImage(index)}
                 style={{ transitionDelay: `${800 + index * 100}ms` }}
               >
-                <div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4 relative">
+                <div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4 relative group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <img 
                     src={image.url} 
                     alt={`Generated image ${index + 1}`} 
-                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105" 
+                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
                   />
                   {selectedImageIndex === index && (
-                    <div className="absolute top-2 right-2 w-8 h-8 bg-[#E70D57] rounded-full flex items-center justify-center shadow-lg">
+                    <div className="absolute top-2 right-2 w-8 h-8 bg-[#E70D57] rounded-full flex items-center justify-center shadow-lg z-20">
                       <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
@@ -303,11 +278,11 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
             
             {/* Plus icon for the 4th slot (if less than 3 images) */}
             {generatedImages.length < 3 && (
-              <div className="bg-white border border-black/5 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-lg min-h-[200px] sm:min-h-0">
+              <div className="bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 min-h-[200px] sm:min-h-0 group">
                 <div className="w-full h-full flex items-center justify-center">
-                  <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-[#F2F2F2] text-[#9B9B9B] flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:bg-[#e8e8e8] hover:scale-110 border-0 outline-none m-0 p-0 leading-none">
+                  <button className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:from-[#E70D57]/10 hover:to-[#F4900C]/10 hover:text-[#E70D57] hover:scale-110 border-0 outline-none m-0 p-0 leading-none shadow-lg group-hover:shadow-xl">
                     +
-                  </div>
+                  </button>
                 </div>
               </div>
             )}
