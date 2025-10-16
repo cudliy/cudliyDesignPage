@@ -26,7 +26,7 @@ export default function DesignPage() {
 	const [selectedStyle, setSelectedStyle] = useState('');
 	const [selectedMaterial, setSelectedMaterial] = useState('');
 	const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
-	const [selectedQuality, setSelectedQuality] = useState('balanced');
+	const [selectedQuality, setSelectedQuality] = useState('medium');
 	const [prompt, setPrompt] = useState('');
 	const [showWorkflow, setShowWorkflow] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -650,7 +650,7 @@ export default function DesignPage() {
 							{/* Brand and title area */}
 			<div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
 					{/* Mode selector */}
-					<div className={`mb-2 flex items-center px-1 gap-1 w-full max-w-[280px] h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
+					<div className={`mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
 						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
@@ -661,16 +661,6 @@ export default function DesignPage() {
 						</button>
 						<button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
 							Draw
-						</button>
-						<button
-							onClick={handleAdvancedClick}
-							className={`px-2 h-[22px] rounded-full text-xs transition-all duration-300 font-medium ${
-								isAdvanced
-									? 'bg-gradient-to-r from-[#E70D57] to-[#F4900C] text-white shadow-lg'
-									: 'text-white/90 hover:bg-white/10'
-							}`}
-						>
-							{isAdvanced ? 'Pro' : 'Basic'}
 						</button>
 					</div>
 					
@@ -696,6 +686,42 @@ export default function DesignPage() {
 						}`}
 						style={{ caretColor: "#E70D57" }}
 					/>
+
+					{/* Advanced Toggle and Quality Selector */}
+					<div className={`mt-4 flex items-center justify-between w-full max-w-[280px] transition-all duration-700 delay-600 ease-out ${
+						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+					}`}>
+						{/* Advanced Toggle */}
+						<div className="flex items-center gap-2">
+							<button
+								onClick={handleAdvancedClick}
+								className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+									isAdvanced ? 'bg-[#E70D57]' : 'bg-white/20'
+								}`}
+							>
+								<span
+									className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+										isAdvanced ? 'translate-x-5' : 'translate-x-1'
+									}`}
+								/>
+							</button>
+							<span className="text-white/80 text-sm">Advanced</span>
+						</div>
+
+						{/* Quality Selector (replaces Model dropdown) */}
+						<div className="flex items-center gap-2">
+							<span className="text-white/80 text-sm">Quality:</span>
+							<select
+								value={selectedQuality}
+								onChange={(e) => setSelectedQuality(e.target.value)}
+								className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-[#E70D57]"
+							>
+								<option value="fast" className="bg-gray-800 text-white">Fast</option>
+								<option value="medium" className="bg-gray-800 text-white">Medium</option>
+								<option value="good" className="bg-gray-800 text-white">Good</option>
+							</select>
+						</div>
+					</div>
 
 					{/* Usage Limits Banner */}
 					{usageLimits && (!canGenerateImages || !canGenerateModels) && (
