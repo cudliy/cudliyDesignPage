@@ -51,28 +51,27 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
       case 'fast':
         return {
           // Fast: fal.ai Hunyuan3D v2 mini/turbo
-          texture_size: 1024,
+          texture_size: 1024 as const,
           mesh_simplify: 0.3,
           ss_sampling_steps: 15,
           slat_sampling_steps: 4,
           ss_guidance_strength: 7.5,
-          slat_guidance_strength: 3,
-          octree_resolution: 128
+          slat_guidance_strength: 3
         };
       case 'medium':
         return {
           // Medium: fal.ai TripoSR
-          mesh_resolution: "medium",
-          texture_resolution: "medium",
-          mesh_simplification: 0.2,
-          num_inference_steps: 30,
-          guidance_scale: 7.5,
-          enable_quality_enhancement: true
+          texture_size: 2048 as const,
+          mesh_simplify: 0.2,
+          ss_sampling_steps: 30,
+          slat_sampling_steps: 15,
+          ss_guidance_strength: 7.5,
+          slat_guidance_strength: 3
         };
       case 'good':
         return {
           // Good: Replicate Trellis (highest quality)
-          texture_size: 4096,
+          texture_size: 4096 as const,
           mesh_simplify: 0.1,
           generate_normal: true,
           save_gaussian_ply: true,
@@ -87,7 +86,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
         };
       default:
         return {
-          texture_size: 2048,
+          texture_size: 2048 as const,
           mesh_simplify: 0.2
         };
     }
