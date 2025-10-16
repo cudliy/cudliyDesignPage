@@ -37,14 +37,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
       }
     }, [userId, token]);
 
-    // Auto-start generation when component mounts
-    useEffect(() => {
-      if (!hasStarted && prompt.trim()) {
-        setHasStarted(true);
-        generateImages();
-      }
-    }, [prompt, hasStarted, generateImages]);
-
   const {
     canGenerateImages,
     canGenerateModels,
@@ -165,6 +157,14 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
       setIsGenerating(false);
     }
   }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
+
+  // Auto-start generation when component mounts
+  useEffect(() => {
+    if (!hasStarted && prompt.trim()) {
+      setHasStarted(true);
+      generateImages();
+    }
+  }, [prompt, hasStarted, generateImages]);
 
   const selectImage = (index: number) => {
     setIsSelectedImageIndex(index);
