@@ -39,9 +39,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   const {
     canGenerateImages,
     canGenerateModels,
-    remainingImages,
-    remainingModels,
-    usageLimits,
     checkLimits
   } = useUsageLimits(userId);
 
@@ -103,7 +100,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
 
     // Check usage limits before generating images
     if (!canGenerateImages) {
-      onError(`You have reached your monthly image generation limit (${usageLimits?.limits.imagesPerMonth || 3} images). Please upgrade your plan to continue.`);
+      onError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
       return;
     }
 
@@ -172,7 +169,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
 
     // Check usage limits before generating 3D model
     if (!canGenerateModels) {
-      onError(`You have reached your monthly model generation limit (${usageLimits?.limits.modelsPerMonth || 1} models). Please upgrade your plan to continue.`);
+      onError(`You have reached your monthly model generation limit. Please upgrade your plan to continue.`);
       return;
     }
 

@@ -647,19 +647,26 @@ export default function DesignPage() {
 					</button>
 				</div>
 
-				{/* Plan Sticker */}
+				{/* Plan Sticker with Usage Info */}
 				{usageLimits && (
 					<div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
-						<div className="px-3 py-1.5 bg-gradient-to-r from-[#E70D57]/20 to-[#F4900C]/20 backdrop-blur-sm rounded-full border border-white/20 shadow-lg">
-							<div className="flex items-center gap-2">
-								<div className="w-2 h-2 bg-[#E70D57] rounded-full animate-pulse"></div>
-								<span className="text-white/90 text-xs font-medium">
-									{usageLimits.plan}
-								</span>
+						<div className="px-4 py-2 bg-gradient-to-r from-[#E70D57]/20 to-[#F4900C]/20 backdrop-blur-sm rounded-full border border-white/20 shadow-lg">
+							<div className="flex items-center gap-3">
+								<div className="flex items-center gap-2">
+									<div className="w-2 h-2 bg-[#E70D57] rounded-full animate-pulse"></div>
+									<span className="text-white/90 text-xs font-medium capitalize">
+										{usageLimits.plan}
+									</span>
+								</div>
+								<div className="flex items-center gap-2 text-xs text-white/70">
+									<span>Images: {usageLimits.usage.imagesGenerated}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}</span>
+									<span>•</span>
+									<span>Models: {usageLimits.usage.modelsGenerated}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth}</span>
+								</div>
 								{(!canGenerateImages || !canGenerateModels) && (
 									<button
 										onClick={() => window.location.href = '/pricing'}
-										className="text-[#E70D57] hover:text-white text-xs font-medium transition-colors"
+										className="text-[#E70D57] hover:text-white text-xs font-medium transition-colors px-2 py-1 bg-white/10 rounded-full hover:bg-white/20"
 									>
 										Upgrade
 									</button>
