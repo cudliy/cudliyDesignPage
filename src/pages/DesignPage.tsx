@@ -938,12 +938,12 @@ export default function DesignPage() {
 							<div key={index} className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: `${800 + index * 100}ms` }}>
-								<div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4 relative group">
+								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
 									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 									<img 
 										src={src} 
 										alt={`Toy camera design ${index + 1}`} 
-										className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
+										className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
 									/>
 								</div>
 							</div>

@@ -255,12 +255,12 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                 onClick={() => selectImage(index)}
                 style={{ transitionDelay: `${800 + index * 100}ms` }}
               >
-                <div className="w-full h-full max-w-[206px] max-h-[216px] flex items-center justify-center p-4 relative group">
+                <div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <img 
                     src={image.url} 
                     alt={`Generated image ${index + 1}`} 
-                    className="max-w-full max-h-full w-auto h-auto object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
+                    className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
                   />
                   {selectedImageIndex === index && (
                     <div className="absolute top-2 right-2 w-8 h-8 bg-[#E70D57] rounded-full flex items-center justify-center shadow-lg z-20">
