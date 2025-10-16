@@ -170,17 +170,12 @@ export default function DesignPage() {
 
 		// Check usage limits before starting workflow
 		if (!canGenerateImages) {
-			setError(`You have reached your monthly image generation limit (${usageLimits?.limits.imagesPerMonth || 3} images). Please upgrade your plan to continue.`);
+			setError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
 			return;
 		}
 
 		setError(null);
 		setShowWorkflow(true);
-		
-		// Auto-start generation immediately
-		setTimeout(() => {
-			// This will trigger the ImageGenerationWorkflow to start automatically
-		}, 100);
 	};
 
 	const handleWorkflowComplete = (designId: string) => {
@@ -935,7 +930,7 @@ export default function DesignPage() {
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full w-full">
 						{/* Grid items with staggered animation */}
 						{['/camera1.png', '/camera2.png', '/camera3.png'].map((src, index) => (
-							<div key={index} className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div key={index} className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: `${800 + index * 100}ms` }}>
 								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
@@ -950,7 +945,7 @@ export default function DesignPage() {
 						))}
 
 						{/* Fixed plus icon container */}
-						<div className={`bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 min-h-[200px] sm:min-h-0 group ${
+						<div className={`bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 h-[300px] group ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 						}`}>
 							<div className="w-full h-full flex items-center justify-center">

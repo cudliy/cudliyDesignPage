@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/api';
 import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
@@ -24,6 +24,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   const [isCreating3D, setIsCreating3D] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
   const [creationId, setCreationId] = useState<string>('');
+  const [hasStarted, setHasStarted] = useState(false);
 
     // Get user ID for usage limits (authenticated users only)
     const userId = sessionStorage.getItem('user_id') || '';
@@ -35,6 +36,14 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
         window.location.href = '/signin';
       }
     }, [userId, token]);
+
+    // Auto-start generation when component mounts
+    useEffect(() => {
+      if (!hasStarted && prompt.trim()) {
+        setHasStarted(true);
+        generateImages();
+      }
+    }, [prompt, hasStarted, generateImages]);
 
   const {
     canGenerateImages,
@@ -89,7 +98,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
     }
   };
 
-  const generateImages = async () => {
+  const generateImages = useCallback(async () => {
     // Strategic Enhancement: Use enhanced prompt if available, otherwise fallback to original
     const finalPrompt = enhancedPrompt || prompt;
     
@@ -155,7 +164,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
 
   const selectImage = (index: number) => {
     setIsSelectedImageIndex(index);
@@ -223,16 +232,13 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   return (
     <div className="w-full max-w-4xl mx-auto">
 
-      {/* Generate Images Button */}
-      {generatedImages.length === 0 && (
-        <div className="text-center">
-          <button
-            onClick={generateImages}
-            disabled={isGenerating || !canGenerateImages}
-            className="px-8 py-3 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isGenerating ? 'Generating Images...' : 'Generate Images'}
-          </button>
+      {/* Loading State */}
+      {isGenerating && generatedImages.length === 0 && (
+        <div className="text-center py-8">
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#E70D57]/10 rounded-full border border-[#E70D57]/20">
+            <div className="animate-spin w-5 h-5 border-2 border-[#E70D57] border-t-transparent rounded-full"></div>
+            <span className="text-[#E70D57] font-medium">Generating Images...</span>
+          </div>
         </div>
       )}
 
@@ -247,7 +253,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
             {generatedImages.map((image, index) => (
               <div
                 key={index}
-                className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center min-h-[200px] sm:min-h-0 transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+                className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
                   selectedImageIndex === index 
                     ? 'ring-4 ring-[#E70D57] shadow-lg' 
                     : 'hover:border-gray-300'
@@ -275,7 +281,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
             
             {/* Plus icon for the 4th slot (if less than 3 images) */}
             {generatedImages.length < 3 && (
-              <div className="bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 min-h-[200px] sm:min-h-0 group">
+              <div className="bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 h-[300px] group">
                 <div className="w-full h-full flex items-center justify-center">
                   <button className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:from-[#E70D57]/10 hover:to-[#F4900C]/10 hover:text-[#E70D57] hover:scale-110 border-0 outline-none m-0 p-0 leading-none shadow-lg group-hover:shadow-xl">
                     +
