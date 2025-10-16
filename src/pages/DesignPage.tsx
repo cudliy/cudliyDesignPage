@@ -688,38 +688,45 @@ export default function DesignPage() {
 					/>
 
 					{/* Advanced Toggle and Quality Selector */}
-					<div className={`mt-4 flex items-center justify-between w-full max-w-[280px] transition-all duration-700 delay-600 ease-out ${
+					<div className={`mt-6 flex items-center justify-between w-full max-w-[280px] transition-all duration-700 delay-600 ease-out ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
 						{/* Advanced Toggle */}
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-3">
 							<button
 								onClick={handleAdvancedClick}
-								className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-									isAdvanced ? 'bg-[#E70D57]' : 'bg-white/20'
+								className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#E70D57]/50 ${
+									isAdvanced ? 'bg-gradient-to-r from-[#E70D57] to-[#d10c50]' : 'bg-white/20 hover:bg-white/30'
 								}`}
 							>
 								<span
-									className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-										isAdvanced ? 'translate-x-5' : 'translate-x-1'
+									className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${
+										isAdvanced ? 'translate-x-6' : 'translate-x-1'
 									}`}
 								/>
 							</button>
-							<span className="text-white/80 text-sm">Advanced</span>
+							<span className="text-white/90 text-sm font-medium">Advanced</span>
 						</div>
 
 						{/* Quality Selector (replaces Model dropdown) */}
-						<div className="flex items-center gap-2">
-							<span className="text-white/80 text-sm">Quality:</span>
-							<select
-								value={selectedQuality}
-								onChange={(e) => setSelectedQuality(e.target.value)}
-								className="px-2 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-[#E70D57]"
-							>
-								<option value="fast" className="bg-gray-800 text-white">Fast</option>
-								<option value="medium" className="bg-gray-800 text-white">Medium</option>
-								<option value="good" className="bg-gray-800 text-white">Good</option>
-							</select>
+						<div className="flex items-center gap-3">
+							<span className="text-white/90 text-sm font-medium">Model</span>
+							<div className="relative">
+								<select
+									value={selectedQuality}
+									onChange={(e) => setSelectedQuality(e.target.value)}
+									className="appearance-none px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-[#E70D57] focus:ring-1 focus:ring-[#E70D57]/50 transition-all duration-300 hover:bg-white/15 min-w-[80px]"
+								>
+									<option value="fast" className="bg-gray-900 text-white">Fast</option>
+									<option value="medium" className="bg-gray-900 text-white">Medium</option>
+									<option value="good" className="bg-gray-900 text-white">Good</option>
+								</select>
+								<div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+									<svg className="w-3 h-3 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									</svg>
+								</div>
+							</div>
 						</div>
 					</div>
 
