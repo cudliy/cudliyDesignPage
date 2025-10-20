@@ -84,12 +84,12 @@ export default function CheckoutPage() {
         }
 
         // Create checkout session (for payment processing)
-        // Backend expects size at top level; keep options for forward-compat but send size too
+        // Backend expects size under options
         const response = await apiService.createStripeCheckout({
           userId,
           designId,
           quantity: 1,
-          size: selectedSize
+          options: { size: selectedSize }
         });
 
         if (response.success && response.data) {
