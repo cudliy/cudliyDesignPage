@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { apiService } from '../services/api';
 import type { CheckoutData } from '../types/checkout';
@@ -20,6 +20,14 @@ export default function CheckoutPage() {
   useEffect(() => {
     sessionStorage.setItem('checkout_selected_size', selectedSize);
   }, [selectedSize]);
+
+  // Preview image URL: prefer item preview, fall back to selected or first design image from state
+  const previewImageUrl = useMemo(() => {
+    const fromItem = checkoutData?.items?.[0]?.designImage as string | undefined;
+    const fromSelected = location.state?.design?.images?.find?.((i: any) => i?.selected)?.url as string | undefined;
+    const fromFirst = location.state?.design?.images?.[0]?.url as string | undefined;
+    return fromItem || fromSelected || fromFirst || null;
+  }, [checkoutData, location.state]);
 
   const [userId] = useState(() => {
     const authed = sessionStorage.getItem('user_id');
@@ -274,11 +282,12 @@ export default function CheckoutPage() {
           <div className="lg:pl-8">
             <div className="bg-white rounded-3xl overflow-hidden w-full max-w-xl border border-gray-200 shadow-xl p-6">
               <div className="bg-[#f2f2f2] aspect-square rounded-2xl flex items-center justify-center">
-                {checkoutData.items[0]?.designImage ? (
+                {previewImageUrl ? (
                   <img
-                    src={checkoutData.items[0].designImage}
-                    alt={checkoutData.items[0].designTitle}
+                    src={previewImageUrl}
+                    alt={checkoutData.items[0]?.designTitle || 'Design preview'}
                     className="object-contain w-full h-full"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />
                 ) : (
                   <div className="text-gray-500">Preview</div>
