@@ -28,7 +28,15 @@ export default function AdminOrders() {
         }
         const res = await apiService.getUserOrders(userId)
         if (res.success && res.data?.orders) {
-          setOrders(res.data.orders)
+          const mapped: OrderRow[] = (res.data.orders as any[]).map((o: any) => ({
+            id: o.id || o._id,
+            orderNumber: o.orderNumber,
+            status: o.status,
+            total: o.pricing?.total ?? 0,
+            createdAt: o.createdAt,
+            items: o.items
+          }))
+          setOrders(mapped)
         } else {
           setError('Failed to load orders')
         }
