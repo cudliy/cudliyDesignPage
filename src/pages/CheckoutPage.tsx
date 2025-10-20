@@ -15,6 +15,7 @@ export default function CheckoutPage() {
   const [orderProcessing, setOrderProcessing] = useState(false);
   // Simple size selection to match design (affects subtotal visually only)
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L'>('S');
+  const formatCurrency = (n: number) => `$${n.toFixed(2)}`;
 
   const [userId] = useState(() => {
     const authed = sessionStorage.getItem('user_id');
@@ -177,11 +178,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <button 
           onClick={() => navigate(-1)}
-          className="text-gray-600 hover:text-gray-800 flex items-center space-x-2 mb-8"
+          className="text-gray-600 hover:text-gray-900 flex items-center space-x-2 mb-8 transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -193,12 +194,12 @@ export default function CheckoutPage() {
           {/* Left Side - Size + Summary */}
           <div>
             <div className="mb-6">
-              <h2 className="text-sm text-gray-600 mb-3">Choose Size</h2>
+              <h2 className="text-sm font-medium text-gray-700 mb-3">Choose Size</h2>
               <div className="flex gap-4">
                 {/* Small */}
                 <button
                   onClick={() => setSelectedSize('S')}
-                  className={`w-40 h-28 rounded-2xl border transition-colors text-left p-4 ${selectedSize==='S' ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300 hover:border-gray-400'}`}
+                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='S' ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Small</div>
                   <div className={`text-xs ${selectedSize==='S' ? 'text-white/80' : 'text-gray-500'}`}>1–4 inch<br/>perfect for tiny<br/>gifts or keepsakes.</div>
@@ -206,7 +207,7 @@ export default function CheckoutPage() {
                 {/* Medium */}
                 <button
                   onClick={() => setSelectedSize('M')}
-                  className={`w-40 h-28 rounded-2xl border transition-colors text-left p-4 ${selectedSize==='M' ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300 hover:border-gray-400'}`}
+                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='M' ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Medium</div>
                   <div className={`text-xs ${selectedSize==='M' ? 'text-white/80' : 'text-gray-500'}`}>5–6 inch<br/>great for small<br/>vases or desk pieces.</div>
@@ -214,7 +215,7 @@ export default function CheckoutPage() {
                 {/* Large */}
                 <button
                   onClick={() => setSelectedSize('L')}
-                  className={`w-40 h-28 rounded-2xl border transition-colors text-left p-4 ${selectedSize==='L' ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300 hover:border-gray-400'}`}
+                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='L' ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Large</div>
                   <div className={`text-xs ${selectedSize==='L' ? 'text-white/80' : 'text-gray-500'}`}>7–8 inch<br/>ideal for display<br/>or special gifts.</div>
@@ -223,20 +224,30 @@ export default function CheckoutPage() {
             </div>
 
             {/* Order summary */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6 w-full max-w-xl">
+            <div className="bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-6 w-full max-w-xl shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm text-gray-500">Selected</span>
+                <span className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-700">Size: {selectedSize === 'S' ? 'Small' : selectedSize === 'M' ? 'Medium' : 'Large'}</span>
+              </div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Sub Total</span>
-                  <span className="font-medium">${(slant3DPricing?.pricing.subtotal ?? checkoutData.pricing.subtotal).toFixed(2)}</span>
+                  <span className="font-medium">{formatCurrency((slant3DPricing?.pricing.subtotal ?? checkoutData.pricing.subtotal))}</span>
                 </div>
+                {typeof (slant3DPricing?.pricing.tax ?? checkoutData.pricing.tax) === 'number' && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Tax</span>
+                    <span className="font-medium">{formatCurrency((slant3DPricing?.pricing.tax ?? checkoutData.pricing.tax) as number)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">${(slant3DPricing?.pricing.shipping ?? checkoutData.pricing.shipping).toFixed(2)}</span>
+                  <span className="font-medium">{formatCurrency((slant3DPricing?.pricing.shipping ?? checkoutData.pricing.shipping))}</span>
                 </div>
                 <div className="border-t pt-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total</span>
-                    <span className="font-bold">${(slant3DPricing?.pricing.total ?? checkoutData.pricing.total).toFixed(2)}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Total</span>
+                    <span className="text-lg font-bold">{formatCurrency((slant3DPricing?.pricing.total ?? checkoutData.pricing.total))}</span>
                   </div>
                 </div>
               </div>
@@ -244,10 +255,10 @@ export default function CheckoutPage() {
               <button
                 onClick={handleProceedToPayment}
                 disabled={orderProcessing}
-                className={`w-full mt-6 font-semibold py-4 px-6 rounded-full transition-colors duration-200 ${
+                className={`w-full mt-6 font-semibold py-4 px-6 rounded-full transition-all duration-200 ${
                   orderProcessing
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-black hover:bg-gray-800 text-white'
+                    : 'bg-[#111] hover:bg-black text-white shadow-md hover:shadow-lg'
                 }`}
               >
                 {orderProcessing ? 'Processing…' : 'Continue to Checkout'}
@@ -257,7 +268,7 @@ export default function CheckoutPage() {
 
           {/* Right Side - Product preview */}
           <div className="lg:pl-8">
-            <div className="bg-gray-100 rounded-2xl overflow-hidden w-full max-w-xl aspect-square flex items-center justify-center">
+            <div className="bg-gray-100 rounded-3xl overflow-hidden w-full max-w-xl aspect-square flex items-center justify-center shadow-xl border border-gray-200">
               {checkoutData.items[0]?.designImage ? (
                 <img src={checkoutData.items[0].designImage} alt={checkoutData.items[0].designTitle} className="object-contain w-full h-full" />
               ) : (
