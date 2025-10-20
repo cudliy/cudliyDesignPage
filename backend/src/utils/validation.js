@@ -89,7 +89,10 @@ export const createRefundSchema = Joi.object({
 export const createCheckoutSchema = Joi.object({
   userId: Joi.string().required(),
   designId: Joi.string().required(),
-  quantity: Joi.number().integer().min(1).default(1)
+  quantity: Joi.number().integer().min(1).default(1),
+  options: Joi.object({
+    size: Joi.string().valid('S', 'M', 'L').default('M')
+  }).optional()
 });
 
 export const updateShippingSchema = Joi.object({
