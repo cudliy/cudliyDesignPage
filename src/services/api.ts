@@ -153,6 +153,9 @@ interface CheckoutRequest {
   userId: string;
   designId: string;
   quantity?: number;
+  options?: {
+    size?: 'S' | 'M' | 'L';
+  };
 }
 
 interface CheckoutResponse {

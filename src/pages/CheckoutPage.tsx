@@ -87,7 +87,10 @@ export default function CheckoutPage() {
         const response = await apiService.createStripeCheckout({
           userId,
           designId,
-          quantity: 1
+          quantity: 1,
+          options: {
+            size: selectedSize
+          }
         });
 
         if (response.success && response.data) {
@@ -304,6 +307,7 @@ export default function CheckoutPage() {
                     src={previewImageUrl}
                     alt={checkoutData.items[0]?.designTitle || 'Design preview'}
                     className="object-contain w-full h-full"
+                    crossOrigin="anonymous"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />
                 ) : (

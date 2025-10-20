@@ -6,6 +6,7 @@ import DownloadPage from './pages/DownloadPage'
 import Dashboard from './pages/Dashboard'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
+import AdminOrders from './pages/AdminOrders'
 import Index from './pages/Index'
 import SignInPage from './pages/SignInPage'
 import SignUpPage from './pages/SignUpPage'
@@ -36,6 +37,7 @@ function App() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
