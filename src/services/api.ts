@@ -156,6 +156,7 @@ interface CheckoutRequest {
   options?: {
     size?: 'S' | 'M' | 'L';
   };
+  size?: 'S' | 'M' | 'L';
 }
 
 interface CheckoutResponse {
