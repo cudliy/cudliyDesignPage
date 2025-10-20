@@ -16,6 +16,10 @@ export default function CheckoutPage() {
   // Simple size selection to match design (affects subtotal visually only)
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L'>('S');
   const formatCurrency = (n: number) => `$${n.toFixed(2)}`;
+  // Persist chosen size so backend can use it during fulfillment
+  useEffect(() => {
+    sessionStorage.setItem('checkout_selected_size', selectedSize);
+  }, [selectedSize]);
 
   const [userId] = useState(() => {
     const authed = sessionStorage.getItem('user_id');
@@ -268,12 +272,22 @@ export default function CheckoutPage() {
 
           {/* Right Side - Product preview */}
           <div className="lg:pl-8">
-            <div className="bg-gray-100 rounded-3xl overflow-hidden w-full max-w-xl aspect-square flex items-center justify-center shadow-xl border border-gray-200">
-              {checkoutData.items[0]?.designImage ? (
-                <img src={checkoutData.items[0].designImage} alt={checkoutData.items[0].designTitle} className="object-contain w-full h-full" />
-              ) : (
-                <div className="text-gray-500">Preview</div>
-              )}
+            <div className="bg-white rounded-3xl overflow-hidden w-full max-w-xl border border-gray-200 shadow-xl p-6">
+              <div className="bg-[#f2f2f2] aspect-square rounded-2xl flex items-center justify-center">
+                {checkoutData.items[0]?.designImage ? (
+                  <img
+                    src={checkoutData.items[0].designImage}
+                    alt={checkoutData.items[0].designTitle}
+                    className="object-contain w-full h-full"
+                  />
+                ) : (
+                  <div className="text-gray-500">Preview</div>
+                )}
+              </div>
+              {/* Print-ready cue */}
+              <div className="mt-4 text-xs text-gray-500">
+                Camera: centered • Size: Medium • Pro 3D render • White bg • Printable • High detail
+              </div>
             </div>
             <div className="mt-4">
               <div className="text-gray-900 font-semibold">{checkoutData.items[0]?.designTitle || 'Cute Dinosaur'}</div>

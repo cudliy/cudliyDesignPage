@@ -351,7 +351,7 @@ export default function DesignView() {
       {/* Left Pane */}
       <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] rounded-[40px] relative overflow-hidden shadow-2xl border border-white/5">
         <button 
-          onClick={() => window.history.back()}
+          onClick={() => navigate(`/design/${designId}`)}
           className="absolute top-4 right-4 sm:top-6 sm:right-6 px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg z-10"
         >
           Back
