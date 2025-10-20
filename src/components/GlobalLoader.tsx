@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function GlobalLoader({ message = 'Loading...' }: { message?: string }) {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-white">
