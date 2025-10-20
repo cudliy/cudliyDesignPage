@@ -22,11 +22,28 @@ export default function CheckoutPage() {
   }, [selectedSize]);
 
   // Preview image URL: prefer item preview, fall back to selected or first design image from state
+  // Normalize relative URLs using API origin
+  const resolveUrl = (url?: string | null) => {
+    if (!url || typeof url !== 'string') return null;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+    // Treat absolute-path URLs as coming from the API server
+    const api = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
+    try {
+      const base = new URL(api);
+      // if api ends with /api, go to root origin
+      const origin = `${base.protocol}//${base.hostname}${base.port ? ':' + base.port : ''}`;
+      return url.startsWith('/') ? origin + url : origin + '/' + url;
+    } catch {
+      return url;
+    }
+  };
+
   const previewImageUrl = useMemo(() => {
     const fromItem = checkoutData?.items?.[0]?.designImage as string | undefined;
     const fromSelected = location.state?.design?.images?.find?.((i: any) => i?.selected)?.url as string | undefined;
     const fromFirst = location.state?.design?.images?.[0]?.url as string | undefined;
-    return fromItem || fromSelected || fromFirst || null;
+    const chosen = fromItem || fromSelected || fromFirst || null;
+    return resolveUrl(chosen);
   }, [checkoutData, location.state]);
 
   const [userId] = useState(() => {
