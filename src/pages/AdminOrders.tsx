@@ -7,6 +7,7 @@ type OrderRow = {
   status: string
   total: number
   createdAt?: string
+  items?: Array<{ designTitle?: string; attributes?: { size?: 'S'|'M'|'L' } }>
 }
 
 export default function AdminOrders() {
@@ -68,6 +69,7 @@ export default function AdminOrders() {
                 <th className="text-left px-4 py-3">Status</th>
                 <th className="text-left px-4 py-3">Total</th>
                 <th className="text-left px-4 py-3">Created</th>
+                <th className="text-left px-4 py-3">Size</th>
               </tr>
             </thead>
             <tbody>
@@ -82,6 +84,7 @@ export default function AdminOrders() {
                     <td className="px-4 py-3 capitalize">{o.status}</td>
                     <td className="px-4 py-3">${o.total?.toFixed?.(2) ?? o.total}</td>
                     <td className="px-4 py-3">{o.createdAt ? new Date(o.createdAt).toLocaleString() : '-'}</td>
+                    <td className="px-4 py-3">{o.items?.[0]?.attributes?.size || '-'}</td>
                   </tr>
                 ))
               )}

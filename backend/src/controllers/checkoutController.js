@@ -10,7 +10,8 @@ import stripeService from '../services/stripeService.js';
 // Create Stripe Checkout Session
 export const createStripeCheckout = async (req, res, next) => {
   try {
-    const { userId, designId, quantity = 1 } = req.body;
+    const { userId, designId, quantity = 1, options } = req.body;
+    const size = (options?.size || 'M').toUpperCase();
     
     logger.info(`Creating checkout for userId: ${userId}, designId: ${designId}, quantity: ${quantity}`);
 
@@ -48,8 +49,10 @@ export const createStripeCheckout = async (req, res, next) => {
       logger.info(`Created placeholder design for checkout: ${designId}`);
     }
 
-    // Calculate pricing
-    const unitPrice = 24.00; // Base price for 3D toys
+    // Calculate pricing with size multiplier
+    const basePrice = 24.00; // Base price for 3D toys
+    const sizeMultiplier = size === 'L' ? 1.5 : size === 'M' ? 1.2 : 1.0;
+    const unitPrice = +(basePrice * sizeMultiplier).toFixed(2);
     const subtotal = unitPrice * quantity;
     const tax = subtotal * 0.08; // 8% tax
     const shipping = 5.99; // Standard shipping
@@ -163,7 +166,7 @@ export const createStripeCheckout = async (req, res, next) => {
           currency: 'usd',
           product_data: {
             name: design.originalText || 'Custom 3D Design',
-            description: `3D printed toy - ${design.userSelections?.color || 'blue'} ${design.userSelections?.style || 'playful'} design`,
+            description: `3D printed toy - ${design.userSelections?.color || 'blue'} ${design.userSelections?.style || 'playful'} design (Size: ${size})`,
             images: [design.generatedImages?.[0]?.url || design.images?.[0]?.url || 'https://via.placeholder.com/512x512/4F46E5/FFFFFF?text=Sample+3D+Toy']
           },
           unit_amount: Math.round(unitPrice * 100) // Convert to cents
@@ -206,7 +209,8 @@ export const createStripeCheckout = async (req, res, next) => {
         {
           userId,
           designId,
-          quantity: quantity.toString()
+          quantity: quantity.toString(),
+          size
         }
       );
     } catch (error) {
@@ -229,7 +233,8 @@ export const createStripeCheckout = async (req, res, next) => {
         designImage: design.generatedImages?.[0]?.url || design.images?.[0]?.url || '',
         quantity,
         unitPrice,
-        totalPrice: subtotal
+        totalPrice: subtotal,
+        attributes: { size }
       }],
       pricing: {
         subtotal,
@@ -275,7 +280,8 @@ export const createStripeCheckout = async (req, res, next) => {
 // Create checkout session (legacy - for custom checkout flow)
 export const createCheckout = async (req, res, next) => {
   try {
-    const { userId, designId, quantity = 1 } = req.body;
+    const { userId, designId, quantity = 1, options } = req.body;
+    const size = (options?.size || 'M').toUpperCase();
 
     // Get design details or create a placeholder if not found
     let design = await Design.findOne({ id: designId });
@@ -311,8 +317,10 @@ export const createCheckout = async (req, res, next) => {
       logger.info(`Created placeholder design for checkout: ${designId}`);
     }
 
-    // Calculate pricing
-    const unitPrice = 24.00; // Base price for 3D toys
+    // Calculate pricing with size multiplier
+    const basePrice = 24.00; // Base price
+    const sizeMultiplier = size === 'L' ? 1.5 : size === 'M' ? 1.2 : 1.0;
+    const unitPrice = +(basePrice * sizeMultiplier).toFixed(2);
     const subtotal = unitPrice * quantity;
     const tax = subtotal * 0.08; // 8% tax
     const shipping = 5.99; // Standard shipping
@@ -330,7 +338,8 @@ export const createCheckout = async (req, res, next) => {
         designImage: design.generatedImages?.[0]?.url || design.images?.[0]?.url || '',
         quantity,
         unitPrice,
-        totalPrice: subtotal
+        totalPrice: subtotal,
+        attributes: { size }
       }],
       pricing: {
         subtotal,
@@ -596,7 +605,7 @@ export const getOrder = async (req, res, next) => {
 // Handle Stripe Checkout Session completion
 export const handleCheckoutSessionCompleted = async (session) => {
   try {
-    const { userId, designId, quantity } = session.metadata;
+    const { userId, designId, quantity, size } = session.metadata || {};
     
     // Find the checkout session
     const checkout = await Checkout.findOne({ sessionId: session.id });
@@ -611,7 +620,7 @@ export const handleCheckoutSessionCompleted = async (session) => {
       designId,
       stripeSessionId: session.id,
       stripePaymentIntentId: session.payment_intent,
-      items: checkout.items,
+      items: checkout.items?.map?.(it => ({ ...it.toObject?.() ?? it, attributes: { size: size || it?.attributes?.size || 'M' } })),
       pricing: checkout.pricing,
       shipping: {
         firstName: session.shipping_details?.name?.split(' ')[0] || '',

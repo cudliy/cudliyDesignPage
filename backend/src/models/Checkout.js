@@ -36,7 +36,10 @@ const checkoutSchema = new mongoose.Schema({
     designImage: String,
     quantity: { type: Number, default: 1 },
     unitPrice: Number,
-    totalPrice: Number
+    totalPrice: Number,
+    attributes: {
+      size: { type: String, enum: ['S', 'M', 'L'], default: 'M' }
+    }
   }],
   pricing: {
     subtotal: { type: Number, required: true },
