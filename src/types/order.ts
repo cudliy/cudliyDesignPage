@@ -13,6 +13,10 @@ export interface Order {
     quantity: number;
     unitPrice: number;
     totalPrice: number;
+    attributes?: {
+      size?: 'S' | 'M' | 'L';
+      inch?: number;
+    };
   }>;
   pricing: {
     subtotal: number;
