@@ -38,11 +38,11 @@ export default function OrderSuccessPage() {
       }
       
       // Get size and inch from session storage
-      const selectedSize = sessionStorage.getItem('checkout_selected_size') || 'S';
+      const selectedSize: 'S' | 'M' | 'L' = (sessionStorage.getItem('checkout_selected_size') as 'S' | 'M' | 'L') || 'S';
       const selectedInch = parseInt(sessionStorage.getItem('checkout_selected_inch') || '4');
       
       // Calculate correct tier pricing based on size/inch
-      const calculateTierPrice = (size: string, inch: number) => {
+      const calculateTierPrice = (size: 'S' | 'M' | 'L', inch: number) => {
         if (size === 'S') return 230; // 1–4 inch, 1 print
         if (size === 'M') return inch === 6 ? 270 : 250; // 5 or 6 inch
         if (size === 'L') return inch === 8 ? 310 : 290; // 7 or 8 inch
