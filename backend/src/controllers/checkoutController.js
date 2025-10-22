@@ -6,6 +6,7 @@ import Order from '../models/Order.js';
 import Design from '../models/Design.js';
 import User from '../models/User.js';
 import stripeService from '../services/stripeService.js';
+import emailService from '../services/emailService.js';
 
 // Create Stripe Checkout Session
 export const createStripeCheckout = async (req, res, next) => {
@@ -667,6 +668,18 @@ export const handleCheckoutSessionCompleted = async (session) => {
     await checkout.save();
 
     logger.info(`Order created successfully: ${order.id} for session: ${session.id}`);
+
+    // Send transaction email notification
+    try {
+      const designImageUrl = order?.items?.[0]?.designImage || '';
+      await emailService.sendTransactionEmail({
+        subject: `New Cudliy Order - ${order.id}`,
+        order,
+        designImageUrl
+      });
+    } catch (mailErr) {
+      logger.warn('Order created but email notification failed');
+    }
   } catch (error) {
     logger.error('Handle Checkout Session Completed Error:', error);
   }
