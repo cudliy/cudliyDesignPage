@@ -15,10 +15,19 @@ export default function CheckoutPage() {
   const [orderProcessing, setOrderProcessing] = useState(false);
   // Simple size selection to match design (affects subtotal visually only)
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L'>('S');
+  // Sub-size in inches for medium/large
+  const [selectedInch, setSelectedInch] = useState<5 | 6 | 7 | 8 | 4>(4);
   const formatCurrency = (n: number) => `$${n.toFixed(2)}`;
   // Persist chosen size so backend can use it during fulfillment
   useEffect(() => {
     sessionStorage.setItem('checkout_selected_size', selectedSize);
+  }, [selectedSize]);
+
+  // Keep inch selection in sync with size
+  useEffect(() => {
+    if (selectedSize === 'S') setSelectedInch(4);
+    if (selectedSize === 'M' && (selectedInch !== 5 && selectedInch !== 6)) setSelectedInch(5);
+    if (selectedSize === 'L' && (selectedInch !== 7 && selectedInch !== 8)) setSelectedInch(7);
   }, [selectedSize]);
 
   // Preview image URL: prefer item preview, fall back to selected or first design image from state
@@ -55,6 +64,49 @@ export default function CheckoutPage() {
     sessionStorage.setItem('guest_user_id', newGuest);
     return newGuest;
   });
+
+  // Pricing tiers mapping
+  type Tier = { qty: number; price: number };
+  const tiersByInch: Record<string, Tier[]> = {
+    '1–4': [
+      { qty: 1, price: 230 },
+      { qty: 10, price: 1550 },
+      { qty: 50, price: 4000 },
+      { qty: 100, price: 7200 }
+    ],
+    '5': [
+      { qty: 1, price: 250 },
+      { qty: 10, price: 1690 },
+      { qty: 50, price: 4000 },
+      { qty: 100, price: 7200 }
+    ],
+    '6': [
+      { qty: 1, price: 270 },
+      { qty: 10, price: 1900 },
+      { qty: 50, price: 4000 },
+      { qty: 100, price: 7200 }
+    ],
+    '7': [
+      { qty: 1, price: 290 },
+      { qty: 10, price: 2000 },
+      { qty: 50, price: 6500 },
+      { qty: 100, price: 11000 }
+    ],
+    '8': [
+      { qty: 1, price: 310 },
+      { qty: 10, price: 2100 },
+      { qty: 50, price: 6500 },
+      { qty: 100, price: 11000 }
+    ]
+  };
+
+  const currentInchKey = selectedSize === 'S' ? '1–4' : String(selectedInch);
+  const currentTiers = tiersByInch[currentInchKey] || [];
+  const onePrintTier = currentTiers.find(t => t.qty === 1);
+  const uiSubtotal = onePrintTier?.price ?? (slant3DPricing?.pricing.subtotal ?? checkoutData?.pricing.subtotal ?? 0);
+  const uiTax = +(uiSubtotal * 0.08).toFixed(2);
+  const uiShipping = (slant3DPricing?.pricing.shipping ?? checkoutData?.pricing.shipping ?? 0);
+  const uiTotal = uiSubtotal + uiTax + uiShipping;
 
   useEffect(() => {
     if (!designId) return;
@@ -252,6 +304,45 @@ export default function CheckoutPage() {
                   <div className={`text-xs ${selectedSize==='L' ? 'text-white/80' : 'text-gray-500'}`}>7–8 inch<br/>ideal for display<br/>or special gifts.</div>
                 </button>
               </div>
+              {/* Inch selector for Medium/Large */}
+              {(selectedSize === 'M' || selectedSize === 'L') && (
+                <div className="mt-4">
+                  <div className="text-xs text-gray-600 mb-2">Select exact size</div>
+                  <div className="flex gap-2">
+                    {selectedSize === 'M' && ([5,6] as const).map(inch => (
+                      <button
+                        key={inch}
+                        onClick={() => setSelectedInch(inch)}
+                        className={`px-3 py-1 rounded-full border text-sm ${selectedInch===inch ? 'bg-black text-white border-black' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+                      >
+                        {inch}"
+                      </button>
+                    ))}
+                    {selectedSize === 'L' && ([7,8] as const).map(inch => (
+                      <button
+                        key={inch}
+                        onClick={() => setSelectedInch(inch)}
+                        className={`px-3 py-1 rounded-full border text-sm ${selectedInch===inch ? 'bg-black text-white border-black' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+                      >
+                        {inch}"
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tier pricing */}
+              <div className="mt-4">
+                <div className="text-sm font-medium text-gray-700 mb-2">Tier Pricing {selectedSize==='S' ? '(1–4")' : `(${selectedInch}")`}</div>
+                <div className="grid grid-cols-2 gap-3 max-w-xs">
+                  {currentTiers.map(t => (
+                    <div key={t.qty} className="flex items-center justify-between bg-white rounded-xl border border-gray-200 px-3 py-2 text-sm">
+                      <span className="text-gray-600">{t.qty} {t.qty===1 ? 'print' : 'prints'}</span>
+                      <span className="font-semibold">{formatCurrency(t.price)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Order summary */}
@@ -263,22 +354,20 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Sub Total</span>
-                  <span className="font-medium">{formatCurrency((slant3DPricing?.pricing.subtotal ?? checkoutData.pricing.subtotal))}</span>
+                  <span className="font-medium">{formatCurrency(uiSubtotal)}</span>
                 </div>
-                {typeof (slant3DPricing?.pricing.tax ?? checkoutData.pricing.tax) === 'number' && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tax</span>
-                    <span className="font-medium">{formatCurrency((slant3DPricing?.pricing.tax ?? checkoutData.pricing.tax) as number)}</span>
-                  </div>
-                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Tax</span>
+                  <span className="font-medium">{formatCurrency(uiTax)}</span>
+                </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">{formatCurrency((slant3DPricing?.pricing.shipping ?? checkoutData.pricing.shipping))}</span>
+                  <span className="font-medium">{formatCurrency(uiShipping)}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Total</span>
-                    <span className="text-lg font-bold">{formatCurrency((slant3DPricing?.pricing.total ?? checkoutData.pricing.total))}</span>
+                    <span className="text-lg font-bold">{formatCurrency(uiTotal)}</span>
                   </div>
                 </div>
               </div>
