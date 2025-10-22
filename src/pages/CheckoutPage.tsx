@@ -141,7 +141,7 @@ export default function CheckoutPage() {
           userId,
           designId,
           quantity: 1,
-          options: { size: selectedSize }
+          options: { size: selectedSize, inch: selectedInch }
         });
 
         if (response.success && response.data) {
@@ -158,7 +158,7 @@ export default function CheckoutPage() {
     };
 
     initializeCheckout();
-  }, [designId, userId, location.state]);
+  }, [designId, userId, location.state, selectedSize, selectedInch]);
 
   const handleProceedToPayment = async () => {
     if (!checkoutData) return;

@@ -155,6 +155,7 @@ interface CheckoutRequest {
   quantity?: number;
   options?: {
     size?: 'S' | 'M' | 'L';
+    inch?: 4 | 5 | 6 | 7 | 8;
   };
   size?: 'S' | 'M' | 'L';
 }

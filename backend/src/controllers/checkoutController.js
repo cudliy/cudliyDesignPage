@@ -13,6 +13,7 @@ export const createStripeCheckout = async (req, res, next) => {
   try {
     const { userId, designId, quantity = 1, options } = req.body;
     const size = (options?.size || 'M').toUpperCase();
+    const inch = options?.inch ?? (size === 'S' ? 4 : size === 'M' ? 5 : 7);
     
     logger.info(`Creating checkout for userId: ${userId}, designId: ${designId}, quantity: ${quantity}`);
 
@@ -50,10 +51,14 @@ export const createStripeCheckout = async (req, res, next) => {
       logger.info(`Created placeholder design for checkout: ${designId}`);
     }
 
-    // Calculate pricing with size multiplier
-    const basePrice = 24.00; // Base price for 3D toys
-    const sizeMultiplier = size === 'L' ? 1.5 : size === 'M' ? 1.2 : 1.0;
-    const unitPrice = +(basePrice * sizeMultiplier).toFixed(2);
+    // Calculate pricing using tier mapping from spec
+    const tierPrice = (() => {
+      if (size === 'S') return 230; // 1–4 inch, 1 print
+      if (size === 'M') return inch === 6 ? 270 : 250; // 5 or 6 inch
+      if (size === 'L') return inch === 8 ? 310 : 290; // 7 or 8 inch
+      return 230;
+    })();
+    const unitPrice = +tierPrice.toFixed(2);
     const subtotal = unitPrice * quantity;
     const tax = subtotal * 0.08; // 8% tax
     const shipping = 5.99; // Standard shipping
@@ -78,7 +83,8 @@ export const createStripeCheckout = async (req, res, next) => {
           designImage: design.generatedImages?.[0]?.url || design.images?.[0]?.url || '',
           quantity,
           unitPrice,
-          totalPrice: subtotal
+          totalPrice: subtotal,
+          attributes: { size, inch }
         }],
         pricing: {
           subtotal,
@@ -167,14 +173,14 @@ export const createStripeCheckout = async (req, res, next) => {
           currency: 'usd',
           product_data: {
             name: design.originalText || 'Custom 3D Design',
-            description: `3D printed toy - ${design.userSelections?.color || 'blue'} ${design.userSelections?.style || 'playful'} design (Size: ${size})`,
+            description: `3D printed toy - ${design.userSelections?.color || 'blue'} ${design.userSelections?.style || 'playful'} design (Size: ${size}${size==='S' ? '' : `/${inch}\"`})`,
             images: [design.generatedImages?.[0]?.url || design.images?.[0]?.url || 'https://via.placeholder.com/512x512/4F46E5/FFFFFF?text=Sample+3D+Toy']
           },
           unit_amount: Math.round(unitPrice * 100) // Convert to cents
         },
         quantity: quantity
       },
-      {
+        {
         price_data: {
           currency: 'usd',
           product_data: {
@@ -211,7 +217,8 @@ export const createStripeCheckout = async (req, res, next) => {
           userId,
           designId,
           quantity: quantity.toString(),
-          size
+          size,
+          inch: String(inch)
         }
       );
     } catch (error) {
@@ -235,7 +242,7 @@ export const createStripeCheckout = async (req, res, next) => {
         quantity,
         unitPrice,
         totalPrice: subtotal,
-        attributes: { size }
+        attributes: { size, inch }
       }],
       pricing: {
         subtotal,
