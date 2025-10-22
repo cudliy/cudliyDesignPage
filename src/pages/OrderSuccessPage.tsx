@@ -37,13 +37,30 @@ export default function OrderSuccessPage() {
         setShippingInfo(JSON.parse(storedShippingInfo));
       }
       
-      // Parse pricing information
+      // Get size and inch from session storage
+      const selectedSize = sessionStorage.getItem('checkout_selected_size') || 'S';
+      const selectedInch = parseInt(sessionStorage.getItem('checkout_selected_inch') || '4');
+      
+      // Calculate correct tier pricing based on size/inch
+      const calculateTierPrice = (size: string, inch: number) => {
+        if (size === 'S') return 230; // 1–4 inch, 1 print
+        if (size === 'M') return inch === 6 ? 270 : 250; // 5 or 6 inch
+        if (size === 'L') return inch === 8 ? 310 : 290; // 7 or 8 inch
+        return 230;
+      };
+      
+      const unitPrice = calculateTierPrice(selectedSize, selectedInch);
+      const subtotal = unitPrice;
+      const tax = subtotal * 0.08; // 8% tax
+      const shipping = 5.99; // Standard shipping
+      const total = subtotal + tax + shipping;
+      
       let pricing = {
-        subtotal: 24.00,
-        tax: 1.92,
-        shipping: 5.99,
+        subtotal,
+        tax,
+        shipping,
         discount: 0,
-        total: 31.91,
+        total,
         currency: 'USD'
       };
       
@@ -62,11 +79,12 @@ export default function OrderSuccessPage() {
         status: 'paid',
         items: [{
           designId: urlParams.get('design_id') || 'temp-design',
-          designTitle: 'Custom 3D Design',
+          designTitle: `Custom 3D Design (${selectedSize}${selectedSize === 'S' ? '' : `/${selectedInch}"`})`,
           designImage: urlParams.get('design_image') || 'https://via.placeholder.com/512x512/4F46E5/FFFFFF?text=3D+Design',
           quantity: 1,
           unitPrice: pricing.subtotal,
-          totalPrice: pricing.subtotal
+          totalPrice: pricing.subtotal,
+          attributes: { size: selectedSize, inch: selectedInch }
         }],
         pricing: pricing,
         shipping: storedShippingInfo ? {

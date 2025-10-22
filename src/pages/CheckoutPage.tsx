@@ -18,10 +18,14 @@ export default function CheckoutPage() {
   // Sub-size in inches for medium/large
   const [selectedInch, setSelectedInch] = useState<5 | 6 | 7 | 8 | 4>(4);
   const formatCurrency = (n: number) => `$${n.toFixed(2)}`;
-  // Persist chosen size so backend can use it during fulfillment
+  // Persist chosen size and inch so backend can use it during fulfillment
   useEffect(() => {
     sessionStorage.setItem('checkout_selected_size', selectedSize);
   }, [selectedSize]);
+
+  useEffect(() => {
+    sessionStorage.setItem('checkout_selected_inch', selectedInch.toString());
+  }, [selectedInch]);
 
   // Keep inch selection in sync with size
   useEffect(() => {
