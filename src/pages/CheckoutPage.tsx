@@ -158,24 +158,42 @@ export default function CheckoutPage() {
     };
 
     initializeCheckout();
-  }, [designId, userId, location.state, selectedSize, selectedInch]);
+  }, [designId, userId, location.state]);
 
   const handleProceedToPayment = async () => {
-    if (!checkoutData) return;
-
     try {
       setOrderProcessing(true);
       setError(null);
 
-      // Check if this is a mock checkout
-      if (checkoutData.mock) {
+      // Always create a fresh session with current size/inch before redirecting
+      const resp = await apiService.createStripeCheckout({
+        userId,
+        designId: designId as string,
+        quantity: 1,
+        options: { size: selectedSize, inch: selectedInch }
+      });
+
+      if (!resp.success || !resp.data) throw new Error(resp.error || 'Failed to create checkout');
+
+      const session = resp.data as unknown as CheckoutData & { url?: string; mock?: boolean };
+
+      if (session.mock) {
         navigate(`/order-success?session_id=mock_${Date.now()}`);
-      } else {
-        // Redirect to Stripe Checkout
-        if (checkoutData.url) {
-          window.location.href = checkoutData.url;
-        }
+        return;
       }
+
+      if (session.url) {
+        window.location.href = session.url;
+        return;
+      }
+
+      // Fallback to any existing URL if present
+      if (checkoutData?.url) {
+        window.location.href = checkoutData.url as unknown as string;
+        return;
+      }
+
+      throw new Error('No checkout URL available');
     } catch (err) {
       // Handle specific error types with user-friendly messages
       let errorMessage = 'Order processing failed';
