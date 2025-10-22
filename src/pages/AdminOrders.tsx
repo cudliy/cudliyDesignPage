@@ -21,12 +21,18 @@ export default function AdminOrders() {
         setLoading(true)
         // For demo/admin, try to load current (guest) user's orders if available
         const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id')
+        console.log('AdminOrders: Looking for orders for userId:', userId)
+        
         if (!userId) {
+          console.log('AdminOrders: No userId found in session storage')
           setOrders([])
           setLoading(false)
           return
         }
+        
         const res = await apiService.getUserOrders(userId)
+        console.log('AdminOrders: API response:', res)
+        
         if (res.success && res.data?.orders) {
           const mapped: OrderRow[] = (res.data.orders as any[]).map((o: any) => ({
             id: o.id || o._id,
@@ -36,11 +42,14 @@ export default function AdminOrders() {
             createdAt: o.createdAt,
             items: o.items
           }))
+          console.log('AdminOrders: Mapped orders:', mapped)
           setOrders(mapped)
         } else {
+          console.log('AdminOrders: No orders found or API error:', res)
           setError('Failed to load orders')
         }
       } catch (e: any) {
+        console.error('AdminOrders: Error fetching orders:', e)
         setError(e?.message || 'Failed to load orders')
       } finally {
         setLoading(false)
@@ -69,6 +78,16 @@ export default function AdminOrders() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto p-6">
         <h1 className="text-2xl font-semibold mb-6">Orders</h1>
+        
+        {/* Debug info */}
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="font-medium text-blue-900 mb-2">Debug Info</h3>
+          <div className="text-sm text-blue-800">
+            <p>User ID: {sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || 'None'}</p>
+            <p>Orders found: {orders.length}</p>
+            {error && <p className="text-red-600">Error: {error}</p>}
+          </div>
+        </div>
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
