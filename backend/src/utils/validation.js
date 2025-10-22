@@ -91,7 +91,8 @@ export const createCheckoutSchema = Joi.object({
   designId: Joi.string().required(),
   quantity: Joi.number().integer().min(1).default(1),
   options: Joi.object({
-    size: Joi.string().valid('S', 'M', 'L').default('M')
+    size: Joi.string().valid('S', 'M', 'L').default('M'),
+    inch: Joi.number().valid(4, 5, 6, 7, 8).optional()
   }).optional()
 });
 

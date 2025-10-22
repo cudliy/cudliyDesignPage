@@ -38,7 +38,8 @@ const checkoutSchema = new mongoose.Schema({
     unitPrice: Number,
     totalPrice: Number,
     attributes: {
-      size: { type: String, enum: ['S', 'M', 'L'], default: 'M' }
+      size: { type: String, enum: ['S', 'M', 'L'], default: 'M' },
+      inch: { type: Number, enum: [4, 5, 6, 7, 8], default: 4 }
     }
   }],
   pricing: {
