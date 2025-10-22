@@ -7,7 +7,7 @@ type OrderRow = {
   status: string
   total: number
   createdAt?: string
-  items?: Array<{ designTitle?: string; attributes?: { size?: 'S'|'M'|'L' } }>
+  items?: Array<{ designTitle?: string; attributes?: { size?: 'S'|'M'|'L'; inch?: number } }>
 }
 
 export default function AdminOrders() {
@@ -78,12 +78,13 @@ export default function AdminOrders() {
                 <th className="text-left px-4 py-3">Total</th>
                 <th className="text-left px-4 py-3">Created</th>
                 <th className="text-left px-4 py-3">Size</th>
+                <th className="text-left px-4 py-3">Inch</th>
               </tr>
             </thead>
             <tbody>
               {orders.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-gray-500" colSpan={4}>No orders yet</td>
+                  <td className="px-4 py-6 text-gray-500" colSpan={6}>No orders yet</td>
                 </tr>
               ) : (
                 orders.map((o) => (
@@ -93,6 +94,7 @@ export default function AdminOrders() {
                     <td className="px-4 py-3">${o.total?.toFixed?.(2) ?? o.total}</td>
                     <td className="px-4 py-3">{o.createdAt ? new Date(o.createdAt).toLocaleString() : '-'}</td>
                     <td className="px-4 py-3">{o.items?.[0]?.attributes?.size || '-'}</td>
+                    <td className="px-4 py-3">{o.items?.[0]?.attributes?.inch || '-'}</td>
                   </tr>
                 ))
               )}

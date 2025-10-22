@@ -58,6 +58,8 @@ export async function sendTransactionEmail({ to = DEFAULT_TO, subject, order, de
     return { skipped: true };
   }
 
+  logger.info(`Sending email to: ${to}, Order ID: ${order?.id}`);
+
   try {
     const html = buildOrderEmailHtml({ order, designImageUrl });
     const payload = {
@@ -66,6 +68,8 @@ export async function sendTransactionEmail({ to = DEFAULT_TO, subject, order, de
       subject: subject || `New Order: ${order?.id || ''}`,
       html
     };
+
+    logger.info('Email payload:', { to, subject: payload.subject, from: payload.from });
 
     const res = await axios.post('https://api.resend.com/emails', payload, {
       headers: {
@@ -80,7 +84,8 @@ export async function sendTransactionEmail({ to = DEFAULT_TO, subject, order, de
   } catch (error) {
     logger.error('Failed to send transaction email via Resend:', {
       message: error?.message,
-      response: error?.response?.data
+      response: error?.response?.data,
+      status: error?.response?.status
     });
     // Do not throw; email failure should not break order flow
     return { error: true };
