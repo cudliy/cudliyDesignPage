@@ -100,8 +100,11 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
       `${basePrompt}, side profile, clean lines, minimal background`
     ];
 
+    // Use Promise.allSettled to handle individual failures gracefully
     const imagePromises = variations.slice(0, count).map(async (prompt, index) => {
       try {
+        logger.info(`Starting image generation ${index + 1}/${count} for prompt: ${prompt.substring(0, 50)}...`);
+        
         const response = await axios.post(
           'https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions',
           {
@@ -113,10 +116,11 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
               'Content-Type': 'application/json',
               'Prefer': 'wait'
             },
-            timeout: 120000 // 2 minutes timeout
+            timeout: 90000 // Reduced to 1.5 minutes per image
           }
         );
 
+        logger.info(`Image generation ${index + 1} completed successfully`);
         return {
           url: response.data.output[0],
           prompt,
@@ -124,11 +128,35 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
         };
       } catch (error) {
         logger.error(`Image generation failed for variation ${index}:`, error);
+        // Return a fallback or re-throw based on your error handling strategy
         throw error;
       }
     });
 
-    return Promise.all(imagePromises);
+    // Execute all promises in parallel
+    const results = await Promise.allSettled(imagePromises);
+    
+    // Filter successful results and handle failures
+    const successfulResults = [];
+    const failedResults = [];
+    
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        successfulResults.push(result.value);
+      } else {
+        failedResults.push({ index, error: result.reason });
+        logger.error(`Image generation ${index + 1} failed:`, result.reason);
+      }
+    });
+
+    // If we have at least one successful result, return them
+    if (successfulResults.length > 0) {
+      logger.info(`Successfully generated ${successfulResults.length}/${count} images`);
+      return successfulResults;
+    } else {
+      // If all failed, throw the first error
+      throw new Error(`All image generations failed. First error: ${failedResults[0]?.error?.message || 'Unknown error'}`);
+    }
   }
 
   async preprocessImageFor3D(imageUrl) {

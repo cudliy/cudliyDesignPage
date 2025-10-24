@@ -245,7 +245,11 @@ const SignUp = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <img
+                      src="/GIFS/Loading-State.gif"
+                      alt="Signing up"
+                      className="w-4 h-4 object-contain"
+                    />
                     <span>Creating account</span>
                   </div>
                 ) : (

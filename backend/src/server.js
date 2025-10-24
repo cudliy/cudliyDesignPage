@@ -60,7 +60,8 @@ const corsOptions = {
       process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
       [
         'https://www.cudliy.com',
-        'https://cudliy.com'
+        'https://cudliy.com',
+        'http://localhost:5173',
       ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -68,6 +69,9 @@ const corsOptions = {
     
     // Allow cudliy.com domains
     if (origin && origin.includes('cudliy.com')) {
+      return callback(null, true);
+    }
+       if (origin && origin.includes('http://localhost:5173')) {
       return callback(null, true);
     }
     
@@ -122,13 +126,16 @@ app.options('*', (req, res) => {
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
       'https://www.cudliy.com',
-      'https://cudliy.com'
+      'https://cudliy.com',
+      'http://localhost:5173'
     ];
   
   console.log('Allowed origins:', allowedOrigins);
   
   // Allow cudliy.com domains
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com'));
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com') 
+  || (origin && origin.includes('http://localhost:5173'))
+) 
   
   console.log('Is origin allowed?', isAllowed);
   
@@ -148,8 +155,8 @@ app.options('*', (req, res) => {
 
 // Set default values for missing environment variables
 if (!process.env.FRONTEND_URL) {
-  process.env.FRONTEND_URL = 'https://www.cudliy.com';
-  logger.warn('FRONTEND_URL not set, using default: https://www.cudliy.com');
+  process.env.FRONTEND_URL = 'http:localhost:5173';
+  logger.warn('FRONTEND_URL not set, using default: http:localhost:5173');
 }
 
 // Validate critical environment variables
@@ -240,11 +247,12 @@ app.use('/api/designs', (req, res, next) => {
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
       'https://www.cudliy.com',
-      'https://cudliy.com'
+      'https://cudliy.com',
+      'http://localhost:5173',
     ];
   
   // Set CORS headers for all requests to designs route
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com'));
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('http://localhost:5173'));
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
@@ -267,10 +275,12 @@ app.options('/api/designs/*', (req, res) => {
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
       'https://www.cudliy.com',
-      'https://cudliy.com'
+      'https://cudliy.com',
+      'http:localhost:5173'
     ];
   
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com'));
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com')) 
+   || (origin && origin.includes('localhost:5173'));
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');

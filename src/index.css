@@ -23,10 +23,7 @@ h1, .heading-large {
 }
 
 /* Apply Manrope Bold to smaller titles */
-h2, h3, h4, h5, h6, .heading {
-  font-family: "Manrope", sans-serif;
-  font-weight: 800;
-}
+
 
 @layer utilities {
   .font-abril { 
@@ -35,7 +32,9 @@ h2, h3, h4, h5, h6, .heading {
   .font-manrope { font-family: "Manrope", sans-serif; }
   .font-fromage { font-family: "Playfair Display", serif; }
 }
-
+h2, h3, h4, h5, h6, .heading {
+  font-family: "Abril", sans-serif;
+}
 /* Custom font definitions for better fallbacks */
 .font-fromage-extrabold {
   font-family: "Playfair Display", "Times New Roman", serif;

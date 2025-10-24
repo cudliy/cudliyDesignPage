@@ -338,7 +338,11 @@ export default function ModelViewer({
       {(loadingState === 'loading' || !isModelViewerAvailable) && (
         <div className="absolute inset-0 flex items-center justify-center bg-transparent">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E70D57] mx-auto mb-2"></div>
+            <img
+              src="/GIFS/Loading-State.gif"
+              alt="Loading 3D model"
+              className="w-16 h-16 object-contain mx-auto mb-2"
+            />
             <p className="text-sm text-gray-600">
               {!isModelViewerAvailable ? 'Initializing 3D viewer...' : 'Loading 3D model...'}
             </p>

@@ -110,7 +110,7 @@ const SignIn = () => {
             {/* Logo */}
             <div className="mb-4 flex justify-center">
               <img
-                src="/Asset 12 1 (1).png"
+                src="/CudliyLogo.svg"
                 alt="Cudliy Logo"
                 style={{
                   width: '28.999998092651392px',
@@ -182,7 +182,11 @@ const SignIn = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <img
+                      src="/GIFS/Loading-State.gif"
+                      alt="Signing in"
+                      className="w-4 h-4 object-contain"
+                    />
                     <span>Signing in</span>
                   </div>
                 ) : (

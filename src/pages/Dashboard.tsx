@@ -5,6 +5,7 @@ import { useUsageLimits } from '../hooks/useUsageLimits';
 import SubscriptionDebug from '../components/SubscriptionDebug';
 import SEO from '@/components/SEO';
 
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [currentView, setCurrentView] = useState<'recent' | 'all' | 'orders' | 'trash' | 'tutorial' | 'community' | 'credits' | 'upgrade' | 'edu'>('recent');
+  const [expandedDesigns, setExpandedDesigns] = useState<Set<string>>(new Set());
   const [userId] = useState(() => {
     const userId = sessionStorage.getItem('user_id');
     const token = sessionStorage.getItem('token');
@@ -212,21 +214,34 @@ export default function Dashboard() {
     navigate(`/design/${designId}`);
   };
 
+  const toggleDesignExpansion = (designId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setExpandedDesigns(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(designId)) {
+        newSet.delete(designId);
+      } else {
+        newSet.add(designId);
+      }
+      return newSet;
+    });
+  };
+
   const navigationItems = {
     explore: [
-      { name: 'Tutorial', icon: '🎓', key: 'tutorial' as const },
-      { name: 'Community', icon: '👥', key: 'community' as const }
+      { name: 'Tutorial', icon: '', key: 'tutorial' as const },
+      { name: 'Community', icon: '', key: 'community' as const }
     ],
     creations: [
-      { name: 'Recent', icon: '📄', key: 'recent' as const },
-      { name: 'All Files', icon: '📄', key: 'all' as const },
-      { name: 'Order history', icon: '🕐', key: 'orders' as const },
-      { name: 'Trash', icon: '🗑️', key: 'trash' as const }
+      { name: 'Recent', icon: '', key: 'recent' as const },
+      { name: 'All Files', icon: '', key: 'all' as const },
+      { name: 'Order history', icon: '', key: 'orders' as const },
+      { name: 'Trash', icon: '', key: 'trash' as const }
     ],
     subscription: [
-      { name: 'Credit balance', icon: '💳', key: 'credits' as const },
-      { name: 'Upgrade to Pro', icon: '⚡', key: 'upgrade' as const },
-      { name: 'EDU License', icon: '🧭', key: 'edu' as const }
+      { name: 'Credit balance', icon: '', key: 'credits' as const },
+      { name: 'Upgrade to Pro', icon: '', key: 'upgrade' as const },
+      { name: 'EDU License', icon: '', key: 'edu' as const }
     ]
   };
 
@@ -241,6 +256,23 @@ export default function Dashboard() {
   // Helper function to get design title
   const getDesignTitle = (design: Design) => {
     return design.originalText || 'Untitled Design';
+  };
+
+  // Helper function to get truncated title
+  const getTruncatedTitle = (design: Design) => {
+    const title = design.originalText || 'Untitled Design';
+    const words = title.split(',');
+    if (words.length > 0) {
+      const firstPart = words[0].trim();
+      return firstPart.charAt(0).toUpperCase() + firstPart.slice(1) + '...';
+    }
+    return title;
+  };
+
+  // Helper function to get full title
+  const getFullTitle = (design: Design) => {
+    const title = design.originalText || 'Untitled Design';
+    return title.charAt(0).toUpperCase() + title.slice(1);
   };
 
   // Helper function to get design category
@@ -266,45 +298,43 @@ export default function Dashboard() {
         keywords="dashboard, my designs, toy management, design gallery, user dashboard, creative workspace"
         url="/dashboard"
       />
-      <div className="w-full h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-2 sm:p-4">
+      <div className="w-full h-screen bg-white flex p-2 sm:p-4">
       {/* Left Sidebar */}
-      <aside className={`bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] shadow-2xl border border-white/5 ${
+      <aside className={`h-screen bg-[#313131] border border-white/5 ${
         isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
-      } transition-all duration-500 relative flex-shrink-0`} 
-      style={{ 
-        width: 'clamp(320px, 35vw, 458px)',
+      } transition-all duration-500 relative flex-shrink-0`}
+      style={{
+        width: 'clamp(310px, 27vw, 450px)',
         borderRadius: 'clamp(20px, 4vw, 40px)',
-        minHeight: '0'
       }}>
         
 
         {/* Main Sidebar Content */}
         <div className="relative h-full flex flex-col text-white overflow-hidden">
           {/* Title */}
-          <div className="px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 lg:pt-12 pb-4 sm:pb-6">
-            <h1 className="font-['Georgia'] leading-tight text-left font-normal" 
-                style={{ fontSize: 'clamp(24px, 4vw, 36px)' }}>
-              Cudliy
-            </h1>
+          <div className="px-4 sm:px-6 flex gap-4 lg:px-8 pt-6 sm:pt-8 lg:pt-12 pb-4 sm:pb-6">
+           <img src='/Asset 13.svg'
+           className='w-[30px] h-[40px]'
+           /> <span className='text-white font-abril mt-[10px] '>{userName}'s Workspace</span>
           </div>
 
           {/* Navigation Container - Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
-            <div className="space-y-4 sm:space-y-6" style={{ marginLeft: 'clamp(60px, 12vw, 144px)' }}>
+			<div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-4 sm:pb-12">
+            <div className="space-y-2 sm:space-y-2" style={{ marginLeft: 'clamp(60px, 12vw, 144px)' }}>
               {/* Explore Section */}
               <div>
-                <h3 className="text-white/60 text-xs sm:text-sm font-semibold mb-2 uppercase tracking-wide">Explore</h3>
+                <h3 className="text-white text-xs font-semibold sm:text-sm mb-1 mt-8 ">Explore</h3>
                 <div className="space-y-0.5">
                   {navigationItems.explore.map((item, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentView(item.key)}
-                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
-                        currentView === item.key ? 'bg-white/10 text-white border-white/20' : ''
+                      className={`w-[226px] h-[34px] flex items-center gap-2 sm:gap-2 p-1 sm:p-2 text-white hover:text-white hover:bg-white/5 rounded-[30px] transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
+                        currentView === item.key ? 'bg-[#FF9CB5] text-white shadow-lg mx-auto' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
-                      <span className="font-medium text-xs sm:text-sm">{item.name}</span>
+                      <span className="font-normal text-white/80 text-xs sm:text-sm">{item.name}</span>
                     </button>
                   ))}
                 </div>
@@ -312,18 +342,18 @@ export default function Dashboard() {
 
               {/* My Creations Section */}
               <div>
-                <h3 className="text-white/60 text-xs sm:text-sm font-semibold mb-2 uppercase tracking-wide">My Creations</h3>
-                <div className="space-y-0.5">
+                <h3 className="text-white text-xs sm:text-sm font-semibold mt-9 mb-0">My Creations</h3>
+                <div>
                   {navigationItems.creations.map((item, index) => (
-                    <button
+                   <button
                       key={index}
                       onClick={() => setCurrentView(item.key)}
-                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
-                        currentView === item.key ? 'bg-gradient-to-r from-[#E91E63] to-[#d81b60] text-white shadow-lg shadow-[#E91E63]/30 border-[#E91E63]/50' : ''
+                      className={`w-[226px] h-[34px] flex items-center gap-2 sm:gap-2 p-1 sm:p-2 text-white hover:text-white hover:bg-white/5 rounded-[30px] transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
+                        currentView === item.key ? 'bg-[#FF9CB5] text-white shadow-lg mx-auto' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
-                      <span className="font-medium text-xs sm:text-sm">{item.name}</span>
+                      <span className="font-normal text-white/80 text-xs sm:text-sm">{item.name}</span>
                     </button>
                   ))}
                 </div>
@@ -331,8 +361,8 @@ export default function Dashboard() {
 
               {/* Subscription Section */}
               <div>
-                <h3 className="text-white/60 text-xs sm:text-sm font-semibold mb-2 uppercase tracking-wide">Subscription</h3>
-                <div className="space-y-0.5">
+                <h3 className="text-white text-xs sm:text-sm font-semibold mt-9 mb-0 tracking-wide">Subscription</h3>
+                <div>
                   {navigationItems.subscription.map((item, index) => (
                     <button
                       key={index}
@@ -343,12 +373,12 @@ export default function Dashboard() {
                           setCurrentView(item.key);
                         }
                       }}
-                      className={`w-full flex items-center gap-3 sm:gap-4 p-2 sm:p-3 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
-                        currentView === item.key ? 'bg-white/10 text-white border-white/20' : ''
+                      className={`w-[226px] h-[34px] flex items-center gap-2 sm:gap-2 p-1 sm:p-2 text-white hover:text-white hover:bg-white/5 rounded-[30px] transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
+                        currentView === item.key ? 'bg-[#FF9CB5] text-white shadow-lg mx-auto' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
-                      <span className="font-medium text-xs sm:text-sm">{item.name}</span>
+                      <span className="font-normal text-white/80 text-xs sm:text-sm">{item.name}</span>
                     </button>
                   ))}
                 </div>
@@ -359,7 +389,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4 shadow-xl border border-gray-200/50" 
+      <div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4 border border-gray-200/50" 
            style={{ borderRadius: 'clamp(20px, 4vw, 40px)' }}>
         {/* Usage Limits Banner */}
         {usageLimits && (!canGenerateImages || !canGenerateModels) && (
@@ -383,7 +413,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => navigate('/pricing')}
-                  className="px-4 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-[#FF9CB5] hover:bg-[#d10c50] text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   Upgrade Plan
                 </button>
@@ -399,7 +429,7 @@ export default function Dashboard() {
             {usageLimits && (
               <div className="hidden sm:flex items-center gap-2 text-xs text-gray-600">
                 <span className={`px-2 py-1 rounded-full ${
-                  usageLimits.plan === 'pro' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
+                  usageLimits.plan === 'pro' ? 'bg-black text-white' :
                   usageLimits.plan === 'premium' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' :
                   'bg-gray-100'
                 }`}>
@@ -407,21 +437,7 @@ export default function Dashboard() {
                    usageLimits.plan === 'premium' ? 'Creator Plan' : 
                    'Free Plan'}
                 </span>
-                <span>
-                  {remainingImages === -1 ? '∞' : remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth} images
-                </span>
-                <span>
-                  {remainingModels === -1 ? '∞' : remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth} models
-                </span>
-                <button
-                  onClick={() => checkLimits(true)}
-                  className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors"
-                  title="Refresh subscription status"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                </button>
+              
               </div>
             )}
           </div>
@@ -429,25 +445,25 @@ export default function Dashboard() {
             <button 
               onClick={() => navigate('/design')}
               disabled={!canGenerateImages && !canGenerateModels}
-              className={`px-3 sm:px-6 lg:px-8 py-1.5 sm:py-2 lg:py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-xs sm:text-sm lg:text-base ${
+              className={`px-2 sm:px-4 lg:px-6 py-2 sm:py-2 lg:py-2 rounded-full font-normal transition-all duration-300 hover:scale-105 text-[16px] sm:text-sm lg:text-sm ${
                 !canGenerateImages && !canGenerateModels
                   ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#E91E63] to-[#d81b60] hover:from-[#d81b60] hover:to-[#E91E63] text-white shadow-[#E91E63]/50'
+                  : 'bg-gradient-to-r from-[#E91E63] to-[#d81b60] hover:from-[#d81b60] hover:to-[#E91E63] text-white'
               }`}
             >
               New Design
             </button>
-          <div className="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 bg-[#FF9800] rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base lg:text-lg shadow-lg">
+          <div className="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 bg-[#313131] rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base lg:text-lg shadow-lg">
             {userInitials}
           </div>
           </div>
         </div>
 
-        {/* Content - Scrollable */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
-          <div className="flex items-center justify-between mb-4 sm:mb-6 lg:mb-8">
-            <h2 className="font-['Georgia'] font-normal text-black" 
-                style={{ fontSize: 'clamp(28px, 5vw, 48px)' }}>
+        {/* Content - No Scrollbar */}
+			<div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-2 sm:pb-2 lg:pb-4 main-content">
+          <div className="flex items-center justify-between mb-2 sm:mb-2 lg:mb-4">
+            <h2 className="font-['Georgia'] text-[16px] font-abril font-normal text-black" 
+                style={{ fontSize: 'clamp(10px, 3.5vw, 37px)' }}>
               {currentView === 'recent' && 'Recent'}
               {currentView === 'all' && 'All Files'}
               {currentView === 'orders' && 'Order history'}
@@ -464,20 +480,24 @@ export default function Dashboard() {
               <input
                 type="text"
                 placeholder="Search"
-                className="w-full max-w-md sm:max-w-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#E91E63] focus:border-transparent bg-white shadow-sm text-sm sm:text-base lg:text-lg"
+                className="w-[307px] h-[39px] max-w-md sm:max-w-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#E91E63] focus:border-transparent bg-white shadow-sm text-sm sm:text-base lg:text-lg"
               />
             </div>
             <div className="flex gap-2">
               <button 
                 onClick={() => fetchDesigns(true)}
                 disabled={refreshing}
-                className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm shadow-lg hover:shadow-xl hover:scale-105"
+                className="px-4 py-2 hover:bg-gray-200 rounded bg-none transition-colors text-white rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm shadow-lg hover:shadow-xl hover:scale-105"
                 title="Refresh designs"
               >
                 {refreshing ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <img
+                    src="/GIFS/Loading-State.gif"
+                    alt="Loading"
+                    className="w-4 h-4 object-contain"
+                  />
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="black" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                 )}
@@ -488,7 +508,11 @@ export default function Dashboard() {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
+                <img
+                  src="/GIFS/Loading-State.gif"
+                  alt="Loading designs"
+                  className="w-24 h-24 object-contain mx-auto mb-4"
+                />
                 <p className="text-gray-600">Loading your designs...</p>
               </div>
             </div>
@@ -566,7 +590,7 @@ export default function Dashboard() {
               EDU License information coming soon.
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-4xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-6 lg:gap-8 max-w-4xl">
               {designs.map((design, index) => (
                 <div
                   key={design.id}
@@ -591,7 +615,7 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex justify-center mb-3 sm:mb-4 lg:mb-6">
-                    <div className="w-16 sm:w-20 lg:w-24 xl:w-32 h-16 sm:h-20 lg:h-24 xl:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner relative group-hover:shadow-lg transition-shadow duration-300">
+                    <div className="w-20 h-16 sm:w-16 lg:w-20 xl:w-24 h-12 sm:h-16 lg:h-20 xl:h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner relative group-hover:shadow-lg transition-shadow duration-300">
                       <div className="absolute inset-0 bg-gradient-to-br from-[#E91E63]/5 to-[#d81b60]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <img
                         src={getDesignImage(design)}
@@ -602,11 +626,14 @@ export default function Dashboard() {
                   </div>
 
                   <div className="text-center">
-                    <h3 className="font-semibold text-black mb-1 sm:mb-2" 
-                        style={{ fontSize: 'clamp(14px, 2.5vw, 20px)' }}>
-                      {getDesignTitle(design)}
+                    <h3 
+                      className="font-semibold text-black mb-1 sm:mb-2 cursor-pointer hover:text-[#E91E63] transition-colors" 
+                      style={{ fontSize: 'clamp(14px, 2.5vw, 20px)' }}
+                      onClick={(e) => toggleDesignExpansion(design.id, e)}
+                    >
+                      {expandedDesigns.has(design.id) ? getFullTitle(design) : getTruncatedTitle(design)}
                     </h3>
-                    <p className="text-gray-400 font-medium" 
+                    <p className="text-gray-400 font-medium hidden" 
                        style={{ fontSize: 'clamp(10px, 2vw, 14px)' }}>
                       {getDesignCategory(design)}
                     </p>
@@ -641,6 +668,29 @@ export default function Dashboard() {
         </div>
       </div>
       </div>
+      
+      <style>{`
+        /* Hide scrollbars */
+        * {
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+        
+        *::-webkit-scrollbar {
+          display: none; /* WebKit */
+        }
+        
+        /* Specifically hide scrollbar for main content area */
+        .main-content {
+          overflow-y: auto;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+        
+        .main-content::-webkit-scrollbar {
+          display: none; /* WebKit */
+        }
+      `}</style>
     </>
   );
 }

@@ -57,26 +57,21 @@ class AWSService {
     }
 
     try {
-      const uploadParams = {
+      // Use PutObjectCommand directly to avoid ACL issues
+      const command = new PutObjectCommand({
         Bucket: this.bucketName,
         Key: fileName,
         Body: fileData,
         ContentType: options.contentType || 'application/octet-stream',
         CacheControl: options.cacheControl || 'public, max-age=31536000', // 1 year cache
-        ACL: 'public-read', // Make file publicly accessible
+        // Explicitly do NOT set ACL - let bucket policy handle public access
         Metadata: {
           uploadedAt: new Date().toISOString(),
           ...options.metadata
         }
-      };
-
-      // Use multipart upload for better performance and reliability
-      const upload = new Upload({
-        client: this.s3Client,
-        params: uploadParams
       });
 
-      await upload.done();
+      await this.s3Client.send(command);
 
       // Generate public URL
       const publicUrl = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${fileName}`;

@@ -14,8 +14,22 @@ import awsService from '../services/awsService.js';
 const saveImagesToS3 = async (imageUrls) => {
   const savedImages = [];
   
+  // Check if we should skip S3 uploads due to ACL issues
+  const skipS3Uploads = process.env.SKIP_S3_UPLOADS === 'true' || true; // Temporarily disable S3 uploads
+  
   for (const imageUrl of imageUrls) {
     try {
+      if (skipS3Uploads) {
+        logger.info('S3 uploads disabled via environment variable, using original URLs');
+        savedImages.push({
+          originalUrl: imageUrl,
+          s3Url: imageUrl, // Use original URL
+          fileName: null,
+          skipReason: 'S3 uploads disabled'
+        });
+        continue;
+      }
+
       // Generate a unique filename
       const timestamp = Date.now();
       const randomId = Math.random().toString(36).substr(2, 9);
@@ -46,6 +60,11 @@ const saveImagesToS3 = async (imageUrls) => {
         fileName: null,
         error: error.message
       });
+      
+      // Log specific S3 error for debugging
+      if (error.message.includes('ACL')) {
+        logger.warn('S3 ACL error detected - bucket may have ACLs disabled. Using original URLs as fallback.');
+      }
     }
   }
   
@@ -54,6 +73,19 @@ const saveImagesToS3 = async (imageUrls) => {
 
 // Helper function to save 3D model to AWS S3
 const saveModelToS3 = async (modelUrl, modelType = 'glb') => {
+  // Temporarily disable S3 uploads for 3D models as well
+  const skipS3Uploads = process.env.SKIP_S3_UPLOADS === 'true' || true;
+  
+  if (skipS3Uploads) {
+    logger.info('S3 uploads disabled, using original 3D model URL');
+    return {
+      originalUrl: modelUrl,
+      s3Url: modelUrl, // Use original URL
+      fileName: null,
+      skipReason: 'S3 uploads disabled'
+    };
+  }
+
   try {
     // Generate a unique filename
     const timestamp = Date.now();
@@ -142,7 +174,7 @@ export const generateImages = async (req, res, next) => {
     // Generate image variations
     const imageResults = await aiService.generateImageVariations(enhancedPrompt, 3);
 
-    // Save images to Google Cloud Storage
+    // Save images to AWS S3 (with fallback to original URLs)
     const imageUrls = imageResults.map(img => img.url);
     const savedImages = await saveImagesToS3(imageUrls);
 
@@ -154,28 +186,60 @@ export const generateImages = async (req, res, next) => {
 
     // No usage tracking for guest users - unlimited access
 
-    logger.info(`Images generated and saved to S3 for session: ${session.id}`);
+    logger.info(`Images generated for session: ${session.id} (S3 storage disabled, using original URLs)`);
 
-    res.json({
+    // Check if any S3 uploads failed or were skipped
+    const s3UploadFailures = savedImages.filter(img => img.error).length;
+    const s3UploadsSkipped = savedImages.filter(img => img.skipReason).length;
+    const successMessage = s3UploadsSkipped > 0 
+      ? 'AI images generated successfully using original URLs (S3 storage disabled)'
+      : s3UploadFailures > 0 
+        ? `AI images generated successfully. ${s3UploadFailures} images using original URLs due to storage issues.`
+        : 'AI images generated and saved to cloud storage successfully';
+
+    const responseData = {
       success: true,
       data: {
         session_id: session.id,
         images: imageResults.map((img, index) => ({
           ...img,
           s3Url: savedImages[index]?.s3Url || img.url,
-          fileName: savedImages[index]?.fileName
+          fileName: savedImages[index]?.fileName,
+          uploadStatus: savedImages[index]?.error ? 'fallback' : 'stored'
         })),
         creation_id,
         user_id: user_id || session.userId,
         prompt: enhancedPrompt,
         // No usage tracking for guest users
-        message: 'AI images generated and saved to cloud storage successfully'
+        message: successMessage
       }
+    };
+
+    logger.info(`📤 Sending response to frontend:`, {
+      session_id: responseData.data.session_id,
+      image_count: responseData.data.images.length,
+      images: responseData.data.images.map(img => ({ url: img.url, index: img.index }))
     });
+
+    res.json(responseData);
 
   } catch (error) {
     logger.error('Generate Images Error:', error);
-    next(new AppError(error.message || 'Failed to generate images', 500));
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to generate images';
+    
+    if (error.message.includes('timeout')) {
+      errorMessage = 'Image generation timed out. Please try again with a simpler prompt.';
+    } else if (error.message.includes('quota') || error.message.includes('limit')) {
+      errorMessage = 'API quota exceeded. Please try again later.';
+    } else if (error.message.includes('network') || error.message.includes('ECONNREFUSED')) {
+      errorMessage = 'Network error. Please check your connection and try again.';
+    } else if (error.message.includes('authentication') || error.message.includes('unauthorized')) {
+      errorMessage = 'Authentication error. Please refresh the page and try again.';
+    }
+    
+    next(new AppError(errorMessage, 500));
   }
 };
 

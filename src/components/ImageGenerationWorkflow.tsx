@@ -134,25 +134,43 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
         details: []
       };
 
-      const response = await apiService.generateImages(request);
-      
-      if (response.success && response.data) {
-        setGeneratedImages(response.data.images);
-        setSessionId(response.data.session_id);
+      // Add timeout and progress tracking
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
+
+      try {
+        const response = await apiService.generateImages(request);
         
-        // Track usage after successful generation
-        try {
-          await apiService.trackUsage(userId, 'image', response.data.images.length);
-          // Force refresh usage limits to get updated counts immediately
-          await checkLimits(true);
-        } catch (trackingError) {
-          // Don't fail the generation if tracking fails
+        if (response.success && response.data) {
+          setGeneratedImages(response.data.images);
+          setSessionId(response.data.session_id);
+          
+          // Track usage after successful generation (non-blocking for Studio users)
+          try {
+            await apiService.trackUsage(userId, 'image', response.data.images.length);
+            // Force refresh usage limits to get updated counts immediately
+            await checkLimits(true);
+          } catch (trackingError) {
+            // Don't fail the generation if tracking fails - Studio users have unlimited access
+            // Just refresh limits without tracking
+            try {
+              await checkLimits(true);
+            } catch (limitsError) {
+              // Limits check failed, but generation succeeded
+            }
+          }
+        } else {
+          throw new Error(response.error || 'Failed to generate images');
         }
-      } else {
-        throw new Error(response.error || 'Failed to generate images');
+      } finally {
+        clearTimeout(timeoutId);
       }
     } catch (error) {
-      onError(error instanceof Error ? error.message : 'Failed to generate images');
+      if (error instanceof Error && error.name === 'AbortError') {
+        onError('Image generation timed out. Please try again with a simpler prompt.');
+      } else {
+        onError(error instanceof Error ? error.message : 'Failed to generate images');
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -165,6 +183,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
       generateImages();
     }
   }, [prompt, hasStarted, generateImages]);
+
 
   const selectImage = (index: number) => {
     setIsSelectedImageIndex(index);
@@ -218,6 +237,12 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
           // Don't fail the generation if tracking fails
         }
         
+        // Mark the selected image as successfully processed
+        setGeneratedImages(prev => prev.map((img, index) => 
+          index === selectedImageIndex 
+            ? { ...img, processed: true }
+            : img
+        ));
         onComplete(response.data.design_id);
       } else {
         throw new Error(response.error || 'Failed to generate 3D model');
@@ -235,12 +260,21 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
       {/* Loading State */}
       {isGenerating && generatedImages.length === 0 && (
         <div className="text-center py-8">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-[#E70D57]/10 rounded-full border border-[#E70D57]/20">
-            <div className="animate-spin w-5 h-5 border-2 border-[#E70D57] border-t-transparent rounded-full"></div>
+          <div className="flex flex-col items-center">
+            <img
+              src="/GIFS/Loading-State.gif"
+              alt="Generating Images"
+              className="w-24 h-24 object-contain mb-4"
+            />
             <span className="text-[#E70D57] font-medium">Generating Images...</span>
+            <div className="mt-4 text-sm text-gray-600">
+              <p>This may take 1-3 minutes depending on complexity</p>
+              <p className="text-xs text-gray-500 mt-1">Generating 3 variations in parallel...</p>
+            </div>
           </div>
         </div>
       )}
+
 
       {/* Generated Images Grid - Matching Demo Layout */}
       {generatedImages.length > 0 && (
@@ -249,60 +283,72 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
             Select your favorite image
           </h3>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full w-full">
-            {generatedImages.map((image, index) => (
-              <div
-                key={index}
-                className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
-                  selectedImageIndex === index 
-                    ? 'ring-4 ring-[#E70D57] shadow-lg' 
-                    : 'hover:border-gray-300'
-                }`}
-                onClick={() => selectImage(index)}
-                style={{ transitionDelay: `${800 + index * 100}ms` }}
-              >
-                <div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <img 
-                    src={image.url} 
-                    alt={`Generated image ${index + 1}`} 
-                    className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
-                  />
-                  {selectedImageIndex === index && (
-                    <div className="absolute top-2 right-2 w-8 h-8 bg-[#E70D57] rounded-full flex items-center justify-center shadow-lg z-20">
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
+          <div className="grid grid-cols-2 gap-4 h-full w-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            {/* First 3 images in 2x2 grid */}
+            {generatedImages.slice(0, 3).map((image, index) => (
+                <div
+                  key={index}
+                  className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+                    selectedImageIndex === index 
+                      ? 'ring-4 ring-[#E70D57] shadow-lg' 
+                      : 'hover:border-gray-300'
+                  }`}
+                  onClick={() => selectImage(index)}
+                  style={{ transitionDelay: `${800 + index * 100}ms` }}
+                >
+                  <div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <img 
+                      src={image.url} 
+                      alt={`Generated image ${index + 1}`} 
+                      className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10"
+                      onLoad={() => {}}
+                      onError={(e) => console.error(`❌ Image ${index} failed to load:`, e, 'URL:', image.url)}
+                    />
+                    {selectedImageIndex === index && (
+                      <div className="absolute top-2 right-2 w-8 h-8 bg-[#E70D57] rounded-full flex items-center justify-center shadow-lg z-20">
+                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                    {(image as any).processed && (
+                      <div className="absolute top-2 left-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg z-20">
+                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
             ))}
             
-            {/* Plus icon for the 4th slot (if less than 3 images) */}
-            {generatedImages.length < 3 && (
-              <div className="bg-gradient-to-br from-white via-gray-50 to-white border-2 border-dashed border-gray-300 rounded-[40px] transition-all duration-700 delay-1100 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/50 h-[300px] group">
-                <div className="w-full h-full flex items-center justify-center">
-                  <button className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 flex items-center justify-center text-5xl sm:text-6xl transition-all duration-300 hover:from-[#E70D57]/10 hover:to-[#F4900C]/10 hover:text-[#E70D57] hover:scale-110 border-0 outline-none m-0 p-0 leading-none shadow-lg group-hover:shadow-xl">
-                    +
+            {/* 4th grid box - Generate 3D Model Button */}
+            <div className="bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm">
+              <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {selectedImageIndex !== null ? (
+                  <button
+                    onClick={generate3DModel}
+                    disabled={isCreating3D || !canGenerateModels}
+                    className="px-8 py-3 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative z-10"
+                  >
+                    {isCreating3D ? 'Creating 3D Model...' : 'Generate 3D Model'}
                   </button>
-                </div>
+                ) : (
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                    </div>
+                    <p className="text-sm text-gray-500">Select an image to generate 3D model</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Generate 3D Model Button */}
-          {selectedImageIndex !== null && (
-            <div className="text-center">
-              <button
-                onClick={generate3DModel}
-                disabled={isCreating3D || !canGenerateModels}
-                className="px-8 py-3 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isCreating3D ? 'Creating 3D Model...' : 'Generate 3D Model'}
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>

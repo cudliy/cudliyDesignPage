@@ -25,7 +25,11 @@ const AuthCallback = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70A55] mx-auto mb-4"></div>
+        <img
+          src="/GIFS/Loading-State.gif"
+          alt="Authenticating"
+          className="w-24 h-24 object-contain mx-auto mb-4"
+        />
         <h2 className="text-xl font-abril text-gray-900 mb-2">
           {isProcessing ? 'Completing sign in...' : 'Redirecting...'}
         </h2>

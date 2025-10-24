@@ -307,7 +307,11 @@ export default function DownloadPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
+          <img
+            src="/GIFS/Loading-State.gif"
+            alt="Processing"
+            className="w-24 h-24 object-contain mx-auto mb-4"
+          />
           <p className="text-gray-600">Loading your 3D model...</p>
         </div>
       </div>
@@ -400,12 +404,20 @@ export default function DownloadPage() {
           >
             {downloading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <img
+                  src="/GIFS/Loading-State.gif"
+                  alt="Downloading"
+                  className="w-5 h-5 object-contain"
+                />
                 Downloading...
               </>
             ) : isProcessing ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <img
+                  src="/GIFS/Loading-State.gif"
+                  alt="Downloading"
+                  className="w-5 h-5 object-contain"
+                />
                 Processing...
               </>
             ) : (
@@ -441,7 +453,11 @@ export default function DownloadPage() {
                 <Suspense fallback={
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E70D57] mx-auto mb-2"></div>
+                      <img
+                        src="/GIFS/Loading-State.gif"
+                        alt="Loading 3D model"
+                        className="w-16 h-16 object-contain mx-auto mb-2"
+                      />
                       <p className="text-sm text-gray-600">Loading 3D model...</p>
                     </div>
                   </div>

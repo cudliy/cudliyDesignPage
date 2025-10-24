@@ -547,6 +547,41 @@ export const checkUsageLimits = async (req, res, next) => {
     }
 
     if (!subscription) {
+      // Check if user has Studio/Pro plan in User model as fallback
+      const userPlan = user.subscription?.type;
+      const isStudioOrPro = userPlan === 'pro' || userPlan === 'enterprise';
+      
+      if (isStudioOrPro) {
+        logger.info(`User ${userId} has ${userPlan} plan in User model (no active subscription found). Giving unlimited access.`);
+        
+        const studioLimits = {
+          imagesPerMonth: -1, // unlimited
+          modelsPerMonth: -1, // unlimited
+          storageGB: 100,
+          prioritySupport: true,
+          customBranding: true,
+          apiAccess: true
+        };
+
+        return res.json({
+          success: true,
+          data: {
+            plan: userPlan,
+            subscription: null,
+            limits: studioLimits,
+            usage: {
+              imagesGenerated: user.usage.imagesGenerated || 0,
+              modelsGenerated: user.usage.modelsGenerated || 0,
+              storageUsed: 0
+            },
+            remaining: {
+              images: -1, // unlimited
+              models: -1  // unlimited
+            }
+          }
+        });
+      }
+
       // Free tier limits
       const freeLimits = {
         imagesPerMonth: 3,
@@ -585,6 +620,17 @@ export const checkUsageLimits = async (req, res, next) => {
     logger.info(`User ${userId} has ${subscription.plan.type} subscription. Limits: ${JSON.stringify(limits)}, Usage: ${JSON.stringify(usage)}`);
     logger.info(`User subscription in User model: ${JSON.stringify(user.subscription)}`);
 
+    // Special handling for Studio/Pro plans - give unlimited access
+    const isStudioOrPro = subscription.plan.type === 'pro' || subscription.plan.type === 'enterprise';
+    const effectiveLimits = isStudioOrPro ? {
+      imagesPerMonth: -1, // unlimited
+      modelsPerMonth: -1, // unlimited
+      storageGB: limits.storageGB,
+      prioritySupport: true,
+      customBranding: true,
+      apiAccess: true
+    } : limits;
+
     res.json({
       success: true,
       data: {
@@ -595,11 +641,11 @@ export const checkUsageLimits = async (req, res, next) => {
           currentPeriodEnd: subscription.billing.currentPeriodEnd,
           planName: subscription.plan.name
         },
-        limits,
+        limits: effectiveLimits,
         usage,
         remaining: {
-          images: limits.imagesPerMonth === -1 ? -1 : Math.max(0, limits.imagesPerMonth - usage.imagesGenerated),
-          models: limits.modelsPerMonth === -1 ? -1 : Math.max(0, limits.modelsPerMonth - usage.modelsGenerated)
+          images: effectiveLimits.imagesPerMonth === -1 ? -1 : Math.max(0, effectiveLimits.imagesPerMonth - usage.imagesGenerated),
+          models: effectiveLimits.modelsPerMonth === -1 ? -1 : Math.max(0, effectiveLimits.modelsPerMonth - usage.modelsGenerated)
         }
       }
     });

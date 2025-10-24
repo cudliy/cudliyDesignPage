@@ -278,7 +278,11 @@ export default function DesignView() {
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="w-full h-full bg-gray-200 rounded-lg animate-pulse flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
+              <img
+                src="/GIFS/Loading-State.gif"
+                alt="Loading 3D model"
+                className="w-24 h-24 object-contain mx-auto mb-4"
+              />
               <p className="text-gray-600">Loading your 3D model...</p>
             </div>
           </div>
@@ -567,7 +571,11 @@ export default function DesignView() {
                   className="px-6 py-3 bg-[#E70D57] hover:bg-[#d10c50] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-full transition-colors flex items-center gap-2"
                 >
                   {regenerating && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <img
+                      src="/GIFS/Loading-State.gif"
+                      alt="Loading"
+                      className="w-4 h-4 object-contain"
+                    />
                   )}
                   {regenerating ? 'Generating 3D Model...' : 'Generate New 3D Model'}
                 </button>
