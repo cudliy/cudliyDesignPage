@@ -353,9 +353,9 @@ export default function DesignView() {
   return (
     <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
       {/* Left Pane */}
-      <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] rounded-[40px] relative overflow-hidden shadow-2xl border border-white/5">
+      <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden shadow-2xl border border-white/5">
         <button 
-          onClick={() => navigate(`/design/${designId}`)}
+          onClick={() => navigate(-1)}
           className="absolute top-4 right-4 sm:top-6 sm:right-6 px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg z-10"
         >
           Back
@@ -623,76 +623,6 @@ export default function DesignView() {
         </div>
       </div>
 
-      {/* Right Panel - Options */}
-      <div className="w-80 bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1f1f1f] rounded-[40px] p-6 flex flex-col shadow-2xl flex-shrink-0 border border-white/5">
-
-        {/* Design Info */}
-        <div className="mb-8 text-right">
-          <h3 className="text-white/70 text-sm font-medium mb-1">
-            Design Ready
-          </h3>
-          <div>
-            <p className="text-2xl font-bold text-white">
-              3D Model
-            </p>
-            <div className="text-xs text-white/60 mt-1">
-              <div>High Quality</div>
-              <div>Download Available</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Menu Items */}
-        <div className="space-y-2 flex-1">
-          <button 
-            onClick={handleDownload}
-            disabled={!getValidModelUrl()}
-            className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left disabled:opacity-50 disabled:cursor-not-allowed border border-white/5 hover:border-white/10 backdrop-blur-sm"
-          >
-            <Download className="w-5 h-5" />
-            <span className="font-medium">Download Model</span>
-          </button>
-
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-            </svg>
-            <span className="font-medium">Creator's Zone</span>
-          </button>
-
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-            </svg>
-            <span className="font-medium">View Setting</span>
-          </button>
-
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
-            </svg>
-            <span className="font-medium">Design Tips</span>
-          </button>
-
-          <button className="w-full flex items-center gap-4 p-4 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 text-left border border-white/5 hover:border-white/10 backdrop-blur-sm">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.5 7h-17C2.67 7 2 7.67 2 8.5v7C2 16.33 2.67 17 3.5 17h17c.83 0 1.5-.67 1.5-1.5v-7C22 7.67 21.33 7 20.5 7zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
-            </svg>
-            <span className="font-medium">AR/VR</span>
-          </button>
-        </div>
-
-        {/* Brand - Vertical Text */}
-        <div className="text-right mt-auto pt-8">
-          <div className="flex justify-end">
-            <div className="transform rotate-90 origin-bottom-right">
-              <span className="text-white/90 text-lg font-light tracking-wider">
-                Cudliy.
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <style>{`
         .slider {

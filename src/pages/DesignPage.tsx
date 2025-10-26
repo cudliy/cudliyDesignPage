@@ -757,7 +757,7 @@ export default function DesignPage() {
 				keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
 				url="/design"
 			/>
-			<div className="w-full h-screen bg-white flex p-2 sm:p-4">
+			<div className="w-screen h-screen bg-white flex p-2 sm:p-4 fixed inset-0 overflow-hidden">
 			{/* Left Sidebar */}
 			<aside className={`h-screen bg-[#313131] border border-white/5 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
@@ -972,10 +972,10 @@ export default function DesignPage() {
 			</aside>
 
 			{/* Main Content Area */}
-			<div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4 border border-gray-200/50"
+			<div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4 border border-gray-200/50 overflow-hidden"
 				 style={{ borderRadius: 'clamp(20px, 4vw, 40px)' }}>
 				{/* Content - Scrollable */}
-				<div className="flex-1 px-4 sm:px-6 lg:px-8 pb-2 sm:pb-2 lg:pb-4 overflow-y-auto">
+				<div className="flex-1 px-4 sm:px-6 lg:px-8 pb-2 sm:pb-2 lg:pb-4 overflow-y-auto overflow-x-hidden">
 					{showWorkflow ? (
 						<>
 						{/* Cancel Button - Top Right */}
@@ -1319,7 +1319,15 @@ export default function DesignPage() {
 			)}
 			
 			<style>{`
-				/* Hide scrollbars */
+				/* Prevent page scrolling and hide scrollbars */
+				html, body {
+					overflow: hidden;
+					height: 100vh;
+					width: 100vw;
+					margin: 0;
+					padding: 0;
+				}
+				
 				* {
 					scrollbar-width: none; /* Firefox */
 					-ms-overflow-style: none; /* Internet Explorer 10+ */
