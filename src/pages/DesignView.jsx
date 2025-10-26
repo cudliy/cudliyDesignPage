@@ -353,7 +353,11 @@ export default function DesignView() {
   return (
     <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
       {/* Left Pane */}
-      <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden shadow-2xl border border-white/5">
+      <aside className="flex-shrink-0 h-screen bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
+             style={{
+               width: 'clamp(310px, 27vw, 450px)',
+               borderRadius: 'clamp(20px, 4vw, 40px)',
+             }}>
         <button 
           onClick={() => navigate(-1)}
           className="absolute top-4 right-4 sm:top-6 sm:right-6 px-4 py-2 text-sm text-white/80 hover:text-white transition-all duration-300 cursor-pointer bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg z-10"
