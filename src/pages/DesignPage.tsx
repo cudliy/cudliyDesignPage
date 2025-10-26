@@ -995,10 +995,10 @@ export default function DesignPage() {
 						{!showWorkflow && (
 							<div className="grid grid-cols-2 gap-4 w-full min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 							{/* Camera 1 - Top Left - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
+								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
 									<img 
 										src="/GIFS/Loading-State.gif" 
 										alt="Loading" 
@@ -1010,10 +1010,10 @@ export default function DesignPage() {
 							</div>
 
 							{/* Camera 2 - Top Right - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
+								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
 									<img 
 										src="/GIFS/Loading-State.gif" 
 										alt="Loading" 
@@ -1025,10 +1025,10 @@ export default function DesignPage() {
 							</div>
 
 							{/* Camera 3 - Bottom Left - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
+								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
 									<img 
 										src="/GIFS/Loading-State.gif" 
 										alt="Loading" 
@@ -1040,15 +1040,14 @@ export default function DesignPage() {
 							</div>
 
 							{/* Generate 3D Model - Bottom Right - Keep Button in Same Position */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
-									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
 									<button
 										onClick={handleReset}
 										disabled={true}
-										className={`px-8 py-3 font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl text-lg relative z-10 ${
+										className={`px-8 py-3 font-medium rounded-full transition-all duration-300 shadow-lg text-lg ${
 											'bg-gray-400 text-gray-200 cursor-not-allowed'
 										}`}
 									>
@@ -1139,64 +1138,55 @@ export default function DesignPage() {
 						/* Default Grid Display */
 						<div className="grid grid-cols-2 gap-4 w-full min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 							{/* Camera 1 - Top Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
-								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
-									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative">
 									<img 
 										src="/camera1.png" 
 										alt="Toy camera design 1" 
-										className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
+										className="w-full h-full object-contain rounded-[20px]" 
 									/>
 								</div>
 							</div>
 
 							{/* Camera 2 - Top Right */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
-								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
-									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative">
 									<img 
 										src="/camera2.png" 
 										alt="Toy camera design 2" 
-										className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
+										className="w-full h-full object-contain rounded-[20px]" 
 									/>
 								</div>
 							</div>
 
 							{/* Camera 3 - Bottom Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
-								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
-									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative">
 									<img 
 										src="/camera3.png" 
 										alt="Toy camera design 3" 
-										className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10" 
+										className="w-full h-full object-contain rounded-[20px]" 
 									/>
 								</div>
 							</div>
 
-							{/* Generate 3D Model - Bottom Right */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
+							{/* Empty space - Bottom Right - No hover effects */}
+							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
-									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-									<button
-										onClick={handleCreateClick}
-										disabled={!canGenerateImages}
-										className={`px-8 py-3 font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl text-lg relative z-10 ${
-											!canGenerateImages
-												? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-												: 'bg-gradient-to-r from-[#E70D57] to-[#F4900C] text-white'
-										}`}
-									>
-										Generate 3D Model
-									</button>
+								<div className="w-full h-full flex items-center justify-center p-6 text-center">
+									<div className="text-gray-400">
+										<svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+										</svg>
+										<p className="text-sm">Generate your design</p>
+									</div>
 								</div>
 							</div>
 						</div>

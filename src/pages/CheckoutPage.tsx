@@ -39,15 +39,26 @@ export default function CheckoutPage() {
   const resolveUrl = (url?: string | null) => {
     if (!url || typeof url !== 'string') return null;
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+    
     // Treat absolute-path URLs as coming from the API server
-    const api = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
+    const apiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001/api';
+    
     try {
-      const base = new URL(api);
+      // Ensure the API URL is valid
+      const base = new URL(apiUrl);
       // if api ends with /api, go to root origin
       const origin = `${base.protocol}//${base.hostname}${base.port ? ':' + base.port : ''}`;
       return url.startsWith('/') ? origin + url : origin + '/' + url;
-    } catch {
-      return url;
+    } catch (error) {
+      console.warn('Failed to resolve URL:', url, 'with API URL:', apiUrl, 'Error:', error);
+      // Fallback: try to construct a basic URL
+      try {
+        const fallbackOrigin = 'http://localhost:3001';
+        return url.startsWith('/') ? fallbackOrigin + url : fallbackOrigin + '/' + url;
+      } catch {
+        // Last resort: return the original URL if it looks like it might work
+        return url.startsWith('/') ? url : '/' + url;
+      }
     }
   };
 

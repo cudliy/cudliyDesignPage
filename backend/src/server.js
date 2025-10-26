@@ -155,8 +155,8 @@ app.options('*', (req, res) => {
 
 // Set default values for missing environment variables
 if (!process.env.FRONTEND_URL) {
-  process.env.FRONTEND_URL = 'http:localhost:5173';
-  logger.warn('FRONTEND_URL not set, using default: http:localhost:5173');
+  process.env.FRONTEND_URL = 'http://localhost:5173';
+  logger.warn('FRONTEND_URL not set, using default: http://localhost:5173');
 }
 
 // Validate critical environment variables

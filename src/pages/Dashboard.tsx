@@ -319,7 +319,7 @@ export default function Dashboard() {
           </div>
 
           {/* Navigation Container - Scrollable content */}
-			<div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-4 sm:pb-12">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-4 sm:pb-12">
             <div className="space-y-2 sm:space-y-2" style={{ marginLeft: 'clamp(60px, 12vw, 144px)' }}>
               {/* Explore Section */}
               <div>
@@ -330,7 +330,7 @@ export default function Dashboard() {
                       key={index}
                       onClick={() => setCurrentView(item.key)}
                       className={`w-[226px] h-[34px] flex items-center gap-2 sm:gap-2 p-1 sm:p-2 text-white hover:text-white hover:bg-white/5 rounded-[30px] transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
-                        currentView === item.key ? 'bg-[#FF9CB5] text-white shadow-lg mx-auto' : ''
+                        currentView === item.key ? 'bg-white/5 text-white shadow-lg mx-auto' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -349,7 +349,7 @@ export default function Dashboard() {
                       key={index}
                       onClick={() => setCurrentView(item.key)}
                       className={`w-[226px] h-[34px] flex items-center gap-2 sm:gap-2 p-1 sm:p-2 text-white hover:text-white hover:bg-white/5 rounded-[30px] transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
-                        currentView === item.key ? 'bg-[#FF9CB5] text-white shadow-lg mx-auto' : ''
+                        currentView === item.key ? 'bg-white/5 text-white shadow-lg mx-auto' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -374,7 +374,7 @@ export default function Dashboard() {
                         }
                       }}
                       className={`w-[226px] h-[34px] flex items-center gap-2 sm:gap-2 p-1 sm:p-2 text-white hover:text-white hover:bg-white/5 rounded-[30px] transition-all text-left border border-transparent hover:border-white/10 backdrop-blur-sm ${
-                        currentView === item.key ? 'bg-[#FF9CB5] text-white shadow-lg mx-auto' : ''
+                        currentView === item.key ? 'bg-white/5 text-white shadow-lg mx-auto' : ''
                       }`}
                     >
                       <span className="text-sm sm:text-lg opacity-70">{item.icon}</span>
@@ -459,8 +459,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Content - No Scrollbar */}
-			<div className="flex-1 overflow-hidden px-4 sm:px-6 lg:px-8 pb-2 sm:pb-2 lg:pb-4 main-content">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-2 sm:pb-2 lg:pb-4">
           <div className="flex items-center justify-between mb-2 sm:mb-2 lg:mb-4">
             <h2 className="font-['Georgia'] text-[16px] font-abril font-normal text-black" 
                 style={{ fontSize: 'clamp(10px, 3.5vw, 37px)' }}>
@@ -480,7 +480,7 @@ export default function Dashboard() {
               <input
                 type="text"
                 placeholder="Search"
-                className="w-[307px] h-[39px] max-w-md sm:max-w-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#E91E63] focus:border-transparent bg-white shadow-sm text-sm sm:text-base lg:text-lg"
+                className="w-[310px] h-[39px] max-w-md sm:max-w-lg px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 border border-gray-200 rounded-full focus:outline-white/5 focus:ring-2 focus:ring-black/8 focus:border-transparent bg-white shadow-sm text-sm sm:text-base lg:text-lg"
               />
             </div>
             <div className="flex gap-2">
@@ -491,11 +491,7 @@ export default function Dashboard() {
                 title="Refresh designs"
               >
                 {refreshing ? (
-                  <img
-                    src="/GIFS/Loading-State.gif"
-                    alt="Loading"
-                    className="w-4 h-4 object-contain"
-                  />
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 ) : (
                   <svg className="w-4 h-4" fill="none" stroke="black" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -508,11 +504,7 @@ export default function Dashboard() {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <img
-                  src="/GIFS/Loading-State.gif"
-                  alt="Loading designs"
-                  className="w-24 h-24 object-contain mx-auto mb-4"
-                />
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E70D57] mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading your designs...</p>
               </div>
             </div>
@@ -597,7 +589,7 @@ export default function Dashboard() {
                   onClick={() => handleDesignClick(design.id)}
                   className={`bg-gradient-to-br from-white via-gray-50 to-white border-2 ${getBorderColor(design)} rounded-2xl p-3 sm:p-4 lg:p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 backdrop-blur-sm ${
                     isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-                  } relative group cursor-pointer hover:border-[#E91E63]/50`}
+                  } relative group cursor-pointer hover:border-black`}
                   style={{ transitionDelay: `${index * 150}ms` }}
                 >
                   <div className="flex justify-end mb-2 sm:mb-3 lg:mb-4">
@@ -616,7 +608,7 @@ export default function Dashboard() {
 
                   <div className="flex justify-center mb-3 sm:mb-4 lg:mb-6">
                     <div className="w-20 h-16 sm:w-16 lg:w-20 xl:w-24 h-12 sm:h-16 lg:h-20 xl:h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-inner relative group-hover:shadow-lg transition-shadow duration-300">
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#E91E63]/5 to-[#d81b60]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <img
                         src={getDesignImage(design)}
                         alt={getDesignTitle(design)}
@@ -627,7 +619,7 @@ export default function Dashboard() {
 
                   <div className="text-center">
                     <h3 
-                      className="font-semibold text-black mb-1 sm:mb-2 cursor-pointer hover:text-[#E91E63] transition-colors" 
+                      className="font-semibold text-black mb-1 sm:mb-2 cursor-pointer hover:text-black transition-colors" 
                       style={{ fontSize: 'clamp(14px, 2.5vw, 20px)' }}
                       onClick={(e) => toggleDesignExpansion(design.id, e)}
                     >
@@ -668,29 +660,6 @@ export default function Dashboard() {
         </div>
       </div>
       </div>
-      
-      <style>{`
-        /* Hide scrollbars */
-        * {
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* Internet Explorer 10+ */
-        }
-        
-        *::-webkit-scrollbar {
-          display: none; /* WebKit */
-        }
-        
-        /* Specifically hide scrollbar for main content area */
-        .main-content {
-          overflow-y: auto;
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* Internet Explorer 10+ */
-        }
-        
-        .main-content::-webkit-scrollbar {
-          display: none; /* WebKit */
-        }
-      `}</style>
     </>
   );
 }

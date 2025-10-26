@@ -71,6 +71,9 @@ export const createStripeCheckout = async (req, res, next) => {
       // Create mock checkout session
       const mockSessionId = `cs_test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
+      // Get frontend URL for mock checkout
+      const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://www.cudliy.com' : 'http://localhost:5173');
+      
       // Save checkout session to database
       const checkout = new Checkout({
         userId,
@@ -205,22 +208,32 @@ export const createStripeCheckout = async (req, res, next) => {
     ];
 
     // Create Stripe Checkout Session
-    const frontendUrl = process.env.FRONTEND_URL || 'https://www.cudliy.com';
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://www.cudliy.com' : 'http://localhost:5173');
+    const successUrl = `${frontendUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${frontendUrl}/checkout/${designId}?cancelled=true`;
+    
+    logger.info(`Creating Stripe checkout session with URLs:`, {
+      frontendUrl,
+      successUrl,
+      cancelUrl,
+      designId
+    });
+    
     let session;
     try {
-      session = await stripeService.createCheckoutSession(
+      session = await stripeService.createCheckoutSession({
         lineItems,
-        customer.id,
-        `${frontendUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-        `${frontendUrl}/checkout/${designId}?cancelled=true`,
-        {
+        customerId: customer.id,
+        successUrl,
+        cancelUrl,
+        metadata: {
           userId,
           designId,
           quantity: quantity.toString(),
           size,
           inch: String(inch)
         }
-      );
+      });
     } catch (error) {
       logger.error('Stripe checkout session creation failed:', error);
       if (error.message.includes('Stripe is not configured')) {

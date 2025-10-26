@@ -230,6 +230,19 @@ class StripeService {
         const cancelUrl = arguments[3] || options.cancelUrl;
         const metadata = arguments[4] || options.metadata || {};
         
+        // Validate URLs before creating session
+        if (!successUrl || !cancelUrl) {
+          throw new Error('Not a valid URL - success and cancel URLs are required');
+        }
+        
+        // Basic URL validation
+        try {
+          new URL(successUrl);
+          new URL(cancelUrl);
+        } catch (urlError) {
+          throw new Error(`Not a valid URL - ${urlError.message}`);
+        }
+        
         sessionConfig = {
           customer: customerId,
           payment_method_types: ['card'],
