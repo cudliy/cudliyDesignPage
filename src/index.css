@@ -118,3 +118,21 @@ body::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
 
+/* Override any focus outlines globally */
+input:focus,
+textarea:focus,
+select:focus,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure no focus rings anywhere */
+*:focus,
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+

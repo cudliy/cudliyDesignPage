@@ -9,7 +9,8 @@ import { toast } from "@/lib/sonner";
 const SignUp = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -27,20 +28,48 @@ const SignUp = () => {
   }, []);
 
   const steps = [
-    { field: "name", placeholder: "Username" },
-    { field: "email", placeholder: "Email Address" },
+    { 
+      fields: ["firstName", "lastName", "email"], 
+      placeholders: ["First Name", "Last Name", "Email Address"] 
+    },
     { field: "password", placeholder: "Password" },
     { field: "confirmPassword", placeholder: "Confirm Password" }
   ];
 
-  const handleInputChange = (value: string) => {
+  const handleInputChange = (value: string, field?: string) => {
+    const targetField = field || (steps[currentStep].field as string);
     setFormData(prev => ({
       ...prev,
-      [steps[currentStep].field]: value
+      [targetField]: value
     }));
   };
 
   const handleNext = async () => {
+    // Validate current step
+    if (currentStep === 0) {
+      // First step: validate firstName, lastName, and email
+      if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
+        toast.error("Please fill in all fields");
+        return;
+      }
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
+    } else if (currentStep === 1) {
+      // Password step
+      if (!formData.password.trim()) {
+        toast.error("Please enter a password");
+        return;
+      }
+      if (formData.password.length < 6) {
+        toast.error("Password must be at least 6 characters long");
+        return;
+      }
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -63,13 +92,15 @@ const SignUp = () => {
 
     setIsLoading(true);
     try {
-      const resp: any = await apiService.signup(formData.email, formData.password, formData.name);
+      const resp: any = await apiService.signup(formData.email, formData.password, formData.firstName, formData.lastName);
       if (resp && resp.error) throw new Error(resp.error || resp.message || 'Signup failed');
       // Store user data in sessionStorage for immediate access
       if (resp.data?.user) {
         const user = resp.data.user;
         if (user.id) sessionStorage.setItem('user_id', user.id);
-        if (user.name) sessionStorage.setItem('user_name', user.name);
+        if (user.profile?.firstName) sessionStorage.setItem('user_firstName', user.profile.firstName);
+        if (user.profile?.lastName) sessionStorage.setItem('user_lastName', user.profile.lastName);
+        if (user.username) sessionStorage.setItem('user_name', user.username);
         if (resp.token) sessionStorage.setItem('token', resp.token);
       }
       
@@ -134,7 +165,19 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl border border-gray-200">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-3 border-gray-300 border-t-black"></div>
+              <p className="text-gray-700 font-medium">Creating your account...</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Left Section - Sign Up Form */}
       <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-8 py-12">
         <div className={`w-full max-w-lg transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
@@ -142,11 +185,10 @@ const SignUp = () => {
             {/* Logo */}
             <div className="mb-4 flex justify-center">
               <img
-                src="/Asset 12 1 (1).png"
+                src="/CudliyLogo.svg"
                 alt="Cudliy Logo"
+                className="w-8 h-8 object-contain"
                 style={{
-                  width: '28.999998092651392px',
-                  height: '25.000001907348654px',
                   opacity: 1
                 }}
               />
@@ -177,21 +219,46 @@ const SignUp = () => {
               >
                 {steps.map((step, index) => (
                   <div key={index} className="w-full flex-shrink-0">
-                    <Input
-                      type={step.field === "password" || step.field === "confirmPassword" ? "password" : (step.field === 'email' ? 'email' : 'text')}
-                      placeholder={step.placeholder}
-                      value={formData[step.field as keyof typeof formData] as string}
-                      onChange={(e) => handleInputChange(e.target.value)}
-                      className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E70A55] focus:border-transparent"
-                      style={{
-                        width: '508px',
-                        height: '50px',
-                        borderRadius: '25px',
-                        borderWidth: '0.5px',
-                        padding: '12px 16px'
-                      }}
-                      required
-                    />
+                    {step.fields ? (
+                      // First step with multiple fields
+                      <div className="space-y-4">
+                        {step.fields.map((field, fieldIndex) => (
+                          <Input
+                            key={fieldIndex}
+                            type={field === 'email' ? 'email' : 'text'}
+                            placeholder={step.placeholders[fieldIndex]}
+                            value={formData[field as keyof typeof formData] as string}
+                            onChange={(e) => handleInputChange(e.target.value, field)}
+                            className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+                            style={{
+                              width: '508px',
+                              height: '50px',
+                              borderRadius: '25px',
+                              borderWidth: '0.5px',
+                              padding: '12px 16px'
+                            }}
+                            required
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      // Single field steps
+                      <Input
+                        type={step.field === "password" || step.field === "confirmPassword" ? "password" : "text"}
+                        placeholder={step.placeholder}
+                        value={formData[step.field as keyof typeof formData] as string}
+                        onChange={(e) => handleInputChange(e.target.value)}
+                        className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+                        style={{
+                          width: '508px',
+                          height: '50px',
+                          borderRadius: '25px',
+                          borderWidth: '0.5px',
+                          padding: '12px 16px'
+                        }}
+                        required
+                      />
+                    )}
                   </div>
                 ))}
               </div>
@@ -245,12 +312,8 @@ const SignUp = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <img
-                      src="/GIFS/Loading-State.gif"
-                      alt="Signing up"
-                      className="w-4 h-4 object-contain"
-                    />
-                    <span>Creating account</span>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <span>Creating account...</span>
                   </div>
                 ) : (
                   getButtonText()

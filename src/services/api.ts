@@ -341,10 +341,10 @@ class ApiService {
   }
 
   // Auth
-  async signup(email: string, password: string, name?: string): Promise<ApiResponse<{ user: any }>> {
+  async signup(email: string, password: string, firstName?: string, lastName?: string): Promise<ApiResponse<{ user: any }>> {
     return this.request('/auth/signup', {
       method: 'POST',
-      body: JSON.stringify({ email, password, name })
+      body: JSON.stringify({ email, password, firstName, lastName })
     });
   }
 

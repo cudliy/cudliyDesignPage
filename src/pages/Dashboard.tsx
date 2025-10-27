@@ -26,7 +26,21 @@ export default function Dashboard() {
   });
 
   const userName = useMemo(() => sessionStorage.getItem('user_name') || '', []);
+  const userFirstName = useMemo(() => sessionStorage.getItem('user_firstName') || '', []);
+  const userLastName = useMemo(() => sessionStorage.getItem('user_lastName') || '', []);
+  const displayName = useMemo(() => {
+    // Use firstName and lastName if available, otherwise fall back to username
+    if (userFirstName && userLastName) {
+      return `${userFirstName} ${userLastName}`;
+    }
+    return userName;
+  }, [userFirstName, userLastName, userName]);
   const userInitials = useMemo(() => {
+    // Use firstName and lastName if available, otherwise fall back to username/email
+    if (userFirstName && userLastName) {
+      return (userFirstName[0] + userLastName[0]).toUpperCase();
+    }
+    
     const source = userName || userId || '';
     if (!source) return 'GU';
     let namePart = source;
@@ -36,7 +50,7 @@ export default function Dashboard() {
     const first = parts[0]?.[0] || '';
     const last = (parts.length > 1 ? parts[parts.length - 1] : parts[0])?.[0] || '';
     return (first + last).toUpperCase();
-  }, [userName, userId]);
+  }, [userFirstName, userLastName, userName, userId]);
 
   // Usage limits and subscription status
   const { 
@@ -315,7 +329,7 @@ export default function Dashboard() {
           <div className="px-4 sm:px-6 flex gap-4 lg:px-8 pt-6 sm:pt-8 lg:pt-12 pb-4 sm:pb-6">
            <img src='/Asset 13.svg'
            className='w-[30px] h-[40px]'
-           /> <span className='text-white font-abril mt-[10px] '>{userName}'s Workspace</span>
+           /> <span className='text-white font-abril mt-[10px] '>{displayName}'s Workspace</span>
           </div>
 
           {/* Navigation Container - Scrollable content */}

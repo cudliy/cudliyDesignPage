@@ -45,6 +45,13 @@ const SignIn = () => {
       if (userName) {
         sessionStorage.setItem('user_name', userName);
       }
+      // Store firstName and lastName if available
+      if (userObj?.profile?.firstName) {
+        sessionStorage.setItem('user_firstName', userObj.profile.firstName);
+      }
+      if (userObj?.profile?.lastName) {
+        sessionStorage.setItem('user_lastName', userObj.profile.lastName);
+      }
       toast.success("Welcome back! Signed in successfully.");
       navigate("/dashboard");
     } catch (error: any) {
@@ -101,8 +108,20 @@ const SignIn = () => {
     }
   };
 
-    return (
-    <div className="min-h-screen flex">
+  return (
+    <div className="min-h-screen flex relative">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl border border-gray-200">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-3 border-gray-300 border-t-black"></div>
+              <p className="text-gray-700 font-medium">Signing you in...</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Left Section - Sign In Form */}
       <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-8 py-12">
         <div className={`w-full max-w-lg transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
@@ -112,9 +131,8 @@ const SignIn = () => {
               <img
                 src="/CudliyLogo.svg"
                 alt="Cudliy Logo"
+                className="w-6 h-6 object-contain"
                 style={{
-                  width: '28.999998092651392px',
-                  height: '25.000001907348654px',
                   opacity: 1
                 }}
               />
@@ -131,7 +149,7 @@ const SignIn = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E70A55] focus:border-transparent"
+                className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
                 style={{
                   width: '508px',
                   height: '50px',
@@ -147,7 +165,7 @@ const SignIn = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E70A55] focus:border-transparent"
+                className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
                 style={{
                   width: '508px',
                   height: '50px',
@@ -182,12 +200,8 @@ const SignIn = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <img
-                      src="/GIFS/Loading-State.gif"
-                      alt="Signing in"
-                      className="w-4 h-4 object-contain"
-                    />
-                    <span>Signing in</span>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <span>Signing in...</span>
                   </div>
                 ) : (
                   "Continue"
