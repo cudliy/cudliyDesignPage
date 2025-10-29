@@ -355,7 +355,7 @@ export default function DesignView() {
       {/* Left Pane */}
       <aside className="left-pane-scale flex-shrink-0 h-screen bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
              style={{
-               width: 'clamp(400px, 27vw, 500px)',
+               width: 'clamp(320px, 24vw, 440px)',
                borderRadius: 'clamp(20px, 4vw, 40px)',
              }}>
         

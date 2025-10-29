@@ -818,7 +818,7 @@ const handleBackToCategories = () => {
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
 			} transition-all duration-500 relative flex-shrink-0 overflow-hidden`}
 			style={{
-				width: 'clamp(330px, 28vw, 420px)',
+				width: 'clamp(300px, 24vw, 380px)',
 				borderRadius: 'clamp(24px, 3vw, 32px)',
 			}}>
 				{/* Workspace Dropdown */}

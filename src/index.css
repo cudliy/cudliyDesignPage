@@ -155,21 +155,28 @@ select:focus-visible {
   .left-pane-scale { --left-pane-scale: 1.4; }
 }
 
+/* Scale left pane more aggressively on wider but not-so-tall screens */
+@media (min-width: 1500px) and (min-height: 650px) {
+  .left-pane-scale { --left-pane-scale: 1.27; }
+}
+
 /* Responsive scaling for DesignPage tour video */
+
 .design-tour-video {
-  transform: scale(0.9); /* Default: 1300px and below */
+  transform: scale(0.85); /* Default: 1300px and below */
   transform-origin: center;
+  max-width: 100%;
 }
 
 @media (min-width: 1400px) {
   .design-tour-video {
-    transform: scale(0.8); /* At 1400px */
+    transform: scale(0.75); /* At 1400px */
   }
 }
 
 @media (min-width: 1500px) {
   .design-tour-video {
-    transform: scale(0.9); /* At 1500px and above */
+    transform: scale(0.85); /* At 1500px and above */
   }
 }
 
