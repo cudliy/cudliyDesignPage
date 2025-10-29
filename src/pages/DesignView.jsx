@@ -353,14 +353,14 @@ export default function DesignView() {
   return (
     <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
       {/* Left Pane */}
-      <aside className="flex-shrink-0 h-screen bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
+      <aside className="left-pane-scale flex-shrink-0 h-screen bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
              style={{
                width: 'clamp(400px, 27vw, 500px)',
                borderRadius: 'clamp(20px, 4vw, 40px)',
              }}>
         
         {/* Brand and title area */}
-        <div className="pt-[2.5rem] sm:pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
+        <div className="left-pane-content pt-[2.5rem] sm:pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
           {/* Mode selector */}
           <div className="mb-3 flex items-center px-1 gap-2 w-full max-w-[222px] mt-6 h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-lg">
             <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
@@ -527,6 +527,7 @@ export default function DesignView() {
             </div>
           ) : (
             <div className="text-center">
+              
               <div className="w-16 h-16 bg-red-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />

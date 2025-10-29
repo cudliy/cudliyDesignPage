@@ -187,3 +187,12 @@ select:focus-visible {
   }
 }
 
+/* Hide scrollbars inside left pane content across browsers */
+.left-pane-content {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge Legacy */
+}
+.left-pane-content::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
