@@ -5,6 +5,7 @@ import ProductionSelector from "../components/ProductionSelector";
 import StyleSelector from "../components/StyleSelector";
 import MaterialSelector from "../components/MaterialSelector";
 import DetailSelector from "../components/DetailSelector";
+import ModelDropdown from "../components/modelDropdown";
 import { usePropertiesAggregator } from "../hooks/usePropertiesAggregator";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import SEO from "@/components/SEO";
@@ -123,9 +124,13 @@ export default function DesignPage() {
 		setSelectedCategory(categoryKey);
 	};
 
-	const handleBackToCategories = () => {
-		setSelectedCategory(null);
-	};
+const handleBackToCategories = () => {
+    console.log('Back button clicked - current selectedCategory:', selectedCategory);
+    // Always return to Advanced section with no subcategory selected
+    if (!isAdvanced) setIsAdvanced(true);
+    setSelectedCategory(null);
+    console.log('Back button clicked - set selectedCategory to null');
+};
 
 
 	const handleSizeChange = (size: string) => {
@@ -197,6 +202,10 @@ export default function DesignPage() {
 	const handleWorkflowError = (errorMessage: string) => {
 		setError(errorMessage);
 		setShowWorkflow(false);
+	};
+
+	const handleQualityChange = (quality: string) => {
+		setSelectedQuality(quality);
 	};
 
  const 	WorkspaceDropdown = ()=>{
@@ -279,25 +288,25 @@ export default function DesignPage() {
 
 	// SVG Icon Components
 	const ColorIcon = () => (
-		<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white group-hover:text-[#FA7072] transition-colors duration-300">
+		<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white group-hover:text-[#FA7072] transition-colors duration-300">
 			<path d="M4.16667 33.3333C3.02084 33.3333 2.04028 32.9257 1.225 32.1104C0.409725 31.2952 0.00139242 30.3139 3.53108e-06 29.1667C-0.00138536 28.0195 0.406948 27.0389 1.225 26.225C2.04306 25.4111 3.02361 25.0028 4.16667 25C5.30973 24.9972 6.29098 25.4056 7.11042 26.225C7.92987 27.0445 8.3375 28.025 8.33334 29.1667C8.32917 30.3083 7.92153 31.2896 7.11042 32.1104C6.29931 32.9313 5.31806 33.3389 4.16667 33.3333ZM20.8333 33.3333C19.6875 33.3333 18.707 32.9257 17.8917 32.1104C17.0764 31.2952 16.6681 30.3139 16.6667 29.1667C16.6653 28.0195 17.0736 27.0389 17.8917 26.225C18.7097 25.4111 19.6903 25.0028 20.8333 25C21.9764 24.9972 22.9576 25.4056 23.7771 26.225C24.5965 27.0445 25.0042 28.025 25 29.1667C24.9958 30.3083 24.5882 31.2896 23.7771 32.1104C22.966 32.9313 21.9847 33.3389 20.8333 33.3333ZM12.5 25C11.3542 25 10.3736 24.5924 9.55834 23.7771C8.74306 22.9618 8.33473 21.9806 8.33334 20.8333C8.33195 19.6861 8.74028 18.7056 9.55834 17.8917C10.3764 17.0778 11.3569 16.6695 12.5 16.6667C13.6431 16.6639 14.6243 17.0722 15.4438 17.8917C16.2632 18.7111 16.6708 19.6917 16.6667 20.8333C16.6625 21.975 16.2549 22.9563 15.4438 23.7771C14.6326 24.5979 13.6514 25.0056 12.5 25ZM29.1667 25C28.0208 25 27.0403 24.5924 26.225 23.7771C25.4097 22.9618 25.0014 21.9806 25 20.8333C24.9986 19.6861 25.4069 18.7056 26.225 17.8917C27.0431 17.0778 28.0236 16.6695 29.1667 16.6667C30.3097 16.6639 31.291 17.0722 32.1104 17.8917C32.9299 18.7111 33.3375 19.6917 33.3333 20.8333C33.3292 21.975 32.9215 22.9563 32.1104 23.7771C31.2993 24.5979 30.3181 25.0056 29.1667 25ZM4.16667 16.6667C3.02084 16.6667 2.04028 16.259 1.225 15.4438C0.409725 14.6285 0.00139242 13.6472 3.53108e-06 12.5C-0.00138536 11.3528 0.406948 10.3722 1.225 9.55835C2.04306 8.74446 3.02361 8.33612 4.16667 8.33335C5.30973 8.33057 6.29098 8.7389 7.11042 9.55835C7.92987 10.3778 8.3375 11.3583 8.33334 12.5C8.32917 13.6417 7.92153 14.6229 7.11042 15.4438C6.29931 16.2646 5.31806 16.6722 4.16667 16.6667ZM20.8333 16.6667C19.6875 16.6667 18.707 16.259 17.8917 15.4438C17.0764 14.6285 16.6681 13.6472 16.6667 12.5C16.6653 11.3528 17.0736 10.3722 17.8917 9.55835C18.7097 8.74446 19.6903 8.33612 20.8333 8.33335C21.9764 8.33057 22.9576 8.7389 23.7771 9.55835C24.5965 10.3778 25.0042 11.3583 25 12.5C24.9958 13.6417 24.5882 14.6229 23.7771 15.4438C22.966 16.2646 21.9847 16.6722 20.8333 16.6667ZM12.5 8.33335C11.3542 8.33335 10.3736 7.92571 9.55834 7.11043C8.74306 6.29515 8.33473 5.3139 8.33334 4.16668C8.33195 3.01946 8.74028 2.0389 9.55834 1.22501C10.3764 0.411125 11.3569 0.00279185 12.5 1.40766e-05C13.6431 -0.0027637 14.6243 0.405569 15.4438 1.22501C16.2632 2.04446 16.6708 3.02501 16.6667 4.16668C16.6625 5.30835 16.2549 6.2896 15.4438 7.11043C14.6326 7.93126 13.6514 8.3389 12.5 8.33335ZM29.1667 8.33335C28.0208 8.33335 27.0403 7.92571 26.225 7.11043C25.4097 6.29515 25.0014 5.3139 25 4.16668C24.9986 3.01946 25.4069 2.0389 26.225 1.22501C27.0431 0.411125 28.0236 0.00279185 29.1667 1.40766e-05C30.3097 -0.0027637 31.291 0.405569 32.1104 1.22501C32.9299 2.04446 33.3375 3.02501 33.3333 4.16668C33.3292 5.30835 32.9215 6.2896 32.1104 7.11043C31.2993 7.93126 30.3181 8.3389 29.1667 8.33335Z" fill="currentColor"/>
 		</svg>
 	);
 
 	const MaterialIcon = () => (
-		<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white group-hover:text-[#FA7072] transition-colors duration-300">
+		<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white group-hover:text-[#FA7072] transition-colors duration-300">
 			<path fillRule="evenodd" clipRule="evenodd" d="M33.8 0C34.2774 0 34.7352 0.189643172 35.0728 0.527208C35.4104 0.864774 35.6 1.32261 35.6 1.8V17.8C35.6 18.2774 35.4104 18.7352 35.0728 19.0728C34.7352 19.4104 34.2774 19.6 33.8 19.6C33.3226 19.6 32.8648 19.4104 32.5272 19.0728C32.1896 18.7352 32 18.2774 32 17.8V6.144L6.144 32H17.8C18.2774 32 18.7352 32.1896 19.0728 32.5272C19.4104 32.8648 19.6 33.3226 19.6 33.8C19.6 34.2774 19.4104 34.7352 19.0728 35.0728C18.7352 35.4104 18.2774 35.6 17.8 35.6H1.8C1.32261 35.6 0.864774 35.4104 0.527208 35.0728C0.189643 34.7352 0 34.2774 0 33.8V17.8C-7.04465e-09 17.5636 0.0465588 17.3296 0.137017 17.1112C0.227476 16.8928 0.360063 16.6944 0.527208 16.5272C0.694354 16.3601 0.892784 16.2275 1.11117 16.137C1.32956 16.0466 1.56362 16 1.8 16C2.03638 16 2.27044 16.0466 2.48883 16.137C2.70722 16.2275 2.90565 16.3601 3.07279 16.5272C3.23994 16.6944 3.37252 16.8928 3.46298 17.1112C3.55344 17.3296 3.6 17.5636 3.6 17.8V29.456L29.456 3.6H17.8C17.3226 3.6 16.8648 3.41036 16.5272 3.07279C16.1896 2.73523 16 2.27739 16 1.8C16 1.32261 16.1896 0.864774 16.5272 0.527208C16.8648 0.189643 17.3226 0 17.8 0H33.8Z" fill="currentColor"/>
 		</svg>
 	);
 
 	const SizeIcon = () => (
-		<svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white group-hover:text-[#FA7072] transition-colors duration-300">
+		<svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white group-hover:text-[#FA7072] transition-colors duration-300">
 			<path d="M0 1.40625C0 1.03329 0.148158 0.675604 0.411881 0.411881C0.675604 0.148158 1.03329 0 1.40625 0L15.4688 0C15.8417 0 16.1994 0.148158 16.4631 0.411881C16.7268 0.675604 16.875 1.03329 16.875 1.40625V16.2478L28.5384 4.62937C28.8021 4.36574 29.1598 4.21764 29.5327 4.21764C29.9055 4.21764 30.2632 4.36574 30.5269 4.62937L40.4691 14.5744C40.6 14.705 40.7039 14.8602 40.7748 15.031C40.8457 15.2019 40.8822 15.385 40.8822 15.57C40.8822 15.755 40.8457 15.9381 40.7748 16.109C40.7039 16.2798 40.6 16.435 40.4691 16.5656L28.8591 28.125H43.5938C43.9667 28.125 44.3244 28.2732 44.5881 28.5369C44.8518 28.8006 45 29.1583 45 29.5312V43.5938C45 43.9667 44.8518 44.3244 44.5881 44.5881C44.3244 44.8518 43.9667 45 43.5938 45H8.4375C6.19992 44.9995 4.05416 44.1103 2.47219 42.5278C0.919703 40.9763 0.0329066 38.8809 0 36.6862M16.875 36.0956L37.485 15.5644L29.5284 7.61063L16.875 20.2163V36.0956ZM12.6562 36.5625C12.6562 35.4436 12.2118 34.3706 11.4206 33.5794C10.6294 32.7882 9.55638 32.3438 8.4375 32.3438C7.31862 32.3438 6.24556 32.7882 5.45439 33.5794C4.66322 34.3706 4.21875 35.4436 4.21875 36.5625C4.21875 37.6814 4.66322 38.7544 5.45439 39.5456C6.24556 40.3368 7.31862 40.7812 8.4375 40.7812C9.55638 40.7812 10.6294 40.3368 11.4206 39.5456C12.2118 38.7544 12.6562 37.6814 12.6562 36.5625ZM42.1875 42.1875V30.9375H26.0381L14.7459 42.1875H42.1875Z" fill="currentColor"/>
 		</svg>
 	);
 
 	const StyleIcon = () => (
-		<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white group-hover:text-[#FA7072] transition-colors duration-300">
+		<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white group-hover:text-[#FA7072] transition-colors duration-300">
 			<path d="M1.5 24.0585C1.5 35.637 10.2008 45.1793 21.4058 46.4685C23.0595 46.6598 24.6615 45.9555 25.8383 44.7742C26.5445 44.0657 26.941 43.1061 26.941 42.1058C26.941 41.1054 26.5445 40.1458 25.8383 39.4373C24.6615 38.256 23.7008 36.4965 24.5895 35.0858C28.1355 29.4428 46.5 42.4005 46.5 24.0608C46.5 11.598 36.4267 1.5 24 1.5C11.5733 1.5 1.5 11.6002 1.5 24.0585Z" stroke="currentColor" strokeWidth="3"/>
 			<path d="M36.375 24.5625C37.307 24.5625 38.0625 23.807 38.0625 22.875C38.0625 21.943 37.307 21.1875 36.375 21.1875C35.443 21.1875 34.6875 21.943 34.6875 22.875C34.6875 23.807 35.443 24.5625 36.375 24.5625Z" fill="currentColor" stroke="currentColor" strokeWidth="3"/>
 			<path d="M11.625 24.5625C12.557 24.5625 13.3125 23.807 13.3125 22.875C13.3125 21.943 12.557 21.1875 11.625 21.1875C10.693 21.1875 9.9375 21.943 9.9375 22.875C9.9375 23.807 10.693 24.5625 11.625 24.5625Z" fill="currentColor" stroke="currentColor" strokeWidth="3"/>
@@ -317,13 +326,13 @@ export default function DesignPage() {
 	);
 
 	const ProductionIcon = () => (
-		<svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white group-hover:text-[#FA7072] transition-colors duration-300">
+		<svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white group-hover:text-[#FA7072] transition-colors duration-300">
 			<path d="M29.2146 7.9201C28.6979 7.03496 27.9524 6.30537 27.0562 5.80802L17.8062 0.705102C16.9462 0.242268 15.9848 0 15.0081 0C14.0315 0 13.07 0.242268 12.21 0.705102L2.96 5.80802C2.06388 6.30537 1.3183 7.03496 0.801667 7.9201C0.277492 8.80731 0.000667015 9.81878 0 10.8493V20.7314C0.00720179 21.7576 0.284568 22.7638 0.804188 23.6488C1.32381 24.5338 2.06735 25.2663 2.96 25.7726L12.21 30.8601C13.0661 31.3352 14.029 31.5846 15.0081 31.5846C15.9872 31.5846 16.9502 31.3352 17.8062 30.8601L27.0562 25.7572C27.9512 25.2588 28.6963 24.5298 29.2141 23.6459C29.7319 22.7621 30.0036 21.7557 30.0008 20.7314V10.9264C30.0269 9.87024 29.7544 8.8282 29.2146 7.9201ZM27.6729 20.7314C27.6791 21.3445 27.5189 21.9479 27.2094 22.4773C26.9 23.0066 26.4528 23.4422 25.9154 23.7376L16.6654 28.8405C16.503 28.932 16.3334 29.0039 16.1567 29.0564V16.4455L27.4108 9.6776C27.5527 10.0507 27.6205 10.4484 27.6112 10.8493L27.6729 20.7314Z" fill="currentColor"/>
 		</svg>
 	);
 
 	const DetailIcon = () => (
-		<svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white group-hover:text-[#FA7072] transition-colors duration-300">
+		<svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white group-hover:text-[#FA7072] transition-colors duration-300">
 			<path d="M23.8123 24.7188L30.6962 31.6026L14.9552 47.3424C14.0421 48.2548 12.8041 48.7673 11.5133 48.7673C10.2225 48.7673 8.98449 48.2548 8.07137 47.3424C7.15899 46.4293 6.64648 45.1913 6.64648 43.9004C6.64648 42.6096 7.15899 41.3716 8.07137 40.4585L23.8123 24.7188Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
 			<path d="M30.6965 31.6027L35.9564 26.344C37.0221 26.8805 38.0069 27.811 38.7718 28.925L37.9344 29.7612C37.753 29.9425 37.6091 30.1578 37.5109 30.3948C37.4127 30.6318 37.3621 30.8858 37.3621 31.1423C37.3621 31.3989 37.4127 31.6529 37.5109 31.8898C37.6091 32.1268 37.753 32.3421 37.9344 32.5235L40.1831 34.771C40.5493 35.137 41.0459 35.3427 41.5636 35.3427C42.0814 35.3427 42.578 35.137 42.9442 34.771L50.7826 26.9337C51.1487 26.5675 51.3543 26.071 51.3543 25.5532C51.3543 25.0354 51.1487 24.5388 50.7826 24.1727L48.5351 21.924C48.3538 21.7423 48.1384 21.5983 47.9013 21.5C47.6642 21.4016 47.4101 21.351 47.1534 21.351C46.8967 21.351 46.6426 21.4016 46.4055 21.5C46.1684 21.5983 45.953 21.7423 45.7717 21.924L44.2613 23.4344L42.0983 21.2715C42.0983 21.2715 43.2765 18.166 40.2786 15.1682C35.154 10.0424 28.014 5.90267 18.5902 13.0669C17.4217 13.955 18.0477 15.8473 19.5146 15.8968C27.5983 16.1711 28.2569 20.2758 28.2569 20.2758L23.8126 24.7188" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 		</svg>
@@ -359,7 +368,7 @@ export default function DesignPage() {
 
 	const renderSizeSelector = () => {
 		return (
-			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
+			<div className="flex flex-col items-center text-center w-full px-3">
 				{/* Breadcrumb Navigation */}
 				<div className={`mb-0 flex items-center gap-1 text-[10px] transition-all duration-700 delay-200 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
@@ -375,7 +384,7 @@ export default function DesignPage() {
 				</div>
 
 				{/* Size Selector */}
-				<div className={`transition-all duration-700 delay-300 ease-out ${
+				<div className={`mb-4 transition-all duration-700 delay-300 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
 					<SizeSelector
@@ -388,10 +397,16 @@ export default function DesignPage() {
 				</div>
 
 				{/* Create Button with Arrow */}
-				<div className="mt-1 flex items-center justify-center gap-3">
+				<div className="mt-[-48px] flex items-center justify-center gap-3 relative z-50">
 					<button 
-						onClick={handleBackToCategories}
-						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							console.log('Size back button clicked');
+							handleBackToCategories();
+						}}
+						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
+						style={{ zIndex: 9999 }}
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -441,10 +456,16 @@ export default function DesignPage() {
 				</div>
 
 				{/* Create Button with Arrow */}
-				<div className="mt-1 flex items-center justify-center gap-3">
+				<div className="mt-1 flex items-center justify-center gap-3 relative z-50">
 					<button 
-						onClick={handleBackToCategories}
-						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							console.log('Production back button clicked');
+							handleBackToCategories();
+						}}
+						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
+						style={{ zIndex: 9999 }}
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -494,10 +515,16 @@ export default function DesignPage() {
 				</div>
 
 				{/* Create Button with Arrow */}
-				<div className="mt-1 flex items-center justify-center gap-3">
+				<div className="mt-1 flex items-center justify-center gap-3 relative z-50">
 					<button 
-						onClick={handleBackToCategories}
-						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							console.log('Style back button clicked');
+							handleBackToCategories();
+						}}
+						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
+						style={{ zIndex: 9999 }}
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -547,10 +574,16 @@ export default function DesignPage() {
 				</div>
 
 				{/* Create Button with Arrow */}
-				<div className="mt-1 flex items-center justify-center gap-3">
+				<div className="mt-4 flex items-center justify-center gap-3 relative z-50">
 					<button 
-						onClick={handleBackToCategories}
-						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							console.log('Material back button clicked');
+							handleBackToCategories();
+						}}
+						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
+						style={{ zIndex: 9999 }}
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -599,10 +632,16 @@ export default function DesignPage() {
 				</div>
 
 				{/* Create Button with Arrow */}
-				<div className="mt-1 flex items-center justify-center gap-3">
+				<div className="mt-1 flex items-center justify-center gap-3 relative z-50">
 					<button 
-						onClick={handleBackToCategories}
-						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							console.log('Detail back button clicked');
+							handleBackToCategories();
+						}}
+						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
+						style={{ zIndex: 9999 }}
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -645,16 +684,24 @@ export default function DesignPage() {
 				<div className={`transition-all duration-700 delay-300 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
-					<ColorPicker
+					<div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', overflow: 'hidden' }}>
+						<ColorPicker
 						onColorChange={handleColorChange}
-					/>
+						/>
+					</div>
 				</div>
 
 				{/* Create Button with Arrow */}
-				<div className="mt-1 flex items-center justify-center gap-3">
+				<div className="mt-1 flex mt-[-30px] items-center justify-center gap-1 relative z-50">
 					<button 
-						onClick={handleBackToCategories}
-						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							console.log('Color back button clicked');
+							handleBackToCategories();
+						}}
+						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
+						style={{ zIndex: 9999 }}
 					>
 						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -663,7 +710,7 @@ export default function DesignPage() {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						className={`px-6 py-3  w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
 								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
@@ -699,7 +746,7 @@ export default function DesignPage() {
 		return (
 			<div className="flex flex-col items-center text-center">
 				{/* Category Icons Grid */}
-				<div className={`grid grid-cols-3 gap-6 w-full max-w-[280px] transition-all duration-700 delay-300 ease-out ${
+				<div className={`mt-6 grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[300px] transition-all duration-700 delay-300 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
 					{Object.entries(sections).map(([key, section], index) => {
@@ -720,10 +767,10 @@ export default function DesignPage() {
 										</svg>
 									</div>
 								)}
-								<div className="w-12 h-12 mx-auto transition-all duration-300 hover:scale-110">
+							<div className="w-9 h-9 mx-auto transition-all duration-300 hover:scale-110">
 									{section.icon}
 								</div>
-								<span className="text-xs font-medium text-white/90">
+							<span className="text-[12px] font-normal text-white/70">
 									{section.title}
 								</span>
 							</div>
@@ -731,15 +778,23 @@ export default function DesignPage() {
 					})}
 				</div>
 
-				{/* Create Button */}
-				<div className="flex justify-center w-full mt-6">
+				{/* Create Button with Back */}
+				<div className="mt-2 flex items-center justify-center gap-3">
+					<button 
+						onClick={handleBackToCategories}
+						className="w-10 h-10 rounded-full border border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+					>
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+						</svg>
+					</button>
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-8 py-3 w-[140px] h-[40px] rounded-[25px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 shadow-lg ${
+						className={`w-[110px] h-[36px] rounded-[24px] font-medium text-sm transition-all duration-700 delay-600 ease-out ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white shadow-[#E70D57]/50'
+								: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -757,100 +812,110 @@ export default function DesignPage() {
 				keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
 				url="/design"
 			/>
-			<div className="w-screen h-screen bg-white flex p-2 sm:p-4 fixed inset-0 overflow-hidden">
+			<div className="w-screen h-screen bg-white flex justify-center p-0 fixed inset-0 overflow-hidden">
 			{/* Left Sidebar */}
-			<aside className={`h-screen bg-[#313131] border border-white/5 ${
+			<aside className={`left-pane-scale h-screen mt-1 sm:mt-1 lg:mt-1 mb-2 sm:mb-4 lg:mb-2 bg-[#313131] border border-white/5 ml-1 sm:ml-1 lg:ml-1 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
-			} transition-all duration-500 relative flex-shrink-0`}
+			} transition-all duration-500 relative flex-shrink-0 overflow-hidden`}
 			style={{
-				width: 'clamp(310px, 27vw, 450px)',
-				borderRadius: 'clamp(20px, 4vw, 40px)',
+				width: 'clamp(330px, 28vw, 420px)',
+				borderRadius: 'clamp(24px, 3vw, 32px)',
 			}}>
 				{/* Workspace Dropdown */}
 			<div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
 				<WorkspaceDropdown/>
 			</div>
+
+			{/* Cancel Button - Only show during workflow */}
+			{showWorkflow && (
+				<div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+					<button
+						onClick={handleReset}
+						className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/40"
+					>
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+						</svg>
+						Cancel
+					</button>
+				</div>
+			)}
 				
 							{/* Brand and title area */}
-			<div className="pt-[2rem] sm:pt-[3rem] px-4 sm:px-6 pb-2 text-white flex flex-col items-center text-center h-full overflow-hidden">
+			<div className="left-pane-content pt-[5.5rem] sm:pt-[5.5rem] px-4 sm:px-6 lg:px-8 pb-2 text-white flex flex-col items-center text-center h-full overflow-hidden">
 					{/* Mode selector */}
-					<div className={`mb-2 flex items-center px-1 gap-2 w-full max-w-[222px] h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
+					<div className={`absolute top-[70px] left-1/2 -translate-x-1/2 flex items-center px-1 gap-2 w-[222px] h-[28px] rounded-[50px] bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
-						<button className="flex-1 h-[22px] rounded-full text-[10px] text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
+						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
 							Voice
 						</button>
-						<button className="flex-1 h-[22px] rounded-full text-[10px] bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
+						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
 							Chat
 						</button>
-						<button className="flex-1 h-[22px] rounded-full text-[10px] text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
+						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
 							Draw
 						</button>
 					</div>
 					
 					{/* Title */}
-					<h1 className={`font-abril mt-2 text-2xl sm:text-3xl lg:text-4xl leading-tight text-center max-w-full transition-all duration-700 delay-300 ease-out ${
-						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
+					<h1
+						className={`font-abril mt-6 lg:mt-7 text-[40px] leading-[1] tracking-[1px] text-center font-extrabold max-w-full transition-all duration-700 delay-300 ease-out ${
+							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+						}`}
+					>
 						Playground
 					</h1>
-					<p className={`mt-0 lg:mt-1 opacity-80 text-xs sm:text-sm transition-all duration-700 delay-400 ease-out ${
+					<p className={`mt-0 sm:mt-1 lg:mt-2 opacity-80 text-[12px] sm:text-[13px] lg:text-[14px] transition-all duration-700 delay-400 ease-out ${
 						isLoaded ? 'opacity-80 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
 						You are a Vibe Designer now
 					</p>
 					
 					{/* Input */}
-					<input
-						placeholder="I want a toy camera"
-						value={prompt}
-						onChange={(e) => setPrompt(e.target.value)}
-						className={`mt-2 lg:mt-3 px-4 py-2 outline-none w-[320px] max-w-[371px] h-[40px] rounded-[20px] border border-gray-200 bg-white text-black text-[18px] transition-all duration-700 delay-500 ease-out focus:border-[#E70D57] focus:ring-2 focus:ring-[#E70D57]/20 shadow-md hover:shadow-lg ${
+					<div
+						className={`mt-3 w-[340px] p-[2px] rounded-[24px] bg-gradient-to-r from-[#E70D57] to-[#ff3b7a] shadow-[0_2px_10px_rgba(231,13,87,0.25)] transition-all duration-700 delay-500 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}
-						style={{ caretColor: "#E70D57" }}
-					/>
+					>
+						<input
+							placeholder="I want a toy camera"
+							value={prompt}
+							onChange={(e) => setPrompt(e.target.value)}
+							className="w-full h-[36px] rounded-[20px] bg-white text-black text-[14px] px-4 lg:px-5 outline-none placeholder:text-gray-400 focus:ring-0"
+							style={{ caretColor: '#E70D57' }}
+						/>
+					</div>
 
 					{/* Advanced Toggle and Model Selector */}
-					<div className={`mt-3 flex items-center justify-between w-full max-w-[280px] transition-all duration-700 delay-600 ease-out ${
+					<div className={`mt-2 sm:mt-3 lg:mt-4 flex items-center justify-between w-full max-w-[280px] sm:max-w-[300px] lg:max-w-[320px] transition-all duration-700 delay-600 ease-out ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
+					}`} style={{ zIndex: 999999 }}>
 						{/* Advanced Toggle */}
-						<div className="flex items-center gap-1">
+						<div className="flex items-center gap-2">
 							<button
 								onClick={handleAdvancedClick}
-								className={`relative inline-flex h-3 w-6  items-center ml-[-15px] rounded-full transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-[#E70D57]/50 ${
+								className={`relative inline-flex h-4 w-8 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-[#E70D57]/50 ${
 									isAdvanced ? 'bg-gradient-to-r from-[#E70D57] to-[#d10c50]' : 'bg-white/20 hover:bg-white/30'
 								}`}
 							>
 								<span
 									className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${
-										isAdvanced ? 'translate-x-3' : 'translate-x-0'
+										isAdvanced ? 'translate-x-4' : 'translate-x-0.5'
 									}`}
 								/>
 							</button>
-							<span className="text-white/60 text-sm font-normal">Advanced</span>
+							<span className="text-white/70 text-[11px] sm:text-[12px] lg:text-[13px] font-normal">Advanced</span>
+							<span className="text-[#E70D57] text-[9px] sm:text-[10px] lg:text-[11px] font-normal">Beta</span>
 						</div>
 
 						{/* Model Selector */}
-						<div className="flex items-center gap-1">
-							<span className="text-white/60 text-sm font-normal">Model</span>
-							<div className="relative">
-								<select
-									value={selectedQuality}
-									onChange={(e) => setSelectedQuality(e.target.value)}
-									className="appearance-none text-[12px] font-normal px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 text-white/60 text-sm focus:outline-none focus:border-[#E70D57] focus:ring-1 focus:ring-[#E70D57]/50 rounded-lg transition-all duration-300 hover:bg-white/15 min-w-[80px]"
-								>
-									<option value="fast" className="bg-gray-900 text-white">Fast</option>
-									<option value="medium" className="bg-gray-900 text-white">Medium</option>
-									<option value="good" className="bg-gray-900 text-white">Good</option>
-								</select>
-								<div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-									<svg className="w-3 h-3 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-									</svg>
-								</div>
-							</div>
+						<div className="flex items-center gap-1" style={{ zIndex: 9999999 }}>
+							<span className="text-white/70 text-[11px] sm:text-[12px] lg:text-[13px] font-normal">Model</span>
+							<ModelDropdown 
+								selectedQuality={selectedQuality}
+								onQualityChange={handleQualityChange}
+							/>
 						</div>
 					</div>
 
@@ -923,31 +988,30 @@ export default function DesignPage() {
 							<button 
 								onClick={handleCreateClick}
 								disabled={!canGenerateImages}
-								className={`mt-4 px-6 py-3 w-[140px] h-[40px] rounded-[25px] font-medium text-sm transition-all duration-700 delay-600 ease-out hover:scale-105 shadow-lg ${
+						className={`mt-2 sm:mt-3 lg:mt-4 px-4 py-1 w-[125px] h-[36px] text-center items-center justify-center rounded-[24px] font-medium text-[12px] sm:text-[13px] lg:text-[14px] transition-all duration-700 delay-600 ease-out hover:scale-105 shadow-lg ${
 									!canGenerateImages
 										? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-										: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white shadow-[#E70D57]/50'
+								: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white'
 								} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}>
 								Create
 							</button>
 
-							{/* Tour section */}
-							<div className={`mt-6 w-full max-w-[300px] flex flex-col items-center text-center transition-all duration-700 delay-700 ease-out ${
+					{/* Tour section */}
+					<div className={`mt-2 sm:mt-3 lg:mt-4 w-full max-w-[340px] flex flex-col items-center text-center relative transition-all duration-700 delay-700 ease-out ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 							}`}>
-								<h3 className="font-semibold text-white text-lg mb-3">Take a Tour 👋</h3>
-								<p className="text-white/70 text-sm leading-relaxed mb-5">
+								<h3 className="font-semibold text-white text-[13px] sm:text-[14px] lg:text-[15px] mb-2 sm:mb-3">Take a Tour 👋</h3>
+								<p className="text-white/70 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed mb-3 sm:mb-4 lg:mb-6">
 									Let's show you around cudliy. Become a designer in 5 minutes.
 								</p>
 								
 								{/* Video container - enhanced design */}
-								<div className="w-full max-w-[260px] h-[160px] relative flex-shrink-0 group">
-									<div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-[16px] blur-xl scale-105 opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>
-									<div className="relative w-full h-full bg-gradient-to-br from-gray-900 to-black border border-white/20 rounded-[12px] overflow-hidden shadow-2xl">
+							<div className="design-tour-video relative w-[289.67px] h-[182.54px] rotate-[0.27deg] mx-auto flex-shrink-0 group">
+								<div className="relative w-full h-full bg-gradient-to-br from-gray-900 to-black border-[1.85px] border-white/30 rounded-[11.13px] overflow-hidden shadow-2xl">
 										<video 
 											ref={videoRef} 
 											src="/final 2.mp4" 
-											className="object-cover h-full w-full" 
+											className="object-cover h-full w-full rounded-[11.13px]" 
 											loop 
 											muted 
 											playsInline 
@@ -956,9 +1020,9 @@ export default function DesignPage() {
 										<button 
 											onClick={handleTourClick} 
 											aria-label="Take a tour" 
-											className="absolute inset-0 m-auto w-8 h-8 rounded-full bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:from-white hover:to-white/90 shadow-lg group"
+											className="absolute inset-0 m-auto w-10 h-10 rounded-full bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:from-white hover:to-white/90 shadow-lg group"
 										>
-											<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-0.5">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-0.5">
 												<path d="M8 5v14l11-7L8 5z" fill="#333" />
 											</svg>
 											<div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/30 to-pink-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -972,33 +1036,21 @@ export default function DesignPage() {
 			</aside>
 
 			{/* Main Content Area */}
-			<div className="flex-1 min-w-0 flex flex-col bg-white ml-2 sm:ml-4 border border-gray-200/50 overflow-hidden"
-				 style={{ borderRadius: 'clamp(20px, 4vw, 40px)' }}>
+			<div className="flex-1 min-w-0 flex flex-col relative bg-white ml-0 lg:ml-0 xl:ml-0 border border-none overflow-hidden"
+				 style={{ borderRadius: 'clamp(24px, 3vw, 32px)' }}>
 				{/* Content - Scrollable */}
-				<div className="flex-1 px-4 sm:px-6 lg:px-8 pb-2 sm:pb-2 lg:pb-4 overflow-y-auto overflow-x-hidden">
+				<div className="flex-1 pl-0 pr-0 sm:pr-0 lg:pr-0 pb-2 sm:pb-2 lg:pb-4 overflow-y-hidden overflow-x-hidden">
 					{showWorkflow ? (
 						<>
-						{/* Cancel Button - Top Right */}
-						<div className="flex justify-end mb-4">
-							<button
-								onClick={handleReset}
-								className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 border border-gray-200 hover:border-red-200"
-							>
-								<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-								</svg>
-								Cancel
-							</button>
-						</div>
 						
 						{/* Workflow Display - Show Loading State in Grid (hidden when workflow is active) */}
 						{!showWorkflow && (
-							<div className="grid grid-cols-2 gap-4 w-full min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+							<div className="grid grid-cols-2 gap-4 w-full ml-[-25px] lg:ml[-15px] xl:ml-0 min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 							{/* Camera 1 - Top Left - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-white border  border-gray-200/50 rounded-[40px] ml-[-25px] lg:ml[-15px] xl:ml-0 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
+								<div className="w-full h-full flex ml-[-25px] lg:ml[-15px] xl:ml-0 flex-col items-center justify-center p-6 text-center relative">
 									<img 
 										src="/GIFS/Loading-State.gif" 
 										alt="Loading" 
@@ -1136,56 +1188,56 @@ export default function DesignPage() {
 						</div>
 					) : (
 						/* Default Grid Display */
-						<div className="grid grid-cols-2 gap-4 w-full min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+						<div className="grid grid-cols-2 gap-0 lg:gap-0 xl:gap-1 relative w-full h-full border-none pl-0 lg:pl-0 xl:pl-0 pr-0 lg:pr-0 xl:pr-0 py-0 lg:py-0 xl:py-0 ml-[-30px] lg:ml-[-25px] xl:ml-[-20px]">
 							{/* Camera 1 - Top Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
-								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative">
+								<div className="w-full h-full flex items-center justify-center p-0 relative">
 									<img 
 										src="/camera1.png" 
 										alt="Toy camera design 1" 
-										className="w-full h-full object-contain rounded-[20px]" 
+										className="max-w-full max-h-full object-contain rounded-[16px]" 
 									/>
 								</div>
 							</div>
 
 							{/* Camera 2 - Top Right */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
-								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative">
+								<div className="w-full h-full flex items-center justify-center p-0 relative">
 									<img 
 										src="/camera2.png" 
 										alt="Toy camera design 2" 
-										className="w-full h-full object-contain rounded-[20px]" 
+										className="max-w-full max-h-full object-contain rounded-[16px]" 
 									/>
 								</div>
 							</div>
 
 							{/* Camera 3 - Bottom Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ml-[-25px] lg:ml-[-15px] xl:ml-0 ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
-								<div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative">
+								<div className="w-full h-full flex items-center justify-center p-0 relative">
 									<img 
 										src="/camera3.png" 
 										alt="Toy camera design 3" 
-										className="w-full h-full object-contain rounded-[20px]" 
+										className="max-w-full max-h-full object-contain rounded-[16px]" 
 									/>
 								</div>
 							</div>
 
 							{/* Empty space - Bottom Right - No hover effects */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-6 text-center">
 									<div className="text-gray-400">
-										<svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<svg className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
 										</svg>
-										<p className="text-sm">Generate your design</p>
+										<p className="text-sm lg:text-base">Generate your design</p>
 									</div>
 								</div>
 							</div>

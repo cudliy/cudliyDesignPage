@@ -60,8 +60,8 @@ export const createStripeCheckout = async (req, res, next) => {
     })();
     const unitPrice = +tierPrice.toFixed(2);
     const subtotal = unitPrice * quantity;
-    const tax = subtotal * 0.08; // 8% tax
-    const shipping = 5.99; // Standard shipping
+    const tax = subtotal * 0.07; // 8% tax
+    const shipping = 9.99; // Standard shipping
     const total = subtotal + tax + shipping;
 
     // TEMPORARY: Skip Stripe for testing - create mock checkout session
@@ -343,8 +343,8 @@ export const createCheckout = async (req, res, next) => {
     const sizeMultiplier = size === 'L' ? 1.5 : size === 'M' ? 1.2 : 1.0;
     const unitPrice = +(basePrice * sizeMultiplier).toFixed(2);
     const subtotal = unitPrice * quantity;
-    const tax = subtotal * 0.08; // 8% tax
-    const shipping = 5.99; // Standard shipping
+    const tax = subtotal * 0.07; // 8% tax
+    const shipping = 9.99; // Standard shipping
     const total = subtotal + tax + shipping;
 
     // Create checkout session

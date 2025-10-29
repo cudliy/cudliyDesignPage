@@ -136,3 +136,54 @@ select:focus-visible {
   box-shadow: none !important;
 }
 
+/* Responsive scaling for DesignPage left pane only */
+.left-pane-scale {
+  /* default scale applied everywhere unless overridden by breakpoints */
+  --left-pane-scale: 1;
+  transform-origin: top left;
+  position: relative;
+  z-index: 30;
+  transform: scale(var(--left-pane-scale));
+  height: calc(100vh / var(--left-pane-scale));
+}
+
+@media (min-width: 1400px) and (min-height: 700px) {
+  .left-pane-scale { --left-pane-scale: 1.3; }
+}
+
+@media (min-width: 1500px) and (min-height: 800px) {
+  .left-pane-scale { --left-pane-scale: 1.4; }
+}
+
+/* Responsive scaling for DesignPage tour video */
+.design-tour-video {
+  transform: scale(0.9); /* Default: 1300px and below */
+  transform-origin: center;
+}
+
+@media (min-width: 1400px) {
+  .design-tour-video {
+    transform: scale(0.8); /* At 1400px */
+  }
+}
+
+@media (min-width: 1500px) {
+  .design-tour-video {
+    transform: scale(0.9); /* At 1500px and above */
+  }
+}
+
+/* Ensure left pane contents remain accessible on short screens */
+@media (max-height: 600px) {
+  .left-pane-scale {
+    --left-pane-scale: 0.85; /* slightly shrink to fit more vertically */
+    height: 100vh; /* keep full viewport height */
+    overflow-y: auto; /* allow scroll inside the pane if needed */
+  }
+  .left-pane-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1rem; /* breathing room at bottom */
+  }
+}
+

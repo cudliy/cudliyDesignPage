@@ -380,13 +380,13 @@ export default function DownloadPage() {
 
           {/* Format Selection */}
           <div className="w-full max-w-sm">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block border-b border-black/30 rounded full bg-white/10 pb-2 text-sm font-normal text-gray-700 mb-3">
               Choose Format
             </label>
             <select
               value={selectedFormat}
               onChange={(e) => handleFormatChange(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E70D57] focus:border-transparent appearance-none bg-white cursor-pointer"
+              className="w-full px-4 py-3 border-black rounded-full bg-white/10 focus:ring-2 focus:ring-[#E70D57] cursor-pointer"
             >
               {availableFormats.map((format) => (
                 <option key={format} value={format}>
@@ -400,7 +400,7 @@ export default function DownloadPage() {
           <button
             onClick={handleDownload}
             disabled={downloading || !modelUrl || isProcessing}
-            className="w-full max-w-sm px-8 py-4 bg-[#E70D57] hover:bg-[#d10c50] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+            className="w-[233px] max-w-sm px-8 py-4 bg-[#E70D57] rounded-full hover:bg-[#d10c50] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-normal rounded-full transition-all duration-300 flex items-center justify-center gap-2"
           >
             {downloading ? (
               <>
@@ -439,7 +439,7 @@ export default function DownloadPage() {
             </p>
           ) : (
             <p className="text-sm text-green-600 text-center max-w-sm">
-              ✅ Your 3D model is ready!
+              
             </p>
           )}
         </div>

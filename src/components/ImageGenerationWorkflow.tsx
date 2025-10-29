@@ -21,11 +21,10 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImageIndex, setIsSelectedImageIndex] = useState<number | null>(null);
-  const [isCreating3D, setIsCreating3D] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
   const [creationId, setCreationId] = useState<string>('');
   const [hasStarted, setHasStarted] = useState(false);
-  const [clickedIconIndex, setClickedIconIndex] = useState<number | null>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
 
     // Get user ID for usage limits (authenticated users only)
     const userId = sessionStorage.getItem('user_id') || '';
@@ -205,7 +204,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
       return;
     }
 
-    setIsCreating3D(true);
 
     try {
       const selectedImage = generatedImages[imageIndex];
@@ -258,46 +256,43 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
     } catch (error) {
       onError(error instanceof Error ? error.message : 'Failed to generate 3D model');
     } finally {
-      setIsCreating3D(false);
-      setClickedIconIndex(null);
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto pt-0 mt-0">
 
       {/* Loading State */}
-      {isGenerating && generatedImages.length === 0 && (
-        <div className="text-center py-8">
+      {(isGenerating && generatedImages.length === 0) || isPrinting ? (
+        <div className="text-center py-2">
           <div className="flex flex-col items-center">
             <img
               src="/GIFS/Loading-State.gif"
               alt="Generating Images"
               className="w-24 h-24 object-contain mb-4"
             />
-            <span className="text-black font-medium">Generating Images...</span>
+            <span className="text-black font-medium">
+              {isPrinting ? 'Generating 3D Model...' : 'Generating Images...'}
+            </span>
             <div className="mt-4 text-sm text-gray-600">
-              <p>This may take 1-3 minutes depending on complexity</p>
-              <p className="text-xs text-gray-500 mt-1">Generating 3 variations in parallel...</p>
+              <p>{isPrinting ? 'This may take 2-5 minutes depending on complexity' : 'This may take 1-3 minutes depending on complexity'}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {isPrinting ? 'Creating your 3D model...' : 'Generating 3 variations in parallel...'}
+              </p>
             </div>
           </div>
         </div>
-      )}
-
-
-      {/* Generated Images Grid - Matching Demo Layout */}
-      {generatedImages.length > 0 && (
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-center text-gray-800 mb-4">
-            Generated Images - Click to generate 3D model
-          </h3>
-          
-          <div className="grid grid-cols-2 gap-4 h-full w-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+      ) : (
+        <>
+          {/* Generated Images Grid - Matching Demo Layout */}
+          {generatedImages.length > 0 && (
+        <div className="space-y-0 mt-0">
+          <div className="grid grid-cols-2 gap-1 lg:gap-1 xl:gap-2 h-full w-full ml-[-20px] lg:ml-[-15px] xl:ml-[-10px]" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
             {/* First 3 images in 2x2 grid */}
             {generatedImages.slice(0, 3).map((image, index) => (
                 <div
                   key={index}
-                  className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-gray-400 backdrop-blur-sm ${
+                  className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[320px] min-h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:border-gray-400 backdrop-blur-sm ${
                     selectedImageIndex === index 
                       ? 'ring-1 ring-gray-400 shadow-lg' 
                       : 'hover:border-gray-300'
@@ -305,7 +300,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                   onClick={() => selectImage(index)}
                   style={{ transitionDelay: `${800 + index * 100}ms` }}
                 >
-                  <div className="w-full h-full max-w-[180px] max-h-[280px] flex items-center justify-center p-4 relative group">
+                  <div className="w-full h-full max-w-[190px] max-h-[280px] flex items-center justify-center p-4 relative group">
                     <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-black/10 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <img 
                       src={image.url} 
@@ -328,112 +323,37 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                         </svg>
                       </div>
                     )}
-                    {/* Elegant Action Icons - Show on hover */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 z-20">
-                      <div className="flex gap-4">
-                        <button 
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            setClickedIconIndex(index);
-                            selectImage(index);
-                            // Auto-generate 3D model immediately
-                            setTimeout(async () => {
-                              await generate3DModel();
-                            }, 100);
-                          }}
-                          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-xl backdrop-blur-sm border-2 ${
-                            clickedIconIndex === index && isCreating3D
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse border-green-300'
-                              : 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white border-white/20 hover:border-white/40'
-                          }`}
-                          title="Generate 3D Model"
-                          disabled={isCreating3D}
-                        >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                          </svg>
-                        </button>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle download action
-                            console.log('Download clicked');
-                          }}
-                          className="w-12 h-12 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-xl backdrop-blur-sm border-2 border-white/20 hover:border-white/40"
-                          title="Download"
-                        >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        </button>
-                      </div>
+                    {/* Print Button - Bottom Right */}
+                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500 z-20">
+                      <button 
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setIsPrinting(true);
+                          try {
+                            await generate3DModel();
+                          } catch (error) {
+                            console.error('3D generation failed:', error);
+                          } finally {
+                            setIsPrinting(false);
+                          }
+                        }}
+                        className="px-4 py-2 bg-white/90 hover:bg-white text-gray-800 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300 shadow-lg hover:shadow-xl cursor-pointer font-medium text-sm"
+                        title="Generate 3D Model"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print
+                      </button>
                     </div>
                   </div>
                 </div>
             ))}
-            
-            {/* 4th grid box - Elegant hover state */}
-            <div className="bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-gray-400 backdrop-blur-sm">
-              <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-black/10 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                {/* Default state - elegant message */}
-                <div className="text-center relative z-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#E70D57]/10 to-[#d10c50]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-[#E70D57]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-600 font-medium">Click any image</p>
-                  <p className="text-xs text-gray-500 mt-1">to generate 3D model</p>
-                </div>
-                
-                {/* Elegant Action Icons - Show on hover */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 z-20">
-                  <div className="flex gap-4">
-                    <button 
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        setClickedIconIndex(3); // Use index 3 for the 4th box
-                        // Auto-select first image and generate 3D model
-                        if (generatedImages.length > 0) {
-                          selectImage(0);
-                          setTimeout(async () => {
-                            await generate3DModel();
-                          }, 100);
-                        }
-                      }}
-                      disabled={isCreating3D || !canGenerateModels || generatedImages.length === 0}
-                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-xl backdrop-blur-sm border-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-                        clickedIconIndex === 3 && isCreating3D
-                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse border-green-300'
-                          : 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white border-white/20 hover:border-white/40'
-                      }`}
-                      title="Generate 3D Model"
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                      </svg>
-                    </button>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        console.log('Download clicked');
-                      }}
-                      className="w-12 h-12 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-xl backdrop-blur-sm border-2 border-white/20 hover:border-white/40"
-                      title="Download"
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
         </div>
+      )}
+        </>
       )}
     </div>
   );

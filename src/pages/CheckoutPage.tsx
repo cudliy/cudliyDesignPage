@@ -119,8 +119,8 @@ export default function CheckoutPage() {
   const currentTiers = tiersByInch[currentInchKey] || [];
   const onePrintTier = currentTiers.find(t => t.qty === 1);
   const uiSubtotal = onePrintTier?.price ?? (slant3DPricing?.pricing.subtotal ?? checkoutData?.pricing.subtotal ?? 0);
-  const uiTax = +(uiSubtotal * 0.08).toFixed(2);
-  const uiShipping = (slant3DPricing?.pricing.shipping ?? checkoutData?.pricing.shipping ?? 0);
+  const uiTax = +(uiSubtotal * 0.07).toFixed(2);
+  const uiShipping = 9.99
   const uiTotal = uiSubtotal + uiTax + uiShipping;
 
   useEffect(() => {
@@ -299,10 +299,10 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <button 
           onClick={() => navigate(-1)}
-          className="text-gray-600 hover:text-gray-900 flex items-center space-x-2 mb-8 transition-colors"
+          className="text-gray-600 hover:text-gray-900 flex items-center space-x-2 mb-6 transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -310,7 +310,7 @@ export default function CheckoutPage() {
           <span>Return to Design</span>
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left Side - Size + Summary */}
           <div>
             <div className="mb-6">
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
                 {/* Small */}
                 <button
                   onClick={() => setSelectedSize('S')}
-                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='S' ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='S' ? 'bg-[#313131] text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Small</div>
                   <div className={`text-xs ${selectedSize==='S' ? 'text-white/80' : 'text-gray-500'}`}>1–4 inch<br/>perfect for tiny<br/>gifts or keepsakes.</div>
@@ -327,7 +327,7 @@ export default function CheckoutPage() {
                 {/* Medium */}
                 <button
                   onClick={() => setSelectedSize('M')}
-                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='M' ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='M' ? 'bg-[#313131] text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Medium</div>
                   <div className={`text-xs ${selectedSize==='M' ? 'text-white/80' : 'text-gray-500'}`}>5–6 inch<br/>great for small<br/>vases or desk pieces.</div>
@@ -335,7 +335,7 @@ export default function CheckoutPage() {
                 {/* Large */}
                 <button
                   onClick={() => setSelectedSize('L')}
-                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='L' ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='L' ? 'bg-[#313131] text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Large</div>
                   <div className={`text-xs ${selectedSize==='L' ? 'text-white/80' : 'text-gray-500'}`}>7–8 inch<br/>ideal for display<br/>or special gifts.</div>
@@ -370,14 +370,7 @@ export default function CheckoutPage() {
 
               {/* Tier pricing */}
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-700 mb-2">Tier Pricing {selectedSize==='S' ? '(1–4")' : `(${selectedInch}")`}</div>
                 <div className="grid grid-cols-2 gap-3 max-w-xs">
-                  {currentTiers.map(t => (
-                    <div key={t.qty} className="flex items-center justify-between bg-white rounded-xl border border-gray-200 px-3 py-2 text-sm">
-                      <span className="text-gray-600">{t.qty} {t.qty===1 ? 'print' : 'prints'}</span>
-                      <span className="font-semibold">{formatCurrency(t.price)}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -412,10 +405,10 @@ export default function CheckoutPage() {
               <button
                 onClick={handleProceedToPayment}
                 disabled={orderProcessing}
-                className={`w-full mt-6 font-semibold py-4 px-6 rounded-full transition-all duration-200 ${
+                className={`w-full mt-6 font-semibold py-4 px-6 rounded-lg transition-all duration-200 ${
                   orderProcessing
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-[#111] hover:bg-black text-white shadow-md hover:shadow-lg'
+                    ? 'bg-[#000000] text-gray-500 cursor-not-allowed'
+                    : 'bg-[#000000] hover:bg-[#000000] text-white shadow-md hover:shadow-lg'
                 }`}
               >
                 {orderProcessing ? 'Processing…' : 'Continue to Checkout'}
@@ -425,7 +418,7 @@ export default function CheckoutPage() {
 
           {/* Right Side - Product preview */}
           <div className="lg:pl-8">
-            <div className="bg-white rounded-3xl overflow-hidden w-full max-w-xl border border-gray-200 shadow-xl p-6">
+            <div className="bg-white rounded-3xl overflow-auto w-full max-w-md border border-gray-200 shadow-xl p-4">
               <div className="bg-[#f2f2f2] aspect-square rounded-2xl flex items-center justify-center">
                 {previewImageUrl ? (
                   <img
@@ -439,14 +432,10 @@ export default function CheckoutPage() {
                   <div className="text-gray-500">Preview</div>
                 )}
               </div>
-              {/* Print-ready cue */}
-              <div className="mt-4 text-xs text-gray-500">
-                Camera: centered • Size: Medium • Pro 3D render • White bg • Printable • High detail
-              </div>
             </div>
-            <div className="mt-4">
-              <div className="text-gray-900 font-semibold">{checkoutData.items[0]?.designTitle || 'Cute Dinosaur'}</div>
-              <div className="text-xs text-gray-500">3D Toys</div>
+            <div className="mt-3">
+              <div className="text-gray-900 text-sm font-normal">{checkoutData.items[0]?.designTitle.slice(0, 60).toUpperCase() + '...' || 'Cute Dinosaur'}</div>
+              <div className="text-xs text-gray-500">Personalized Gift</div>
             </div>
           </div>
         </div>
