@@ -7,7 +7,6 @@ import Dashboard from './pages/Dashboard'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
 import AdminOrders from './pages/AdminOrders'
-import Index from './pages/Index'
 import SignInPage from './pages/SignInPage'
 import SignUpPage from './pages/SignUpPage'
 import NotFound from './pages/NotFound'
@@ -23,7 +22,6 @@ function App() {
       <div className="h-screen w-screen bg-white">
         <Toaster />
         <Routes>
-          <Route path="/" element={<Index />} />
           <Route path="/design" element={<DesignPage />} />
           <Route path="/design/:designId" element={<DesignView />} />
           <Route path="/download/:designId" element={<DownloadPage />} />
@@ -31,7 +29,7 @@ function App() {
           <Route path="/checkout/:designId" element={<CheckoutPage />} />
           <Route path="/order-success" element={<OrderSuccessPage />} />
           <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
-          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/pricing" element={<PricingPage />} />
