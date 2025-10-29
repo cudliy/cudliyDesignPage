@@ -1043,11 +1043,11 @@ const handleBackToCategories = () => {
 					{showWorkflow ? (
 						<>
 						
-						{/* Workflow Display - Show Loading State in Grid (hidden when workflow is active) */}
-						{!showWorkflow && (
-							<div className="grid grid-cols-2 gap-4 w-full ml-[-25px] lg:ml[-15px] xl:ml-0 min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+							{/* Workflow Display - Show Loading State in Grid (hidden when workflow is active) */}
+							{!showWorkflow && (
+								<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 w-full ml-0 lg:ml-0 xl:ml-0 min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 							{/* Camera 1 - Top Left - Show Loading GIF */}
-							<div className={`bg-white border  border-gray-200/50 rounded-[40px] ml-[-25px] lg:ml[-15px] xl:ml-0 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] ml-0 lg:ml-1 xl:ml-1 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex ml-[-25px] lg:ml[-15px] xl:ml-0 flex-col items-center justify-center p-6 text-center relative">
@@ -1062,7 +1062,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 2 - Top Right - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1077,7 +1077,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 3 - Bottom Left - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1092,7 +1092,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Generate 3D Model - Bottom Right - Keep Button in Same Position */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1188,9 +1188,9 @@ const handleBackToCategories = () => {
 						</div>
 					) : (
 						/* Default Grid Display */
-						<div className="grid grid-cols-2 gap-0 lg:gap-0 xl:gap-1 relative w-full h-full border-none pl-0 lg:pl-0 xl:pl-0 pr-0 lg:pr-0 xl:pr-0 py-0 lg:py-0 xl:py-0 ml-[-30px] lg:ml-[-25px] xl:ml-[-20px]">
+						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 py-0 lg:py-0 xl:py-0 ml-0 lg:ml-0 xl:ml-1">
 							{/* Camera 1 - Top Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1203,7 +1203,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 2 - Top Right */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1216,7 +1216,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 3 - Bottom Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ml-[-25px] lg:ml-[-15px] xl:ml-0 ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ml-0 lg:ml-0 xl:ml-0 ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1229,7 +1229,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Empty space - Bottom Right - No hover effects */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-6 text-center">
