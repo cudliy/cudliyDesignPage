@@ -292,20 +292,19 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
             {generatedImages.slice(0, 3).map((image, index) => (
                 <div
                   key={index}
-                  className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[320px] min-h-[300px] transition-all duration-700 ease-out hover:scale-[1.02] hover:border-gray-400 backdrop-blur-sm ${
+                  className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[320px] min-h-[300px] transition-all duration-700 ease-out backdrop-blur-sm ${
                     selectedImageIndex === index 
                       ? 'ring-1 ring-gray-400 shadow-lg' 
-                      : 'hover:border-gray-300'
+                      : ''
                   }`}
                   onClick={() => selectImage(index)}
                   style={{ transitionDelay: `${800 + index * 100}ms` }}
                 >
                   <div className="w-full h-full max-w-[190px] max-h-[280px] flex items-center justify-center p-4 relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-black/10 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <img 
                       src={image.url} 
                       alt={`Generated image ${index + 1}`} 
-                      className="w-full h-full object-contain rounded-[20px] transition-transform duration-300 hover:scale-105 relative z-10"
+                      className="w-full h-full object-contain rounded-[20px] relative z-10"
                       onLoad={() => {}}
                       onError={(e) => console.error(`❌ Image ${index} failed to load:`, e, 'URL:', image.url)}
                     />
@@ -323,8 +322,8 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                         </svg>
                       </div>
                     )}
-                    {/* Print Button - Bottom Right */}
-                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500 z-20">
+                    {/* Print Button - Bottom Right (icon with rectangular outline) */}
+                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
                       <button 
                         onClick={async (e) => {
                           e.stopPropagation();
@@ -337,13 +336,12 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                             setIsPrinting(false);
                           }
                         }}
-                        className="px-4 py-2 bg-white/90 hover:bg-white text-gray-800 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300 shadow-lg hover:shadow-xl cursor-pointer font-medium text-sm"
+                        className="px-2.5 py-1.5 bg-transparent text-gray-800 rounded-[6px] flex items-center justify-center transition-colors duration-200 border border-gray-300 hover:border-gray-500 shadow-none cursor-pointer"
                         title="Generate 3D Model"
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
-                        Print
                       </button>
                     </div>
                   </div>

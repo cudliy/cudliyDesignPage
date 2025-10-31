@@ -874,7 +874,7 @@ const handleBackToCategories = () => {
 					
 					{/* Input */}
 					<div
-						className={`mt-3 w-[340px] p-[2px] rounded-[24px] bg-gradient-to-r from-[#E70D57] to-[#ff3b7a] shadow-[0_2px_10px_rgba(231,13,87,0.25)] transition-all duration-700 delay-500 ease-out ${
+						className={`mt-3 w-[272px] p-[1px] rounded-[24px] bg-gradient-to-r from-[#E70D57]/30 to-[#ff3b7a]/30 shadow-[0_2px_10px_rgba(231,13,87,0.15)] transition-all duration-700 delay-500 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}
 					>
@@ -882,7 +882,7 @@ const handleBackToCategories = () => {
 							placeholder="I want a toy camera"
 							value={prompt}
 							onChange={(e) => setPrompt(e.target.value)}
-							className="w-full h-[36px] rounded-[20px] bg-white text-black text-[14px] px-4 lg:px-5 outline-none placeholder:text-gray-400 focus:ring-0"
+							className="w-full h-[29px] rounded-[20px] bg-white text-black text-[14px] px-4 lg:px-5 outline-none placeholder:text-gray-400 focus:ring-0"
 							style={{ caretColor: '#E70D57' }}
 						/>
 					</div>
@@ -1190,7 +1190,7 @@ const handleBackToCategories = () => {
 						/* Default Grid Display */
 						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 py-0 lg:py-0 xl:py-0 ml-0 lg:ml-0 xl:ml-1">
 							{/* Camera 1 - Top Left */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1203,7 +1203,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 2 - Top Right */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1216,7 +1216,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 3 - Bottom Left */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ml-0 lg:ml-0 xl:ml-0 ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
