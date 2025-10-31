@@ -81,7 +81,7 @@ export default function ModelDropdown({ selectedQuality, onQualityChange }: Mode
         {/*Dropdown Button*/}
         <Button 
           variant="outline" 
-          className="flex items-center gap-1 bg-white/10 hover:bg-white/20 border-none text-white px-2 py-0.5 text-[9px] sm:text-[10px] lg:text-[11px] font-medium transition-all duration-300 h-6 sm:h-7 lg:h-8 rounded-md" 
+          className="flex items-center gap-1 bg-white/10 hover:bg-white/20 border-none text-white px-2 py-0 text-[9px] sm:text-[10px] lg:text-[11px] font-medium transition-all duration-300 h-5 sm:h-6 lg:h-7 rounded-md" 
           onClick={(e) => {
             e.stopPropagation();
             setOpen(!open);

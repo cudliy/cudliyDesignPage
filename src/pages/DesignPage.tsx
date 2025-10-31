@@ -906,7 +906,6 @@ const handleBackToCategories = () => {
 								/>
 							</button>
 							<span className="text-white/70 text-[11px] sm:text-[12px] lg:text-[13px] font-normal">Advanced</span>
-							<span className="text-[#E70D57] text-[9px] sm:text-[10px] lg:text-[11px] font-normal">Beta</span>
 						</div>
 
 						{/* Model Selector */}

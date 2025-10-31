@@ -322,7 +322,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                         </svg>
                       </div>
                     )}
-                    {/* Print Button - Bottom Right (icon with rectangular outline) */}
+                    {/* View 3D Button - Bottom Right (icon with rectangular outline) */}
                     <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
                       <button 
                         onClick={async (e) => {
@@ -336,12 +336,15 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                             setIsPrinting(false);
                           }
                         }}
-                        className="px-2.5 py-1.5 bg-transparent text-gray-800 rounded-[6px] flex items-center justify-center transition-colors duration-200 border border-gray-300 hover:border-gray-500 shadow-none cursor-pointer"
+                        className="px-2.5 py-1.5 bg-transparent text-gray-800 rounded-[6px] flex items-center justify-center gap-2 transition-colors duration-200 border border-gray-300 hover:border-gray-500 shadow-none cursor-pointer text-[12px]"
                         title="Generate 3D Model"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7.5v9l9 4.5 9-4.5v-9" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v9" />
                         </svg>
+                        <span>View 3D</span>
                       </button>
                     </div>
                   </div>
