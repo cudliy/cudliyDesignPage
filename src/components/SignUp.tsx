@@ -402,7 +402,7 @@ const SignUp = () => {
         {/* Image Carousel */}
         <div className={`absolute inset-0 flex items-center justify-center transform transition-all duration-1000 delay-300 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
           <ImageCarousel 
-            images={['/3d1.webp', '/3d3.webp', '/3d4.webp', '/3d5.webp']}
+            images={['/Rectangle 346240796.png', '/3d1.webp', '/3d3.webp', '/3d4.webp', '/3d5.webp']}
             autoSlideInterval={5000}
           />
         </div>
