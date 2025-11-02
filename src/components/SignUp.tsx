@@ -166,7 +166,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex relative">
+    <div className="h-screen flex relative overflow-hidden">
       {/* Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -367,7 +367,7 @@ const SignUp = () => {
               Already have an account?{" "}
               <span 
                 className="text-[#E70A55] cursor-pointer hover:underline"
-                onClick={() => navigate("/signin")}
+                onClick={() => navigate("/")}
               >
                 Log In
               </span>
