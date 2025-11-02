@@ -36,7 +36,7 @@ const ImageCarousel = ({ images, autoSlideInterval = 5000 }: ImageCarouselProps)
             <img
               src={image}
               alt={`Carousel image ${index + 1}`}
-              className="object-contain w-full h-full"
+              className="object-cover w-full h-full"
               style={{
                 borderRadius: '30px',
                 imageRendering: '-webkit-optimize-contrast',
