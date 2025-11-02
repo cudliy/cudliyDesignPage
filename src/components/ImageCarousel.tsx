@@ -43,8 +43,7 @@ const ImageCarousel = ({ images, autoSlideInterval = 5000 }: ImageCarouselProps)
                 backfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',
                 WebkitFontSmoothing: 'antialiased',
-                msInterpolationMode: 'bicubic',
-              }}
+              } as React.CSSProperties}
               loading="eager"
               decoding="async"
             />
