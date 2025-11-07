@@ -404,19 +404,19 @@ export default function CheckoutPage() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">${formatCurrency(uiSubtotal)}</span>
+                <span className="font-medium">{formatCurrency(uiSubtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Tax</span>
-                <span className="font-medium">${formatCurrency(uiTax)}</span>
+                <span className="font-medium">{formatCurrency(uiTax)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
-                <span className="font-medium">${formatCurrency(uiShipping)}</span>
+                <span className="font-medium">{formatCurrency(uiShipping)}</span>
               </div>
               <div className="border-t pt-2 flex justify-between">
                 <span className="font-semibold">Total</span>
-                <span className="font-bold text-lg">${formatCurrency(uiTotal)}</span>
+                <span className="font-bold text-lg">{formatCurrency(uiTotal)}</span>
               </div>
             </div>
           </div>

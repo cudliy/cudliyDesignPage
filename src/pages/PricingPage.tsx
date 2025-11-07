@@ -11,7 +11,16 @@ const PricingPage = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Check authentication status
   useEffect(() => {
@@ -209,7 +218,7 @@ const PricingPage = () => {
       {/* Pricing Cards */}
       <section className="py-16 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className={`flex flex-wrap justify-center gap-1 transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
+          <div className={`flex flex-col md:flex-row md:flex-wrap justify-center gap-4 md:gap-1 transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
             {pricingPlans.map((plan, index) => (
               <div
                 key={plan.name}

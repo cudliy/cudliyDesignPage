@@ -106,7 +106,9 @@ const SignUp = () => {
       }
       
       toast.success("Account created successfully! Welcome to Cudliy!");
-      navigate("/dashboard");
+      // Show intro popup and then redirect to design page
+      sessionStorage.setItem('show_intro', 'true');
+      navigate("/design");
     } catch (error: any) {
       // Parse specific error messages
       let errorMessage = "An unexpected error occurred";
@@ -241,7 +243,7 @@ const SignUp = () => {
                         type={step.field === "password" || step.field === "confirmPassword" ? "password" : "text"}
                         placeholder={step.placeholder}
                         value={formData[step.field as keyof typeof formData] as string}
-                        onChange={(e) => handleInputChange(e.target.value)}
+                        onChange={(e) => handleInputChange(e.target.value, step.field)}
                         className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
                         required
                       />

@@ -20,6 +20,16 @@ export default function DesignPage() {
 	const [isModalPlaying, setIsModalPlaying] = useState(false);
 	const [showTourModal, setShowTourModal] = useState(false);
 	const [isLoaded, setIsLoaded] = useState(false);
+	const [showIntroPopup, setShowIntroPopup] = useState(false);
+
+	// Check if intro should be shown (for new signups)
+	useEffect(() => {
+		const shouldShowIntro = sessionStorage.getItem('show_intro');
+		if (shouldShowIntro === 'true') {
+			setShowIntroPopup(true);
+			sessionStorage.removeItem('show_intro');
+		}
+	}, []);
 	const [isAdvanced, setIsAdvanced] = useState(false);
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [selectedSize, setSelectedSize] = useState('M');
