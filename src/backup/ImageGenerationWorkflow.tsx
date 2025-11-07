@@ -260,33 +260,33 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   };
 
   return (
-    <div className="w-full mx-auto pt-0 mt-0 px-4 md:px-0 md:max-w-4xl">
+    <div className="w-full max-w-4xl mx-auto pt-0 mt-0">
 
       {/* Loading State */}
       {(isGenerating && generatedImages.length === 0) || isPrinting ? (
-        <div className="text-center py-8 h-full flex items-center justify-center min-h-[60vh]">
+        <div className="text-center py-8 h-full flex items-center justify-center">
           <div className="flex flex-col items-center">
             <img
               src="/GIFS/Loading-State.gif"
               alt="Generating Images"
-              className="w-48 h-48 md:w-96 md:h-96 object-contain mb-8"
+              className="w-96 h-96 object-contain mb-8"
             />
-            <span className="text-black font-medium text-lg md:text-xl">
+            <span className="text-black font-medium text-xl">
               {isPrinting ? 'Creating 3D Model...' : 'Generating Images...'}
             </span>
           </div>
         </div>
       ) : (
         <>
-          {/* Generated Images Grid - Responsive Layout */}
+          {/* Generated Images Grid - Matching Demo Layout */}
           {generatedImages.length > 0 && (
         <div className="space-y-0 mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-1 lg:gap-1 xl:gap-2 h-full w-full md:ml-[-20px] lg:ml-[-15px] xl:ml-[-10px]" style={{ display: 'grid' }}>
-            {/* First 3 images in responsive grid */}
+          <div className="grid grid-cols-2 gap-1 lg:gap-1 xl:gap-2 h-full w-full ml-[-20px] lg:ml-[-15px] xl:ml-[-10px]" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            {/* First 3 images in 2x2 grid */}
             {generatedImages.slice(0, 3).map((image, index) => (
                 <div
                   key={index}
-                  className={`bg-white flex items-center justify-center h-[280px] md:h-[320px] min-h-[250px] md:min-h-[300px] transition-all duration-700 ease-out overflow-hidden rounded-lg md:rounded-none shadow-md md:shadow-none ${
+                  className={`bg-white flex items-center justify-center h-[320px] min-h-[300px] transition-all duration-700 ease-out overflow-hidden ${
                     selectedImageIndex === index 
                       ? 'ring-2 ring-blue-400 shadow-lg' 
                       : ''
@@ -316,8 +316,8 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                         </svg>
                       </div>
                     )}
-                    {/* View 3D Button - Responsive */}
-                    <div className="md:absolute md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-all md:duration-300 md:z-20 md:backdrop-blur-sm absolute bottom-3 left-1/2 transform -translate-x-1/2 md:transform-none z-20 opacity-100 md:opacity-0">
+                    {/* View 3D Button - Centered Professional */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 backdrop-blur-sm">
                       <button 
                         onClick={async (e) => {
                           e.stopPropagation();
@@ -330,9 +330,9 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                             setIsPrinting(false);
                           }
                         }}
-                        className="px-4 py-2 md:px-6 md:py-3 bg-white text-gray-800 flex items-center justify-center gap-2 md:gap-3 transition-all duration-200 hover:bg-white hover:scale-105 shadow-lg cursor-pointer text-[12px] md:text-[14px] font-medium rounded-lg md:rounded-none"
+                        className="px-6 py-3 bg-white text-gray-800 flex items-center justify-center gap-3 transition-all duration-200 hover:bg-white hover:scale-105 shadow-lg cursor-pointer text-[14px] font-medium"
                       >
-                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7.5v9l9 4.5 9-4.5v-9" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v9" />

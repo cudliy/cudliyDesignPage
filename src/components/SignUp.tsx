@@ -180,28 +180,28 @@ const SignUp = () => {
       )}
       
       {/* Left Section - Sign Up Form */}
-      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-8 py-12">
+      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12">
         <div className={`w-full max-w-lg transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <div className={`text-center mb-8 transform transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <div className={`text-center mb-6 sm:mb-8 transform transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
             {/* Logo */}
-            <div className="mb-4 flex justify-center">
+            <div className="mb-3 sm:mb-4 flex justify-center">
               <img
                 src="/CudliyLogo.svg"
                 alt="Cudliy Logo"
-                className="w-8 h-8 object-contain"
+                className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
                 style={{
                   opacity: 1
                 }}
               />
             </div>
-            <h1 className="text-3xl font-bold text-black mb-2 font-abril">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2 font-abril">
               Create Account
             </h1>
           </div>
 
-          <div className={`space-y-6 transform transition-all duration-700 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <div className={`space-y-4 sm:space-y-6 transform transition-all duration-700 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
             {/* Progress Indicator */}
-            <div className="flex justify-center space-x-2 mb-6">
+            <div className="flex justify-center space-x-2 mb-4 sm:mb-6">
               {steps.map((_, index) => (
                 <div
                   key={index}
@@ -222,7 +222,7 @@ const SignUp = () => {
                   <div key={index} className="w-full flex-shrink-0">
                     {step.fields ? (
                       // First step with multiple fields
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {step.fields.map((field, fieldIndex) => (
                           <Input
                             key={fieldIndex}
@@ -230,14 +230,7 @@ const SignUp = () => {
                             placeholder={step.placeholders[fieldIndex]}
                             value={formData[field as keyof typeof formData] as string}
                             onChange={(e) => handleInputChange(e.target.value, field)}
-                            className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                            style={{
-                              width: '508px',
-                              height: '50px',
-                              borderRadius: '25px',
-                              borderWidth: '0.5px',
-                              padding: '12px 16px'
-                            }}
+                            className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
                             required
                           />
                         ))}
@@ -249,14 +242,7 @@ const SignUp = () => {
                         placeholder={step.placeholder}
                         value={formData[step.field as keyof typeof formData] as string}
                         onChange={(e) => handleInputChange(e.target.value)}
-                        className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                        style={{
-                          width: '508px',
-                          height: '50px',
-                          borderRadius: '25px',
-                          borderWidth: '0.5px',
-                          padding: '12px 16px'
-                        }}
+                        className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
                         required
                       />
                     )}
@@ -265,28 +251,11 @@ const SignUp = () => {
               </div>
             </div>
 
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3 sm:gap-4">
               {currentStep > 0 && (
                 <Button
                   onClick={handleBack}
-                  className="font-medium transition-colors"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '120px',
-                    height: '42px',
-                    borderRadius: '22px',
-                    gap: '10px',
-                    paddingTop: '14px',
-                    paddingRight: '40px',
-                    paddingBottom: '14px',
-                    paddingLeft: '40px',
-                    background: 'transparent',
-                    border: '2px solid #E70A55',
-                    color: '#E70A55'
-                  }}
+                  className="font-medium transition-colors bg-transparent border-2 border-[#E70A55] text-[#E70A55] rounded-[22px] h-[42px] px-6 sm:px-10 hover:bg-[#E70A55] hover:text-white"
                 >
                   Back
                 </Button>
@@ -294,27 +263,12 @@ const SignUp = () => {
               <Button
                 onClick={handleNext}
                 disabled={isLoading}
-                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '120px',
-                  height: '42px',
-                  borderRadius: '22px',
-                  gap: '10px',
-                  paddingTop: '14px',
-                  paddingRight: '40px',
-                  paddingBottom: '14px',
-                  paddingLeft: '40px',
-                  background: '#000000'
-                }}
+                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black rounded-[22px] h-[42px] px-6 sm:px-10"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span>Creating account...</span>
+                    <span className="hidden sm:inline">Creating account...</span>
                   </div>
                 ) : (
                   getButtonText()
@@ -323,9 +277,9 @@ const SignUp = () => {
             </div>
           </div>
 
-          <div className={`mt-8 text-center transform transition-all duration-700 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p className="text-gray-600 mb-4">Sign in with</p>
-            <div className="flex justify-center space-x-4">
+          <div className={`mt-6 sm:mt-8 text-center transform transition-all duration-700 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">Sign in with</p>
+            <div className="flex justify-center space-x-3 sm:space-x-4">
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
@@ -362,8 +316,8 @@ const SignUp = () => {
             </div>
           </div>
 
-          <div className={`mt-6 text-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p className="text-gray-600">
+          <div className={`mt-4 sm:mt-6 text-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <p className="text-sm sm:text-base text-gray-600">
               Already have an account?{" "}
               <span 
                 className="text-[#E70A55] cursor-pointer hover:underline"
@@ -374,8 +328,8 @@ const SignUp = () => {
             </p>
           </div>
 
-          <div className={`mt-4 text-center text-sm text-gray-500 transform transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p>
+          <div className={`mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-500 transform transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <p className="px-2">
               By clicking "Create account" or "Continue with Google or Apple", you agree to Cudliy's{" "}
               <span 
                 className="text-[#E70A55] cursor-pointer hover:underline"

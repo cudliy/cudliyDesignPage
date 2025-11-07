@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Sliders } from 'lucide-react';
 
 export interface ModelDropdownProps {
   selectedQuality: string;
@@ -54,18 +53,9 @@ export default function ModelDropdown({ selectedQuality, onQualityChange }: Mode
     setOpen(false);
   };
 
-  const getDisplayText = (quality: string) => {
-    switch (quality) {
-      case 'fast': return 'Fast';
-      case 'medium': return 'Medium';
-      case 'good': return 'Good';
-      default: return 'Medium';
-    }
-  };
-
   return (
     <>
-      {/* Global CSS to ensure dropdown appears above everything */}
+      {/* Global CSS to ensure dropdown appears above everything and is fully opaque */}
       <style>{`
         .model-dropdown-container {
           z-index: 9999999 !important;
@@ -74,58 +64,125 @@ export default function ModelDropdown({ selectedQuality, onQualityChange }: Mode
         .model-dropdown-menu {
           z-index: 9999999 !important;
           position: absolute !important;
+          background-color: #414141 !important;
+          opacity: 1 !important;
         }
       `}</style>
       
       <div className='relative text-left model-dropdown-container' style={{ zIndex: 999999 }} ref={containerRef}>
-        {/*Dropdown Button*/}
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-1 bg-white/10 hover:bg-white/20 border-none text-white px-2 py-0 text-[9px] sm:text-[10px] lg:text-[11px] font-medium transition-all duration-300 h-5 sm:h-6 lg:h-7 rounded-md" 
+        {/*Dropdown Button - Settings/Sliders Icon Only*/}
+        <button 
+          className="flex items-center justify-center bg-transparent hover:opacity-70 border-none text-gray-400 p-0 transition-all duration-300" 
           onClick={(e) => {
             e.stopPropagation();
             setOpen(!open);
           }}
         >
-          {getDisplayText(selectedQuality)}
-          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`} />
-        </Button>
+          <Sliders className="w-4 h-4" />
+        </button>
         
-        {/* Dropdown Menu - Simple approach with maximum z-index */}
+        {/* Dropdown Menu - Solid Overlay */}
         {open && (
           <div
-            className="absolute mt-2 w-48 right-0 bg-[#414141] rounded-md shadow-2xl overflow-hidden model-dropdown-menu"
-            style={{ 
-              zIndex: 9999999,
-              backgroundColor: '#414141',
-              position: 'absolute'
-            }}
-            ref={dropdownRef}
+            className="fixed inset-0 z-[99999]"
+            onClick={() => setOpen(false)}
           >
-            <div className="py-1">
-              <div 
-                onClick={() => handleOptionClick('fast')}
-                className={`px-3 py-2 text-[10px] sm:text-[11px] lg:text-[12px] cursor-pointer transition-colors duration-200 hover:bg-white/20 ${
-                  selectedQuality === 'fast' ? 'bg-white/30 text-white font-medium' : 'text-white'
-                }`}
-              >
-                Fast
-              </div>
-              <div 
-                onClick={() => handleOptionClick('medium')}
-                className={`px-3 py-2 text-[10px] sm:text-[11px] lg:text-[12px] cursor-pointer transition-colors duration-200 hover:bg-white/20 ${
-                  selectedQuality === 'medium' ? 'bg-white/30 text-white font-medium' : 'text-white'
-                }`}
-              >
-                Medium
-              </div>
-              <div 
-                onClick={() => handleOptionClick('good')}
-                className={`px-3 py-2 text-[10px] sm:text-[11px] lg:text-[12px] cursor-pointer transition-colors duration-200 hover:bg-white/20 ${
-                  selectedQuality === 'good' ? 'bg-white/30 text-white font-medium' : 'text-white'
-                }`}
-              >
-                Good
+            <div
+              className="absolute w-36 shadow-xl"
+              style={{ 
+                right: '0px',
+                top: '60px',
+                backgroundColor: '#414141',
+                zIndex: 99999
+              }}
+              ref={dropdownRef}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="py-2">
+                <div 
+                  onClick={() => handleOptionClick('fast')}
+                  style={{
+                    backgroundColor: selectedQuality === 'fast' ? '#E70D57' : '#414141'
+                  }}
+                  className={`px-4 py-2.5 text-[13px] cursor-pointer flex items-center justify-between transition-all duration-200 ${
+                    selectedQuality === 'fast' 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-300'
+                  }`}
+                  onMouseEnter={(e) => {
+                    if (selectedQuality !== 'fast') {
+                      e.currentTarget.style.backgroundColor = '#525252';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedQuality !== 'fast') {
+                      e.currentTarget.style.backgroundColor = '#414141';
+                    }
+                  }}
+                >
+                  <span>Fast</span>
+                  {selectedQuality === 'fast' && (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+                <div 
+                  onClick={() => handleOptionClick('medium')}
+                  style={{
+                    backgroundColor: selectedQuality === 'medium' ? '#E70D57' : '#414141'
+                  }}
+                  className={`px-4 py-2.5 text-[13px] cursor-pointer flex items-center justify-between transition-all duration-200 ${
+                    selectedQuality === 'medium' 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-300'
+                  }`}
+                  onMouseEnter={(e) => {
+                    if (selectedQuality !== 'medium') {
+                      e.currentTarget.style.backgroundColor = '#525252';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedQuality !== 'medium') {
+                      e.currentTarget.style.backgroundColor = '#414141';
+                    }
+                  }}
+                >
+                  <span>Medium</span>
+                  {selectedQuality === 'medium' && (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+                <div 
+                  onClick={() => handleOptionClick('good')}
+                  style={{
+                    backgroundColor: selectedQuality === 'good' ? '#E70D57' : '#414141'
+                  }}
+                  className={`px-4 py-2.5 text-[13px] cursor-pointer flex items-center justify-between transition-all duration-200 ${
+                    selectedQuality === 'good' 
+                      ? 'text-white font-medium' 
+                      : 'text-gray-300'
+                  }`}
+                  onMouseEnter={(e) => {
+                    if (selectedQuality !== 'good') {
+                      e.currentTarget.style.backgroundColor = '#525252';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedQuality !== 'good') {
+                      e.currentTarget.style.backgroundColor = '#414141';
+                    }
+                  }}
+                >
+                  <span>Good</span>
+                  {selectedQuality === 'good' && (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -124,11 +124,11 @@ const SignIn = () => {
       )}
       
       {/* Left Section - Sign In Form */}
-      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-8 py-12">
+      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12">
         <div className={`w-full max-w-lg transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <div className={`text-center mb-8 transform transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <div className={`text-center mb-6 sm:mb-8 transform transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
             {/* Logo */}
-            <div className="mb-4 flex justify-center">
+            <div className="mb-3 sm:mb-4 flex justify-center">
               <img
                 src="/CudliyLogo.svg"
                 alt="Cudliy Logo"
@@ -138,26 +138,19 @@ const SignIn = () => {
                 }}
               />
             </div>
-            <h1 className="text-3xl font-bold text-black mb-2 font-abril">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2 font-abril">
               Sign in
             </h1>
           </div>
 
-          <form onSubmit={handleSignIn} className={`space-y-6 transform transition-all duration-700 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <div className="space-y-4">
+          <form onSubmit={handleSignIn} className={`space-y-4 sm:space-y-6 transform transition-all duration-700 delay-400 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <div className="space-y-3 sm:space-y-4">
               <Input
                 type="email"
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                style={{
-                  width: '508px',
-                  height: '50px',
-                  borderRadius: '25px',
-                  borderWidth: '0.5px',
-                  padding: '12px 16px'
-                }}
+                className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
                 required
               />
 
@@ -166,14 +159,7 @@ const SignIn = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                style={{
-                  width: '508px',
-                  height: '50px',
-                  borderRadius: '25px',
-                  borderWidth: '0.5px',
-                  padding: '12px 16px'
-                }}
+                className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
                 required
               />
             </div>
@@ -182,27 +168,11 @@ const SignIn = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '120px',
-                  height: '42px',
-                  borderRadius: '22px',
-                  gap: '10px',
-                  paddingTop: '14px',
-                  paddingRight: '40px',
-                  paddingBottom: '14px',
-                  paddingLeft: '40px',
-                  background: '#000000'
-                }}
+                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black rounded-full h-[42px] min-w-[120px] px-10"
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span>Signing in...</span>
                   </div>
                 ) : (
                   "Continue"
@@ -211,9 +181,9 @@ const SignIn = () => {
             </div>
           </form>
 
-          <div className={`mt-8 text-center transform transition-all duration-700 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p className="text-gray-600 mb-4">Sign in with</p>
-            <div className="flex justify-center space-x-4">
+          <div className={`mt-6 sm:mt-8 text-center transform transition-all duration-700 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">Sign in with</p>
+            <div className="flex justify-center space-x-3 sm:space-x-4">
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
@@ -250,8 +220,8 @@ const SignIn = () => {
             </div>
           </div>
 
-          <div className={`mt-6 text-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p className="text-gray-600">
+          <div className={`mt-4 sm:mt-6 text-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <p className="text-sm sm:text-base text-gray-600">
               Don't have an account?{" "}
               <span 
                 className="text-[#E70A55] cursor-pointer hover:underline"
@@ -262,8 +232,8 @@ const SignIn = () => {
             </p>
           </div>
 
-          <div className={`mt-4 text-center text-sm text-gray-500 transform transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p>
+          <div className={`mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-500 transform transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <p className="px-2">
               By clicking "Create account" or "Continue with Google or Apple", you agree to Cudliy's{" "}
               <span 
                 className="text-[#E70A55] cursor-pointer hover:underline"

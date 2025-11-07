@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import ImageGenerationWorkflow from "../components/ImageGenerationWorkflow";
 
 export default function DesignPage() {
-	const videoRef = useRef<HTMLVideoElement>(null);
 	const modalVideoRef = useRef<HTMLVideoElement>(null);
 	const [isModalPlaying, setIsModalPlaying] = useState(false);
 	const [showTourModal, setShowTourModal] = useState(false);
@@ -55,9 +54,9 @@ export default function DesignPage() {
   
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!userId || !token) {
-      window.location.href = '/signin';
-    }
+	if (!userId || !token) {
+	  window.location.href = '/signin';
+	}
   }, [userId, token]);
 
 	// Usage limits and subscription status
@@ -103,10 +102,6 @@ export default function DesignPage() {
 		handleModalPlay();
 	};
 
-	const handleTourClick = () => {
-		setShowTourModal(true);
-	};
-
 	const handleCloseModal = () => {
 		if (modalVideoRef.current) {
 			modalVideoRef.current.pause();
@@ -125,11 +120,11 @@ export default function DesignPage() {
 	};
 
 const handleBackToCategories = () => {
-    console.log('Back button clicked - current selectedCategory:', selectedCategory);
-    // Always return to Advanced section with no subcategory selected
-    if (!isAdvanced) setIsAdvanced(true);
-    setSelectedCategory(null);
-    console.log('Back button clicked - set selectedCategory to null');
+	console.log('Back button clicked - current selectedCategory:', selectedCategory);
+	// Always return to Advanced section with no subcategory selected
+	if (!isAdvanced) setIsAdvanced(true);
+	setSelectedCategory(null);
+	console.log('Back button clicked - set selectedCategory to null');
 };
 
 
@@ -214,59 +209,59 @@ const handleBackToCategories = () => {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
+	const handleClickOutside = (event: MouseEvent) => {
+	  if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+		setOpen(false);
+	  }
+	};
 
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+	if (open) {
+	  document.addEventListener('mousedown', handleClickOutside);
+	}
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+	return () => {
+	  document.removeEventListener('mousedown', handleClickOutside);
+	};
   }, [open]);
 
   return (
-    <div className='relative inline-block text-left' ref={dropdownRef}>
-      {/*Dropdown Button*/}
-      <Button 
-        variant="ghost" 
-        className="flex items-center gap-2 bg-transparent hover:bg-transparent text-white px-2 py-2 transition-all duration-300" 
-        onClick={() => setOpen(!open)}
-      >
-       <img className="w-5 h-5" src="Asset 13.svg" alt="Workspace"/> 
-       <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`} />
-      </Button>
-      
-      {/* Dropdown Menu*/}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute mt-3 w-48 left-0 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden"
-          >
-            <div className="py-1">
-              <a 
-                href="/dashboard" 
-                className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-200 group"
-              >
-                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
-                </svg>
-                <span className="font-medium">Back to Workspace</span>
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+	<div className='relative inline-block text-left' ref={dropdownRef}>
+	  {/*Dropdown Button*/}
+	  <Button 
+		variant="ghost" 
+		className="flex items-center gap-2 bg-transparent hover:bg-transparent text-white px-2 py-2 transition-all duration-300" 
+		onClick={() => setOpen(!open)}
+	  >
+	   <img className="w-5 h-5" src="Asset 13.svg" alt="Workspace"/> 
+	   <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`} />
+	  </Button>
+	  
+	  {/* Dropdown Menu*/}
+	  <AnimatePresence>
+		{open && (
+		  <motion.div
+			initial={{ opacity: 0, scale: 0.95, y: -10 }}
+			animate={{ opacity: 1, scale: 1, y: 0 }}
+			exit={{ opacity: 0, scale: 0.95, y: -10 }}
+			transition={{ duration: 0.2, ease: "easeOut" }}
+			className="absolute mt-3 w-48 left-0 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden"
+		  >
+			<div className="py-1">
+			  <a 
+				href="/dashboard" 
+				className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-200 group"
+			  >
+				<svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+				  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+				</svg>
+				<span className="font-medium">Back to Workspace</span>
+			  </a>
+			</div>
+		  </motion.div>
+		)}
+	  </AnimatePresence>
+	</div>
   );
 }
 
@@ -814,11 +809,11 @@ const handleBackToCategories = () => {
 			/>
 			<div className="w-screen h-screen bg-white flex justify-center p-0 fixed inset-0 overflow-hidden">
 			{/* Left Sidebar */}
-			<aside className={`h-screen mt-1 sm:mt-1 lg:mt-1 mb-2 sm:mb-4 lg:mb-2 bg-[#313131] border border-white/5 ml-1 sm:ml-1 lg:ml-1 ${
+			<aside className={`left-pane-scale h-screen mt-1 sm:mt-1 lg:mt-1 mb-2 sm:mb-4 lg:mb-2 bg-[#313131] border border-white/5 ml-1 sm:ml-1 lg:ml-1 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
 			} transition-all duration-500 relative flex-shrink-0 overflow-hidden`}
 			style={{
-				width: 'clamp(330px, 28vw, 420px)',
+				width: 'clamp(300px, 24vw, 380px)',
 				borderRadius: 'clamp(24px, 3vw, 32px)',
 			}}>
 				{/* Workspace Dropdown */}
@@ -826,35 +821,16 @@ const handleBackToCategories = () => {
 				<WorkspaceDropdown/>
 			</div>
 
-			{/* Cancel Button - Only show during workflow */}
-			{showWorkflow && (
-				<div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
-					<button
-						onClick={handleReset}
-						className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200 border border-white/20 hover:border-white/40"
-					>
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-						</svg>
-						Cancel
-					</button>
-				</div>
-			)}
+
 				
 							{/* Brand and title area */}
-			<div className="pt-[5.5rem] sm:pt-[5.5rem] px-4 sm:px-6 lg:px-8 pb-2 text-white flex flex-col items-center text-center h-full overflow-hidden">
+			<div className="left-pane-content pt-[5.5rem] sm:pt-[5.5rem] px-4 sm:px-6 lg:px-8 pb-2 text-white flex flex-col items-center text-center h-full overflow-hidden">
 					{/* Mode selector */}
-					<div className={`absolute top-[70px] left-1/2 -translate-x-1/2 flex items-center px-1 gap-2 w-[222px] h-[28px] rounded-[50px] bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
+					<div className={`absolute top-[70px] left-1/2 -translate-x-1/2 flex items-center px-1 gap-2 w-[120px] h-[28px] rounded-[50px] bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
-						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
-							Voice
-						</button>
 						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
 							Chat
-						</button>
-						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
-							Draw
 						</button>
 					</div>
 					
@@ -872,30 +848,65 @@ const handleBackToCategories = () => {
 						You are a Vibe Designer now
 					</p>
 					
-					{/* Input */}
-					<div
-						className={`mt-3 w-[340px] p-[2px] rounded-[24px] bg-gradient-to-r from-[#E70D57] to-[#ff3b7a] shadow-[0_2px_10px_rgba(231,13,87,0.25)] transition-all duration-700 delay-500 ease-out ${
-							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-						}`}
-					>
-						<input
-							placeholder="I want a toy camera"
-							value={prompt}
-							onChange={(e) => setPrompt(e.target.value)}
-							className="w-full h-[36px] rounded-[20px] bg-white text-black text-[14px] px-4 lg:px-5 outline-none placeholder:text-gray-400 focus:ring-0"
-							style={{ caretColor: '#E70D57' }}
-						/>
-					</div>
-
-					{/* Advanced Toggle and Model Selector */}
-					<div className={`mt-2 sm:mt-3 lg:mt-4 flex items-center justify-between w-full max-w-[280px] sm:max-w-[300px] lg:max-w-[320px] transition-all duration-700 delay-600 ease-out ${
+					{/* Input Field with Icon Dropdown */}
+					<div className={`mt-3 w-full max-w-[320px] transition-all duration-700 delay-500 ease-out ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`} style={{ zIndex: 999999 }}>
-						{/* Advanced Toggle */}
-						<div className="flex items-center gap-2">
+					}`}>
+						{/* Main Input Container */}
+						<div className="relative w-full rounded-[28px] bg-[#2a2a2a]">
+							<div className="relative px-4 py-4 min-h-[60px]">
+								{/* Input Field */}
+								<input
+									placeholder="Turn landscape into portrait"
+									value={prompt}
+									onChange={(e) => setPrompt(e.target.value)}
+									onKeyDown={(e) => {
+										console.log('Key pressed:', e.key);
+										if (e.key === 'Enter' && !e.shiftKey) {
+											console.log('Enter key detected, calling handleCreateClick');
+											e.preventDefault();
+											handleCreateClick();
+										}
+									}}
+									className="w-full bg-transparent text-white text-[15px] outline-none placeholder:text-gray-500 pr-16 pb-6"
+									style={{ caretColor: '#E70D57' }}
+								/>
+								
+								{/* Bottom Right Icons */}
+								<div className="absolute bottom-3 right-3 flex items-center gap-2">
+									{/* Settings Icon as Dropdown */}
+									<div className="relative" style={{ zIndex: 9999999 }}>
+										<ModelDropdown 
+											selectedQuality={selectedQuality}
+											onQualityChange={handleQualityChange}
+										/>
+									</div>
+									
+									{/* Submit Button */}
+									<button 
+										onClick={handleCreateClick}
+										disabled={!canGenerateImages}
+										className={`transition-all duration-300 ${
+											!canGenerateImages
+												? 'text-gray-600 cursor-not-allowed'
+												: 'text-gray-400 hover:text-white'
+										}`}
+									>
+										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
+						
+						{/* Advanced Toggle - Below Input */}
+						<div className={`mt-3 flex items-center gap-2 px-2 transition-all duration-700 delay-600 ease-out ${
+							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+						}`}>
 							<button
 								onClick={handleAdvancedClick}
-								className={`relative inline-flex h-4 w-8 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-[#E70D57]/50 ${
+								className={`relative inline-flex h-4 w-8 items-center rounded-full transition-all duration-300 focus:outline-none ${
 									isAdvanced ? 'bg-gradient-to-r from-[#E70D57] to-[#d10c50]' : 'bg-white/20 hover:bg-white/30'
 								}`}
 							>
@@ -905,17 +916,7 @@ const handleBackToCategories = () => {
 									}`}
 								/>
 							</button>
-							<span className="text-white/70 text-[11px] sm:text-[12px] lg:text-[13px] font-normal">Advanced</span>
-							<span className="text-[#E70D57] text-[9px] sm:text-[10px] lg:text-[11px] font-normal">Beta</span>
-						</div>
-
-						{/* Model Selector */}
-						<div className="flex items-center gap-1" style={{ zIndex: 9999999 }}>
-							<span className="text-white/70 text-[11px] sm:text-[12px] lg:text-[13px] font-normal">Model</span>
-							<ModelDropdown 
-								selectedQuality={selectedQuality}
-								onQualityChange={handleQualityChange}
-							/>
+							<span className="text-white/70 text-[11px] sm:text-[12px] font-normal">Advanced</span>
 						</div>
 					</div>
 
@@ -982,54 +983,9 @@ const handleBackToCategories = () => {
 							)}
 						</div>
 					) : (
-						/* Basic Mode Content - Show Create button and Tour section */
-						<div className="flex flex-col items-center w-full">
-							{/* Create Button */}
-							<button 
-								onClick={handleCreateClick}
-								disabled={!canGenerateImages}
-						className={`mt-2 sm:mt-3 lg:mt-4 px-4 py-1 w-[125px] h-[36px] text-center items-center justify-center rounded-[24px] font-medium text-[12px] sm:text-[13px] lg:text-[14px] transition-all duration-700 delay-600 ease-out hover:scale-105 shadow-lg ${
-									!canGenerateImages
-										? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white'
-								} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}>
-								Create
-							</button>
-
-					{/* Tour section */}
-					<div className={`mt-2 sm:mt-3 lg:mt-4 w-full max-w-[340px] flex flex-col items-center text-center relative transition-all duration-700 delay-700 ease-out ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-							}`}>
-								<h3 className="font-semibold text-white text-[13px] sm:text-[14px] lg:text-[15px] mb-2 sm:mb-3">Take a Tour 👋</h3>
-								<p className="text-white/70 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed mb-3 sm:mb-4 lg:mb-6">
-									Let's show you around cudliy. Become a designer in 5 minutes.
-								</p>
-								
-								{/* Video container - enhanced design */}
-							<div className="relative w-[289.67px] h-[182.54px] rotate-[0.27deg] mx-auto flex-shrink-0 group">
-								<div className="relative w-full h-full bg-gradient-to-br from-gray-900 to-black border-[1.85px] border-white/30 rounded-[11.13px] overflow-hidden shadow-2xl">
-										<video 
-											ref={videoRef} 
-											src="/final 2.mp4" 
-											className="object-cover h-full w-full" 
-											loop 
-											muted 
-											playsInline 
-										/>
-										<div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none"></div>
-										<button 
-											onClick={handleTourClick} 
-											aria-label="Take a tour" 
-											className="absolute inset-0 m-auto w-10 h-10 rounded-full bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:from-white hover:to-white/90 shadow-lg group"
-										>
-											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-0.5">
-												<path d="M8 5v14l11-7L8 5z" fill="#333" />
-											</svg>
-											<div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/30 to-pink-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-										</button>
-									</div>
-								</div>
-							</div>
+						/* Basic Mode Content - Clean minimal view */
+						<div className="flex flex-col items-center w-full mt-8">
+							{/* Clean minimal design with no text */}
 						</div>
 					)}
 				</div>
@@ -1038,16 +994,30 @@ const handleBackToCategories = () => {
 			{/* Main Content Area */}
 			<div className="flex-1 min-w-0 flex flex-col relative bg-white ml-0 lg:ml-0 xl:ml-0 border border-none overflow-hidden"
 				 style={{ borderRadius: 'clamp(24px, 3vw, 32px)' }}>
+				{/* Cancel Button - Only show during workflow */}
+				{showWorkflow && (
+					<div className="absolute top-4 right-4 z-20">
+						<button
+							onClick={handleReset}
+							className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+						>
+							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+					</div>
+				)}
+				
 				{/* Content - Scrollable */}
 				<div className="flex-1 pl-0 pr-0 sm:pr-0 lg:pr-0 pb-2 sm:pb-2 lg:pb-4 overflow-y-hidden overflow-x-hidden">
 					{showWorkflow ? (
 						<>
 						
-						{/* Workflow Display - Show Loading State in Grid (hidden when workflow is active) */}
-						{!showWorkflow && (
-							<div className="grid grid-cols-2 gap-4 w-full ml-[-25px] lg:ml[-15px] xl:ml-0 min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+							{/* Workflow Display - Show Loading State in Grid (hidden when workflow is active) */}
+							{!showWorkflow && (
+								<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 w-full ml-0 lg:ml-0 xl:ml-0 min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 							{/* Camera 1 - Top Left - Show Loading GIF */}
-							<div className={`bg-white border  border-gray-200/50 rounded-[40px] ml-[-25px] lg:ml[-15px] xl:ml-0 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] ml-0 lg:ml-1 xl:ml-1 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex ml-[-25px] lg:ml[-15px] xl:ml-0 flex-col items-center justify-center p-6 text-center relative">
@@ -1062,7 +1032,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 2 - Top Right - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1077,7 +1047,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 3 - Bottom Left - Show Loading GIF */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1092,7 +1062,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Generate 3D Model - Bottom Right - Keep Button in Same Position */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1188,9 +1158,9 @@ const handleBackToCategories = () => {
 						</div>
 					) : (
 						/* Default Grid Display */
-						<div className="grid grid-cols-2 gap-0 lg:gap-0 xl:gap-1 relative w-full h-full border-none pl-0 lg:pl-0 xl:pl-0 pr-0 lg:pr-0 xl:pr-0 py-0 lg:py-0 xl:py-0 ml-[-30px] lg:ml-[-25px] xl:ml-[-20px]">
+						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 py-0 lg:py-0 xl:py-0 ml-0 lg:ml-0 xl:ml-1">
 							{/* Camera 1 - Top Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1203,7 +1173,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 2 - Top Right */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1216,7 +1186,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 3 - Bottom Left */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm hover:shadow-lg ml-[-25px] lg:ml-[-15px] xl:ml-0 ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
@@ -1229,7 +1199,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Empty space - Bottom Right - No hover effects */}
-							<div className={`bg-white border border-gray-200/50 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-6 text-center">
