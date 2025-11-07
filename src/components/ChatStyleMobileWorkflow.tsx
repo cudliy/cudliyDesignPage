@@ -186,11 +186,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       return;
     }
 
-    const loadingMessageId = `loading_${Date.now()}`;
-    setMessages(prev => [
-      ...prev,
-      { id: loadingMessageId, type: 'assistant', content: 'Creating 3D model...', isGenerating: true }
-    ]);
+    // Set generating state to show full-screen loading
+    setIsGenerating(true);
 
     try {
       const request: Generate3DModelRequest = {
@@ -222,7 +219,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       }
     } catch (error) {
       onError(error instanceof Error ? error.message : 'Failed to generate 3D model');
-      setMessages(prev => prev.filter(msg => msg.id !== loadingMessageId));
+      setIsGenerating(false);
     }
   };
 
@@ -330,6 +327,21 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
 
   return (
     <div className="flex flex-col h-full w-full bg-gray-50 relative overflow-hidden">
+      {/* Full-Screen Loading State for 3D Generation */}
+      {isGenerating && (
+        <div className="absolute inset-0 bg-white z-50 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <img
+              src="/GIFS/Loading-State.gif"
+              alt="Generating 3D Model"
+              className="w-32 h-32 object-contain mb-6"
+            />
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Creating 3D Model</h3>
+            <p className="text-sm text-gray-600">This may take a moment...</p>
+          </div>
+        </div>
+      )}
+
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto px-4 py-6 pb-32 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {messages.length === 0 && (
