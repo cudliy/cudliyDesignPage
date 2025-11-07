@@ -1292,6 +1292,131 @@ const handleBackToCategories = () => {
 				<img src="/icon.png" alt="Help" className="w-full h-full object-cover" />
 			</button>
 
+			{/* Intro Popup for New Users */}
+			{showIntroPopup && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					{/* Backdrop */}
+					<div 
+						className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-500 ease-out"
+						style={{
+							animation: showIntroPopup ? 'fadeIn 0.5s ease-out' : 'fadeOut 0.3s ease-in'
+						}}
+					></div>
+					
+					{/* Modal */}
+					<div 
+						className="relative bg-gradient-to-br from-white via-gray-50 to-white rounded-[32px] flex flex-col items-center gap-[30px] z-10 shadow-2xl border border-gray-200/50 transition-all duration-700 ease-out max-w-[90vw] md:max-w-[773px]"
+						style={{
+							width: '90vw',
+							maxWidth: '773px',
+							height: 'auto',
+							maxHeight: '90vh',
+							transform: showIntroPopup ? 'rotate(-0.03deg) scale(1)' : 'rotate(-0.03deg) scale(0.9)',
+							opacity: showIntroPopup ? 1 : 0,
+							paddingTop: '40px',
+							paddingRight: '20px',
+							paddingBottom: '40px',
+							paddingLeft: '20px',
+							animation: showIntroPopup ? 'modalSlideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'modalSlideOut 0.3s ease-in'
+						}}
+					>
+						{/* Close button */}
+						<button 
+							onClick={() => setShowIntroPopup(false)}
+							className="absolute top-6 right-6 w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-300 hover:scale-110 shadow-md border border-gray-200/50"
+						>
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+							</svg>
+						</button>
+
+						{/* Title */}
+						<h2 className="font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent text-2xl" style={{ fontFamily: 'Nohemi' }}>
+							Welcome to Cudliy! 👋
+						</h2>
+
+						{/* Subtitle */}
+						<p 
+							style={{ 
+								fontFamily: 'Manrope',
+								fontWeight: 500,
+								fontSize: '18px',
+								lineHeight: '140%',
+								letterSpacing: '-0.01em',
+								textAlign: 'center',
+								maxWidth: '100%',
+								color: '#666'
+							}}
+						>
+							Let's show you around. Become a designer in 5 minutes.
+						</p>
+
+						{/* Video container */}
+						<div 
+							className="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-300 overflow-hidden relative flex-shrink-0 shadow-lg cursor-pointer w-full"
+							style={{
+								maxWidth: '677px',
+								height: 'auto',
+								aspectRatio: '16/9',
+								transform: 'rotate(0.27deg)',
+								opacity: 1,
+								borderRadius: '11.13px',
+								borderWidth: '1.85px'
+							}}
+							onClick={() => {
+								if (modalVideoRef.current) {
+									if (isModalPlaying) {
+										modalVideoRef.current.pause();
+										setIsModalPlaying(false);
+									} else {
+										modalVideoRef.current.play();
+										setIsModalPlaying(true);
+									}
+								}
+							}}
+						>
+							<video 
+								ref={modalVideoRef}
+								src="/final 2.mp4" 
+								className="w-full h-full object-cover" 
+								loop 
+								muted 
+								playsInline 
+							/>
+							{!isModalPlaying && (
+								<button 
+									aria-label="Play intro video" 
+									className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-black/80 pointer-events-none"
+								>
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M8 5v14l11-7L8 5z" fill="#fff" />
+									</svg>
+								</button>
+							)}
+						</div>
+
+						{/* Buttons */}
+						<div className="flex gap-3">
+							<button 
+								onClick={() => setShowIntroPopup(false)}
+								className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium text-base transition-all duration-300 hover:scale-105 shadow-md px-6 py-3 rounded-full"
+							>
+								Skip
+							</button>
+							<button 
+								onClick={() => {
+									setShowIntroPopup(false);
+									setShowTourModal(true);
+								}}
+								className="bg-gradient-to-r from-[#E70D57] to-[#d10c50] text-white font-medium text-base transition-all duration-300 hover:scale-105 hover:shadow-lg px-6 py-3 rounded-full"
+							>
+								Watch Tour
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
 			{/* Enhanced Tour Modal */}
 			{showTourModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center">
