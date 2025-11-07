@@ -643,7 +643,75 @@ export default function Dashboard() {
               <div className="py-12 text-center text-gray-600">
                 <p className="text-sm">Order history will appear here.</p>
               </div>
-            ) : (
+            ) : currentView === 'trash' ? (
+              <div className="py-12 text-center text-gray-600">
+                <p className="text-sm">Trash is empty.</p>
+              </div>
+            ) : currentView === 'tutorial' ? (
+              <div className="py-12 text-center text-gray-600">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Tutorials</h3>
+                  <p className="text-sm text-gray-600">Learn how to create amazing 3D designs.</p>
+                </div>
+              </div>
+            ) : currentView === 'community' ? (
+              <div className="py-12 text-center text-gray-600">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Community</h3>
+                  <p className="text-sm text-gray-600">Connect with other creators and share your work.</p>
+                </div>
+              </div>
+            ) : currentView === 'credits' ? (
+              <div className="py-12 text-center text-gray-600">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Credit Balance</h3>
+                  {usageLimits && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600">
+                        Images: {remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Models: {remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : currentView === 'edu' ? (
+              <div className="py-12 text-center text-gray-600">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">EDU License</h3>
+                  <p className="text-sm text-gray-600 mb-4">Special pricing for educational institutions.</p>
+                  <button 
+                    onClick={() => window.location.href = 'mailto:sales@cudliy.com?subject=EDU License Inquiry'}
+                    className="px-6 py-2 bg-orange-500 text-white rounded-full text-sm"
+                  >
+                    Contact Us
+                  </button>
+                </div>
+              </div>
+            ) : (currentView === 'recent' || currentView === 'all') ? (
               <div className="grid grid-cols-2 gap-3">
                 {designs.map((design) => (
                   <div
@@ -663,7 +731,7 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </>

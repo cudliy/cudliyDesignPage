@@ -167,10 +167,10 @@ const PricingPage = () => {
         keywords="pricing, subscription plans, toy design pricing, 3D printing plans, creator plan, studio plan, student discount, enterprise pricing"
         url="/pricing"
       />
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white overflow-x-hidden">
         <GlassNav />
       {/* Hero Section */}
-      <section className="pt-32 md:pt-40 pb-16 md:pb-24 px-4 md:px-8">
+      <section className="pt-32 md:pt-40 pb-16 md:pb-24 px-4 md:px-8 overflow-x-hidden">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className={`text-3xl md:text-4xl font-bold text-black mb-4 transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
             Plans for Every{" "}
@@ -207,7 +207,7 @@ const PricingPage = () => {
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-16 px-4 md:px-8">
+      <section className="py-16 px-4 md:px-8 overflow-x-hidden">
         <div className="max-w-7xl mx-auto">
           <div className={`flex flex-col md:flex-row md:flex-wrap justify-center gap-4 md:gap-1 transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
             {pricingPlans.map((plan, index) => (

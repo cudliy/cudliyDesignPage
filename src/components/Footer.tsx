@@ -55,18 +55,20 @@ const Footer = () => {
         {/* Large Cudliy Text at the very bottom */}
         <div className="text-center relative">
           {/* Ensure large wordmark is not clipped */}
-          <div className="relative w-full overflow-visible">
+          <div className="relative w-full overflow-hidden px-2">
             <h2
-              className="whitespace-nowrap leading-none font-extrabold mb-0 font-manrope text-[#E70A55] select-none"
+              className="leading-none font-extrabold mb-0 font-manrope text-[#E70A55] select-none"
               style={{
                 opacity: 1,
                 fontFamily: 'Manrope, sans-serif',
                 fontWeight: 800,
                 fontStyle: 'normal',
-                fontSize: 'clamp(140px, 20vw, 363.08px)',
+                fontSize: 'clamp(60px, 15vw, 363.08px)',
                 lineHeight: '100%',
                 letterSpacing: '0%',
-                margin: '0 auto'
+                margin: '0 auto',
+                wordBreak: 'keep-all',
+                whiteSpace: 'nowrap'
               }}
             >
               Cudliy
