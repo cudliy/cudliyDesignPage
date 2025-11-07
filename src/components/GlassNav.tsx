@@ -347,7 +347,7 @@ const GlassNav = () => {
                     }}
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      navigate('/signin');
+                      navigate('/');
                     }}
                   >
                     <span className="relative z-10">Login</span>
