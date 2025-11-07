@@ -297,6 +297,151 @@ export default function CheckoutPage() {
     );
   }
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Mobile View
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        {/* Mobile Header */}
+        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+          <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/20 rounded-lg">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-lg font-semibold">Checkout</h1>
+          <div className="w-5"></div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Product Preview */}
+          <div className="bg-white rounded-2xl p-4 shadow-md">
+            <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden mb-3">
+              {previewImageUrl && (
+                <img src={previewImageUrl} alt="Design" className="w-full h-full object-contain" />
+              )}
+            </div>
+            <h3 className="text-sm font-medium text-gray-800 truncate">{checkoutData?.items[0]?.designTitle || 'Design'}</h3>
+            <p className="text-xs text-gray-500">Personalized Gift</p>
+          </div>
+
+          {/* Size Selection */}
+          <div className="bg-white rounded-2xl p-4 shadow-md">
+            <h3 className="text-sm font-medium text-gray-800 mb-3">Choose Size</h3>
+            <div className="space-y-2">
+              {(['S', 'M', 'L'] as const).map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+                    selectedSize === size
+                      ? 'bg-pink-50 border-pink-500'
+                      : 'bg-white border-gray-200'
+                  }`}
+                >
+                  <div className="font-medium text-sm">
+                    {size === 'S' && 'Small (1-4")'}
+                    {size === 'M' && 'Medium (5-6")'}
+                    {size === 'L' && 'Large (7-8")'}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {size === 'S' && 'Perfect for tiny gifts'}
+                    {size === 'M' && 'Great for desk pieces'}
+                    {size === 'L' && 'Ideal for display'}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Inch selector for M/L */}
+            {(selectedSize === 'M' || selectedSize === 'L') && (
+              <div className="mt-3">
+                <p className="text-xs text-gray-600 mb-2">Select exact size</p>
+                <div className="flex gap-2">
+                  {selectedSize === 'M' && ([5, 6] as const).map(inch => (
+                    <button
+                      key={inch}
+                      onClick={() => setSelectedInch(inch)}
+                      className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                        selectedInch === inch
+                          ? 'bg-pink-500 text-white'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {inch}"
+                    </button>
+                  ))}
+                  {selectedSize === 'L' && ([7, 8] as const).map(inch => (
+                    <button
+                      key={inch}
+                      onClick={() => setSelectedInch(inch)}
+                      className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                        selectedInch === inch
+                          ? 'bg-pink-500 text-white'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {inch}"
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Order Summary */}
+          <div className="bg-white rounded-2xl p-4 shadow-md">
+            <h3 className="text-sm font-medium text-gray-800 mb-3">Order Summary</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Subtotal</span>
+                <span className="font-medium">${formatCurrency(uiSubtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Tax</span>
+                <span className="font-medium">${formatCurrency(uiTax)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Shipping</span>
+                <span className="font-medium">${formatCurrency(uiShipping)}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between">
+                <span className="font-semibold">Total</span>
+                <span className="font-bold text-lg">${formatCurrency(uiTotal)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fixed Bottom Button */}
+        <div className="bg-white border-t border-gray-200 p-4 shadow-lg">
+          <button
+            onClick={handleProceedToPayment}
+            disabled={orderProcessing}
+            className={`w-full py-3 rounded-full font-semibold transition-all ${
+              orderProcessing
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white'
+            }`}
+          >
+            {orderProcessing ? 'Processing...' : 'Continue to Checkout'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop View
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

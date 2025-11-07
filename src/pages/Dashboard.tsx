@@ -304,6 +304,139 @@ export default function Dashboard() {
     return colors[hash % colors.length];
   };
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Mobile View
+  if (isMobile) {
+    return (
+      <>
+        <SEO 
+          title="Dashboard - Manage Your Toy Designs"
+          description="Access your personal dashboard to view, manage, and organize your custom toy designs. Track your creations and continue your creative journey."
+          keywords="dashboard, my designs, toy management, design gallery, user dashboard, creative workspace"
+          url="/dashboard"
+        />
+        <div className="w-screen h-screen bg-gray-50 flex flex-col fixed inset-0 overflow-hidden">
+          {/* Mobile Header */}
+          <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
+            <div className="flex items-center gap-3">
+              <img src='/Asset 13.svg' className='w-6 h-6' alt="Logo" />
+              <h1 className="text-lg font-semibold">{displayName}'s Workspace</h1>
+            </div>
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-sm">
+              {userInitials}
+            </div>
+          </div>
+
+          {/* Usage Limits Banner */}
+          {usageLimits && (!canGenerateImages || !canGenerateModels) && (
+            <div className="mx-4 mt-3 mb-2">
+              <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-semibold text-red-800">Limit Reached</h3>
+                      <p className="text-xs text-red-600">
+                        {!canGenerateImages && `Images: ${remainingImages}/${usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}`}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    className="px-3 py-1 bg-[#FF9CB5] text-white text-xs font-medium rounded-lg"
+                  >
+                    Upgrade
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            {/* New Design Button */}
+            <button 
+              onClick={() => navigate('/design')}
+              disabled={!canGenerateImages && !canGenerateModels}
+              className={`w-full mb-4 px-6 py-3 rounded-full font-medium transition-all ${
+                !canGenerateImages && !canGenerateModels
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white'
+              }`}
+            >
+              + New Design
+            </button>
+
+            {/* Search */}
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search designs..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
+              />
+            </div>
+
+            {/* Designs Grid */}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading...</p>
+                </div>
+              </div>
+            ) : designs.length === 0 ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">No Designs Yet</h3>
+                  <p className="text-sm text-gray-600 mb-4">Start creating your first 3D design!</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {designs.map((design) => (
+                  <div
+                    key={design.id}
+                    onClick={() => handleDesignClick(design.id)}
+                    className="bg-white border-2 border-gray-200 rounded-2xl p-3 hover:shadow-lg transition-all cursor-pointer"
+                  >
+                    <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden mb-2">
+                      <img
+                        src={getDesignImage(design)}
+                        alt={getDesignTitle(design)}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <h3 className="text-xs font-medium text-gray-800 truncate">{getTruncatedTitle(design)}</h3>
+                    <p className="text-xs text-gray-500">{getDesignCategory(design)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Desktop View
   return (
     <>
       <SEO 

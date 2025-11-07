@@ -341,6 +341,148 @@ export default function DownloadPage() {
     );
   }
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Mobile View
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        {/* Mobile Header */}
+        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+          <button onClick={handleBack} className="p-2 hover:bg-white/20 rounded-lg">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-lg font-semibold">Download</h1>
+          <div className="w-5"></div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Progress */}
+          <div className="bg-white rounded-2xl p-6 shadow-md text-center">
+            <div className="text-6xl font-bold text-pink-500 mb-3">
+              {Math.round(progress)}%
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              {downloading ? 'Downloading...' : isProcessing ? 'Processing...' : 'Ready to download'}
+            </p>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-pink-500 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          </div>
+
+          {/* 3D Preview */}
+          <div className="bg-white rounded-2xl p-4 shadow-md">
+            <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden">
+              {modelUrl ? (
+                <Suspense fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-16 h-16" />
+                  </div>
+                }>
+                  <ModelViewer
+                    modelUrl={modelUrl}
+                    className="w-full h-full"
+                    lighting={50}
+                    background={100}
+                    size={50}
+                    cameraAngle={50}
+                  />
+                </Suspense>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="text-center">
+                    <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <p className="text-sm">Loading model...</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Format Selection */}
+          <div className="bg-white rounded-2xl p-4 shadow-md">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Choose Format
+            </label>
+            <select
+              value={selectedFormat}
+              onChange={(e) => handleFormatChange(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+            >
+              {availableFormats.map((format) => (
+                <option key={format} value={format}>{format}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Social Sharing */}
+          <div className="bg-white rounded-2xl p-4 shadow-md">
+            <h3 className="text-sm font-medium text-gray-800 mb-3">Share Your Design</h3>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => handleSocialShare('instagram')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <Instagram className="w-5 h-5 text-gray-600" />
+              </button>
+              <button onClick={() => handleSocialShare('linkedin')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <Linkedin className="w-5 h-5 text-gray-600" />
+              </button>
+              <button onClick={() => handleSocialShare('twitter')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <Twitter className="w-5 h-5 text-gray-600" />
+              </button>
+              <button onClick={() => handleSocialShare('facebook')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <Facebook className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Fixed Bottom Button */}
+        <div className="bg-white border-t border-gray-200 p-4 shadow-lg">
+          <button
+            onClick={handleDownload}
+            disabled={downloading || !modelUrl || isProcessing}
+            className={`w-full py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 ${
+              downloading || !modelUrl || isProcessing
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white'
+            }`}
+          >
+            {downloading ? (
+              <>
+                <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-5 h-5" />
+                Downloading...
+              </>
+            ) : isProcessing ? (
+              <>
+                <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-5 h-5" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Download className="w-5 h-5" />
+                Download Now
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop View
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}

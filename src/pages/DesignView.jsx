@@ -445,7 +445,7 @@ export default function DesignView() {
             </button>
             <button 
               onClick={handleMakeOrder}
-              className="flex-1 py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-full font-medium text-sm"
+              className="px-6 py-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-full font-medium text-xs"
             >
               Make Order
             </button>
