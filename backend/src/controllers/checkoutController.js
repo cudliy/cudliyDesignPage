@@ -208,7 +208,7 @@ export const createStripeCheckout = async (req, res, next) => {
     ];
 
     // Create Stripe Checkout Session
-    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://www.cudliy.com' : 'http://localhost:5173');
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://app.cudliy.com' : 'http://localhost:5173');
     const successUrl = `${frontendUrl}/order-success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${frontendUrl}/checkout/${designId}?cancelled=true`;
     

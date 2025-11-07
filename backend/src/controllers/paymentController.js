@@ -234,7 +234,7 @@ export const createSubscription = async (req, res, next) => {
     }
 
     // Create Stripe Checkout Session for subscription payment
-    const frontendUrl = process.env.FRONTEND_URL || 'https://www.cudliy.com';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://app.cudliy.com';
     const checkoutSession = await stripeService.createCheckoutSession({
       customerId: customer.id,
       priceId: targetPriceId,
