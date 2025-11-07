@@ -15,6 +15,9 @@ export default function DesignView() {
   const [regenerating, setRegenerating] = useState(false);
   const navigate = useNavigate();
   
+  // Mobile detection - MUST be at top
+  const [isMobile, setIsMobile] = useState(false);
+  
   // Control states - matching the image positions
   const [lighting, setLighting] = useState(30);
   const [background, setBackground] = useState(100);
@@ -25,6 +28,14 @@ export default function DesignView() {
   const [modelLoadError, setModelLoadError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
+
+  // Mobile detection effect
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Memoized helper function to get valid model URL - prioritize GLB files
   const getValidModelUrl = useCallback(() => {
@@ -350,16 +361,6 @@ export default function DesignView() {
     );
   }
 
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   // Mobile View
   if (isMobile) {
     return (
@@ -673,7 +674,7 @@ export default function DesignView() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <button className="flex-1 max-w-[150px] py-3 bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
+              <button className="flex-1 max-w-[130px] py-2.5 text-sm bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
                 Save to draft
               </button>
             </div>
