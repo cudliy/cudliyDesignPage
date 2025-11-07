@@ -386,7 +386,7 @@ export default function DesignView() {
         </div>
 
         {/* 3D Model Viewer - Takes most space */}
-        <div className="flex-1 bg-white p-4 overflow-hidden" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="bg-white p-4 overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={
@@ -428,9 +428,9 @@ export default function DesignView() {
         </div>
 
         {/* Bottom Controls - Collapsible */}
-        <div className="bg-white border-t border-gray-200 shadow-lg flex-shrink-0">
+        <div className="bg-white border-t border-gray-200 shadow-lg flex-shrink-0" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {/* Quick Actions */}
-          <div className="px-4 py-3 flex items-center justify-between gap-3 safe-area-bottom">
+          <div className="px-4 py-3 pb-4 flex items-center justify-between gap-3">
             <button 
               onClick={() => {
                 const controls = document.getElementById('mobile-controls');
