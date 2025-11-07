@@ -386,7 +386,7 @@ export default function DesignView() {
         </div>
 
         {/* 3D Model Viewer - Takes most space */}
-        <div className="flex-1 bg-white p-4 min-h-0">
+        <div className="flex-1 bg-white p-4 overflow-hidden" style={{ maxHeight: 'calc(100vh - 200px)' }}>
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={
