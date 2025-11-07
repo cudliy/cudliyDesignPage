@@ -306,6 +306,7 @@ export default function Dashboard() {
 
   // Mobile detection
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -316,7 +317,6 @@ export default function Dashboard() {
 
   // Mobile View
   if (isMobile) {
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     return (
       <>
@@ -357,7 +357,10 @@ export default function Dashboard() {
               />
               
               {/* Menu Panel */}
-              <div className="fixed top-0 left-0 bottom-0 w-80 bg-[#313131] z-40 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto">
+              <div className="fixed top-0 left-0 bottom-0 w-80 bg-[#313131] z-40 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto scrollbar-hide" style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}>
                 {/* Menu Header */}
                 <div className="p-6 border-b border-white/10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
