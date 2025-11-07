@@ -21,6 +21,7 @@ export default function DownloadPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
   const [autoDownloadTriggered, setAutoDownloadTriggered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   // Available formats
   const availableFormats = ['STL', 'GLB', 'PLY', 'OBJ'];
@@ -341,9 +342,7 @@ export default function DownloadPage() {
     );
   }
 
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(false);
-
+  // Mobile detection effect
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
