@@ -385,8 +385,8 @@ export default function DesignView() {
           </button>
         </div>
 
-        {/* 3D Model Viewer - 80% of screen */}
-        <div className="bg-white p-4" style={{ height: '80vh' }}>
+        {/* 3D Model Viewer - 65% of screen */}
+        <div className="bg-white p-4" style={{ height: '65vh' }}>
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={

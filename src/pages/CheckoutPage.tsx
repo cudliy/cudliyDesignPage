@@ -13,6 +13,7 @@ export default function CheckoutPage() {
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
   const [slant3DPricing, setSlant3DPricing] = useState<Slant3DPricing | null>(null);
   const [orderProcessing, setOrderProcessing] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   // Simple size selection to match design (affects subtotal visually only)
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L'>('S');
   // Sub-size in inches for medium/large
@@ -26,6 +27,14 @@ export default function CheckoutPage() {
   useEffect(() => {
     sessionStorage.setItem('checkout_selected_inch', selectedInch.toString());
   }, [selectedInch]);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Keep inch selection in sync with size
   useEffect(() => {
@@ -296,16 +305,6 @@ export default function CheckoutPage() {
       </div>
     );
   }
-
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Mobile View
   if (isMobile) {
