@@ -364,9 +364,9 @@ export default function DesignView() {
   // Mobile View
   if (isMobile) {
     return (
-      <div className="w-screen h-screen bg-gray-50 flex flex-col fixed inset-0">
+      <div className="w-screen h-screen bg-gray-50 flex flex-col">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20 flex-shrink-0">
+        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
           <button
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -385,8 +385,8 @@ export default function DesignView() {
           </button>
         </div>
 
-        {/* 3D Model Viewer - Takes most space */}
-        <div className="bg-white p-4 overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
+        {/* 3D Model Viewer - Fixed smaller height */}
+        <div className="bg-white p-4" style={{ height: '50vh' }}>
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={
@@ -427,10 +427,10 @@ export default function DesignView() {
           )}
         </div>
 
-        {/* Bottom Controls - Collapsible */}
-        <div className="bg-white border-t border-gray-200 shadow-lg flex-shrink-0" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        {/* Bottom Controls - Always Visible */}
+        <div className="bg-white border-t border-gray-200 shadow-lg">
           {/* Quick Actions */}
-          <div className="px-4 py-3 pb-4 flex items-center justify-between gap-3">
+          <div className="px-4 py-4 flex items-center justify-between gap-3">
             <button 
               onClick={() => {
                 const controls = document.getElementById('mobile-controls');

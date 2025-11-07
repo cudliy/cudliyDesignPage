@@ -324,7 +324,7 @@ export default function Dashboard() {
           keywords="dashboard, my designs, toy management, design gallery, user dashboard, creative workspace"
           url="/dashboard"
         />
-        <div className="w-screen h-screen bg-gray-50 flex flex-col fixed inset-0 overflow-hidden">
+        <div className="w-screen h-screen bg-gray-50 flex flex-col">
           {/* Mobile Header */}
           <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
             <div className="flex items-center gap-3">
@@ -380,6 +380,46 @@ export default function Dashboard() {
               + New Design
             </button>
 
+            {/* View Tabs */}
+            <div className="mb-4 flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <button
+                onClick={() => setCurrentView('recent')}
+                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
+                  currentView === 'recent'
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300'
+                }`}
+              >
+                Recent
+              </button>
+              <button
+                onClick={() => setCurrentView('all')}
+                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
+                  currentView === 'all'
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300'
+                }`}
+              >
+                All Files
+              </button>
+              <button
+                onClick={() => setCurrentView('orders')}
+                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
+                  currentView === 'orders'
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300'
+                }`}
+              >
+                Orders
+              </button>
+              <button
+                onClick={() => navigate('/pricing')}
+                className="px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap bg-gradient-to-r from-pink-500 to-orange-500 text-white"
+              >
+                Upgrade
+              </button>
+            </div>
+
             {/* Search */}
             <div className="mb-4">
               <input
@@ -389,7 +429,7 @@ export default function Dashboard() {
               />
             </div>
 
-            {/* Designs Grid */}
+            {/* Content based on view */}
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
@@ -397,7 +437,25 @@ export default function Dashboard() {
                   <p className="text-gray-600">Loading...</p>
                 </div>
               </div>
-            ) : designs.length === 0 ? (
+            ) : error ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Error</h3>
+                  <p className="text-sm text-gray-600 mb-4">{error}</p>
+                  <button 
+                    onClick={() => fetchDesigns(true)}
+                    className="px-6 py-2 bg-pink-500 text-white rounded-full"
+                  >
+                    Retry
+                  </button>
+                </div>
+              </div>
+            ) : (currentView === 'recent' || currentView === 'all') && designs.length === 0 ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -408,6 +466,10 @@ export default function Dashboard() {
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">No Designs Yet</h3>
                   <p className="text-sm text-gray-600 mb-4">Start creating your first 3D design!</p>
                 </div>
+              </div>
+            ) : currentView === 'orders' ? (
+              <div className="py-12 text-center text-gray-600">
+                <p className="text-sm">Order history will appear here.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
