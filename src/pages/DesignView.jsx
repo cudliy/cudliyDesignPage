@@ -350,6 +350,178 @@ export default function DesignView() {
     );
   }
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Mobile View
+  if (isMobile) {
+    return (
+      <div className="w-screen h-screen bg-gray-50 overflow-hidden flex flex-col">
+        {/* Mobile Header */}
+        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-lg font-semibold">3D Model View</h1>
+          <button
+            onClick={handleDownload}
+            disabled={!getValidModelUrl()}
+            className="p-2 hover:bg-white/20 rounded-lg transition-colors disabled:opacity-50"
+          >
+            <Download className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* 3D Model Viewer - Takes most space */}
+        <div className="flex-1 bg-white p-4 overflow-hidden">
+          {testModelUrl && !modelLoadError ? (
+            <div className="w-full h-full">
+              <Suspense fallback={
+                <div className="w-full h-full flex items-center justify-center">
+                  <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-24 h-24" />
+                </div>
+              }>
+                <ModelViewer
+                  modelUrl={testModelUrl}
+                  className="w-full h-full"
+                  lighting={lighting}
+                  background={background}
+                  size={size}
+                  cameraAngle={cameraAngle}
+                  onError={handleModelError}
+                />
+              </Suspense>
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center px-4">
+                <div className="w-16 h-16 bg-red-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Model Loading Failed</h3>
+                <p className="text-sm text-gray-600 mb-4">{modelLoadError || 'Unable to load 3D model'}</p>
+                <button 
+                  onClick={handleRegenerateModel}
+                  disabled={regenerating}
+                  className="px-6 py-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-full text-sm font-medium"
+                >
+                  {regenerating ? 'Generating...' : 'Regenerate Model'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Controls - Collapsible */}
+        <div className="bg-white border-t border-gray-200 shadow-lg">
+          {/* Quick Actions */}
+          <div className="px-4 py-3 flex items-center justify-between gap-3">
+            <button 
+              onClick={() => {
+                const controls = document.getElementById('mobile-controls');
+                controls.classList.toggle('hidden');
+              }}
+              className="flex items-center gap-2 text-gray-700 text-sm font-medium"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              Controls
+            </button>
+            <button 
+              onClick={handleMakeOrder}
+              className="flex-1 py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-full font-medium text-sm"
+            >
+              Make Order
+            </button>
+          </div>
+
+          {/* Expandable Controls */}
+          <div id="mobile-controls" className="hidden px-4 pb-4 space-y-4 max-h-64 overflow-y-auto">
+            {/* Lighting */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium text-gray-700">Lighting</span>
+                <span className="text-xs text-gray-500">{lighting}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={lighting}
+                onChange={(e) => setLighting(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+              />
+            </div>
+
+            {/* Background */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium text-gray-700">Background</span>
+                <span className="text-xs text-gray-500">{background}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={background}
+                onChange={(e) => setBackground(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+              />
+            </div>
+
+            {/* Size */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium text-gray-700">Size</span>
+                <span className="text-xs text-gray-500">{Math.round(size * 0.8)}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={size}
+                onChange={(e) => setSize(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+              />
+            </div>
+
+            {/* Camera Angle */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium text-gray-700">Camera Angle</span>
+                <span className="text-xs text-gray-500">{cameraAngle}°</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={cameraAngle}
+                onChange={(e) => setCameraAngle(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop View
   return (
     <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
       {/* Left Pane */}
