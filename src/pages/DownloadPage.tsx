@@ -26,6 +26,14 @@ export default function DownloadPage() {
   // Available formats
   const availableFormats = ['STL', 'GLB', 'PLY', 'OBJ'];
   
+  // Mobile detection effect - MUST be before any conditional rendering
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   // Get model URL from location state or fetch from API
   const getModelUrl = useCallback(() => {
     if (location.state?.modelUrl) {
@@ -342,13 +350,7 @@ export default function DownloadPage() {
     );
   }
 
-  // Mobile detection effect
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+
 
   // Mobile View
   if (isMobile) {
