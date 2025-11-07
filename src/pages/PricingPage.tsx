@@ -11,16 +11,7 @@ const PricingPage = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
-
-  // Mobile detection
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Check authentication status
   useEffect(() => {

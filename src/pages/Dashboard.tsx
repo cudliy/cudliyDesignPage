@@ -316,6 +316,8 @@ export default function Dashboard() {
 
   // Mobile View
   if (isMobile) {
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+
     return (
       <>
         <SEO 
@@ -328,13 +330,218 @@ export default function Dashboard() {
           {/* Mobile Header */}
           <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
             <div className="flex items-center gap-3">
+              {/* Hamburger Menu Button */}
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
               <img src='/Asset 13.svg' className='w-6 h-6' alt="Logo" />
-              <h1 className="text-lg font-semibold">{displayName}'s Workspace</h1>
+              <h1 className="text-base font-semibold truncate">{displayName}'s Workspace</h1>
             </div>
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
               {userInitials}
             </div>
           </div>
+
+          {/* Slide-out Menu */}
+          {showMobileMenu && (
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 bg-black/50 z-30 transition-opacity"
+                onClick={() => setShowMobileMenu(false)}
+              />
+              
+              {/* Menu Panel */}
+              <div className="fixed top-0 left-0 bottom-0 w-80 bg-[#313131] z-40 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto">
+                {/* Menu Header */}
+                <div className="p-6 border-b border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <img src='/Asset 13.svg' className='w-8 h-8' alt="Logo" />
+                    <span className="text-white font-semibold text-lg">Menu</span>
+                  </div>
+                  <button
+                    onClick={() => setShowMobileMenu(false)}
+                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Menu Content */}
+                <div className="p-6 space-y-6">
+                  {/* Explore Section */}
+                  <div>
+                    <h3 className="text-white/60 text-xs font-semibold mb-3 uppercase tracking-wider">Explore</h3>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => {
+                          setCurrentView('tutorial');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'tutorial'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <span className="text-sm font-medium">Tutorial</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentView('community');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'community'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span className="text-sm font-medium">Community</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* My Creations Section */}
+                  <div>
+                    <h3 className="text-white/60 text-xs font-semibold mb-3 uppercase tracking-wider">My Creations</h3>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => {
+                          setCurrentView('recent');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'recent'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium">Recent</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentView('all');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'all'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        <span className="text-sm font-medium">All Files</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentView('orders');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'orders'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <span className="text-sm font-medium">Order History</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentView('trash');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'trash'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span className="text-sm font-medium">Trash</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Subscription Section */}
+                  <div>
+                    <h3 className="text-white/60 text-xs font-semibold mb-3 uppercase tracking-wider">Subscription</h3>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => {
+                          setCurrentView('credits');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'credits'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium">Credit Balance</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigate('/pricing');
+                          setShowMobileMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-orange-500 text-white"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span className="text-sm font-medium">Upgrade to Pro</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentView('edu');
+                          setShowMobileMenu(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                          currentView === 'edu'
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                        </svg>
+                        <span className="text-sm font-medium">EDU License</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Usage Limits Banner */}
           {usageLimits && (!canGenerateImages || !canGenerateModels) && (
@@ -380,45 +587,7 @@ export default function Dashboard() {
               + New Design
             </button>
 
-            {/* View Tabs */}
-            <div className="mb-4 flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <button
-                onClick={() => setCurrentView('recent')}
-                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
-                  currentView === 'recent'
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300'
-                }`}
-              >
-                Recent
-              </button>
-              <button
-                onClick={() => setCurrentView('all')}
-                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
-                  currentView === 'all'
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300'
-                }`}
-              >
-                All Files
-              </button>
-              <button
-                onClick={() => setCurrentView('orders')}
-                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
-                  currentView === 'orders'
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-white text-gray-700 border border-gray-300'
-                }`}
-              >
-                Orders
-              </button>
-              <button
-                onClick={() => navigate('/pricing')}
-                className="px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap bg-gradient-to-r from-pink-500 to-orange-500 text-white"
-              >
-                Upgrade
-              </button>
-            </div>
+
 
             {/* Search */}
             <div className="mb-4">
