@@ -364,9 +364,9 @@ export default function DesignView() {
   // Mobile View
   if (isMobile) {
     return (
-      <div className="w-screen h-screen bg-gray-50 overflow-hidden flex flex-col">
+      <div className="w-screen h-screen bg-gray-50 flex flex-col fixed inset-0">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
+        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20 flex-shrink-0">
           <button
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -386,7 +386,7 @@ export default function DesignView() {
         </div>
 
         {/* 3D Model Viewer - Takes most space */}
-        <div className="flex-1 bg-white p-4 overflow-hidden">
+        <div className="flex-1 bg-white p-4 min-h-0">
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={
@@ -428,9 +428,9 @@ export default function DesignView() {
         </div>
 
         {/* Bottom Controls - Collapsible */}
-        <div className="bg-white border-t border-gray-200 shadow-lg">
+        <div className="bg-white border-t border-gray-200 shadow-lg flex-shrink-0">
           {/* Quick Actions */}
-          <div className="px-4 py-3 flex items-center justify-between gap-3">
+          <div className="px-4 py-3 flex items-center justify-between gap-3 safe-area-bottom">
             <button 
               onClick={() => {
                 const controls = document.getElementById('mobile-controls');
@@ -452,7 +452,7 @@ export default function DesignView() {
           </div>
 
           {/* Expandable Controls */}
-          <div id="mobile-controls" className="hidden px-4 pb-4 space-y-4 max-h-64 overflow-y-auto">
+          <div id="mobile-controls" className="hidden px-4 pb-4 space-y-4 max-h-64 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {/* Lighting */}
             <div>
               <div className="flex justify-between items-center mb-2">
