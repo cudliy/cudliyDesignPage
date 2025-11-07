@@ -102,7 +102,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       { id: assistantMessageId, type: 'assistant', content: 'Generating images...', isGenerating: true }
     ]);
 
-    setIsGenerating(true);
+    // Don't set isGenerating for image generation - only for 3D model generation
 
     try {
       const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -175,9 +175,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
           ? { ...msg, content: 'Sorry, something went wrong. Please try again.', isGenerating: false }
           : msg
       ));
-    } finally {
-      setIsGenerating(false);
     }
+    // Don't set isGenerating to false here - it's not set to true for image generation
   }, [canGenerateImages, userId, checkLimits, onError, hasProperties, generateEnhancedPrompt]);
 
   const generate3DModel = async (imageUrl: string, sessionId: string, creationId: string) => {

@@ -353,6 +353,50 @@ export default function DownloadPage() {
 
   // Mobile View
   if (isMobile) {
+    // Show loading state
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-24 h-24 mx-auto mb-4" />
+            <p className="text-gray-600">Loading design...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Show error state
+    if (error) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+          <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+            <button onClick={handleBack} className="p-2 hover:bg-white/20 rounded-lg">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-lg font-semibold">Download</h1>
+            <div className="w-5"></div>
+          </div>
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Error</h3>
+              <p className="text-sm text-gray-600 mb-4">{error}</p>
+              <button 
+                onClick={handleBack}
+                className="px-6 py-2 bg-pink-500 text-white rounded-full"
+              >
+                Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* Mobile Header */}
