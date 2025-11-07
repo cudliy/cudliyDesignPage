@@ -112,7 +112,7 @@ const GlassNav = () => {
                 onClick={() => {
                   if (item === 'Home') {
                     // @ts-ignore
-                    navigate('/');
+                    navigate('/cudliy.com');
                   } else if (item === 'Community') {
                     // @ts-ignore
                     navigate('/'); // Navigate to home and scroll to community section
@@ -175,7 +175,7 @@ const GlassNav = () => {
                   padding: '10px 20px',
                   gap: '10px'
                 }}
-                onClick={() => navigate('/signin')}
+                onClick={() => navigate('/')}
               >
                 <span className="relative z-10">Login</span>
               </Button>

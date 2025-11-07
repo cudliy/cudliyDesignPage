@@ -213,19 +213,20 @@ const PricingPage = () => {
             {pricingPlans.map((plan, index) => (
               <div
                 key={plan.name}
-                className={`relative p-6 border transform transition-all duration-1000 delay-${600 + index * 100} ease-out ${
+                className={`relative p-6 border transform transition-all duration-1000 delay-${600 + index * 100} ease-out w-full md:w-auto ${
                   isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
                 } ${
-                  plan.isPopular ? 'ring-2 ring-[#E70A55] scale-105 bg-white rounded-2xl' : 
+                  plan.isPopular ? 'ring-2 ring-[#E70A55] md:scale-105 bg-white rounded-2xl' : 
                   index === 0 || index === 1 ? 'text-white border-gray-700 rounded-2xl' :
                   index === 3 ? 'text-white border-gray-700 rounded-2xl' : 'bg-white border-gray-200 rounded-2xl'
                 }`}
                 style={{
-                  width: index === 0 || index === 1 ? '290px' : index === 2 ? '349px' : '280px',
-                  height: index === 0 || index === 1 ? '699px' : index === 2 ? '841.21px' : '600px',
-                  minHeight: index === 0 || index === 1 ? '699px' : index === 2 ? '841.21px' : '600px',
+                  maxWidth: '100%',
+                  width: window.innerWidth < 768 ? '100%' : (index === 0 || index === 1 ? '290px' : index === 2 ? '349px' : '280px'),
+                  height: 'auto',
+                  minHeight: window.innerWidth < 768 ? 'auto' : (index === 0 || index === 1 ? '699px' : index === 2 ? '841.21px' : '600px'),
                   borderRadius: index === 0 || index === 1 ? '20px' : index === 2 ? '20px' : '16px',
-                  margin: index === 2 ? '11.0px' : '5.0px',
+                  margin: window.innerWidth < 768 ? '0' : (index === 2 ? '11.0px' : '5.0px'),
                   backgroundColor: index === 0 || index === 1 || index === 3 ? '#313030' : 'white',
                   boxShadow: index === 2 ? '-8px 4.81px 45px 0px rgba(0, 0, 0, 0.15)' : (index === 0 || index === 1 || index === 3) ? '-4px 4px 30px 0px rgba(0, 0, 0, 0.1)' : '0px 2px 8px 0px rgba(0, 0, 0, 0.1)',
                   outline: index === 2 ? 'none' : undefined
@@ -322,20 +323,21 @@ const PricingPage = () => {
       {/* Student Plan */}
       <section className="py-16 px-4 md:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <div className={`bg-white rounded-2xl p-8 transform transition-all duration-1000 delay-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} style={{
-            width: '1300px',
-            height: '212px',
+          <div className={`bg-white rounded-2xl p-4 md:p-8 transform transition-all duration-1000 delay-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} style={{
+            maxWidth: '100%',
+            width: '100%',
+            height: 'auto',
             borderRadius: '20px',
             boxShadow: '-8px 4.81px 45px 0px rgba(0, 0, 0, 0.15)'
           }}>
-            <div className="flex flex-col lg:flex-row gap-8 h-full">
+            <div className="flex flex-col lg:flex-row gap-4 md:gap-8 h-full">
               {/* Left side - Title, pricing, and button */}
               <div className="lg:w-1/3 flex flex-col justify-center">
-                <h3 className="text-2xl font-bold text黑 mb-4">{studentPlan.name}</h3>
-                <p className="text-base text-gray-600 mb-6">{studentPlan.offer}</p>
+                <h3 className="text-xl md:text-2xl font-bold text-black mb-3 md:mb-4">{studentPlan.name}</h3>
+                <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">{studentPlan.offer}</p>
                 <Button 
-                  className="bg-black text-white px-9 py-4 rounded-2xl font-semibold text-sm" 
-                  style={{width: '211.81px', height: '53.10px'}}
+                  className="bg-black text-white px-6 md:px-9 py-3 md:py-4 rounded-2xl font-semibold text-sm w-full md:w-auto" 
+                  style={{maxWidth: '211.81px', height: '53.10px'}}
                   onClick={() => {
                     if (!isAuthenticated) {
                       // Not logged in - redirect to signin
@@ -369,24 +371,24 @@ const PricingPage = () => {
       {/* Consultation Section */}
       <section className="py-16 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className={`bg-white rounded-2xl p-8 shadow-lg transform transition-all duration-1000 delay-1200 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-            <div className="flex flex-col lg:flex-row justify-between gap-8 items-center">
+          <div className={`bg-white rounded-2xl p-4 md:p-8 shadow-lg transform transition-all duration-1000 delay-1200 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+            <div className="flex flex-col lg:flex-row justify-between gap-6 md:gap-8 items-center">
               {/* Left content constrained to design width to preserve space for CTA */}
-              <div className="flex-1 w-full text-left" style={{maxWidth: '821px'}}>
-                <h2 className="font-extrabold text-black mb-4" style={{fontSize: '40px', lineHeight: '100%', textTransform: 'capitalize'}}>
+              <div className="flex-1 w-full text-left md:text-left" style={{maxWidth: '821px'}}>
+                <h2 className="font-extrabold text-black mb-4 text-2xl md:text-4xl" style={{lineHeight: '120%', textTransform: 'capitalize'}}>
                   Let's chat to get the best{" "}
-                  <br/><span className="bg-gradient-to-r ml-[302px] from-[#E70A55] to-[#F4900C] bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] bg-clip-text text-transparent block md:inline md:ml-0">
                     Fit for you
                   </span>
                 </h2>
-                <p className="text-base text-gray-600 mb-6">
+                <p className="text-sm md:text-base text-gray-600 mb-6">
                   Cudliy scales as you grow. Let's find the right plan that fits your company size.
                 </p>
               </div>
               
               {/* Right side - Button and contact info */}
-              <div className="flex flex-col items-center lg:items-end space-y-4">
-                <Button className="bg-black text-white px-9 py-4 rounded-2xl font-semibold" style={{width: '211.81px', height: '53.10px'}}>
+              <div className="flex flex-col items-center lg:items-end space-y-4 w-full lg:w-auto">
+                <Button className="bg-black text-white px-6 md:px-9 py-3 md:py-4 rounded-2xl font-semibold w-full md:w-auto" style={{maxWidth: '211.81px', height: '53.10px'}}>
                   Talk to us
                 </Button>
                 <div className="text-center lg:text-right space-y-2">
