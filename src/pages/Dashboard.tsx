@@ -326,24 +326,20 @@ export default function Dashboard() {
           keywords="dashboard, my designs, toy management, design gallery, user dashboard, creative workspace"
           url="/dashboard"
         />
-        <div className="w-screen h-screen bg-gray-50 flex flex-col">
+        <div className="w-screen h-screen bg-white flex flex-col">
           {/* Mobile Header */}
-          <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
-            <div className="flex items-center gap-3">
+          <div className="bg-white px-4 py-3 flex items-center justify-between shadow-sm z-20 border-b border-gray-200">
+            <div className="flex items-center gap-2">
               {/* Hamburger Menu Button */}
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
-              <img src='/Asset 13.svg' className='w-6 h-6' alt="Logo" />
-              <h1 className="text-base font-semibold truncate">{displayName}'s Workspace</h1>
-            </div>
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-              {userInitials}
+              <h1 className="text-lg font-semibold text-[#212121]">Cudliy</h1>
             </div>
           </div>
 
@@ -357,32 +353,31 @@ export default function Dashboard() {
               />
               
               {/* Menu Panel */}
-              <div className="fixed top-0 left-0 bottom-0 w-80 bg-[#313131] z-40 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto scrollbar-hide" style={{
+              <div className="fixed top-0 left-0 bottom-0 w-80 bg-white z-40 shadow-2xl transform transition-transform duration-300 ease-out overflow-y-auto scrollbar-hide" style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none'
               }}>
                 {/* Menu Header */}
-                <div className="p-6 border-b border-white/10 flex items-center justify-between">
+                <div className="p-6 border-b border-gray-200 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img src='/Asset 13.svg' className='w-8 h-8' alt="Logo" />
-                    <span className="text-white font-semibold text-lg">Menu</span>
+                    <img src='/CudliyLogo.svg' className='w-8 h-8' alt="Logo" />
                   </div>
                   <button
                     onClick={() => setShowMobileMenu(false)}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
 
                 {/* Menu Content */}
-                <div className="p-6 space-y-6">
+                <div className="p-6 space-y-4">
                   {/* Explore Section */}
                   <div>
-                    <h3 className="text-white/60 text-xs font-semibold mb-3 uppercase tracking-wider">Explore</h3>
-                    <div className="space-y-1">
+                    <h3 className="text-[#212121] opacity-60 text-xs font-semibold mb-2 uppercase tracking-wider">Explore</h3>
+                    <div className="space-y-0.5">
                       <button
                         onClick={() => {
                           setCurrentView('tutorial');
@@ -390,8 +385,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'tutorial'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -406,8 +401,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'community'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,8 +415,8 @@ export default function Dashboard() {
 
                   {/* My Creations Section */}
                   <div>
-                    <h3 className="text-white/60 text-xs font-semibold mb-3 uppercase tracking-wider">My Creations</h3>
-                    <div className="space-y-1">
+                    <h3 className="text-[#212121] opacity-60 text-xs font-semibold mb-2 uppercase tracking-wider">My Creations</h3>
+                    <div className="space-y-0.5">
                       <button
                         onClick={() => {
                           setCurrentView('recent');
@@ -429,8 +424,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'recent'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,8 +440,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'all'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,8 +456,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'orders'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -477,8 +472,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'trash'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -491,8 +486,8 @@ export default function Dashboard() {
 
                   {/* Subscription Section */}
                   <div>
-                    <h3 className="text-white/60 text-xs font-semibold mb-3 uppercase tracking-wider">Subscription</h3>
-                    <div className="space-y-1">
+                    <h3 className="text-[#212121] opacity-60 text-xs font-semibold mb-2 uppercase tracking-wider">Subscription</h3>
+                    <div className="space-y-0.5">
                       <button
                         onClick={() => {
                           setCurrentView('credits');
@@ -500,8 +495,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'credits'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -514,7 +509,7 @@ export default function Dashboard() {
                           navigate('/pricing');
                           setShowMobileMenu(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-orange-500 text-white"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-[#FF9CB5] hover:bg-gray-50"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -528,8 +523,8 @@ export default function Dashboard() {
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           currentView === 'edu'
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            ? 'bg-gray-100 text-[#212121]'
+                            : 'text-[#212121] opacity-70 hover:bg-gray-50 hover:opacity-100'
                         }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -577,51 +572,50 @@ export default function Dashboard() {
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto px-4 py-4">
-            {/* New Design Button */}
-            <button 
-              onClick={() => navigate('/design')}
-              disabled={!canGenerateImages && !canGenerateModels}
-              className={`w-full mb-4 px-6 py-3 rounded-full font-medium transition-all ${
-                !canGenerateImages && !canGenerateModels
-                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white'
-              }`}
-            >
-              + New Design
-            </button>
-
-
-
-            {/* Search */}
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Search designs..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
-              />
+            {/* Top Actions Bar */}
+            <div className="mb-4 flex items-center justify-between">
+              {/* Search Icon */}
+              <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                <svg className="w-6 h-6 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              
+              {/* New Design Button */}
+              <button 
+                onClick={() => navigate('/design')}
+                disabled={!canGenerateImages && !canGenerateModels}
+                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                  !canGenerateImages && !canGenerateModels
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-black text-white hover:bg-gray-800'
+                }`}
+              >
+                New Design
+              </button>
             </div>
 
             {/* Content based on view */}
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading...</p>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+                  <p className="text-[#212121]">Loading...</p>
                 </div>
               </div>
             ) : error ? (
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Error</h3>
-                  <p className="text-sm text-gray-600 mb-4">{error}</p>
+                  <h3 className="text-lg font-semibold text-[#212121] mb-2">Error</h3>
+                  <p className="text-sm text-[#212121] opacity-70 mb-4">{error}</p>
                   <button 
                     onClick={() => fetchDesigns(true)}
-                    className="px-6 py-2 bg-pink-500 text-white rounded-full"
+                    className="px-6 py-2 bg-black text-white rounded-full hover:bg-gray-800"
                   >
                     Retry
                   </button>
@@ -635,57 +629,68 @@ export default function Dashboard() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">No Designs Yet</h3>
-                  <p className="text-sm text-gray-600 mb-4">Start creating your first 3D design!</p>
+                  <h3 className="text-lg font-semibold text-[#212121] mb-2">No Designs Yet</h3>
+                  <p className="text-sm text-[#212121] mb-4">Start creating your first 3D design!</p>
+                  <button 
+                    onClick={() => navigate('/design')}
+                    disabled={!canGenerateImages && !canGenerateModels}
+                    className={`px-8 py-3 rounded-full font-medium transition-all ${
+                      !canGenerateImages && !canGenerateModels
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-black text-white hover:bg-gray-800'
+                    }`}
+                  >
+                    + New Design
+                  </button>
                 </div>
               </div>
             ) : currentView === 'orders' ? (
-              <div className="py-12 text-center text-gray-600">
-                <p className="text-sm">Order history will appear here.</p>
+              <div className="py-12 text-center">
+                <p className="text-sm text-[#212121]">Order history will appear here.</p>
               </div>
             ) : currentView === 'trash' ? (
-              <div className="py-12 text-center text-gray-600">
-                <p className="text-sm">Trash is empty.</p>
+              <div className="py-12 text-center">
+                <p className="text-sm text-[#212121]">Trash is empty.</p>
               </div>
             ) : currentView === 'tutorial' ? (
-              <div className="py-12 text-center text-gray-600">
+              <div className="py-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Tutorials</h3>
-                  <p className="text-sm text-gray-600">Learn how to create amazing 3D designs.</p>
+                  <h3 className="text-lg font-semibold text-[#212121] mb-2">Tutorials</h3>
+                  <p className="text-sm text-[#212121] opacity-70">Learn how to create amazing 3D designs.</p>
                 </div>
               </div>
             ) : currentView === 'community' ? (
-              <div className="py-12 text-center text-gray-600">
+              <div className="py-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Community</h3>
-                  <p className="text-sm text-gray-600">Connect with other creators and share your work.</p>
+                  <h3 className="text-lg font-semibold text-[#212121] mb-2">Community</h3>
+                  <p className="text-sm text-[#212121] opacity-70">Connect with other creators and share your work.</p>
                 </div>
               </div>
             ) : currentView === 'credits' ? (
-              <div className="py-12 text-center text-gray-600">
+              <div className="py-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Credit Balance</h3>
+                  <h3 className="text-lg font-semibold text-[#212121] mb-2">Credit Balance</h3>
                   {usageLimits && (
                     <div className="space-y-2">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-[#212121] opacity-70">
                         Images: {remainingImages}/{usageLimits.limits.imagesPerMonth === -1 ? '∞' : usageLimits.limits.imagesPerMonth}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-[#212121] opacity-70">
                         Models: {remainingModels}/{usageLimits.limits.modelsPerMonth === -1 ? '∞' : usageLimits.limits.modelsPerMonth}
                       </p>
                     </div>
@@ -693,19 +698,19 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : currentView === 'edu' ? (
-              <div className="py-12 text-center text-gray-600">
+              <div className="py-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">EDU License</h3>
-                  <p className="text-sm text-gray-600 mb-4">Special pricing for educational institutions.</p>
+                  <h3 className="text-lg font-semibold text-[#212121] mb-2">EDU License</h3>
+                  <p className="text-sm text-[#212121] opacity-70 mb-4">Special pricing for educational institutions.</p>
                   <button 
                     onClick={() => window.location.href = 'mailto:sales@cudliy.com?subject=EDU License Inquiry'}
-                    className="px-6 py-2 bg-orange-500 text-white rounded-full text-sm"
+                    className="px-6 py-2 bg-black text-white rounded-full text-sm hover:bg-gray-800"
                   >
                     Contact Us
                   </button>
@@ -724,10 +729,15 @@ export default function Dashboard() {
                         src={getDesignImage(design)}
                         alt={getDesignTitle(design)}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPkltYWdlPC90ZXh0Pjwvc3ZnPg==';
+                        }}
+                        loading="lazy"
                       />
                     </div>
-                    <h3 className="text-xs font-medium text-gray-800 truncate">{getTruncatedTitle(design)}</h3>
-                    <p className="text-xs text-gray-500">{getDesignCategory(design)}</p>
+                    <h3 className="text-xs font-medium text-[#212121] truncate">{getTruncatedTitle(design)}</h3>
+                    <p className="text-xs text-[#212121] opacity-60">{getDesignCategory(design)}</p>
                   </div>
                 ))}
               </div>

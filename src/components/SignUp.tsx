@@ -232,7 +232,7 @@ const SignUp = () => {
                             placeholder={step.placeholders[fieldIndex]}
                             value={formData[field as keyof typeof formData] as string}
                             onChange={(e) => handleInputChange(e.target.value, field)}
-                            className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
+                            className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 transition-colors"
                             required
                           />
                         ))}
@@ -244,7 +244,7 @@ const SignUp = () => {
                         placeholder={step.placeholder}
                         value={formData[step.field as keyof typeof formData] as string}
                         onChange={(e) => handleInputChange(e.target.value, step.field)}
-                        className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
+                        className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 transition-colors"
                         required
                       />
                     )}
@@ -257,7 +257,7 @@ const SignUp = () => {
               {currentStep > 0 && (
                 <Button
                   onClick={handleBack}
-                  className="font-medium transition-colors bg-transparent border-2 border-[#E70A55] text-[#E70A55] rounded-[22px] h-[42px] px-6 sm:px-10 hover:bg-[#E70A55] hover:text-white"
+                  className="font-medium transition-colors bg-transparent border-2 border-[#E70A55] text-[#E70A55] !rounded-full h-[42px] px-6 sm:px-10 hover:bg-[#E70A55] hover:text-white"
                 >
                   Back
                 </Button>
@@ -265,7 +265,8 @@ const SignUp = () => {
               <Button
                 onClick={handleNext}
                 disabled={isLoading}
-                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black rounded-[22px] h-[42px] px-6 sm:px-10"
+                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black !rounded-full h-[42px] w-[120px] px-[40px] py-[14px] gap-[10px]"
+                style={{ opacity: 1 }}
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">

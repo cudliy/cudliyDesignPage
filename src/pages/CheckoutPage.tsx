@@ -309,43 +309,46 @@ export default function CheckoutPage() {
   // Mobile View
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="h-screen bg-white flex flex-col overflow-hidden">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/20 rounded-lg">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-lg font-semibold">Checkout</h1>
-          <div className="w-5"></div>
+        <div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between shadow-sm border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-lg">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h1 className="text-lg font-semibold">Cudliy</h1>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Product Preview */}
-          <div className="bg-white rounded-2xl p-4 shadow-md">
-            <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden mb-3">
+          <div className="bg-white rounded-xl p-3 border border-gray-200 flex items-center gap-3">
+            <div className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
               {previewImageUrl && (
                 <img src={previewImageUrl} alt="Design" className="w-full h-full object-contain" />
               )}
             </div>
-            <h3 className="text-sm font-medium text-gray-800 truncate">{checkoutData?.items[0]?.designTitle || 'Design'}</h3>
-            <p className="text-xs text-gray-500">Personalized Gift</p>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-medium text-[#212121] truncate">{checkoutData?.items[0]?.designTitle || 'Design'}</h3>
+              <p className="text-xs text-[#212121] opacity-60">Personalized Gift</p>
+            </div>
           </div>
 
           {/* Size Selection */}
-          <div className="bg-white rounded-2xl p-4 shadow-md">
-            <h3 className="text-sm font-medium text-gray-800 mb-3">Choose Size</h3>
+          <div className="bg-white rounded-xl p-3 border border-gray-200">
+            <h3 className="text-sm font-medium text-[#212121] mb-2">Choose Size</h3>
             <div className="space-y-2">
               {(['S', 'M', 'L'] as const).map((size) => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+                  className={`w-full p-2 rounded-lg border text-left transition-all ${
                     selectedSize === size
-                      ? 'bg-pink-50 border-pink-500'
-                      : 'bg-white border-gray-200'
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-[#212121] border-gray-300'
                   }`}
                 >
                   <div className="font-medium text-sm">
@@ -353,19 +356,14 @@ export default function CheckoutPage() {
                     {size === 'M' && 'Medium (5-6")'}
                     {size === 'L' && 'Large (7-8")'}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {size === 'S' && 'Perfect for tiny gifts'}
-                    {size === 'M' && 'Great for desk pieces'}
-                    {size === 'L' && 'Ideal for display'}
-                  </div>
                 </button>
               ))}
             </div>
 
             {/* Inch selector for M/L */}
             {(selectedSize === 'M' || selectedSize === 'L') && (
-              <div className="mt-3">
-                <p className="text-xs text-gray-600 mb-2">Select exact size</p>
+              <div className="mt-2">
+                <p className="text-xs text-[#212121] opacity-70 mb-1">Select exact size</p>
                 <div className="flex gap-2">
                   {selectedSize === 'M' && ([5, 6] as const).map(inch => (
                     <button
@@ -373,8 +371,8 @@ export default function CheckoutPage() {
                       onClick={() => setSelectedInch(inch)}
                       className={`flex-1 py-2 rounded-lg text-sm font-medium ${
                         selectedInch === inch
-                          ? 'bg-pink-500 text-white'
-                          : 'bg-gray-100 text-gray-700'
+                          ? 'bg-black text-white'
+                          : 'bg-gray-100 text-[#212121]'
                       }`}
                     >
                       {inch}"
@@ -386,8 +384,8 @@ export default function CheckoutPage() {
                       onClick={() => setSelectedInch(inch)}
                       className={`flex-1 py-2 rounded-lg text-sm font-medium ${
                         selectedInch === inch
-                          ? 'bg-pink-500 text-white'
-                          : 'bg-gray-100 text-gray-700'
+                          ? 'bg-black text-white'
+                          : 'bg-gray-100 text-[#212121]'
                       }`}
                     >
                       {inch}"
@@ -399,38 +397,38 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="bg-white rounded-2xl p-4 shadow-md">
-            <h3 className="text-sm font-medium text-gray-800 mb-3">Order Summary</h3>
-            <div className="space-y-2 text-sm">
+          <div className="bg-white rounded-xl p-3 border border-gray-200">
+            <h3 className="text-sm font-medium text-[#212121] mb-2">Order Summary</h3>
+            <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">{formatCurrency(uiSubtotal)}</span>
+                <span className="text-[#212121] opacity-70">Subtotal</span>
+                <span className="font-medium text-[#212121]">{formatCurrency(uiSubtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Tax</span>
-                <span className="font-medium">{formatCurrency(uiTax)}</span>
+                <span className="text-[#212121] opacity-70">Tax</span>
+                <span className="font-medium text-[#212121]">{formatCurrency(uiTax)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span className="font-medium">{formatCurrency(uiShipping)}</span>
+                <span className="text-[#212121] opacity-70">Shipping</span>
+                <span className="font-medium text-[#212121]">{formatCurrency(uiShipping)}</span>
               </div>
-              <div className="border-t pt-2 flex justify-between">
-                <span className="font-semibold">Total</span>
-                <span className="font-bold text-lg">{formatCurrency(uiTotal)}</span>
+              <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between">
+                <span className="font-semibold text-[#212121]">Total</span>
+                <span className="font-bold text-lg text-[#212121]">{formatCurrency(uiTotal)}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Fixed Bottom Button */}
-        <div className="bg-white border-t border-gray-200 p-4 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 z-30">
           <button
             onClick={handleProceedToPayment}
             disabled={orderProcessing}
-            className={`w-full py-3 rounded-full font-semibold transition-all ${
+            className={`w-full h-[42px] rounded-full font-medium transition-all ${
               orderProcessing
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white'
+                : 'bg-black text-white hover:bg-gray-800'
             }`}
           >
             {orderProcessing ? 'Processing...' : 'Continue to Checkout'}

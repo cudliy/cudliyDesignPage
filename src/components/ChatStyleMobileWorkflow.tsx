@@ -346,27 +346,12 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-6">
             <img
-              src="/GIFS/Loading-State.gif"
-              alt="Start Creating"
-              className="w-32 h-32 object-contain mb-6"
-              onLoad={(e) => {
-                // Play GIF once and stop
-                const img = e.currentTarget;
-                setTimeout(() => {
-                  // Create a canvas to capture the last frame
-                  const canvas = document.createElement('canvas');
-                  canvas.width = img.naturalWidth;
-                  canvas.height = img.naturalHeight;
-                  const ctx = canvas.getContext('2d');
-                  if (ctx) {
-                    ctx.drawImage(img, 0, 0);
-                    img.src = canvas.toDataURL();
-                  }
-                }, 2000); // Stop after 2 seconds (one loop)
-              }}
+              src="/CudliyLogo.svg"
+              alt="Cudliy Logo"
+              className="w-10 h-10 object-contain mb-6"
             />
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Start Creating</h2>
-            <p className="text-sm text-gray-500">Describe what you want to create and I'll generate images for you</p>
+            <h2 className="text-xl font-semibold text-[#212121] mb-2">Start Creating</h2>
+            <p className="text-sm text-[#212121] opacity-70">Describe what you want to create and I'll generate images for you</p>
           </div>
         )}
 
@@ -378,15 +363,28 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             <div
               className={`max-w-[85%] relative px-4 py-3 ${
                 message.type === 'user'
-                  ? 'bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-[20px_20px_4px_20px] shadow-md'
-                  : 'bg-gray-100 text-gray-800 rounded-[20px_20px_20px_4px] shadow-md'
+                  ? 'bg-[#212121] text-white rounded-[18px]'
+                  : 'text-[#212121] rounded-[18px]'
               }`}
+              style={message.type === 'user' ? {
+                borderBottomRightRadius: '4px'
+              } : {
+                borderBottomLeftRadius: '4px'
+              }}
             >
-              {/* Chat bubble tail */}
-              {message.type === 'user' ? (
-                <div className="absolute -right-1 bottom-0 w-4 h-4 bg-gradient-to-br from-pink-500 to-orange-500 transform rotate-45 translate-x-1 translate-y-1" />
-              ) : (
-                <div className="absolute -left-1 bottom-0 w-4 h-4 bg-gray-100 transform rotate-45 -translate-x-1 translate-y-1" />
+              {/* Chat bubble tail - curved */}
+              {message.type === 'user' && (
+                <svg 
+                  className="absolute -right-2 bottom-0" 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 20 20"
+                >
+                  <path 
+                    d="M 0 0 Q 8 5 15 18 Q 10 20 0 20 Z" 
+                    fill="#212121"
+                  />
+                </svg>
               )}
               {message.isGenerating && (
                 <div className="flex items-center gap-2">
@@ -408,7 +406,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                       {message.images.map((imageUrl, index) => (
                         <div
                           key={index}
-                          className="relative rounded-xl overflow-hidden bg-white shadow-lg cursor-pointer hover:shadow-xl transition-all hover:scale-[1.02]"
+                          className="relative overflow-hidden cursor-pointer transition-all hover:opacity-90"
                           onClick={() => {
                             if (message.sessionId && message.creationId) {
                               generate3DModel(imageUrl, message.sessionId, message.creationId);
@@ -442,22 +440,23 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       </div>
 
       {/* Input Container - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white p-4 shadow-lg z-30">
+      <div className="fixed bottom-0 left-0 right-0 bg-white p-4 z-30">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className={`p-3 rounded-2xl transition-all flex-shrink-0 ${
-              showAdvanced || hasProperties()
-                ? 'bg-gradient-to-r from-pink-500 to-orange-500 text-white'
-                : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
-          </button>
-          <div className="flex-1 relative bg-gray-100 rounded-2xl">
+          <div className="flex-1 relative bg-white border border-gray-300 rounded-2xl">
+            {/* Toggle button inside text field */}
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className={`absolute left-3 top-1/2 -translate-y-1/2 transition-all z-10 ${
+                showAdvanced || hasProperties()
+                  ? 'text-black'
+                  : 'text-gray-600'
+              }`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+            </button>
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
@@ -467,20 +466,20 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   handleSubmit(e);
                 }
               }}
-              placeholder="Describe what you want to create..."
-              className="w-full px-4 py-4 pr-14 bg-transparent rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 text-base"
-              rows={2}
-              style={{ minHeight: '56px', maxHeight: '120px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              placeholder="Describe your design..."
+              className="w-full pl-14 pr-14 py-3 bg-transparent rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-black text-base placeholder:text-base leading-6"
+              rows={1}
+              style={{ minHeight: '48px', maxHeight: '120px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               disabled={isGenerating}
             />
             {/* Send button inside text field */}
             <button
               type="submit"
               disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
-              className={`absolute right-2 bottom-2 p-2 rounded-xl transition-all ${
+              className={`absolute right-3 top-1/2 -translate-y-1/2 transition-all ${
                 !inputValue.trim() || isGenerating || !canGenerateImages
                   ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-600 hover:text-pink-500'
+                  : 'text-gray-600 hover:text-black'
               }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

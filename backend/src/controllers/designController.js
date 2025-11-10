@@ -184,6 +184,35 @@ export const generateImages = async (req, res, next) => {
     session.currentStep = 'image_selection';
     await session.save();
 
+    // Create Design document immediately after image generation
+    const actualUserId = user_id || session.userId || 'guest';
+    
+    const design = new Design({
+      userId: actualUserId,
+      creationId: creation_id || session.creationId || `creation_${Date.now()}`,
+      sessionId: session.id,
+      originalText: text,
+      userSelections: {
+        color,
+        size,
+        style,
+        material,
+        production,
+        details
+      },
+      generatedPrompt: enhancedPrompt,
+      images: imageResults.map((img, index) => ({
+        url: savedImages[index]?.s3Url || img.url,
+        selected: index === 0,
+        index
+      })),
+      selectedImageIndex: 0,
+      status: 'completed'
+    });
+
+    await design.save();
+    logger.info(`Design created with images for session: ${session.id}`);
+
     // No usage tracking for guest users - unlimited access
 
     logger.info(`Images generated for session: ${session.id} (S3 storage disabled, using original URLs)`);

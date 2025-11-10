@@ -364,22 +364,24 @@ export default function DesignView() {
   // Mobile View
   if (isMobile) {
     return (
-      <div className="w-screen h-screen bg-gray-50 flex flex-col">
+      <div className="w-screen h-screen bg-white flex flex-col">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg z-20">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-lg font-semibold">3D Model View</h1>
+        <div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between shadow-sm border-b border-gray-200 z-20">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h1 className="text-lg font-semibold">Cudliy</h1>
+          </div>
           <button
             onClick={handleDownload}
             disabled={!getValidModelUrl()}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors disabled:opacity-50"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
           >
             <Download className="w-5 h-5" />
           </button>
@@ -427,16 +429,16 @@ export default function DesignView() {
           )}
         </div>
 
-        {/* Bottom Controls - Always Visible */}
-        <div className="bg-white border-t border-gray-200 shadow-lg">
+        {/* Bottom Controls - Fixed at bottom like text field */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 z-30">
           {/* Quick Actions */}
-          <div className="px-4 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 mb-3">
             <button 
               onClick={() => {
                 const controls = document.getElementById('mobile-controls');
                 controls.classList.toggle('hidden');
               }}
-              className="flex items-center gap-2 text-gray-700 text-sm font-medium"
+              className="flex items-center gap-2 text-[#212121] text-sm font-medium"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -445,7 +447,7 @@ export default function DesignView() {
             </button>
             <button 
               onClick={handleMakeOrder}
-              className="px-6 py-2 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-full font-medium text-xs"
+              className="px-6 py-2 bg-black text-white rounded-full font-medium text-sm hover:bg-gray-800"
             >
               Make Order
             </button>

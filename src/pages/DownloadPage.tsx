@@ -399,37 +399,38 @@ export default function DownloadPage() {
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="h-screen bg-white flex flex-col overflow-hidden">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
-          <button onClick={handleBack} className="p-2 hover:bg-white/20 rounded-lg">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-semibold">Download</h1>
-          <div className="w-5"></div>
+        <div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between shadow-sm border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <button onClick={handleBack} className="p-2 hover:bg-gray-100 rounded-lg">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-lg font-semibold">Cudliy</h1>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Progress */}
-          <div className="bg-white rounded-2xl p-6 shadow-md text-center">
-            <div className="text-6xl font-bold text-pink-500 mb-3">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
+            <div className="text-4xl font-bold text-[#212121] mb-2">
               {Math.round(progress)}%
             </div>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-[#212121] opacity-70 mb-3">
               {downloading ? 'Downloading...' : isProcessing ? 'Processing...' : 'Ready to download'}
             </p>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
-                className="bg-pink-500 h-2 rounded-full transition-all duration-500"
+                className="bg-black h-2 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
           </div>
 
           {/* 3D Preview */}
-          <div className="bg-white rounded-2xl p-4 shadow-md">
-            <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden">
+          <div className="bg-white rounded-xl p-3 border border-gray-200">
+            <div className="w-full h-64 bg-gray-50 rounded-lg overflow-hidden">
               {modelUrl ? (
                 <Suspense fallback={
                   <div className="w-full h-full flex items-center justify-center">
@@ -502,7 +503,7 @@ export default function DownloadPage() {
             className={`w-full py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 ${
               downloading || !modelUrl || isProcessing
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white'
+                : 'bg-black text-white hover:bg-gray-800'
             }`}
           >
             {downloading ? (

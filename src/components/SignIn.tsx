@@ -150,7 +150,7 @@ const SignIn = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
+                className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 transition-colors"
                 required
               />
 
@@ -159,7 +159,7 @@ const SignIn = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 h-[50px] rounded-[25px] px-4"
+                className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 transition-colors"
                 required
               />
             </div>
@@ -168,7 +168,8 @@ const SignIn = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black rounded-full h-[42px] min-w-[120px] px-10"
+                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black !rounded-full h-[42px] w-[120px] px-[40px] py-[14px] gap-[10px]"
+                style={{ opacity: 1 }}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">

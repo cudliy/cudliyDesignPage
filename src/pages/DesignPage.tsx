@@ -831,19 +831,18 @@ const handleBackToCategories = () => {
 				/>
 				<div className="w-screen h-screen bg-white flex flex-col fixed inset-0 overflow-hidden">
 					{/* Mobile Header */}
-					<div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
-						<div className="flex items-center gap-3">
+					<div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between shadow-sm border-b border-gray-200">
+						<div className="flex items-center gap-2">
 							<button
 								onClick={() => window.location.href = '/dashboard'}
-								className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+								className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
 							>
 								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
 								</svg>
 							</button>
-							<h1 className="text-lg font-semibold">Playground</h1>
+							<h1 className="text-lg font-semibold">Cudliy</h1>
 						</div>
-						<img src="/icon.png" alt="Logo" className="w-8 h-8 rounded-full" />
 					</div>
 
 					{/* Chat Interface */}
