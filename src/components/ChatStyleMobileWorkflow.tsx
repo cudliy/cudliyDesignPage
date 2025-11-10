@@ -325,18 +325,18 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-gray-50 relative overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-gray-50bg-slate-900 relative overflow-hidden transition-colors duration-300">
       {/* Full-Screen Loading State for 3D Generation */}
       {isGenerating && (
-        <div className="absolute inset-0 bg-white z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-whitebg-slate-900 z-50 flex items-center justify-center transition-colors duration-300">
           <div className="flex flex-col items-center">
             <img
               src="/GIFS/Loading-State.gif"
               alt="Generating 3D Model"
               className="w-32 h-32 object-contain mb-6"
             />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Creating 3D Model</h3>
-            <p className="text-sm text-gray-600">This may take a moment...</p>
+            <h3 className="text-xl font-semibold text-gray-800text-slate-100 mb-2">Creating 3D Model</h3>
+            <p className="text-sm text-gray-600text-slate-300">This may take a moment...</p>
           </div>
         </div>
       )}
@@ -350,8 +350,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               alt="Cudliy Logo"
               className="w-10 h-10 object-contain mb-6"
             />
-            <h2 className="text-xl font-semibold text-[#212121] mb-2">Start Creating</h2>
-            <p className="text-sm text-[#212121] opacity-70">Describe what you want to create and I'll generate images for you</p>
+            <h2 className="text-xl font-semibold text-[#212121]text-slate-100 mb-2">Start Creating</h2>
+            <p className="text-sm text-[#212121]text-slate-300 opacity-70">Describe what you want to create and I'll generate images for you</p>
           </div>
         )}
 
@@ -363,9 +363,9 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             <div
               className={`max-w-[85%] relative px-4 py-3 ${
                 message.type === 'user'
-                  ? 'bg-[#212121] text-white rounded-[18px]'
-                  : 'text-[#212121] rounded-[18px]'
-              }`}
+                  ? 'bg-[#212121]bg-slate-700 text-white rounded-[18px]'
+                  : 'bg-whitebg-slate-800 text-[#212121]text-slate-100 rounded-[18px]'
+              } transition-colors duration-300`}
               style={message.type === 'user' ? {
                 borderBottomRightRadius: '4px'
               } : {
@@ -382,24 +382,24 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 >
                   <path 
                     d="M 0 0 Q 8 5 15 18 Q 10 20 0 20 Z" 
-                    fill="#212121"
+                    className="fill-[#212121]fill-slate-700"
                   />
                 </svg>
               )}
               {message.isGenerating && (
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
-                  <span className="text-sm">{message.content}</span>
+                  <span className="text-sm text-whitetext-slate-100">{message.content}</span>
                 </div>
               )}
               
               {!message.isGenerating && (
                 <>
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap text-[#212121]text-slate-100">{message.content}</p>
                   
                   {message.images && message.images.length > 0 && (
                     <div className="mt-3 grid grid-cols-1 gap-3">
@@ -419,8 +419,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                             className="w-full h-auto"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <div className="bg-white rounded-full p-3 shadow-xl transform hover:scale-110 transition-transform">
-                              <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="bg-whitebg-slate-700 rounded-full p-3 shadow-xl transform hover:scale-110 transition-transform">
+                              <svg className="w-6 h-6 text-gray-800text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7.5v9l9 4.5 9-4.5v-9" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v9" />
@@ -440,17 +440,17 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       </div>
 
       {/* Input Container - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white p-4 z-30">
+      <div className="fixed bottom-0 left-0 right-0 bg-whitebg-slate-800 p-4 z-30 transition-colors duration-300">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          <div className="flex-1 relative bg-white border border-gray-300 rounded-2xl">
+          <div className="flex-1 relative bg-whitebg-slate-700 rounded-2xl transition-colors duration-300">
             {/* Toggle button inside text field */}
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}
               className={`absolute left-3 top-1/2 -translate-y-1/2 transition-all z-10 ${
                 showAdvanced || hasProperties()
-                  ? 'text-black'
-                  : 'text-gray-600'
+                  ? 'text-blacktext-slate-100'
+                  : 'text-gray-600text-slate-400'
               }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -467,7 +467,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 }
               }}
               placeholder="Describe your design..."
-              className="w-full pl-14 pr-14 py-3 bg-transparent rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-black text-base placeholder:text-base leading-6"
+              className="w-full pl-14 pr-14 py-3 bg-whitebg-slate-800 text-blacktext-white placeholder-gray-400placeholder-slate-400 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blackfocus:ring-slate-400 text-base placeholder:text-base leading-6 transition-colors duration-300"
               rows={1}
               style={{ minHeight: '48px', maxHeight: '120px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               disabled={isGenerating}
@@ -478,8 +478,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
               className={`absolute right-3 top-1/2 -translate-y-1/2 transition-all ${
                 !inputValue.trim() || isGenerating || !canGenerateImages
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-600 hover:text-black'
+                  ? 'text-gray-400text-slate-500 cursor-not-allowed'
+                  : 'text-gray-600text-slate-300 hover:text-blackhover:text-slate-100'
               }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

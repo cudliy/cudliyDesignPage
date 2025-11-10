@@ -261,7 +261,7 @@ export default function DesignView() {
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
-    <div className="w-screen h-screen bg-gray-100 overflow-hidden flex p-4 gap-4">
+    <div className="w-screen h-screen bg-gray-100bg-slate-900 overflow-hidden flex p-4 gap-4 transition-colors duration-300">
       {/* Left Pane Skeleton */}
       <aside className="flex-shrink-0 w-full max-w-[476px] min-w-[320px] lg:w-[476px] bg-[#313131] rounded-[40px] relative overflow-hidden animate-pulse">
         <div className="pt-[3rem] sm:pt-[4rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full">
@@ -285,7 +285,7 @@ export default function DesignView() {
       </aside>
 
       {/* Center Panel Skeleton */}
-      <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden">
+      <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden transition-colors duration-300">
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="w-full h-full bg-gray-200 rounded-lg animate-pulse flex items-center justify-center">
             <div className="text-center">
@@ -341,7 +341,7 @@ export default function DesignView() {
 
   if (error || !design) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50bg-slate-900 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,31 +364,33 @@ export default function DesignView() {
   // Mobile View
   if (isMobile) {
     return (
-      <div className="w-screen h-screen bg-white flex flex-col">
+      <div className="w-screen h-screen bg-white-900 flex flex-col transition-colors duration-300">
         {/* Mobile Header */}
-        <div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between shadow-sm border-b border-gray-200 z-20">
+        <div className="bg-white text-[#212121]text-slate-100 px-4 py-3 flex items-center justify-between shadow-sm z-20 transition-colors duration-300">
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#212121]text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold">Cudliy</h1>
+            <h1 className="text-lg font-semibold text-[#212121]text-slate-100">Cudliy</h1>
           </div>
-          <button
-            onClick={handleDownload}
-            disabled={!getValidModelUrl()}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-          >
-            <Download className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownload}
+              disabled={!getValidModelUrl()}
+              className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Download className="w-5 h-5 text-[#212121]text-slate-100" />
+            </button>
+          </div>
         </div>
 
         {/* 3D Model Viewer - 70% of screen */}
-        <div className="bg-white p-4" style={{ height: '70vh' }}>
+        <div className="bg-white-900 p-4 transition-colors duration-300" style={{ height: '70vh' }}>
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={
@@ -410,13 +412,13 @@ export default function DesignView() {
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center px-4">
-                <div className="w-16 h-16 bg-red-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-red-100bg-red-900/30 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-red-600text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Model Loading Failed</h3>
-                <p className="text-sm text-gray-600 mb-4">{modelLoadError || 'Unable to load 3D model'}</p>
+                <h3 className="text-lg font-semibold text-gray-800text-slate-100 mb-2">Model Loading Failed</h3>
+                <p className="text-sm text-gray-600text-slate-300 mb-4">{modelLoadError || 'Unable to load 3D model'}</p>
                 <button 
                   onClick={handleRegenerateModel}
                   disabled={regenerating}
@@ -430,7 +432,7 @@ export default function DesignView() {
         </div>
 
         {/* Bottom Controls - Fixed at bottom like text field */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 z-30">
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 z-30 transition-colors duration-300">
           {/* Quick Actions */}
           <div className="flex items-center justify-between gap-3 mb-3">
             <button 
@@ -438,16 +440,16 @@ export default function DesignView() {
                 const controls = document.getElementById('mobile-controls');
                 controls.classList.toggle('hidden');
               }}
-              className="flex items-center gap-2 text-[#212121] text-sm font-medium"
+              className="flex items-center gap-2 text-[#212121]text-slate-100 text-sm font-medium"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#212121]text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
               Controls
             </button>
             <button 
               onClick={handleMakeOrder}
-              className="px-6 py-2 bg-black text-white rounded-full font-medium text-sm hover:bg-gray-800"
+              className="px-6 py-2 bg-[#212121] text-white rounded-full font-medium text-sm hover:bg-[#2a2a2a] transition-colors duration-300"
             >
               Make Order
             </button>
@@ -526,7 +528,7 @@ export default function DesignView() {
 
   // Desktop View
   return (
-    <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden flex p-4 gap-4">
+    <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100from-slate-900via-slate-800to-slate-900 overflow-hidden flex p-4 gap-4 transition-colors duration-300">
       {/* Left Pane */}
       <aside className="left-pane-scale flex-shrink-0 h-screen bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
              style={{
@@ -794,7 +796,7 @@ export default function DesignView() {
             </button>
             <button 
               onClick={handleMakeOrder}
-              className="px-8 py-3 rounded-full font-normal transition-all duration-300 bg-gradient-to-r from-[#E70D57] to-[#d10c50] text-white hover:from-[#d10c50] hover:to-[#E70D57] hover:scale-105"
+              className="px-8 py-3 rounded-full font-normal transition-all duration-300 bg-[#212121] text-white hover:bg-[#2a2a2a] hover:scale-105"
             >
               Make
             </button>

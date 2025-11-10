@@ -314,7 +314,7 @@ export default function DownloadPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-white-900 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
           <img
             src="/GIFS/Loading-State.gif"
@@ -330,7 +330,7 @@ export default function DownloadPage() {
   // Error state
   if (error || !design) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-white-900 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,38 +399,38 @@ export default function DownloadPage() {
     }
 
     return (
-      <div className="h-screen bg-white flex flex-col overflow-hidden">
+      <div className="h-screen bg-white-900 flex flex-col overflow-hidden transition-colors duration-300">
         {/* Mobile Header */}
-        <div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between shadow-sm border-b border-gray-200">
+        <div className="bg-white text-[#212121]text-slate-100 px-4 py-3 flex items-center justify-between shadow-sm transition-colors duration-300">
           <div className="flex items-center gap-2">
-            <button onClick={handleBack} className="p-2 hover:bg-gray-100 rounded-lg">
-              <ArrowLeft className="w-5 h-5" />
+            <button onClick={handleBack} className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors">
+              <ArrowLeft className="w-5 h-5 text-[#212121]text-slate-100" />
             </button>
-            <h1 className="text-lg font-semibold">Cudliy</h1>
+            <h1 className="text-lg font-semibold text-[#212121]text-slate-100">Cudliy</h1>
           </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Progress */}
-          <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-            <div className="text-4xl font-bold text-[#212121] mb-2">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 text-center transition-colors duration-300">
+            <div className="text-4xl font-bold text-[#212121]text-slate-100 mb-2">
               {Math.round(progress)}%
             </div>
-            <p className="text-sm text-[#212121] opacity-70 mb-3">
+            <p className="text-sm text-[#212121]text-slate-300 opacity-70 mb-3">
               {downloading ? 'Downloading...' : isProcessing ? 'Processing...' : 'Ready to download'}
             </p>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-200bg-slate-700 rounded-full h-2">
               <div 
-                className="bg-black h-2 rounded-full transition-all duration-500"
+                className="bg-blackbg-white h-2 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
           </div>
 
           {/* 3D Preview */}
-          <div className="bg-white rounded-xl p-3 border border-gray-200">
-            <div className="w-full h-64 bg-gray-50 rounded-lg overflow-hidden">
+          <div className="bg-white rounded-xl p-3 border border-gray-200 transition-colors duration-300">
+            <div className="w-full h-64 bg-gray-50bg-slate-900 rounded-lg overflow-hidden">
               {modelUrl ? (
                 <Suspense fallback={
                   <div className="w-full h-full flex items-center justify-center">
@@ -447,7 +447,7 @@ export default function DownloadPage() {
                   />
                 </Suspense>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <div className="w-full h-full flex items-center justify-center text-gray-400text-slate-500">
                   <div className="text-center">
                     <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -460,14 +460,14 @@ export default function DownloadPage() {
           </div>
 
           {/* Format Selection */}
-          <div className="bg-white rounded-2xl p-4 shadow-md">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="bg-white rounded-2xl p-4 shadow-md transition-colors duration-300">
+            <label className="block text-sm font-medium text-gray-700text-slate-300 mb-2">
               Choose Format
             </label>
             <select
               value={selectedFormat}
               onChange={(e) => handleFormatChange(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-2 border border-gray-300-600 rounded-lg focus:ring-2 focus:ring-pink-500 bg-white text-[#212121]text-slate-100 transition-colors duration-300"
             >
               {availableFormats.map((format) => (
                 <option key={format} value={format}>{format}</option>
@@ -476,34 +476,34 @@ export default function DownloadPage() {
           </div>
 
           {/* Social Sharing */}
-          <div className="bg-white rounded-2xl p-4 shadow-md">
-            <h3 className="text-sm font-medium text-gray-800 mb-3">Share Your Design</h3>
+          <div className="bg-white rounded-2xl p-4 shadow-md transition-colors duration-300">
+            <h3 className="text-sm font-medium text-gray-800text-slate-200 mb-3">Share Your Design</h3>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => handleSocialShare('instagram')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                <Instagram className="w-5 h-5 text-gray-600" />
+              <button onClick={() => handleSocialShare('instagram')} className="w-12 h-12 bg-gray-100bg-slate-700 rounded-full flex items-center justify-center hover:bg-gray-200hover:bg-slate-600 transition-colors">
+                <Instagram className="w-5 h-5 text-gray-600text-slate-300" />
               </button>
-              <button onClick={() => handleSocialShare('linkedin')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                <Linkedin className="w-5 h-5 text-gray-600" />
+              <button onClick={() => handleSocialShare('linkedin')} className="w-12 h-12 bg-gray-100bg-slate-700 rounded-full flex items-center justify-center hover:bg-gray-200hover:bg-slate-600 transition-colors">
+                <Linkedin className="w-5 h-5 text-gray-600text-slate-300" />
               </button>
-              <button onClick={() => handleSocialShare('twitter')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                <Twitter className="w-5 h-5 text-gray-600" />
+              <button onClick={() => handleSocialShare('twitter')} className="w-12 h-12 bg-gray-100bg-slate-700 rounded-full flex items-center justify-center hover:bg-gray-200hover:bg-slate-600 transition-colors">
+                <Twitter className="w-5 h-5 text-gray-600text-slate-300" />
               </button>
-              <button onClick={() => handleSocialShare('facebook')} className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                <Facebook className="w-5 h-5 text-gray-600" />
+              <button onClick={() => handleSocialShare('facebook')} className="w-12 h-12 bg-gray-100bg-slate-700 rounded-full flex items-center justify-center hover:bg-gray-200hover:bg-slate-600 transition-colors">
+                <Facebook className="w-5 h-5 text-gray-600text-slate-300" />
               </button>
             </div>
           </div>
         </div>
 
         {/* Fixed Bottom Button */}
-        <div className="bg-white border-t border-gray-200 p-4 shadow-lg">
+        <div className="bg-white p-4 shadow-lg transition-colors duration-300">
           <button
             onClick={handleDownload}
             disabled={downloading || !modelUrl || isProcessing}
             className={`w-full py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 ${
               downloading || !modelUrl || isProcessing
-                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-black text-white hover:bg-gray-800'
+                ? 'bg-gray-400bg-slate-600 text-gray-200text-slate-400 cursor-not-allowed'
+                : 'bg-blackbg-white text-whitetext-black hover:bg-gray-800hover:bg-gray-200'
             }`}
           >
             {downloading ? (
@@ -530,7 +530,7 @@ export default function DownloadPage() {
 
   // Desktop View
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white-900 transition-colors duration-300">
       {/* Navigation */}
       <div className="p-6">
         <button 

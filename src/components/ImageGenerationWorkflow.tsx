@@ -260,18 +260,18 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   };
 
   return (
-    <div className="w-full mx-auto pt-0 mt-0 px-4 md:px-0 md:max-w-4xl">
+    <div className="w-full mx-auto pt-0 mt-0 px-4 md:px-0 md:max-w-4xl bg-transparentbg-transparent">
 
       {/* Loading State */}
       {(isGenerating && generatedImages.length === 0) || isPrinting ? (
-        <div className="text-center py-8 h-full flex items-center justify-center min-h-[60vh]">
+        <div className="text-center py-8 h-full flex items-center justify-center min-h-[60vh] bg-transparentbg-transparent">
           <div className="flex flex-col items-center">
             <img
               src="/GIFS/Loading-State.gif"
               alt="Generating Images"
               className="w-48 h-48 md:w-96 md:h-96 object-contain mb-8"
             />
-            <span className="text-black font-medium text-lg md:text-xl">
+            <span className="text-blacktext-white font-medium text-lg md:text-xl">
               {isPrinting ? 'Creating 3D Model...' : 'Generating Images...'}
             </span>
           </div>
@@ -286,9 +286,9 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
             {generatedImages.slice(0, 3).map((image, index) => (
                 <div
                   key={index}
-                  className={`bg-white flex items-center justify-center h-[280px] md:h-[320px] min-h-[250px] md:min-h-[300px] transition-all duration-700 ease-out overflow-hidden rounded-lg md:rounded-none shadow-md md:shadow-none ${
+                  className={`bg-whitebg-slate-800 flex items-center justify-center h-[280px] md:h-[320px] min-h-[250px] md:min-h-[300px] transition-all duration-700 ease-out overflow-hidden rounded-lg md:rounded-none shadow-md md:shadow-none ${
                     selectedImageIndex === index 
-                      ? 'ring-2 ring-blue-400 shadow-lg' 
+                      ? 'ring-2 ring-blue-400ring-blue-500 shadow-lg' 
                       : ''
                   }`}
                   onClick={() => selectImage(index)}
@@ -330,7 +330,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                             setIsPrinting(false);
                           }
                         }}
-                        className="px-4 py-2 md:px-6 md:py-3 bg-white text-gray-800 flex items-center justify-center gap-2 md:gap-3 transition-all duration-200 hover:bg-white hover:scale-105 shadow-lg cursor-pointer text-[12px] md:text-[14px] font-medium rounded-lg md:rounded-none"
+                        className="px-4 py-2 md:px-6 md:py-3 bg-whitebg-slate-700 text-gray-800text-white flex items-center justify-center gap-2 md:gap-3 transition-all duration-200 hover:bg-gray-50hover:bg-slate-600 hover:scale-105 shadow-lg cursor-pointer text-[12px] md:text-[14px] font-medium rounded-lg md:rounded-none"
                       >
                         <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />

@@ -40,8 +40,25 @@
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#E70D57" />
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DR8HMGTQYX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-DR8HMGTQYX');
+    </script>
   </head>
   <body>
+    <script>
+      // Prevent flash of unstyled content (FOUC) by setting theme before React loads
+      (function() {
+        const theme = localStorage.getItem('theme') || 
+                     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.add(theme);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

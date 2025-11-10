@@ -6,6 +6,30 @@
 /* Import Fromage ExtraBold from Google Fonts or custom source */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
+@theme {
+  --color-dark-bg-primary: #0f172a;
+  --color-dark-bg-secondary: #1e293b;
+  --color-dark-bg-tertiary: #334155;
+  --color-dark-text-primary: #f1f5f9;
+  --color-dark-text-secondary: #cbd5e1;
+  --color-dark-text-tertiary: #94a3b8;
+  --color-dark-border-primary: #334155;
+  --color-dark-border-secondary: #475569;
+}
+
+/* Ensure smooth transitions for dark mode */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
 
 /* Cudliy Trademark Font */
 @font-face {

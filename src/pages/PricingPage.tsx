@@ -167,7 +167,7 @@ const PricingPage = () => {
         keywords="pricing, subscription plans, toy design pricing, 3D printing plans, creator plan, studio plan, student discount, enterprise pricing"
         url="/pricing"
       />
-      <div className="min-h-screen bg-white overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-slate-900 overflow-x-hidden transition-colors duration-300">
         <GlassNav />
       {/* Hero Section */}
       <section className="pt-32 md:pt-40 pb-16 md:pb-24 px-4 md:px-8 overflow-x-hidden">
