@@ -110,21 +110,21 @@ const SignIn = () => {
   };
 
   return (
-    <div className="h-screen flex relative overflow-hidden bg-white dark:bg-slate-900 transition-colors duration-300">
+    <div className="h-screen flex relative overflow-hidden bg-white">
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center transition-colors duration-300">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-2xl border border-gray-200 dark:border-slate-700 transition-colors duration-300">
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl border border-gray-200">
             <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-3 border-gray-300 dark:border-slate-600 border-t-black dark:border-t-white"></div>
-              <p className="text-gray-700 dark:text-slate-200 font-medium">Signing you in...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-3 border-gray-300 border-t-black"></div>
+              <p className="text-gray-700 font-medium">Signing you in...</p>
             </div>
           </div>
         </div>
       )}
       
       {/* Left Section - Sign In Form */}
-      <div className="w-full lg:w-1/2 bg-white dark:bg-slate-900 flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 transition-colors duration-300">
+      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12">
         <div className={`w-full max-w-lg transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
           <div className={`text-center mb-6 sm:mb-8 transform transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
             {/* Logo */}
@@ -138,7 +138,7 @@ const SignIn = () => {
                 }}
               />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-2 font-abril transition-colors duration-300">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2 font-abril">
               Sign in
             </h1>
           </div>
@@ -150,7 +150,7 @@ const SignIn = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border-2 border-gray-300 dark:border-slate-600 focus:outline-none focus:border-black dark:focus:border-slate-400 focus:ring-0 h-[50px] rounded-[25px] px-4 transition-colors bg-white dark:bg-slate-800 text-black dark:text-white"
+                className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 bg-white text-black"
                 required
               />
 
@@ -159,7 +159,7 @@ const SignIn = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border-2 border-gray-300 dark:border-slate-600 focus:outline-none focus:border-black dark:focus:border-slate-400 focus:ring-0 h-[50px] rounded-[25px] px-4 transition-colors bg-white dark:bg-slate-800 text-black dark:text-white"
+                className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 bg-white text-black"
                 required
               />
             </div>
@@ -168,7 +168,7 @@ const SignIn = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 dark:hover:bg-slate-700 disabled:opacity-70 disabled:cursor-not-allowed bg-black dark:bg-slate-800 !rounded-full h-[42px] w-[120px] px-[40px] py-[14px] gap-[10px]"
+                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black !rounded-full h-[42px] w-[120px] px-[40px] py-[14px] gap-[10px]"
                 style={{ opacity: 1 }}
               >
                 {isLoading ? (
@@ -183,12 +183,12 @@ const SignIn = () => {
           </form>
 
           <div className={`mt-6 sm:mt-8 text-center transform transition-all duration-700 delay-600 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 mb-3 sm:mb-4 transition-colors duration-300">Sign in with</p>
+            <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">Sign in with</p>
             <div className="flex justify-center space-x-3 sm:space-x-4">
               <button
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="w-12 h-12 border border-gray-300 dark:border-slate-600 rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+                className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
               >
                 <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
                   <path
@@ -212,9 +212,9 @@ const SignIn = () => {
               <button
                 onClick={handleAppleSignIn}
                 disabled={isLoading}
-                className="w-12 h-12 border border-gray-300 dark:border-slate-600 rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+                className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
               >
-                <svg className="w-5 h-5 flex-shrink-0 text-black dark:text-white transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMid meet">
+                <svg className="w-5 h-5 flex-shrink-0 text-black" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMid meet">
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
                 </svg>
               </button>
@@ -222,10 +222,10 @@ const SignIn = () => {
           </div>
 
           <div className={`mt-4 sm:mt-6 text-center transform transition-all duration-700 delay-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-slate-400 transition-colors duration-300">
+            <p className="text-sm sm:text-base text-gray-600 transition-colors duration-300">
               Don't have an account?{" "}
               <span 
-                className="text-[#E70A55] dark:text-[#FA7072] cursor-pointer hover:underline transition-colors duration-300"
+                className="text-[#E70A55] cursor-pointer hover:underline transition-colors duration-300"
                 onClick={() => navigate("/signup")}
               >
                 Sign Up
@@ -233,17 +233,17 @@ const SignIn = () => {
             </p>
           </div>
 
-          <div className={`mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-500 dark:text-slate-500 transform transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'} transition-colors duration-300`}>
+          <div className={`mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-500 transform transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'} transition-colors duration-300`}>
             <p className="px-2">
               By clicking "Create account" or "Continue with Google or Apple", you agree to Cudliy's{" "}
               <span 
-                className="text-[#E70A55] dark:text-[#FA7072] cursor-pointer hover:underline transition-colors duration-300"
+                className="text-[#E70A55] cursor-pointer hover:underline transition-colors duration-300"
                 onClick={() => navigate("/terms")}
               >
                 Terms
               </span> and{" "}
               <span 
-                className="text-[#E70A55] dark:text-[#FA7072] cursor-pointer hover:underline transition-colors duration-300"
+                className="text-[#E70A55] cursor-pointer hover:underline transition-colors duration-300"
                 onClick={() => navigate("/privacy")}
               >
                 Privacy Policy
@@ -255,7 +255,7 @@ const SignIn = () => {
 
       {/* Right Section - Image Carousel */}
       <div 
-        className={`hidden lg:flex lg:w-1/2 relative overflow-hidden transform transition-all duration-1000 ease-out bg-[#F5F5DC] dark:bg-slate-800 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'} transition-colors duration-300`}
+        className={`hidden lg:flex lg:w-1/2 relative overflow-hidden transform transition-all duration-1000 ease-out bg-[#F5F5DC] ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'} transition-colors duration-300`}
       >
         {/* Image Carousel */}
         <div className={`absolute inset-0 flex items-center justify-center transform transition-all duration-1000 delay-300 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>

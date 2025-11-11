@@ -372,11 +372,11 @@ export default function DesignView() {
               onClick={() => navigate(-1)}
               className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-[#212121]text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-[#212121]text-slate-100">Cudliy</h1>
+            <h1 className="text-lg font-semibold text-black">Cudliy</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -440,12 +440,12 @@ export default function DesignView() {
                 const controls = document.getElementById('mobile-controls');
                 controls.classList.toggle('hidden');
               }}
-              className="flex items-center gap-2 text-[#212121]text-slate-100 text-sm font-medium"
+              className="flex items-center gap-2 text-black text-sm font-medium"
             >
               <svg className="w-5 h-5 text-[#212121]text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
-              Controls
+              
             </button>
             <button 
               onClick={handleMakeOrder}

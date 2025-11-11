@@ -904,14 +904,14 @@ const handleBackToCategories = () => {
 					
 					{/* Title */}
 					<h1
-						className={`font-abril mt-6 lg:mt-7 text-[40px] leading-[1] tracking-[1px] text-center font-extrabold max-w-full transition-all duration-700 delay-300 ease-out ${
+						className={`font-abril mt-6 lg:mt-7 text-[40px] leading-[1] tracking-[1px] text-center font-extrabold max-w-full text-white dark:text-slate-100 transition-all duration-700 delay-300 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}
 					>
 						Playground
 					</h1>
-					<p className={`mt-0 sm:mt-1 lg:mt-2 opacity-80 text-[12px] sm:text-[13px] lg:text-[14px] transition-all duration-700 delay-400 ease-out ${
-						isLoaded ? 'opacity-80 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+					<p className={`mt-0 sm:mt-1 lg:mt-2 opacity-80 dark:opacity-70 text-[12px] sm:text-[13px] lg:text-[14px] text-white dark:text-slate-300 transition-all duration-700 delay-400 ease-out ${
+						isLoaded ? 'opacity-80 dark:opacity-70 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 					}`}>
 						You are a Vibe Designer now
 					</p>
@@ -936,7 +936,7 @@ const handleBackToCategories = () => {
 											handleCreateClick();
 										}
 									}}
-									className="w-full bg-transparent text-white text-[15px] outline-none placeholder:text-gray-500 pr-16 pb-6"
+									className="w-full bg-transparent text-black text-[16px] outline-none placeholder:text-gray-400 pr-16 pb-6 transition-colors duration-300"
 									style={{ caretColor: '#E70D57' }}
 								/>
 								
@@ -957,7 +957,7 @@ const handleBackToCategories = () => {
 										className={`transition-all duration-300 ${
 											!canGenerateImages
 												? 'text-gray-600 cursor-not-allowed'
-												: 'text-gray-400 hover:text-white'
+												: 'text-black hover:text-gray-800'
 										}`}
 									>
 										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

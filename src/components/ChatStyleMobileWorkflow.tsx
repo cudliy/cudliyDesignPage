@@ -449,8 +449,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               onClick={() => setShowAdvanced(!showAdvanced)}
               className={`absolute left-3 top-1/2 -translate-y-1/2 transition-all z-10 ${
                 showAdvanced || hasProperties()
-                  ? 'text-blacktext-slate-100'
-                  : 'text-gray-600text-slate-400'
+                  ? 'text-black text-black'
+                  : 'text-black text-black'
               }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -467,7 +467,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 }
               }}
               placeholder="Describe your design..."
-              className="w-full pl-14 pr-14 py-3 bg-whitebg-slate-800 text-blacktext-white placeholder-gray-400placeholder-slate-400 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blackfocus:ring-slate-400 text-base placeholder:text-base leading-6 transition-colors duration-300"
+              className="w-full pl-14 pr-14 py-3 bg-white/20 text-black placeholder-gray-400 placeholder-slate-400 border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blackfocus:ring-slate-400 text-base placeholder:text-base leading-6 transition-colors duration-300"
               rows={1}
               style={{ minHeight: '48px', maxHeight: '120px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               disabled={isGenerating}
@@ -478,8 +478,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
               className={`absolute right-3 top-1/2 -translate-y-1/2 transition-all ${
                 !inputValue.trim() || isGenerating || !canGenerateImages
-                  ? 'text-gray-400text-slate-500 cursor-not-allowed'
-                  : 'text-gray-600text-slate-300 hover:text-blackhover:text-slate-100'
+                  ? 'text-black text-black cursor-not-allowed'
+                  : 'text-black text-black  hover:text-blackhover:text-slate-100'
               }`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

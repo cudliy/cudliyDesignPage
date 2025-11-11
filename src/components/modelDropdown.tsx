@@ -72,7 +72,7 @@ export default function ModelDropdown({ selectedQuality, onQualityChange }: Mode
       <div className='relative text-left model-dropdown-container' style={{ zIndex: 999999 }} ref={containerRef}>
         {/*Dropdown Button - Settings/Sliders Icon Only*/}
         <button 
-          className="flex items-center justify-center bg-transparent hover:opacity-70 border-none text-gray-400 p-0 transition-all duration-300" 
+          className="flex items-center justify-center bg-transparent hover:opacity-70 border-none text-black p-0 transition-all duration-300" 
           onClick={(e) => {
             e.stopPropagation();
             setOpen(!open);
