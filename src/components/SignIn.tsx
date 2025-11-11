@@ -110,7 +110,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="h-screen flex relative overflow-hidden bg-white">
+    <div className="min-h-screen flex relative overflow-hidden bg-white">
       {/* Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -124,7 +124,7 @@ const SignIn = () => {
       )}
       
       {/* Left Section - Sign In Form */}
-      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12">
+      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center px-4 sm:px-8 py-8 sm:py-12 min-h-screen lg:min-h-0">
         <div className={`w-full max-w-lg transform transition-all duration-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
           <div className={`text-center mb-6 sm:mb-8 transform transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
             {/* Logo */}
@@ -150,7 +150,8 @@ const SignIn = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 bg-white text-black"
+                className="w-full border-2 border-gray-200 focus:outline-none focus:border-gray-400 focus:ring-0 h-[56px] rounded-full px-6 bg-white text-black text-base"
+                style={{ fontSize: '16px' }}
                 required
               />
 
@@ -159,7 +160,8 @@ const SignIn = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border-2 border-gray-300 focus:outline-none focus:border-black focus:ring-0 h-[50px] rounded-[25px] px-4 bg-white text-black"
+                className="w-full border-2 border-gray-200 focus:outline-none focus:border-gray-400 focus:ring-0 h-[56px] rounded-full px-6 bg-white text-black text-base"
+                style={{ fontSize: '16px' }}
                 required
               />
             </div>
