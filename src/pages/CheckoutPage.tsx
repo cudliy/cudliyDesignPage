@@ -345,9 +345,9 @@ export default function CheckoutPage() {
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`w-full p-2 rounded-lg border text-left transition-all ${
+                  className={`w-full p-2 rounded-full border text-left transition-all ${
                     selectedSize === size
-                      ? 'bg-black text-white border-black'
+                      ? 'bg-gray-200 text-[#212121] border-none'
                       : 'bg-white text-[#212121] border-gray-300'
                   }`}
                 >
@@ -369,9 +369,9 @@ export default function CheckoutPage() {
                     <button
                       key={inch}
                       onClick={() => setSelectedInch(inch)}
-                      className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                      className={`flex-1 py-2 rounded-full text-sm font-medium ${
                         selectedInch === inch
-                          ? 'bg-black text-white'
+                          ? 'bg-black/20 text-white'
                           : 'bg-gray-100 text-[#212121]'
                       }`}
                     >
@@ -382,9 +382,9 @@ export default function CheckoutPage() {
                     <button
                       key={inch}
                       onClick={() => setSelectedInch(inch)}
-                      className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                      className={`flex-1 py-2 rounded-full text-sm font-medium ${
                         selectedInch === inch
-                          ? 'bg-black text-white'
+                          ? 'bg-black/20 text-white'
                           : 'bg-gray-100 text-[#212121]'
                       }`}
                     >
@@ -461,26 +461,26 @@ export default function CheckoutPage() {
                 {/* Small */}
                 <button
                   onClick={() => setSelectedSize('S')}
-                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='S' ? 'bg-[#313131] text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-28 rounded-full border transition-all text-left p-4 shadow-sm ${selectedSize==='S' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Small</div>
-                  <div className={`text-xs ${selectedSize==='S' ? 'text-white/80' : 'text-gray-500'}`}>1–4 inch<br/>perfect for tiny<br/>gifts or keepsakes.</div>
+                  <div className={`text-xs ${selectedSize==='S' ? 'text-gray-600' : 'text-gray-500'}`}>1–4 inch<br/>perfect for tiny<br/>gifts or keepsakes.</div>
                 </button>
                 {/* Medium */}
                 <button
                   onClick={() => setSelectedSize('M')}
-                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='M' ? 'bg-[#313131] text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-28 rounded-full border transition-all text-left p-4 shadow-sm ${selectedSize==='M' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Medium</div>
-                  <div className={`text-xs ${selectedSize==='M' ? 'text-white/80' : 'text-gray-500'}`}>5–6 inch<br/>great for small<br/>vases or desk pieces.</div>
+                  <div className={`text-xs ${selectedSize==='M' ? 'text-gray-600' : 'text-gray-500'}`}>5–6 inch<br/>great for small<br/>vases or desk pieces.</div>
                 </button>
                 {/* Large */}
                 <button
                   onClick={() => setSelectedSize('L')}
-                  className={`w-40 h-28 rounded-2xl border transition-all text-left p-4 shadow-sm ${selectedSize==='L' ? 'bg-[#313131] text-white border-black shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-28 rounded-full border transition-all text-left p-4 shadow-sm ${selectedSize==='L' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
                 >
                   <div className="font-semibold mb-1">Large</div>
-                  <div className={`text-xs ${selectedSize==='L' ? 'text-white/80' : 'text-gray-500'}`}>7–8 inch<br/>ideal for display<br/>or special gifts.</div>
+                  <div className={`text-xs ${selectedSize==='L' ? 'text-gray-600' : 'text-gray-500'}`}>7–8 inch<br/>ideal for display<br/>or special gifts.</div>
                 </button>
               </div>
               {/* Inch selector for Medium/Large */}
@@ -492,7 +492,7 @@ export default function CheckoutPage() {
                       <button
                         key={inch}
                         onClick={() => setSelectedInch(inch)}
-                        className={`px-3 py-1 rounded-full border text-sm ${selectedInch===inch ? 'bg-black text-white border-black' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+                        className={`px-3 py-1 rounded-full border text-sm ${selectedInch===inch ? 'bg-gray-200 text-black border-gray-300' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
                       >
                         {inch}"
                       </button>
@@ -501,7 +501,7 @@ export default function CheckoutPage() {
                       <button
                         key={inch}
                         onClick={() => setSelectedInch(inch)}
-                        className={`px-3 py-1 rounded-full border text-sm ${selectedInch===inch ? 'bg-black text-white border-black' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+                        className={`px-3 py-1 rounded-full border text-sm ${selectedInch===inch ? 'bg-gray-200 text-black border-gray-300' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
                       >
                         {inch}"
                       </button>

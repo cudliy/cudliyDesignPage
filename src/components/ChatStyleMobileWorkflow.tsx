@@ -325,33 +325,26 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-gray-50bg-slate-900 relative overflow-hidden transition-colors duration-300">
+    <div className="flex flex-col h-full w-full bg-gray-50 relative overflow-hidden transition-colors duration-300">
       {/* Full-Screen Loading State for 3D Generation */}
       {isGenerating && (
-        <div className="absolute inset-0 bg-whitebg-slate-900 z-50 flex items-center justify-center transition-colors duration-300">
+        <div className="absolute inset-0 bg-white z-50 flex items-center justify-center transition-colors duration-300">
           <div className="flex flex-col items-center">
             <img
               src="/GIFS/Loading-State.gif"
               alt="Generating 3D Model"
-              className="w-32 h-32 object-contain mb-6"
+              className="w-64 h-64 object-contain mb-6"
             />
-            <h3 className="text-xl font-semibold text-gray-800text-slate-100 mb-2">Creating 3D Model</h3>
-            <p className="text-sm text-gray-600text-slate-300">This may take a moment...</p>
+            <p className="text-xl font-medium text-gray-800">Generating 3D...</p>
           </div>
         </div>
       )}
 
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 pb-32 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      {/* Messages Container - Increased bottom padding to ensure visibility */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 pb-40 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center px-6">
-            <img
-              src="/CudliyLogo.svg"
-              alt="Cudliy Logo"
-              className="w-10 h-10 object-contain mb-6"
-            />
-            <h2 className="text-xl font-semibold text-[#212121]text-slate-100 mb-2">Start Creating</h2>
-            <p className="text-sm text-[#212121]text-slate-300 opacity-70">Describe what you want to create and I'll generate images for you</p>
+          <div className="flex flex-col items-center justify-center h-full text-center px-6 font-inter">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Start Creating</h2>
           </div>
         )}
 
@@ -359,17 +352,22 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
           <div
             key={message.id}
             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            style={{ opacity: 1, visibility: 'visible' }}
           >
             <div
               className={`max-w-[85%] relative px-4 py-3 ${
                 message.type === 'user'
-                  ? 'bg-[#212121]bg-slate-700 text-white rounded-[18px]'
-                  : 'bg-whitebg-slate-800 text-[#212121]text-slate-100 rounded-[18px]'
+                  ? 'bg-white text-black rounded-[18px] shadow-sm border border-gray-200'
+                  : 'bg-gray-100 text-black rounded-[4px] shadow-none border border-gray-100'
               } transition-colors duration-300`}
               style={message.type === 'user' ? {
-                borderBottomRightRadius: '4px'
+                borderBottomRightRadius: '4px',
+                backgroundColor: '#ffffff !important',
+                color: '#000000 !important'
               } : {
-                borderBottomLeftRadius: '4px'
+                borderBottomLeftRadius: '4px',
+                backgroundColor: '#ffffff !important',
+                color: '#000000 !important'
               }}
             >
               {/* Chat bubble tail - curved */}
@@ -382,31 +380,31 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 >
                   <path 
                     d="M 0 0 Q 8 5 15 18 Q 10 20 0 20 Z" 
-                    className="fill-[#212121]fill-slate-700"
+                    className="fill-white"
                   />
                 </svg>
               )}
               {message.isGenerating && (
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
-                  <span className="text-sm text-whitetext-slate-100">{message.content}</span>
+                  <span className="text-sm text-black" style={{ color: '#000000 !important' }}>{message.content}</span>
                 </div>
               )}
               
               {!message.isGenerating && (
                 <>
-                  <p className="text-sm whitespace-pre-wrap text-[#212121]text-slate-100">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap text-black" style={{ color: '#000000 !important' }}>{message.content}</p>
                   
                   {message.images && message.images.length > 0 && (
                     <div className="mt-3 grid grid-cols-1 gap-3">
                       {message.images.map((imageUrl, index) => (
                         <div
                           key={index}
-                          className="relative overflow-hidden cursor-pointer transition-all hover:opacity-90"
+                          className="relative overflow-hidden cursor-pointer transition-all hover:opacity-90 rounded-lg"
                           onClick={() => {
                             if (message.sessionId && message.creationId) {
                               generate3DModel(imageUrl, message.sessionId, message.creationId);
@@ -416,16 +414,21 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                           <img
                             src={imageUrl}
                             alt={`Generated ${index + 1}`}
-                            className="w-full h-auto"
+                            className="w-full h-auto rounded-lg"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <div className="bg-whitebg-slate-700 rounded-full p-3 shadow-xl transform hover:scale-110 transition-transform">
-                              <svg className="w-6 h-6 text-gray-800text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          {/* Professional 3D select overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                            <div className="bg-black rounded-full p-4 shadow-2xl transform hover:scale-110 transition-transform border-2 border-white/20">
+                              <svg className="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7.5v9l9 4.5 9-4.5v-9" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v9" />
                               </svg>
                             </div>
+                          </div>
+                          {/* Professional select badge */}
+                          <div className="absolute top-3 right-3 bg-none text-[#212121] px-3 py-1 rounded-full text-xs font-medium shadow-lg opacity-90">
+                            View 3D
                           </div>
                         </div>
                       ))}
@@ -439,25 +442,13 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Container - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-whitebg-slate-800 p-4 z-30 transition-colors duration-300">
+      {/* Input Container - Fixed at bottom with exact design from image */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          <div className="flex-1 relative bg-whitebg-slate-700 rounded-2xl transition-colors duration-300">
-            {/* Toggle button inside text field */}
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className={`absolute left-3 top-1/2 -translate-y-1/2 transition-all z-10 ${
-                showAdvanced || hasProperties()
-                  ? 'text-black text-black'
-                  : 'text-black text-black'
-              }`}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-            </button>
-            <textarea
+          <div className="flex-1 relative bg-gray-100 rounded-3xl transition-colors duration-300" style={{ minHeight: '88px' }}>
+            {/* Text input - increased height and removed left padding */}
+            <input
+              type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => {
@@ -466,26 +457,44 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   handleSubmit(e);
                 }
               }}
-              placeholder="Describe your design..."
-              className="w-full pl-14 pr-14 py-3 bg-white/20 text-black placeholder-gray-400 placeholder-slate-400 border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blackfocus:ring-slate-400 text-base placeholder:text-base leading-6 transition-colors duration-300"
-              rows={1}
-              style={{ minHeight: '48px', maxHeight: '120px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              placeholder=""
+              className="w-full pl-6 pr-20 py-6 bg-transparent text-gray-800 placeholder-gray-500 border-none rounded-3xl resize-none focus:outline-none text-base leading-6 transition-colors duration-300"
+              style={{ minHeight: '88px' }}
               disabled={isGenerating}
             />
-            {/* Send button inside text field */}
-            <button
-              type="submit"
-              disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 transition-all ${
-                !inputValue.trim() || isGenerating || !canGenerateImages
-                  ? 'text-black text-black cursor-not-allowed'
-                  : 'text-black text-black  hover:text-blackhover:text-slate-100'
-              }`}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-            </button>
+            
+            {/* Bottom right icons container */}
+            <div className="absolute right-4 bottom-2 flex items-center gap-4">
+              {/* Settings/Toggle icon - larger with no background */}
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className={`transition-all ${
+                  showAdvanced || hasProperties()
+                    ? 'text-gray-700'
+                    : 'text-gray-500'
+                }`}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+              </button>
+              
+              {/* Send arrow - gray when empty, dark when typing */}
+              <button
+                type="submit"
+                disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
+                className={`transition-all ${
+                  !inputValue.trim() || isGenerating || !canGenerateImages
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-gray-800 hover:text-gray-600'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+              </button>
+            </div>
           </div>
         </form>
       </div>

@@ -273,7 +273,7 @@ export default function MobileOptimizedImageWorkflow({
           {generatedImages.slice(0, 3).map((image, index) => (
             <div
               key={index}
-              className={`bg-white flex items-center justify-center transition-all duration-700 ease-out overflow-hidden ${
+              className={`bg-gray-100 flex items-center justify-center transition-all duration-700 ease-out overflow-hidden ${
                 selectedImageIndex === index ? 'ring-2 ring-blue-400 shadow-lg' : ''
               } ${
                 isMobile 
@@ -334,7 +334,7 @@ export default function MobileOptimizedImageWorkflow({
                         setIsPrinting(false);
                       }
                     }}
-                    className={`bg-white text-gray-800 flex items-center justify-center gap-2 transition-all duration-200 hover:bg-white hover:scale-105 shadow-lg cursor-pointer font-medium ${
+                    className={`bg-gray-100 text-gray-800 flex items-center justify-center gap-2 transition-all duration-200 hover:bg-gray-200 hover:scale-105 shadow-lg cursor-pointer font-medium ${
                       isMobile 
                         ? 'px-4 py-2 text-xs rounded-xl' 
                         : 'px-4 py-2 md:px-6 md:py-3 text-[12px] md:text-[14px] rounded-lg md:rounded-none'

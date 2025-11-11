@@ -287,12 +287,12 @@ export default function DesignView() {
       {/* Center Panel Skeleton */}
       <div className="flex-1 bg-white rounded-[40px] flex flex-col overflow-hidden transition-colors duration-300">
         <div className="flex-1 flex items-center justify-center p-8">
-          <div className="w-full h-full bg-gray-200 rounded-lg animate-pulse flex items-center justify-center">
+          <div className="w-full h-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
             <div className="text-center">
               <img
                 src="/GIFS/Loading-State.gif"
                 alt="Loading 3D model"
-                className="w-24 h-24 object-contain mx-auto mb-4"
+                className="w-64 h-64 object-contain mx-auto mb-4"
               />
               <p className="text-gray-600">Loading your 3D model...</p>
             </div>
@@ -394,8 +394,8 @@ export default function DesignView() {
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={
-                <div className="w-full h-full flex items-center justify-center">
-                  <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-24 h-24" />
+                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                  <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-64 h-64" />
                 </div>
               }>
                 <ModelViewer
@@ -432,24 +432,24 @@ export default function DesignView() {
         </div>
 
         {/* Bottom Controls - Fixed at bottom like text field */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 z-30 transition-colors duration-300">
+        <div className="fixed bottom-0 left-0 right-0 p-4 z-30 transition-colors duration-300">
           {/* Quick Actions */}
-          <div className="flex items-center justify-between gap-3 mb-3">
+          <div className="flex items-center  justify-between bg-gray-100 p-2 rounded-lg gap-3 mb-3">
             <button 
               onClick={() => {
                 const controls = document.getElementById('mobile-controls');
                 controls.classList.toggle('hidden');
               }}
-              className="flex items-center gap-2 text-black text-sm font-medium"
+              className="flex items-center gap-2 text-[#313131] text-sm font-medium"
             >
-              <svg className="w-5 h-5 text-[#212121]text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#212121]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
               
             </button>
             <button 
               onClick={handleMakeOrder}
-              className="px-6 py-2 bg-[#212121] text-white rounded-full font-medium text-sm hover:bg-[#2a2a2a] transition-colors duration-300"
+              className="px-6 py-2 bg-[#313131] text-white rounded-full font-medium text-sm hover:bg-[#2a2a2a] transition-colors duration-300"
             >
               Make Order
             </button>
@@ -761,7 +761,7 @@ export default function DesignView() {
                     <img
                       src="/GIFS/Loading-State.gif"
                       alt="Loading"
-                      className="w-4 h-4 object-contain"
+                      className="w-10 h-10 object-contain"
                     />
                   )}
                   {regenerating ? 'Generating 3D Model...' : 'Generate New 3D Model'}

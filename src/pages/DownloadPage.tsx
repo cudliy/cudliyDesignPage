@@ -319,7 +319,7 @@ export default function DownloadPage() {
           <img
             src="/GIFS/Loading-State.gif"
             alt="Processing"
-            className="w-24 h-24 object-contain mx-auto mb-4"
+            className="w-64 h-64 object-contain mx-auto mb-4"
           />
           <p className="text-gray-600">Loading your 3D model...</p>
         </div>
@@ -359,7 +359,7 @@ export default function DownloadPage() {
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-24 h-24 mx-auto mb-4" />
+            <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-64 h-64 mx-auto mb-4" />
             <p className="text-gray-600">Loading design...</p>
           </div>
         </div>
