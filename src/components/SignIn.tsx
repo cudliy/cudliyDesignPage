@@ -100,14 +100,17 @@ const SignIn = () => {
         const isNewUser = responseData.isNewUser || responseData.data?.isNewUser;
         
         // Store authentication data
+        console.log('Storing auth data:', { token: !!token, user });
         if (token) {
           sessionStorage.setItem('token', token);
+          console.log('Token stored:', sessionStorage.getItem('token') ? 'YES' : 'NO');
         }
         
         if (user?.id || user?._id) {
           const userId = user.id || user._id;
           sessionStorage.setItem('user_id', userId);
           sessionStorage.removeItem('guest_user_id');
+          console.log('User ID stored:', sessionStorage.getItem('user_id'));
         }
         
         // Store user profile data
@@ -120,6 +123,12 @@ const SignIn = () => {
         if (user?.username || user?.email) {
           sessionStorage.setItem('user_name', user.username || user.email);
         }
+        
+        console.log('All sessionStorage after storing:', {
+          token: sessionStorage.getItem('token'),
+          user_id: sessionStorage.getItem('user_id'),
+          user_name: sessionStorage.getItem('user_name')
+        });
         
         // Show success message and navigate
         if (isNewUser) {
