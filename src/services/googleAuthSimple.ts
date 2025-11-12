@@ -1,10 +1,5 @@
 // Simplified Google OAuth Service - Alternative Implementation
-declare global {
-  interface Window {
-    google: any;
-    gapi: any;
-  }
-}
+// Type definitions are in src/types/google.d.ts
 
 export interface GoogleUser {
   id: string;

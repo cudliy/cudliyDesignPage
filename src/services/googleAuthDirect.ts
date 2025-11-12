@@ -174,11 +174,6 @@ class DirectGoogleAuthService {
   }
 }
 
-// Add global types
-declare global {
-  interface Window {
-    gapi: any;
-  }
-}
+// Type definitions are in src/types/google.d.ts
 
 export const directGoogleAuthService = new DirectGoogleAuthService();
