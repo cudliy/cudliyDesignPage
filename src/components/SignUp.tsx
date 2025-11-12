@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { apiService } from "@/services/api";
 import { toast } from "@/lib/sonner";
 import ImageCarousel from "@/components/ImageCarousel";
+import { modernGoogleAuthService } from "@/services/googleAuthModern";
  
 
 const SignUp = () => {
@@ -18,9 +19,6 @@ const SignUp = () => {
   });
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // Removed unused placeholder signUp
-  const signInWithGoogle = async () => ({ error: null as any });
-  const signInWithApple = async () => ({ error: null as any });
   const navigate = useNavigate();
 
   
@@ -138,12 +136,74 @@ const SignUp = () => {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      const { error } = await signInWithGoogle();
-      if (error) {
-        toast.error(error.message);
+      // Get Google credential token using modern Google Identity Services
+      const credential = await modernGoogleAuthService.signIn();
+      
+      // Send credential to backend for authentication
+      const response = await apiService.googleAuth(credential);
+      
+      if (response.success && response.data) {
+        const { token, user } = response.data;
+        
+        // Store authentication data
+        if (token) {
+          sessionStorage.setItem('token', token);
+        }
+        
+        if (user?.id || user?._id) {
+          const userId = user.id || user._id;
+          sessionStorage.setItem('user_id', userId);
+          sessionStorage.removeItem('guest_user_id');
+        }
+        
+        // Store user profile data
+        if (user?.profile?.firstName) {
+          sessionStorage.setItem('user_firstName', user.profile.firstName);
+        }
+        if (user?.profile?.lastName) {
+          sessionStorage.setItem('user_lastName', user.profile.lastName);
+        }
+        if (user?.username || user?.email) {
+          sessionStorage.setItem('user_name', user.username || user.email);
+        }
+        
+        // Always treat Google auth as new user experience for signup page
+        toast.success("Welcome to Cudliy! Your account has been created successfully!");
+        sessionStorage.setItem('show_intro', 'true');
+        navigate("/design");
+      } else {
+        throw new Error(response.error || 'Google sign-up failed');
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred");
+    } catch (error: any) {
+      console.error('Google Sign-Up Error:', error);
+      
+      let errorMessage = "Google sign-up failed. Please try again.";
+      
+      if (error && typeof error === 'object') {
+        if (error.message) {
+          if (error.message.includes('cancelled') || error.message.includes('not displayed')) {
+            errorMessage = "Google sign-up was cancelled.";
+          } else if (error.message.includes('popup') || error.message.includes('blocked')) {
+            errorMessage = "Please allow popups for Google sign-up to work.";
+          } else if (error.message.includes('network') || error.message.includes('Network')) {
+            errorMessage = "Network error. Please check your connection and try again.";
+          } else if (error.message.includes('Invalid') || error.message.includes('expired')) {
+            errorMessage = "Google authentication failed. Please try again.";
+          } else if (error.message.includes('already exists')) {
+            errorMessage = "An account with this Google email already exists. Please sign in instead.";
+          } else if (error.message.includes('timed out')) {
+            errorMessage = "Google sign-up timed out. Please try again.";
+          } else if (error.message.includes('refresh')) {
+            errorMessage = error.message;
+          } else {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = "Google sign-up encountered an error. Please refresh the page and try again.";
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -152,12 +212,10 @@ const SignUp = () => {
   const handleAppleSignIn = async () => {
     setIsLoading(true);
     try {
-      const { error } = await signInWithApple();
-      if (error) {
-        toast.error(error.message);
-      }
+      // Apple Sign-In is not implemented yet
+      toast.error("Apple Sign-In is coming soon!");
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error("Apple Sign-In is not available yet");
     } finally {
       setIsLoading(false);
     }

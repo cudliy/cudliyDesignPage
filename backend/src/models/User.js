@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema({
     avatar: String,
     bio: String
   },
+  googleAuth: {
+    googleId: String,
+    email: String,
+    name: String,
+    picture: String
+  },
   preferences: {
     defaultStyle: String,
     defaultMaterial: String,

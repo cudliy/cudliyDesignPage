@@ -84,7 +84,7 @@ export default function CheckoutPage() {
     if (authed) return authed;
     const guest = sessionStorage.getItem('guest_user_id');
     if (guest) return guest;
-    const newGuest = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${Math.random().toString(36).substr(2, 5)}`;
+    const newGuest = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${Math.random().toString(36).substring(2, 7)}`;
     sessionStorage.setItem('guest_user_id', newGuest);
     return newGuest;
   });

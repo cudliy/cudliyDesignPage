@@ -1,7 +1,11 @@
 import bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 import { AppError } from '../utils/errorHandler.js';
 import { createSendToken } from '../middleware/auth.js';
+
+// Initialize Google OAuth client
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const signup = async (req, res, next) => {
   try {
@@ -59,6 +63,89 @@ export const login = async (req, res, next) => {
 
 export const me = async (req, res) => {
   res.json({ success: true, data: { user: req.user } });
+};
+
+export const googleAuth = async (req, res, next) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return next(new AppError('Google credential is required', 400));
+    }
+
+    // Verify the Google token
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return next(new AppError('Invalid Google token', 401));
+    }
+
+    const { sub: googleId, email, name, given_name: firstName, family_name: lastName, picture } = payload;
+
+    if (!email) {
+      return next(new AppError('Email not provided by Google', 400));
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ 
+      $or: [
+        { email },
+        { 'googleAuth.googleId': googleId }
+      ]
+    });
+
+    let isNewUser = false;
+
+    if (user) {
+      // Update Google auth info if not already set
+      if (!user.googleAuth || !user.googleAuth.googleId) {
+        user.googleAuth = {
+          googleId,
+          email,
+          name,
+          picture
+        };
+        await user.save();
+      }
+    } else {
+      // Create new user
+      isNewUser = true;
+      const username = email.includes('@') ? email.split('@')[0] : `user_${Date.now()}`;
+      
+      user = await User.create({
+        email,
+        username,
+        profile: { 
+          firstName: firstName || name?.split(' ')[0] || '',
+          lastName: lastName || name?.split(' ').slice(1).join(' ') || ''
+        },
+        googleAuth: {
+          googleId,
+          email,
+          name,
+          picture
+        },
+        // No password needed for Google auth users
+        password: await bcrypt.hash(Math.random().toString(36), 12) // Random password as fallback
+      });
+    }
+
+    // Create and send token
+    createSendToken(user, 200, res, { isNewUser });
+  } catch (err) {
+    console.error('Google Auth Error:', err);
+    if (err.message.includes('Token used too early') || err.message.includes('Token used too late')) {
+      return next(new AppError('Google authentication token expired. Please try again.', 401));
+    }
+    if (err.message.includes('Invalid token signature')) {
+      return next(new AppError('Invalid Google authentication. Please try again.', 401));
+    }
+    next(new AppError('Google authentication failed. Please try again.', 500));
+  }
 };
 
 

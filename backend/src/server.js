@@ -36,21 +36,10 @@ const PORT = process.env.PORT || 3001;
 // Trust proxy for rate limiting behind reverse proxy
 app.set('trust proxy', 1);
 
-// Security middleware
+// Security middleware - Disable CSP to let frontend handle it
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:", "storage.googleapis.com", "*.replicate.com", "*.amazonaws.com", "*.fal.media", "*.fal.run", "*.fal.ai"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.jsdelivr.net"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      connectSrc: ["'self'", "https:", "wss:", "*.replicate.com", "*.amazonaws.com", "*.fal.media", "*.fal.run", "*.fal.ai"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'", "https:", "data:"],
-      frameSrc: ["'none'"]
-    }
-  }
+  contentSecurityPolicy: false, // Disable backend CSP
 }));
 
 // CORS configuration - Dynamic origins based on environment
@@ -62,16 +51,26 @@ const corsOptions = {
         'https://www.cudliy.com',
         'https://cudliy.com',
         'http://localhost:5173',
+        'http://localhost:3000',
+        'https://accounts.google.com',
+        'https://accounts.google.com:443'
       ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Allow Google domains for OAuth
+    if (origin && (origin.includes('google.com') || origin.includes('googleapis.com'))) {
+      return callback(null, true);
+    }
+    
     // Allow cudliy.com domains
     if (origin && origin.includes('cudliy.com')) {
       return callback(null, true);
     }
-       if (origin && origin.includes('http://localhost:5173')) {
+    
+    // Allow localhost for development
+    if (origin && (origin.includes('localhost:5173') || origin.includes('localhost:3000'))) {
       return callback(null, true);
     }
     
@@ -86,7 +85,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Goog-*'],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar']
 };
 app.use(cors(corsOptions));

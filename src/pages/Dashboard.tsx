@@ -91,7 +91,13 @@ export default function Dashboard() {
       
       if (response.success && response.data) {
         const fetchedDesigns = response.data.designs || [];
-        setDesigns(fetchedDesigns);
+        
+        // Deduplicate designs by ID to prevent duplicates
+        const uniqueDesigns = fetchedDesigns.filter((design: Design, index: number, self: Design[]) => 
+          index === self.findIndex((d: Design) => d.id === design.id)
+        );
+        
+        setDesigns(uniqueDesigns);
         setError(null);
         
         // Store in sessionStorage as cache (optional)
@@ -259,11 +265,23 @@ export default function Dashboard() {
     ]
   };
 
-  // Helper function to get design image
+  // Helper function to get design image with better URL handling
   const getDesignImage = (design: Design) => {
     if (design.images && design.images.length > 0) {
-      return design.images[0].url;
+      const imageUrl = design.images[0].url;
+      
+      // Prefer external URLs over base64 data
+      if (imageUrl && !imageUrl.startsWith('data:')) {
+        return imageUrl;
+      }
+      
+      // If we have a base64 image, use it but prefer external URLs
+      if (imageUrl && imageUrl.startsWith('data:')) {
+        return imageUrl;
+      }
     }
+    
+    // Fallback placeholder
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+';
   };
 
@@ -533,6 +551,23 @@ export default function Dashboard() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
                         </svg>
                         <span className="text-sm font-medium">EDU License</span>
+                      </button>
+
+                      {/* Sign Out Button */}
+                      <button
+                        onClick={() => {
+                          // Clear session storage
+                          sessionStorage.clear();
+                          // Redirect to sign in
+                          navigate('/signin');
+                          setShowMobileMenu(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-red-600 hover:bg-red-50"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span className="text-sm font-medium">Sign Out</span>
                       </button>
                     </div>
                   </div>

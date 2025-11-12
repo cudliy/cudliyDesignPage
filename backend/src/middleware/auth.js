@@ -27,7 +27,7 @@ export const signToken = (id) => {
   });
 };
 
-export const createSendToken = (user, statusCode, res) => {
+export const createSendToken = (user, statusCode, res, additionalData = {}) => {
   const token = signToken(user._id);
   
   // Sanitize cookie expiry from env (in days). Fallback to 7 days if unset/invalid
@@ -53,7 +53,8 @@ export const createSendToken = (user, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      user
+      user,
+      ...additionalData
     }
   });
 };

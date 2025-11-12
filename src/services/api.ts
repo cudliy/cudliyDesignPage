@@ -355,6 +355,14 @@ class ApiService {
     });
   }
 
+  // Google OAuth
+  async googleAuth(credential: string): Promise<ApiResponse<{ token: string; user: any; isNewUser: boolean }>> {
+    return this.request('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ credential })
+    });
+  }
+
   // Health check
   async healthCheck(): Promise<ApiResponse> {
     return this.request('/health');
