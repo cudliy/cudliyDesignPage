@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
     name: String,
     picture: String
   },
+  appleAuth: {
+    appleId: String,
+    email: String
+  },
   preferences: {
     defaultStyle: String,
     defaultMaterial: String,

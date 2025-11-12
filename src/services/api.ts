@@ -368,6 +368,14 @@ class ApiService {
     });
   }
 
+  // Apple OAuth
+  async appleAuth(idToken: string, code: string, user?: { email: string; firstName?: string; lastName?: string }): Promise<ApiResponse<{ token: string; user: any; isNewUser: boolean }>> {
+    return this.request('/auth/apple', {
+      method: 'POST',
+      body: JSON.stringify({ idToken, code, user })
+    });
+  }
+
   // Health check
   async healthCheck(): Promise<ApiResponse> {
     return this.request('/health');

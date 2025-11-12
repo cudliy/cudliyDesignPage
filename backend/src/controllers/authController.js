@@ -148,4 +148,75 @@ export const googleAuth = async (req, res, next) => {
   }
 };
 
+export const appleAuth = async (req, res, next) => {
+  try {
+    const { idToken, code, user: appleUser } = req.body;
+
+    if (!idToken) {
+      return next(new AppError('Apple ID token is required', 400));
+    }
+
+    // For Apple Sign-In, we need to verify the ID token
+    // Apple provides the user info only on first sign-in
+    // We'll decode the JWT to get the email
+    const tokenParts = idToken.split('.');
+    if (tokenParts.length !== 3) {
+      return next(new AppError('Invalid Apple ID token', 401));
+    }
+
+    const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
+    const { sub: appleId, email } = payload;
+
+    if (!email) {
+      return next(new AppError('Email not provided by Apple', 400));
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ 
+      $or: [
+        { email },
+        { 'appleAuth.appleId': appleId }
+      ]
+    });
+
+    let isNewUser = false;
+
+    if (user) {
+      // Update Apple auth info if not already set
+      if (!user.appleAuth || !user.appleAuth.appleId) {
+        user.appleAuth = {
+          appleId,
+          email
+        };
+        await user.save();
+      }
+    } else {
+      // Create new user
+      isNewUser = true;
+      const username = email.includes('@') ? email.split('@')[0] : `user_${Date.now()}`;
+      
+      user = await User.create({
+        email,
+        username,
+        profile: { 
+          firstName: appleUser?.firstName || '',
+          lastName: appleUser?.lastName || ''
+        },
+        appleAuth: {
+          appleId,
+          email
+        },
+        // No password needed for Apple auth users
+        password: await bcrypt.hash(Math.random().toString(36), 12) // Random password as fallback
+      });
+    }
+
+    // Create and send token
+    createSendToken(user, 200, res, { isNewUser });
+  } catch (err) {
+    console.error('Apple Auth Error:', err);
+    next(new AppError('Apple authentication failed. Please try again.', 500));
+  }
+};
+
 

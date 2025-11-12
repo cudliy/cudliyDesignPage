@@ -216,12 +216,87 @@ const SignUp = () => {
   };
 
   const handleAppleSignIn = async () => {
+    // Apple Sign-In requires Apple Developer Program enrollment ($99/year)
+    // For now, show a friendly message
+    toast.error("Apple Sign-In coming soon! Please use Google or email sign-up for now.");
+    return;
+    
+    /* Uncomment when Apple Developer Program is enrolled
     setIsLoading(true);
     try {
-      // Apple Sign-In is not implemented yet
-      toast.error("Apple Sign-In is coming soon!");
-    } catch (error) {
-      toast.error("Apple Sign-In is not available yet");
+      const { appleAuthService } = await import('@/services/appleAuth');
+      
+      // Get Apple credential
+      const appleResponse = await appleAuthService.signIn();
+      
+      // Send credential to backend for authentication
+      const response = await apiService.appleAuth(
+        appleResponse.idToken,
+        appleResponse.code,
+        appleResponse.user
+      );
+      
+      // Handle both response formats: {success: true} and {status: 'success'}
+      const isSuccess = response.success || (response as any).status === 'success';
+      
+      if (isSuccess) {
+        // Backend returns: {status: 'success', token: '...', data: {user: {...}, isNewUser: true}}
+        const token = (response as any).token || response.data?.token;
+        const user = (response as any).data?.user || response.data?.user;
+        
+        // Store authentication data
+        if (token) {
+          sessionStorage.setItem('token', token);
+        }
+        
+        if (user?.id || user?._id) {
+          const userId = user.id || user._id;
+          sessionStorage.setItem('user_id', userId);
+          sessionStorage.removeItem('guest_user_id');
+        }
+        
+        // Store user profile data
+        if (user?.profile?.firstName) {
+          sessionStorage.setItem('user_firstName', user.profile.firstName);
+        }
+        if (user?.profile?.lastName) {
+          sessionStorage.setItem('user_lastName', user.profile.lastName);
+        }
+        if (user?.username || user?.email) {
+          sessionStorage.setItem('user_name', user.username || user.email);
+        }
+        
+        // Always treat Apple auth as new user experience for signup page
+        toast.success("Welcome to Cudliy! Your account has been created successfully!");
+        sessionStorage.setItem('show_intro', 'true');
+        window.location.href = "/design";
+      } else {
+        throw new Error(response.error || 'Apple sign-up failed');
+      }
+    } catch (error: any) {
+      console.error('Apple Sign-Up Error:', error);
+      
+      let errorMessage = "Apple sign-up failed. Please try again.";
+      
+      if (error && typeof error === 'object') {
+        if (error.message) {
+          if (error.message.includes('cancelled')) {
+            errorMessage = "Apple sign-up was cancelled.";
+          } else if (error.message.includes('not configured')) {
+            errorMessage = "Apple Sign-In is not configured yet. Please use Google or email sign-up.";
+          } else if (error.message.includes('popup') || error.message.includes('blocked')) {
+            errorMessage = "Please allow popups for Apple sign-up to work.";
+          } else if (error.message.includes('network') || error.message.includes('Network')) {
+            errorMessage = "Network error. Please check your connection and try again.";
+          } else if (error.message.includes('already exists')) {
+            errorMessage = "An account with this Apple ID already exists. Please sign in instead.";
+          } else {
+            errorMessage = error.message;
+          }
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

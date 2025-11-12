@@ -179,15 +179,106 @@ const SignIn = () => {
   };
 
   const handleAppleSignIn = async () => {
+    // Apple Sign-In requires Apple Developer Program enrollment ($99/year)
+    // For now, show a friendly message
+    toast.error("Apple Sign-In coming soon! Please use Google or email sign-in for now.");
+    return;
+    
+    /* Uncomment when Apple Developer Program is enrolled
     setIsLoading(true);
     try {
-      // Apple Sign-In is not implemented yet
-      toast.error("Apple Sign-In is coming soon!");
-    } catch (error) {
-      toast.error("Apple Sign-In is not available yet");
+      const { appleAuthService } = await import('@/services/appleAuth');
+      
+      // Get Apple credential
+      const appleResponse = await appleAuthService.signIn();
+      console.log('Got credential from Apple, sending to backend...');
+      
+      // Send credential to backend for authentication
+      const response = await apiService.appleAuth(
+        appleResponse.idToken,
+        appleResponse.code,
+        appleResponse.user
+      );
+      console.log('Backend response:', response);
+      
+      // Handle both response formats: {success: true} and {status: 'success'}
+      const isSuccess = response.success || (response as any).status === 'success';
+      
+      if (isSuccess) {
+        // Backend returns: {status: 'success', token: '...', data: {user: {...}, isNewUser: true}}
+        const token = (response as any).token || response.data?.token;
+        const user = (response as any).data?.user || response.data?.user;
+        const isNewUser = (response as any).data?.isNewUser || response.data?.isNewUser;
+        
+        // Store authentication data
+        console.log('Storing auth data:', { token: !!token, user });
+        if (token) {
+          sessionStorage.setItem('token', token);
+          console.log('Token stored:', sessionStorage.getItem('token') ? 'YES' : 'NO');
+        }
+        
+        if (user?.id || user?._id) {
+          const userId = user.id || user._id;
+          sessionStorage.setItem('user_id', userId);
+          sessionStorage.removeItem('guest_user_id');
+          console.log('User ID stored:', sessionStorage.getItem('user_id'));
+        }
+        
+        // Store user profile data
+        if (user?.profile?.firstName) {
+          sessionStorage.setItem('user_firstName', user.profile.firstName);
+        }
+        if (user?.profile?.lastName) {
+          sessionStorage.setItem('user_lastName', user.profile.lastName);
+        }
+        if (user?.username || user?.email) {
+          sessionStorage.setItem('user_name', user.username || user.email);
+        }
+        
+        console.log('All sessionStorage after storing:', {
+          token: sessionStorage.getItem('token'),
+          user_id: sessionStorage.getItem('user_id'),
+          user_name: sessionStorage.getItem('user_name')
+        });
+        
+        // Show success message and navigate
+        if (isNewUser) {
+          toast.success("Welcome to Cudliy! Your account has been created successfully.");
+          sessionStorage.setItem('show_intro', 'true');
+          window.location.href = "/design";
+        } else {
+          toast.success("Welcome back! Signed in with Apple successfully.");
+          window.location.href = "/dashboard";
+        }
+      } else {
+        throw new Error(response.error || 'Apple sign-in failed');
+      }
+    } catch (error: any) {
+      console.error('Apple Sign-In Error:', error);
+      
+      let errorMessage = "Apple sign-in failed. Please try again.";
+      
+      if (error && typeof error === 'object') {
+        if (error.message) {
+          if (error.message.includes('cancelled')) {
+            errorMessage = "Apple sign-in was cancelled.";
+          } else if (error.message.includes('not configured')) {
+            errorMessage = "Apple Sign-In is not configured yet. Please use Google or email sign-in.";
+          } else if (error.message.includes('popup') || error.message.includes('blocked')) {
+            errorMessage = "Please allow popups for Apple sign-in to work.";
+          } else if (error.message.includes('network') || error.message.includes('Network')) {
+            errorMessage = "Network error. Please check your connection and try again.";
+          } else {
+            errorMessage = error.message;
+          }
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
+    */
   };
 
   return (
