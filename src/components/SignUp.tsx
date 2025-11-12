@@ -142,8 +142,12 @@ const SignUp = () => {
       // Send credential to backend for authentication
       const response = await apiService.googleAuth(credential);
       
-      if (response.success && response.data) {
-        const { token, user } = response.data;
+      // Handle both response formats: {success: true} and {status: 'success'}
+      const isSuccess = response.success || (response as any).status === 'success';
+      const responseData = response.data || response;
+      
+      if (isSuccess && responseData) {
+        const { token, user } = responseData;
         
         // Store authentication data
         if (token) {

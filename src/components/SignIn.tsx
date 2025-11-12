@@ -90,8 +90,12 @@ const SignIn = () => {
       const response = await apiService.googleAuth(credential);
       console.log('Backend response:', response);
       
-      if (response.success && response.data) {
-        const { token, user, isNewUser } = response.data;
+      // Handle both response formats: {success: true} and {status: 'success'}
+      const isSuccess = response.success || (response as any).status === 'success';
+      const responseData = response.data || response;
+      
+      if (isSuccess && responseData) {
+        const { token, user, isNewUser } = responseData;
         
         // Store authentication data
         if (token) {
