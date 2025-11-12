@@ -84,9 +84,11 @@ const SignIn = () => {
     try {
       // Get Google credential token using modern Google Identity Services
       const credential = await modernGoogleAuthService.signIn();
+      console.log('Got credential from Google, sending to backend...');
       
       // Send credential to backend for authentication
       const response = await apiService.googleAuth(credential);
+      console.log('Backend response:', response);
       
       if (response.success && response.data) {
         const { token, user, isNewUser } = response.data;
