@@ -92,10 +92,12 @@ const SignIn = () => {
       
       // Handle both response formats: {success: true} and {status: 'success'}
       const isSuccess = response.success || (response as any).status === 'success';
-      const responseData = response.data || response;
+      const responseData: any = response.data || response;
       
       if (isSuccess && responseData) {
-        const { token, user, isNewUser } = responseData;
+        const token = responseData.token;
+        const user = responseData.user || responseData.data?.user;
+        const isNewUser = responseData.isNewUser || responseData.data?.isNewUser;
         
         // Store authentication data
         if (token) {

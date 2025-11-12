@@ -144,10 +144,11 @@ const SignUp = () => {
       
       // Handle both response formats: {success: true} and {status: 'success'}
       const isSuccess = response.success || (response as any).status === 'success';
-      const responseData = response.data || response;
+      const responseData: any = response.data || response;
       
       if (isSuccess && responseData) {
-        const { token, user } = responseData;
+        const token = responseData.token;
+        const user = responseData.user || responseData.data?.user;
         
         // Store authentication data
         if (token) {
