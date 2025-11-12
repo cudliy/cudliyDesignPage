@@ -175,7 +175,8 @@ const SignUp = () => {
         // Always treat Google auth as new user experience for signup page
         toast.success("Welcome to Cudliy! Your account has been created successfully!");
         sessionStorage.setItem('show_intro', 'true');
-        navigate("/design");
+        // Use window.location for full page reload to ensure sessionStorage is read
+        window.location.href = "/design";
       } else {
         throw new Error(response.error || 'Google sign-up failed');
       }

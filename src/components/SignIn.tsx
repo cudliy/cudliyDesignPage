@@ -121,15 +121,17 @@ const SignIn = () => {
           sessionStorage.setItem('user_name', user.username || user.email);
         }
         
-        // Show success message
+        // Show success message and navigate
         if (isNewUser) {
           toast.success("Welcome to Cudliy! Your account has been created successfully.");
           // Show intro for new users
           sessionStorage.setItem('show_intro', 'true');
-          navigate("/design");
+          // Use window.location for full page reload to ensure sessionStorage is read
+          window.location.href = "/design";
         } else {
           toast.success("Welcome back! Signed in with Google successfully.");
-          navigate("/dashboard");
+          // Use window.location for full page reload to ensure sessionStorage is read
+          window.location.href = "/dashboard";
         }
       } else {
         throw new Error(response.error || 'Google sign-in failed');
