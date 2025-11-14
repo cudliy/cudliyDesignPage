@@ -332,12 +332,22 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       {/* Full-Screen Loading State for 3D Generation */}
       {isGenerating && (
         <div className="absolute inset-0 bg-white z-50 flex items-center justify-center transition-colors duration-300">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center px-8 max-w-md">
+            {/* Centered GIF */}
             <img
               src="/GIFS/Loading-State.gif"
               alt="Generating 3D Model"
-              className="w-64 h-64 object-contain mb-6"
+              className="w-80 h-80 object-contain mb-8"
             />
+            
+            {/* Progress bar between GIF and text */}
+            <div className="w-full mb-6">
+              <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full rounded-full animate-progress-indeterminate" style={{ width: '30%', backgroundColor: '#E70D57' }}></div>
+              </div>
+            </div>
+            
+            {/* Text */}
             <p className="text-xl font-medium text-gray-800">Generating 3D...</p>
           </div>
         </div>
@@ -827,6 +837,20 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         }
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
+        }
+        @keyframes progress-indeterminate {
+          0% {
+            transform: translateX(-100%);
+          }
+          50% {
+            transform: translateX(350%);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+        .animate-progress-indeterminate {
+          animation: progress-indeterminate 1.5s ease-in-out infinite;
         }
         /* Hide scrollbar for Chrome, Safari and Opera */
         *::-webkit-scrollbar {

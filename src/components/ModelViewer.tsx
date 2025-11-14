@@ -341,7 +341,7 @@ export default function ModelViewer({
             <img
               src="/GIFS/Loading-State.gif"
               alt="Loading 3D model"
-              className="w-16 h-16 object-contain mx-auto mb-2"
+              className="w-48 h-48 object-contain mx-auto mb-4"
             />
             <p className="text-sm text-gray-600">
               {!isModelViewerAvailable ? 'Initializing 3D viewer...' : 'Loading 3D model...'}
