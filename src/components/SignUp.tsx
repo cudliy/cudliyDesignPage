@@ -215,96 +215,7 @@ const SignUp = () => {
     }
   };
 
-  const handleAppleSignIn = async () => {
-    // Apple Sign-In requires Apple Developer Program enrollment ($99/year)
-    // For now, show a friendly message
-    toast.error("Apple Sign-In coming soon! Please use Google or email sign-up for now.");
-    return;
-    
-    /* Uncomment when Apple Developer Program is enrolled
-    setIsLoading(true);
-    try {
-      const { appleAuthService } = await import('@/services/appleAuth');
-      
-      // Get Apple credential
-      const appleResponse = await appleAuthService.signIn();
-      
-      // Send credential to backend for authentication
-      const response = await apiService.appleAuth(
-        appleResponse.idToken,
-        appleResponse.code,
-        appleResponse.user
-      );
-      
-      // Handle both response formats: {success: true} and {status: 'success'}
-      const isSuccess = response.success || (response as any).status === 'success';
-      
-      if (isSuccess) {
-        // Backend returns: {status: 'success', token: '...', data: {user: {...}, isNewUser: true}}
-        const token = (response as any).token || response.data?.token;
-        const user = (response as any).data?.user || response.data?.user;
-        
-        // Store authentication data
-        if (token) {
-          sessionStorage.setItem('token', token);
-        }
-        
-        if (user?.id || user?._id) {
-          const userId = user.id || user._id;
-          sessionStorage.setItem('user_id', userId);
-          sessionStorage.removeItem('guest_user_id');
-        }
-        
-        // Store user profile data
-        if (user?.profile?.firstName) {
-          sessionStorage.setItem('user_firstName', user.profile.firstName);
-        }
-        if (user?.profile?.lastName) {
-          sessionStorage.setItem('user_lastName', user.profile.lastName);
-        }
-        if (user?.username || user?.email) {
-          sessionStorage.setItem('user_name', user.username || user.email);
-        }
-        
-        // Always treat Apple auth as new user experience for signup page
-        toast.success("Welcome to Cudliy! Your account has been created successfully!");
-        sessionStorage.setItem('show_intro', 'true');
-        window.location.href = "/design";
-      } else {
-        throw new Error(response.error || 'Apple sign-up failed');
-      }
-    } catch (error: any) {
-      console.error('Apple Sign-Up Error:', error);
-      
-      let errorMessage = "Apple sign-up failed. Please try again.";
-      
-      if (error && typeof error === 'object') {
-        if (error.message) {
-          if (error.message.includes('cancelled')) {
-            errorMessage = "Apple sign-up was cancelled.";
-          } else if (error.message.includes('not configured')) {
-            errorMessage = "Apple Sign-In is not configured yet. Please use Google or email sign-up.";
-          } else if (error.message.includes('popup') || error.message.includes('blocked')) {
-            errorMessage = "Please allow popups for Apple sign-up to work.";
-          } else if (error.message.includes('network') || error.message.includes('Network')) {
-            errorMessage = "Network error. Please check your connection and try again.";
-          } else if (error.message.includes('already exists')) {
-            errorMessage = "An account with this Apple ID already exists. Please sign in instead.";
-          } else {
-            errorMessage = error.message;
-          }
-        }
-      }
-      
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const getButtonText = () => {
-    return currentStep === steps.length - 1 ? "Continue" : "Continue";
-  };
 
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-white">
@@ -415,7 +326,7 @@ const SignUp = () => {
                     <span className="hidden sm:inline">Creating account...</span>
                   </div>
                 ) : (
-                  getButtonText()
+                  "Continue"
                 )}
               </Button>
             </div>
@@ -448,15 +359,6 @@ const SignUp = () => {
                   />
                 </svg>
               </button>
-              <button
-                onClick={handleAppleSignIn}
-                disabled={isLoading}
-                className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
-              >
-                <svg className="w-5 h-5 flex-shrink-0 text-black" viewBox="0 0 24 24" fill="currentColor" preserveAspectRatio="xMidYMid meet">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-                </svg>
-              </button>
             </div>
           </div>
 
@@ -474,7 +376,7 @@ const SignUp = () => {
 
           <div className={`mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-500 transform transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'} transition-colors duration-300`}>
             <p className="px-2">
-              By clicking "Create account" or "Continue with Google or Apple", you agree to Cudliy's{" "}
+              By clicking "Create account" or "Continue with Google", you agree to Cudliy's{" "}
               <span 
                 className="text-[#E70A55] cursor-pointer hover:underline transition-colors duration-300"
                 onClick={() => navigate("/terms")}
@@ -509,5 +411,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
-
 

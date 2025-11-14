@@ -344,7 +344,94 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       <div className="flex-1 overflow-y-auto px-4 py-6 pb-40 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-6 font-inter">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Start Creating</h2>
+            {/* Hero Title - Abril Fatface, 40px, capitalize */}
+            <h2 
+              className="text-gray-900 mb-12 text-center capitalize" 
+              style={{ 
+                fontFamily: 'Abril Fatface, serif',
+                fontWeight: 400,
+                fontSize: '40px',
+                lineHeight: '100%',
+                letterSpacing: '0%'
+              }}
+            >
+              Make It<br />Memorable
+            </h2>
+
+            {/* Example Cards - 215px width, 14px border radius - centered */}
+            <div className="flex flex-col gap-4 w-full items-center">
+              <button 
+                onClick={() => {
+                  setInputValue("Birthday gift for my mum. She is 50 years old");
+                  setTimeout(() => {
+                    const form = document.querySelector('form');
+                    if (form) {
+                      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                    }
+                  }, 100);
+                }}
+                className="text-center hover:shadow-lg transition-all border border-gray-100"
+                style={{
+                  width: '215px',
+                  borderRadius: '14px',
+                  paddingTop: '13px',
+                  paddingRight: '16px',
+                  paddingBottom: '13px',
+                  paddingLeft: '16px',
+                  backgroundColor: '#F6F6F6'
+                }}
+              >
+                <h3 
+                  className="text-gray-900 mb-1"
+                  style={{
+                    fontFamily: 'Inter',
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    lineHeight: '21px',
+                    letterSpacing: '-0.4px'
+                  }}
+                >
+                  Birthday gift for my mum
+                </h3>
+                <p className="text-gray-500 text-sm">She is 50 years old</p>
+              </button>
+
+              <button 
+                onClick={() => {
+                  setInputValue("Anniversary Gift for my partner in New York");
+                  setTimeout(() => {
+                    const form = document.querySelector('form');
+                    if (form) {
+                      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                    }
+                  }, 100);
+                }}
+                className="text-center hover:shadow-lg transition-all border border-gray-100"
+                style={{
+                  width: '215px',
+                  borderRadius: '14px',
+                  paddingTop: '13px',
+                  paddingRight: '16px',
+                  paddingBottom: '13px',
+                  paddingLeft: '16px',
+                  backgroundColor: '#F6F6F6'
+                }}
+              >
+                <h3 
+                  className="text-gray-900 mb-1"
+                  style={{
+                    fontFamily: 'Inter',
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    lineHeight: '21px',
+                    letterSpacing: '-0.4px'
+                  }}
+                >
+                  Anniversary Gift
+                </h3>
+                <p className="text-gray-500 text-sm">for my partner in New York</p>
+              </button>
+            </div>
           </div>
         )}
 
@@ -442,11 +529,12 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Container - Fixed at bottom with exact design from image */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          <div className="flex-1 relative bg-gray-100 rounded-3xl transition-colors duration-300" style={{ minHeight: '88px' }}>
-            {/* Text input - increased height and removed left padding */}
+      {/* Input Container - Fixed at bottom matching image design */}
+      <div className="fixed bottom-6 left-6 right-6 z-30">
+        <form onSubmit={handleSubmit}>
+          {/* Main input field - 118px height, 32px border radius */}
+          <div className="relative bg-[#E5E5EA] border border-gray-300" style={{ height: '118px', borderRadius: '32px' }}>
+            {/* Text input area - top portion */}
             <input
               type="text"
               value={inputValue}
@@ -457,43 +545,68 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   handleSubmit(e);
                 }
               }}
-              placeholder=""
-              className="w-full pl-6 pr-20 py-6 bg-transparent text-gray-800 placeholder-gray-500 border-none rounded-3xl resize-none focus:outline-none text-base leading-6 transition-colors duration-300"
-              style={{ minHeight: '88px' }}
+              placeholder="Ask Cuddly"
+              className="w-full pt-4 pb-12 pl-6 pr-20 bg-transparent text-gray-800 placeholder-gray-400 border-none focus:outline-none text-sm"
+              style={{ borderRadius: '32px' }}
               disabled={isGenerating}
             />
             
-            {/* Bottom right icons container */}
-            <div className="absolute right-4 bottom-2 flex items-center gap-4">
-              {/* Settings/Toggle icon - larger with no background */}
+            {/* Up arrow button - top right - dark when typing */}
+            <button
+              type="submit"
+              disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
+              className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                !inputValue.trim() || isGenerating || !canGenerateImages
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-[#374151] hover:bg-gray-800'
+              }`}
+            >
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+            </button>
+
+            {/* Bottom row with icons - INSIDE the field - scaled down */}
+            <div className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-4">
+              {/* Plus button - left - dark - smaller */}
               <button
                 type="button"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-                className={`transition-all ${
-                  showAdvanced || hasProperties()
-                    ? 'text-gray-700'
-                    : 'text-gray-500'
-                }`}
+                className="w-7 h-7 flex items-center justify-center text-gray-800 hover:text-black transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
               </button>
-              
-              {/* Send arrow - gray when empty, dark when typing */}
-              <button
-                type="submit"
-                disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
-                className={`transition-all ${
-                  !inputValue.trim() || isGenerating || !canGenerateImages
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-gray-800 hover:text-gray-600'
-                }`}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
-              </button>
+
+              {/* Right side icons - very close together - smaller */}
+              <div className="flex items-center gap-1">
+                {/* 3D cube icon - dark - smaller */}
+                <button
+                  type="button"
+                  className="w-7 h-7 flex items-center justify-center text-gray-800 hover:text-black transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5v9l9 4.5 9-4.5v-9" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 12v9" />
+                  </svg>
+                </button>
+
+                {/* Settings/sliders icon - dark - smaller */}
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className={`w-7 h-7 flex items-center justify-center transition-all ${
+                    showAdvanced || hasProperties()
+                      ? 'text-black'
+                      : 'text-gray-800'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </form>
