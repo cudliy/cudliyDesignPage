@@ -830,19 +830,17 @@ const handleBackToCategories = () => {
 					url="/design"
 				/>
 				<div className="w-screen h-screen bg-white flex flex-col fixed inset-0 overflow-hidden">
-					{/* Mobile Header */}
-					<div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between shadow-sm border-b border-gray-200">
-						<div className="flex items-center gap-2">
-							<button
-								onClick={() => window.location.href = '/dashboard'}
-								className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-							>
-								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-								</svg>
-							</button>
-							<h1 className="text-lg font-semibold">Cudliy</h1>
-						</div>
+					{/* Mobile Header - Clean with Inter font */}
+					<div className="bg-white text-[#212121] px-4 py-3 flex items-center gap-2">
+						<button
+							onClick={() => window.location.href = '/dashboard'}
+							className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+						>
+							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+							</svg>
+						</button>
+						<h1 className="text-lg font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
 					</div>
 
 					{/* Chat Interface */}

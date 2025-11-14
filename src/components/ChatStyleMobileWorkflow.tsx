@@ -9,6 +9,7 @@ import ProductionSelector from './ProductionSelector';
 import StyleSelector from './StyleSelector';
 import MaterialSelector from './MaterialSelector';
 import DetailSelector from './DetailSelector';
+import { toast } from '@/lib/sonner';
 
 interface ChatStyleMobileWorkflowProps {
   onError: (error: string) => void;
@@ -37,6 +38,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
   const [selectedStyle, setSelectedStyle] = useState('');
   const [selectedMaterial, setSelectedMaterial] = useState('');
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
+  const [selectedQuality, setSelectedQuality] = useState('medium');
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const userId = sessionStorage.getItem('user_id') || '';
@@ -344,13 +347,13 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       <div className="flex-1 overflow-y-auto px-4 py-6 pb-40 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-6 font-inter">
-            {/* Hero Title - Abril Fatface, 40px, capitalize */}
+            {/* Hero Title - Abril Fatface (Cuddly custom font), smaller size */}
             <h2 
-              className="text-gray-900 mb-12 text-center capitalize" 
+              className="text-gray-900 mb-6 text-center capitalize" 
               style={{ 
                 fontFamily: 'Abril Fatface, serif',
                 fontWeight: 400,
-                fontSize: '40px',
+                fontSize: '32px',
                 lineHeight: '100%',
                 letterSpacing: '0%'
               }}
@@ -358,8 +361,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               Make It<br />Memorable
             </h2>
 
-            {/* Example Cards - 215px width, 14px border radius - centered */}
-            <div className="flex flex-col gap-4 w-full items-center">
+            {/* Example Cards - smaller, 180px width */}
+            <div className="flex flex-col gap-3 w-full items-center">
               <button 
                 onClick={() => {
                   setInputValue("Birthday gift for my mum. She is 50 years old");
@@ -372,12 +375,12 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 }}
                 className="text-center hover:shadow-lg transition-all border border-gray-100"
                 style={{
-                  width: '215px',
-                  borderRadius: '14px',
-                  paddingTop: '13px',
-                  paddingRight: '16px',
-                  paddingBottom: '13px',
-                  paddingLeft: '16px',
+                  width: '180px',
+                  borderRadius: '12px',
+                  paddingTop: '10px',
+                  paddingRight: '12px',
+                  paddingBottom: '10px',
+                  paddingLeft: '12px',
                   backgroundColor: '#F6F6F6'
                 }}
               >
@@ -386,14 +389,14 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   style={{
                     fontFamily: 'Inter',
                     fontWeight: 600,
-                    fontSize: '16px',
-                    lineHeight: '21px',
-                    letterSpacing: '-0.4px'
+                    fontSize: '14px',
+                    lineHeight: '18px',
+                    letterSpacing: '-0.3px'
                   }}
                 >
                   Birthday gift for my mum
                 </h3>
-                <p className="text-gray-500 text-sm">She is 50 years old</p>
+                <p className="text-gray-500 text-xs">She is 50 years old</p>
               </button>
 
               <button 
@@ -408,12 +411,12 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 }}
                 className="text-center hover:shadow-lg transition-all border border-gray-100"
                 style={{
-                  width: '215px',
-                  borderRadius: '14px',
-                  paddingTop: '13px',
-                  paddingRight: '16px',
-                  paddingBottom: '13px',
-                  paddingLeft: '16px',
+                  width: '180px',
+                  borderRadius: '12px',
+                  paddingTop: '10px',
+                  paddingRight: '12px',
+                  paddingBottom: '10px',
+                  paddingLeft: '12px',
                   backgroundColor: '#F6F6F6'
                 }}
               >
@@ -422,14 +425,14 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   style={{
                     fontFamily: 'Inter',
                     fontWeight: 600,
-                    fontSize: '16px',
-                    lineHeight: '21px',
-                    letterSpacing: '-0.4px'
+                    fontSize: '14px',
+                    lineHeight: '18px',
+                    letterSpacing: '-0.3px'
                   }}
                 >
                   Anniversary Gift
                 </h3>
-                <p className="text-gray-500 text-sm">for my partner in New York</p>
+                <p className="text-gray-500 text-xs">for my partner in New York</p>
               </button>
             </div>
           </div>
@@ -532,8 +535,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       {/* Input Container - Fixed at bottom matching image design */}
       <div className="fixed bottom-6 left-6 right-6 z-30">
         <form onSubmit={handleSubmit}>
-          {/* Main input field - 118px height, 32px border radius */}
-          <div className="relative bg-[#E5E5EA] border border-gray-300" style={{ height: '118px', borderRadius: '32px' }}>
+          {/* Main input field - 118px height, 32px border radius - no visible border */}
+          <div className="relative bg-[#E5E5EA]" style={{ height: '118px', borderRadius: '32px' }}>
             {/* Text input area - top portion */}
             <input
               type="text"
@@ -545,7 +548,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   handleSubmit(e);
                 }
               }}
-              placeholder="Ask Cuddly"
+              placeholder="Ask Cudliy"
               className="w-full pt-4 pb-12 pl-6 pr-20 bg-transparent text-gray-800 placeholder-gray-400 border-none focus:outline-none text-sm"
               style={{ borderRadius: '32px' }}
               disabled={isGenerating}
@@ -568,9 +571,10 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
 
             {/* Bottom row with icons - INSIDE the field - scaled down */}
             <div className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-4">
-              {/* Plus button - left - dark - smaller */}
+              {/* Plus button - left - dark - smaller - shows toast */}
               <button
                 type="button"
+                onClick={() => toast.info('Image upload coming soon!')}
                 className="w-7 h-7 flex items-center justify-center text-gray-800 hover:text-black transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -580,9 +584,10 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
 
               {/* Right side icons - very close together - smaller */}
               <div className="flex items-center gap-1">
-                {/* 3D cube icon - dark - smaller */}
+                {/* 3D cube icon - Model selector trigger */}
                 <button
                   type="button"
+                  onClick={() => setShowModelDropdown(!showModelDropdown)}
                   className="w-7 h-7 flex items-center justify-center text-gray-800 hover:text-black transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -720,6 +725,92 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Model Quality Dropdown - Mobile Bottom Sheet */}
+      {showModelDropdown && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+            onClick={() => setShowModelDropdown(false)}
+          />
+          
+          {/* Bottom Sheet */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 animate-slide-up">
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+            </div>
+
+            {/* Header */}
+            <div className="px-6 py-3 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Model Quality</h3>
+              <button
+                onClick={() => setShowModelDropdown(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Quality Options */}
+            <div className="px-6 py-4 space-y-3 pb-8">
+              <button
+                onClick={() => {
+                  setSelectedQuality('fast');
+                  setShowModelDropdown(false);
+                }}
+                className={`w-full text-left p-4 rounded-xl transition-all ${
+                  selectedQuality === 'fast'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                <div className="font-semibold mb-1">Fast</div>
+                <div className={`text-sm ${selectedQuality === 'fast' ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Quick generation, lower quality
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedQuality('medium');
+                  setShowModelDropdown(false);
+                }}
+                className={`w-full text-left p-4 rounded-xl transition-all ${
+                  selectedQuality === 'medium'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                <div className="font-semibold mb-1">Medium</div>
+                <div className={`text-sm ${selectedQuality === 'medium' ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Balanced speed and quality
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedQuality('good');
+                  setShowModelDropdown(false);
+                }}
+                className={`w-full text-left p-4 rounded-xl transition-all ${
+                  selectedQuality === 'good'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                <div className="font-semibold mb-1">High Quality</div>
+                <div className={`text-sm ${selectedQuality === 'good' ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Best quality, slower generation
+                </div>
+              </button>
             </div>
           </div>
         </>
