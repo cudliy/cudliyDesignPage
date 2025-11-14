@@ -347,11 +347,11 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       <div className="flex-1 overflow-y-auto px-4 py-6 pb-40 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-6 font-inter">
-            {/* Hero Title - Abril Fatface (Cuddly custom font), smaller size */}
+            {/* Hero Title - CudliyTrademark custom font */}
             <h2 
               className="text-gray-900 mb-6 text-center capitalize" 
               style={{ 
-                fontFamily: 'Abril Fatface, serif',
+                fontFamily: 'CudliyTrademark, Abril Fatface, serif',
                 fontWeight: 400,
                 fontSize: '32px',
                 lineHeight: '100%',
@@ -375,23 +375,24 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 }}
                 className="text-center hover:shadow-lg transition-all border border-gray-100"
                 style={{
-                  width: '180px',
+                  width: '240px',
                   borderRadius: '12px',
-                  paddingTop: '10px',
-                  paddingRight: '12px',
-                  paddingBottom: '10px',
-                  paddingLeft: '12px',
+                  paddingTop: '12px',
+                  paddingRight: '16px',
+                  paddingBottom: '12px',
+                  paddingLeft: '16px',
                   backgroundColor: '#F6F6F6'
                 }}
               >
                 <h3 
                   className="text-gray-900 mb-1"
                   style={{
-                    fontFamily: 'Inter',
-                    fontWeight: 600,
-                    fontSize: '14px',
-                    lineHeight: '18px',
-                    letterSpacing: '-0.3px'
+                    fontFamily: 'Manrope, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '15px',
+                    lineHeight: '20px',
+                    letterSpacing: '-0.3px',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   Birthday gift for my mum
@@ -411,23 +412,24 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 }}
                 className="text-center hover:shadow-lg transition-all border border-gray-100"
                 style={{
-                  width: '180px',
+                  width: '240px',
                   borderRadius: '12px',
-                  paddingTop: '10px',
-                  paddingRight: '12px',
-                  paddingBottom: '10px',
-                  paddingLeft: '12px',
+                  paddingTop: '12px',
+                  paddingRight: '16px',
+                  paddingBottom: '12px',
+                  paddingLeft: '16px',
                   backgroundColor: '#F6F6F6'
                 }}
               >
                 <h3 
                   className="text-gray-900 mb-1"
                   style={{
-                    fontFamily: 'Inter',
-                    fontWeight: 600,
-                    fontSize: '14px',
-                    lineHeight: '18px',
-                    letterSpacing: '-0.3px'
+                    fontFamily: 'Manrope, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '15px',
+                    lineHeight: '20px',
+                    letterSpacing: '-0.3px',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   Anniversary Gift
@@ -554,17 +556,21 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               disabled={isGenerating}
             />
             
-            {/* Up arrow button - top right - dark when typing */}
+            {/* Up arrow button - white when empty, #313131 when typing */}
             <button
               type="submit"
               disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
               className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                 !inputValue.trim() || isGenerating || !canGenerateImages
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-[#374151] hover:bg-gray-800'
+                  ? 'bg-white cursor-not-allowed'
+                  : 'bg-[#313131] hover:bg-gray-800'
               }`}
             >
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-5 h-5 transition-colors ${
+                !inputValue.trim() || isGenerating || !canGenerateImages
+                  ? 'text-gray-400'
+                  : 'text-white'
+              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
               </svg>
             </button>
@@ -739,21 +745,21 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             onClick={() => setShowModelDropdown(false)}
           />
           
-          {/* Bottom Sheet */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 animate-slide-up">
+          {/* Bottom Sheet - Dark theme matching Advanced Options */}
+          <div className="fixed bottom-0 left-0 right-0 bg-[#414141] rounded-t-3xl shadow-2xl z-50 animate-slide-up">
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
               <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
             </div>
 
             {/* Header */}
-            <div className="px-6 py-3 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Model Quality</h3>
+            <div className="px-6 py-3 border-b border-white/10 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Model Quality</h3>
               <button
                 onClick={() => setShowModelDropdown(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
               >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -762,52 +768,43 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             {/* Quality Options */}
             <div className="px-6 py-4 space-y-3 pb-8">
               <button
-                onClick={() => {
-                  setSelectedQuality('fast');
-                  setShowModelDropdown(false);
-                }}
+                onClick={() => setSelectedQuality('fast')}
                 className={`w-full text-left p-4 rounded-xl transition-all ${
                   selectedQuality === 'fast'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    ? 'bg-white/10 border border-white'
+                    : 'bg-white/5 border border-white/10'
                 }`}
               >
-                <div className="font-semibold mb-1">Fast</div>
-                <div className={`text-sm ${selectedQuality === 'fast' ? 'text-gray-300' : 'text-gray-600'}`}>
+                <div className="font-semibold mb-1 text-white">Fast</div>
+                <div className="text-sm text-white/70">
                   Quick generation, lower quality
                 </div>
               </button>
 
               <button
-                onClick={() => {
-                  setSelectedQuality('medium');
-                  setShowModelDropdown(false);
-                }}
+                onClick={() => setSelectedQuality('medium')}
                 className={`w-full text-left p-4 rounded-xl transition-all ${
                   selectedQuality === 'medium'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    ? 'bg-white/10 border border-white'
+                    : 'bg-white/5 border border-white/10'
                 }`}
               >
-                <div className="font-semibold mb-1">Medium</div>
-                <div className={`text-sm ${selectedQuality === 'medium' ? 'text-gray-300' : 'text-gray-600'}`}>
+                <div className="font-semibold mb-1 text-white">Medium</div>
+                <div className="text-sm text-white/70">
                   Balanced speed and quality
                 </div>
               </button>
 
               <button
-                onClick={() => {
-                  setSelectedQuality('good');
-                  setShowModelDropdown(false);
-                }}
+                onClick={() => setSelectedQuality('good')}
                 className={`w-full text-left p-4 rounded-xl transition-all ${
                   selectedQuality === 'good'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    ? 'bg-white/10 border border-white'
+                    : 'bg-white/5 border border-white/10'
                 }`}
               >
-                <div className="font-semibold mb-1">High Quality</div>
-                <div className={`text-sm ${selectedQuality === 'good' ? 'text-gray-300' : 'text-gray-600'}`}>
+                <div className="font-semibold mb-1 text-white">High Quality</div>
+                <div className="text-sm text-white/70">
                   Best quality, slower generation
                 </div>
               </button>
