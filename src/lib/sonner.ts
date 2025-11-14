@@ -11,7 +11,14 @@ export const toast = {
     return toastInstance;
   },
   error: (msg: string) => toastImpl({ title: msg }),
-  info: (msg: string) => toastImpl({ title: msg })
+  info: (msg: string) => {
+    const toastInstance = toastImpl({ title: msg });
+    // Auto-dismiss info toasts after 2 seconds
+    setTimeout(() => {
+      toastInstance.dismiss();
+    }, 2000);
+    return toastInstance;
+  }
 };
 
 export default toast;
