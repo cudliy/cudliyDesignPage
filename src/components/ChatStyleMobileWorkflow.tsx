@@ -387,7 +387,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 <h3 
                   className="text-gray-900 mb-1"
                   style={{
-                    fontFamily: 'Manrope, sans-serif',
+                    fontFamily: 'Inter, sans-serif',
                     fontWeight: 700,
                     fontSize: '15px',
                     lineHeight: '20px',
@@ -424,7 +424,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 <h3 
                   className="text-gray-900 mb-1"
                   style={{
-                    fontFamily: 'Manrope, sans-serif',
+                    fontFamily: 'Inter, sans-serif',
                     fontWeight: 700,
                     fontSize: '15px',
                     lineHeight: '20px',
@@ -771,12 +771,13 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 onClick={() => setSelectedQuality('fast')}
                 className={`w-full text-left p-4 rounded-xl transition-all ${
                   selectedQuality === 'fast'
-                    ? 'bg-white/10 border border-white'
+                    ? 'bg-white/10'
                     : 'bg-white/5 border border-white/10'
                 }`}
+                style={selectedQuality === 'fast' ? { border: '1px solid white' } : {}}
               >
                 <div className="font-semibold mb-1 text-white">Fast</div>
-                <div className="text-sm text-white/70">
+                <div style={{ fontSize: '16px', color: '#FFFFFF99' }}>
                   Quick generation, lower quality
                 </div>
               </button>
@@ -785,12 +786,13 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 onClick={() => setSelectedQuality('medium')}
                 className={`w-full text-left p-4 rounded-xl transition-all ${
                   selectedQuality === 'medium'
-                    ? 'bg-white/10 border border-white'
+                    ? 'bg-white/10'
                     : 'bg-white/5 border border-white/10'
                 }`}
+                style={selectedQuality === 'medium' ? { border: '1px solid white' } : {}}
               >
                 <div className="font-semibold mb-1 text-white">Medium</div>
-                <div className="text-sm text-white/70">
+                <div style={{ fontSize: '16px', color: '#FFFFFF99' }}>
                   Balanced speed and quality
                 </div>
               </button>
@@ -799,12 +801,13 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 onClick={() => setSelectedQuality('good')}
                 className={`w-full text-left p-4 rounded-xl transition-all ${
                   selectedQuality === 'good'
-                    ? 'bg-white/10 border border-white'
+                    ? 'bg-white/10'
                     : 'bg-white/5 border border-white/10'
                 }`}
+                style={selectedQuality === 'good' ? { border: '1px solid white' } : {}}
               >
                 <div className="font-semibold mb-1 text-white">High Quality</div>
-                <div className="text-sm text-white/70">
+                <div style={{ fontSize: '16px', color: '#FFFFFF99' }}>
                   Best quality, slower generation
                 </div>
               </button>

@@ -365,26 +365,26 @@ export default function DesignView() {
   if (isMobile) {
     return (
       <div className="w-screen h-screen bg-white-900 flex flex-col transition-colors duration-300">
-        {/* Mobile Header */}
-        <div className="bg-white text-[#212121]text-slate-100 px-4 py-3 flex items-center justify-between shadow-sm z-20 transition-colors duration-300">
+        {/* Mobile Header - Matching ChatStyleMobile */}
+        <div className="bg-white px-4 py-3 flex items-center justify-between shadow-sm z-20 transition-colors duration-300">
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-black">Cudliy</h1>
+            <h1 className="text-lg font-semibold text-black" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownload}
               disabled={!getValidModelUrl()}
-              className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors disabled:opacity-50"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
             >
-              <Download className="w-5 h-5 text-[#212121]text-slate-100" />
+              <Download className="w-5 h-5 text-black" />
             </button>
           </div>
         </div>
