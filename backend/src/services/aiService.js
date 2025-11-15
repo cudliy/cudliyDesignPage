@@ -100,10 +100,10 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
       `${basePrompt}, side profile, clean lines, minimal background`
     ];
 
-    // Use Promise.allSettled to handle individual failures gracefully
-    const imagePromises = variations.slice(0, count).map(async (prompt, index) => {
+    const generateSingleImage = async (prompt, index, retryCount = 0) => {
+      const maxRetries = 2;
       try {
-        logger.info(`Starting image generation ${index + 1}/${count} for prompt: ${prompt.substring(0, 50)}...`);
+        logger.info(`Starting image generation ${index + 1}/${count} (attempt ${retryCount + 1}) for prompt: ${prompt.substring(0, 50)}...`);
         
         const response = await axios.post(
           'https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions',
@@ -116,7 +116,7 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
               'Content-Type': 'application/json',
               'Prefer': 'wait'
             },
-            timeout: 90000 // Reduced to 1.5 minutes per image
+            timeout: 90000 // 1.5 minutes per image
           }
         );
 
@@ -127,11 +127,23 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
           index
         };
       } catch (error) {
-        logger.error(`Image generation failed for variation ${index}:`, error);
-        // Return a fallback or re-throw based on your error handling strategy
+        logger.error(`Image generation failed for variation ${index} (attempt ${retryCount + 1}):`, error.message);
+        
+        // Retry if we haven't exceeded max retries
+        if (retryCount < maxRetries) {
+          logger.info(`Retrying image generation ${index + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+          return generateSingleImage(prompt, index, retryCount + 1);
+        }
+        
         throw error;
       }
-    });
+    };
+
+    // Generate all images in parallel with retry logic
+    const imagePromises = variations.slice(0, count).map((prompt, index) => 
+      generateSingleImage(prompt, index)
+    );
 
     // Execute all promises in parallel
     const results = await Promise.allSettled(imagePromises);
@@ -145,13 +157,17 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
         successfulResults.push(result.value);
       } else {
         failedResults.push({ index, error: result.reason });
-        logger.error(`Image generation ${index + 1} failed:`, result.reason);
+        logger.error(`Image generation ${index + 1} failed after all retries:`, result.reason?.message);
       }
     });
 
-    // If we have at least one successful result, return them
-    if (successfulResults.length > 0) {
+    // Require at least the requested count of images
+    if (successfulResults.length >= count) {
       logger.info(`Successfully generated ${successfulResults.length}/${count} images`);
+      return successfulResults.slice(0, count);
+    } else if (successfulResults.length > 0) {
+      // If we have some but not all, log warning but return what we have
+      logger.warn(`Only generated ${successfulResults.length}/${count} images. Some generations failed.`);
       return successfulResults;
     } else {
       // If all failed, throw the first error

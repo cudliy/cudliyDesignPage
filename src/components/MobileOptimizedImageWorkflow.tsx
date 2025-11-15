@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiService } from '../services/api';
 import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
@@ -26,12 +26,18 @@ export default function MobileOptimizedImageWorkflow({
 }: MobileOptimizedImageWorkflowProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
-  const [selectedImageIndex, setIsSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
   const [creationId, setCreationId] = useState<string>('');
   const [hasStarted, setHasStarted] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const generateImagesRef = useRef<(() => Promise<void>) | null>(null);
+  const isGeneratingRef = useRef(false); // Prevent double generation in StrictMode
+
+  // Debug: Track generatedImages changes
+  useEffect(() => {
+    console.log('🔄 generatedImages state changed:', generatedImages.length, generatedImages);
+  }, [generatedImages]);
 
   const userId = sessionStorage.getItem('user_id') || '';
   const token = sessionStorage.getItem('token');
@@ -41,13 +47,6 @@ export default function MobileOptimizedImageWorkflow({
       window.location.href = '/signin';
     }
   }, [userId, token]);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const { canGenerateImages, canGenerateModels, checkLimits } = useUsageLimits(userId);
 
@@ -107,9 +106,10 @@ export default function MobileOptimizedImageWorkflow({
       return;
     }
 
+    console.log('🚀 Starting image generation...');
     setIsGenerating(true);
     setGeneratedImages([]);
-    setIsSelectedImageIndex(null);
+    setSelectedImageIndex(null);
 
     try {
       const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -141,18 +141,30 @@ export default function MobileOptimizedImageWorkflow({
       try {
         const response = await apiService.generateImages(request);
         
+        console.log('📥 API Response:', response);
+        console.log('📥 Images received:', response.data?.images?.length);
+        
         if (response.success && response.data) {
+          console.log('✅ Setting generated images:', response.data.images);
+          console.log('✅ Number of images:', response.data.images.length);
+          
+          // Set images first
           setGeneratedImages(response.data.images);
           setSessionId(response.data.session_id);
           
+          console.log('✅ Images state updated');
+          
+          // Track usage after setting images (don't let this affect image display)
           try {
             await apiService.trackUsage(userId, 'image', response.data.images.length);
             await checkLimits(true);
+            console.log('✅ Usage tracked successfully');
           } catch (trackingError) {
+            console.warn('⚠️ Usage tracking failed:', trackingError);
             try {
               await checkLimits(true);
             } catch (limitsError) {
-              // Limits check failed, but generation succeeded
+              console.warn('⚠️ Limits check failed:', limitsError);
             }
           }
         } else {
@@ -172,15 +184,27 @@ export default function MobileOptimizedImageWorkflow({
     }
   }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
 
+  // Store the latest generateImages function in ref
   useEffect(() => {
-    if (!hasStarted && prompt.trim()) {
+    generateImagesRef.current = generateImages;
+  }, [generateImages]);
+
+  // Trigger generation only once when component mounts with a prompt
+  useEffect(() => {
+    console.log('🔍 useEffect triggered - hasStarted:', hasStarted, 'prompt:', prompt, 'isGeneratingRef:', isGeneratingRef.current);
+    
+    // Prevent double generation in React StrictMode
+    if (!hasStarted && prompt.trim() && generateImagesRef.current && !isGeneratingRef.current) {
+      console.log('▶️ Starting generation for the first time');
+      isGeneratingRef.current = true;
       setHasStarted(true);
-      generateImages();
+      generateImagesRef.current();
     }
-  }, [prompt, hasStarted, generateImages]);
+  }, [prompt, hasStarted]); // Removed generateImages from dependencies!
 
   const selectImage = (index: number) => {
-    setIsSelectedImageIndex(index);
+    console.log('🖱️ Image selected:', index);
+    setSelectedImageIndex(index);
   };
 
   const generate3DModel = async () => {
@@ -246,82 +270,58 @@ export default function MobileOptimizedImageWorkflow({
   // Loading State
   if ((isGenerating && generatedImages.length === 0) || isPrinting) {
     return (
-      <div className={`text-center flex items-center justify-center ${isMobile ? 'py-8 min-h-[60vh]' : 'py-8 h-full min-h-[60vh]'}`}>
+      <div className="text-center flex items-center justify-center py-8 min-h-[60vh] md:h-full">
         <div className="flex flex-col items-center">
           <img
             src="/GIFS/Loading-State.gif"
             alt="Generating Images"
-            className={`object-contain mb-8 ${isMobile ? 'w-32 h-32' : 'w-48 h-48 md:w-96 md:h-96'}`}
+            className="object-contain mb-8 w-32 h-32 md:w-48 md:h-48 lg:w-96 lg:h-96"
           />
-          <span className={`text-black font-medium ${isMobile ? 'text-base' : 'text-lg md:text-xl'}`}>
+          <span className="text-black font-medium text-base md:text-lg lg:text-xl">
             {isPrinting ? 'Creating 3D Model...' : 'Generating Images...'}
           </span>
         </div>
       </div>
     );
   }
-
-  // Generated Images - Mobile Optimized
   if (generatedImages.length > 0) {
+    console.log('🖼️ Rendering images. Total count:', generatedImages.length);
+    console.log('🖼️ Images:', generatedImages);
+    
     return (
-      <div className={`w-full ${isMobile ? 'px-4' : 'mx-auto px-4 md:px-0 md:max-w-4xl'}`}>
-        <div className={`${
-          isMobile 
-            ? 'flex flex-col gap-5' 
-            : 'grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-1 lg:gap-1 xl:gap-2 md:ml-[-20px] lg:ml-[-15px] xl:ml-[-10px]'
-        }`}>
+      <div className="w-full h-full flex items-center relative" style={{
+        justifyContent: window.innerWidth >= 1470 ? 'flex-start' : 'center',
+        paddingLeft: window.innerWidth >= 1470 ? '8px' : '8px',
+        paddingRight: '8px'
+      }}>
+        <div className="grid grid-cols-2 gap-2" style={{ 
+          width: window.innerWidth >= 1470 ? 'min(1300px, 95vw)' : 'min(1130px, 95vw)',
+          height: window.innerWidth >= 1470 ? 'min(950px, 92vh)' : 'min(820px, 90vh)',
+          gridTemplateRows: 'repeat(2, 1fr)'
+        }}>
           {generatedImages.slice(0, 3).map((image, index) => (
             <div
               key={index}
-              className={`bg-gray-100 flex items-center justify-center transition-all duration-700 ease-out overflow-hidden ${
-                selectedImageIndex === index ? 'ring-2 ring-blue-400 shadow-lg' : ''
-              } ${
-                isMobile 
-                  ? 'h-[280px] rounded-2xl shadow-md' 
-                  : 'h-[280px] md:h-[320px] min-h-[250px] md:min-h-[300px] rounded-lg md:rounded-none shadow-md md:shadow-none'
+              className={`bg-white border-2 border-gray-300 flex items-center justify-center transition-all duration-700 ease-out overflow-hidden cursor-pointer shadow-lg group ${
+                selectedImageIndex === index ? 'ring-4 ring-blue-500 shadow-2xl' : ''
               }`}
               onClick={() => selectImage(index)}
-              style={{ transitionDelay: `${800 + index * 100}ms` }}
+              style={{ 
+                transitionDelay: `${800 + index * 100}ms`,
+                borderRadius: '10px'
+              }}
             >
-              <div className="w-full h-full flex items-center justify-center relative group">
+              <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-[10px]">
                 <img 
                   src={image.url} 
                   alt={`Generated image ${index + 1}`} 
-                  className="w-full h-full object-cover relative z-10"
+                  className="w-full h-full object-contain relative z-10"
+                  loading="eager"
+                  style={{ imageRendering: '-webkit-optimize-contrast' as any }}
                 />
                 
-                {/* Selection Indicator */}
-                {selectedImageIndex === index && (
-                  <div className={`absolute flex items-center justify-center shadow-lg z-20 ${
-                    isMobile 
-                      ? 'top-3 right-3 w-7 h-7 bg-blue-500 rounded-full' 
-                      : 'top-2 right-2 w-8 h-8 bg-black rounded-full'
-                  }`}>
-                    <svg className={`text-white ${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-                
-                {/* Processed Indicator */}
-                {(image as any).processed && (
-                  <div className={`absolute flex items-center justify-center shadow-lg z-20 ${
-                    isMobile 
-                      ? 'top-3 left-3 w-7 h-7 bg-green-500 rounded-full' 
-                      : 'top-2 left-2 w-8 h-8 bg-green-500 rounded-full'
-                  }`}>
-                    <svg className={`text-white ${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-                
-                {/* View 3D Button */}
-                <div className={`${
-                  isMobile 
-                    ? 'absolute bottom-3 left-1/2 transform -translate-x-1/2 z-20' 
-                    : 'md:absolute md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-all md:duration-300 md:z-20 md:backdrop-blur-sm absolute bottom-3 left-1/2 transform -translate-x-1/2 md:transform-none z-20 opacity-100 md:opacity-0'
-                }`}>
+                {/* Hover Overlay - Full Coverage */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/40 backdrop-blur-sm z-30 rounded-[10px]">
                   <button 
                     onClick={async (e) => {
                       e.stopPropagation();
@@ -334,23 +334,30 @@ export default function MobileOptimizedImageWorkflow({
                         setIsPrinting(false);
                       }
                     }}
-                    className={`bg-gray-100 text-gray-800 flex items-center justify-center gap-2 transition-all duration-200 hover:bg-gray-200 hover:scale-105 shadow-lg cursor-pointer font-medium ${
-                      isMobile 
-                        ? 'px-4 py-2 text-xs rounded-xl' 
-                        : 'px-4 py-2 md:px-6 md:py-3 text-[12px] md:text-[14px] rounded-lg md:rounded-none'
-                    }`}
+                    className="bg-white text-gray-800 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-105 shadow-lg cursor-pointer font-medium rounded-full"
+                    style={{
+                      padding: 'clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px)',
+                      fontSize: 'clamp(12px, 1.2vw, 14px)'
+                    }}
                   >
-                    <svg className={`${isMobile ? 'w-4 h-4' : 'w-4 h-4 md:w-5 md:h-5'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7.5v9l9 4.5 9-4.5v-9" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v9" />
-                    </svg>
-                    <span>View 3D</span>
+                    <span>View 360°</span>
                   </button>
                 </div>
               </div>
             </div>
           ))}
+          
+          {/* Cancel Button - 4th Grid Item */}
+          <div className="flex items-center justify-center">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-16 h-16 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     );

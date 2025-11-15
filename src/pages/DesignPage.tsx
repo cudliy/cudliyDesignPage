@@ -12,6 +12,7 @@ import SEO from "@/components/SEO";
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/lib/sonner';
 import MobileOptimizedImageWorkflow from "../components/MobileOptimizedImageWorkflow";
 import ChatStyleMobileWorkflow from "../components/ChatStyleMobileWorkflow";
 
@@ -759,9 +760,9 @@ const handleBackToCategories = () => {
 		};
 
 		return (
-			<div className="flex flex-col items-center text-center">
+			<div className="flex flex-col items-center justify-center text-center w-full h-full">
 				{/* Category Icons Grid */}
-				<div className={`mt-6 grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[300px] transition-all duration-700 delay-300 ease-out ${
+				<div className={`grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[320px] mx-auto transition-all duration-700 delay-300 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
 					{Object.entries(sections).map(([key, section], index) => {
@@ -794,7 +795,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Create Button with Back */}
-				<div className="mt-2 flex items-center justify-center gap-3">
+				<div className="mt-8 flex items-center justify-center gap-3">
 					<button 
 						onClick={handleBackToCategories}
 						className="w-10 h-10 rounded-full border border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
@@ -875,12 +876,15 @@ const handleBackToCategories = () => {
 			/>
 			<div className="w-screen h-screen bg-white flex justify-center p-0 fixed inset-0 overflow-hidden">
 			{/* Left Sidebar */}
-			<aside className={`left-pane-scale h-screen mt-1 sm:mt-1 lg:mt-1 mb-2 sm:mb-4 lg:mb-2 bg-[#313131] border border-white/5 ml-1 sm:ml-1 lg:ml-1 ${
+			<aside className={`left-pane-scale bg-[#313131] border border-white/5 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
 			} transition-all duration-500 relative flex-shrink-0 overflow-hidden`}
 			style={{
-				width: 'clamp(300px, 24vw, 380px)',
-				borderRadius: 'clamp(24px, 3vw, 32px)',
+				width: 'clamp(400px, 476px, 476px)',
+				minWidth: '400px',
+				height: 'calc(100vh - 8px)',
+				borderRadius: 'clamp(16px, 2vw, 28px)',
+				margin: '4px 0 4px 4px'
 			}}>
 				{/* Workspace Dropdown */}
 			<div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
@@ -890,101 +894,150 @@ const handleBackToCategories = () => {
 
 				
 							{/* Brand and title area */}
-			<div className="left-pane-content pt-[5.5rem] sm:pt-[5.5rem] px-4 sm:px-6 lg:px-8 pb-2 text-white flex flex-col items-center text-center h-full overflow-hidden">
-					{/* Mode selector */}
-					<div className={`absolute top-[70px] left-1/2 -translate-x-1/2 flex items-center px-1 gap-2 w-[120px] h-[28px] rounded-[50px] bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
-						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
-						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
-							Chat
-						</button>
-					</div>
+			<div className="left-pane-content pt-[5.5rem] pb-2 text-white flex flex-col h-full overflow-hidden" style={{ 
+				scrollbarWidth: 'none', 
+				msOverflowStyle: 'none',
+				paddingLeft: 'clamp(20px, 2vw, 40px)',
+				paddingRight: 'clamp(20px, 2vw, 40px)'
+			}}>
 					
-					{/* Title */}
+					{/* Title - Make It Memorable */}
 					<h1
-						className={`font-abril mt-6 lg:mt-7 text-[40px] leading-[1] tracking-[1px] text-center font-extrabold max-w-full text-white dark:text-slate-100 transition-all duration-700 delay-300 ease-out ${
+						className={`font-abril text-[37px] leading-[1.1] tracking-tight text-center font-normal w-full max-w-[420px] text-white transition-all duration-500 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-						}`}
+						} ${isAdvanced ? 'mt-6' : 'mt-32'}`}
+						style={{ fontFamily: 'CudliyTrademark, Abril Fatface, serif' }}
 					>
-						Playground
+						Make It Memorable
 					</h1>
-					<p className={`mt-0 sm:mt-1 lg:mt-2 opacity-80 dark:opacity-70 text-[12px] sm:text-[13px] lg:text-[14px] text-white dark:text-slate-300 transition-all duration-700 delay-400 ease-out ${
-						isLoaded ? 'opacity-80 dark:opacity-70 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
-						You are a Vibe Designer now
-					</p>
 					
 					{/* Input Field with Icon Dropdown */}
-					<div className={`mt-3 w-full max-w-[320px] transition-all duration-700 delay-500 ease-out ${
+					<div className={`w-full max-w-[420px] transition-all duration-500 ease-out ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
-						{/* Main Input Container */}
-						<div className="relative w-full rounded-[28px] bg-[#2a2a2a]">
-							<div className="relative px-4 py-4 min-h-[60px]">
-								{/* Input Field */}
-								<input
-									placeholder="Turn landscape into portrait"
-									value={prompt}
-									onChange={(e) => setPrompt(e.target.value)}
-									onKeyDown={(e) => {
-										console.log('Key pressed:', e.key);
-										if (e.key === 'Enter' && !e.shiftKey) {
-											console.log('Enter key detected, calling handleCreateClick');
-											e.preventDefault();
-											handleCreateClick();
-										}
-									}}
-									className="w-full bg-transparent text-black text-[16px] outline-none placeholder:text-gray-400 pr-16 pb-6 transition-colors duration-300"
-									style={{ caretColor: '#E70D57' }}
-								/>
-								
-								{/* Bottom Right Icons */}
-								<div className="absolute bottom-3 right-3 flex items-center gap-2">
-									{/* Settings Icon as Dropdown */}
+					} ${isAdvanced ? 'mt-3' : 'mt-4'}`}>
+						{/* Main Input Container - Dark Style */}
+						<div className="relative w-full bg-[#515151]" style={{ height: '100px', borderRadius: '25px' }}>
+							{/* Input Field - Top portion */}
+							<input
+								placeholder="Ask Cudliy"
+								value={prompt}
+								onChange={(e) => setPrompt(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter' && !e.shiftKey) {
+										e.preventDefault();
+										handleCreateClick();
+									}
+								}}
+								className="w-full pt-3 pb-10 pl-6 pr-20 bg-transparent text-white placeholder-gray-400 border-none focus:outline-none text-sm"
+								style={{ borderRadius: '25px' }}
+							/>
+							
+							{/* Up arrow button - white when empty, #313131 when typing */}
+							<button
+								onClick={handleCreateClick}
+								disabled={!prompt.trim() || !canGenerateImages}
+								className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+									!prompt.trim() || !canGenerateImages
+										? 'bg-white cursor-not-allowed'
+										: 'bg-[#313131] hover:bg-gray-800'
+								}`}
+							>
+								<svg className={`w-5 h-5 transition-colors ${
+									!prompt.trim() || !canGenerateImages
+										? 'text-gray-400'
+										: 'text-white'
+								}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+								</svg>
+							</button>
+
+							{/* Bottom row with icons - INSIDE the field */}
+							<div className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-4">
+								{/* Plus button - left */}
+								<button
+									type="button"
+									onClick={() => toast.info('Image upload coming soon!')}
+									className="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-white transition-colors"
+								>
+									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+										<path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+									</svg>
+								</button>
+
+								{/* Right side icons */}
+								<div className="flex items-center gap-1">
+									{/* Model selector with 3D box icon */}
 									<div className="relative" style={{ zIndex: 9999999 }}>
 										<ModelDropdown 
 											selectedQuality={selectedQuality}
 											onQualityChange={handleQualityChange}
+											use3DIcon={true}
 										/>
 									</div>
-									
-									{/* Submit Button */}
-									<button 
-										onClick={handleCreateClick}
-										disabled={!canGenerateImages}
-										className={`transition-all duration-300 ${
-											!canGenerateImages
-												? 'text-gray-600 cursor-not-allowed'
-												: 'text-black hover:text-gray-800'
+
+									{/* Advanced settings icon */}
+									<button
+										type="button"
+										onClick={handleAdvancedClick}
+										className={`w-7 h-7 flex items-center justify-center transition-all ${
+											isAdvanced || hasProperties()
+												? 'text-white'
+												: 'text-gray-300'
 										}`}
 									>
-										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+											<path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
 										</svg>
 									</button>
 								</div>
 							</div>
 						</div>
-						
-						{/* Advanced Toggle - Below Input */}
-						<div className={`mt-3 flex items-center gap-2 px-2 transition-all duration-700 delay-600 ease-out ${
+
+					</div>
+
+					{/* Example Prompts - Only show in basic mode */}
+					{!isAdvanced && (
+						<div className={`mt-6 w-full max-w-[420px] space-y-3 transition-all duration-700 delay-600 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}>
-							<button
-								onClick={handleAdvancedClick}
-								className={`relative inline-flex h-4 w-8 items-center rounded-full transition-all duration-300 focus:outline-none ${
-									isAdvanced ? 'bg-gradient-to-r from-[#E70D57] to-[#d10c50]' : 'bg-white/20 hover:bg-white/30'
-								}`}
-							>
-								<span
-									className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${
-										isAdvanced ? 'translate-x-4' : 'translate-x-0.5'
-									}`}
-								/>
-							</button>
-							<span className="text-white/70 text-[11px] sm:text-[12px] font-normal">Advanced</span>
+						<button
+							onClick={() => {
+								setPrompt("Birthday Gift for my Mom");
+								setTimeout(() => handleCreateClick(), 100);
+							}}
+							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+						>
+							Birthday Gift for my Mom
+						</button>
+						<button
+							onClick={() => {
+								setPrompt("Gift for my partner");
+								setTimeout(() => handleCreateClick(), 100);
+							}}
+							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+						>
+							Gift for my partner
+						</button>
+						<button
+							onClick={() => {
+								setPrompt("Graduation gift for my Daughter");
+								setTimeout(() => handleCreateClick(), 100);
+							}}
+							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+						>
+							Graduation gift for my  Daughter
+						</button>
+						<button
+							onClick={() => {
+								setPrompt("My dog statue");
+								setTimeout(() => handleCreateClick(), 100);
+							}}
+							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+						>
+							My dog statue
+						</button>
 						</div>
-					</div>
+					)}
 
 					{/* Usage Limits Banner */}
 					{usageLimits && (!canGenerateImages || !canGenerateModels) && (
@@ -1029,7 +1082,7 @@ const handleBackToCategories = () => {
 					{/* Content based on mode */}
 					{isAdvanced ? (
 						/* Advanced Mode Content - Show 6 categories */
-						<div className={`mt-1 w-full max-w-[320px] flex-grow hover:text-[#FA7072] transition-all duration-700 delay-600 ease-out ${
+						<div className={`w-full flex-grow flex items-center justify-center hover:text-[#FA7072] transition-all duration-700 delay-600 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}>
 							{selectedCategory === 'color' ? (
@@ -1058,24 +1111,19 @@ const handleBackToCategories = () => {
 			</aside>
 
 			{/* Main Content Area */}
-			<div className="flex-1 min-w-0 flex flex-col relative bg-white ml-0 lg:ml-0 xl:ml-0 border border-none overflow-hidden"
-				 style={{ borderRadius: 'clamp(24px, 3vw, 32px)' }}>
-				{/* Cancel Button - Only show during workflow */}
-				{showWorkflow && (
-					<div className="absolute top-4 right-4 z-20">
-						<button
-							onClick={handleReset}
-							className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
-						>
-							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-							</svg>
-						</button>
-					</div>
-				)}
+			<div className="flex-1 min-w-0 flex flex-col relative bg-white border-none"
+				 style={{ 
+					borderRadius: 'clamp(16px, 2vw, 28px)',
+					marginTop: '4px',
+					marginRight: '4px',
+					marginBottom: '4px',
+					marginLeft: '4px',
+					height: 'calc(100vh - 8px)'
+				 }}>
+
 				
-				{/* Content - Scrollable */}
-				<div className="flex-1 pl-0 pr-0 sm:pr-0 lg:pr-0 pb-2 sm:pb-2 lg:pb-4 overflow-y-hidden overflow-x-hidden">
+				{/* Content - No scroll */}
+				<div className="flex-1 pl-0 pr-0 sm:pr-0 lg:pr-0 pb-2 sm:pb-2 lg:pb-4 overflow-hidden flex items-center justify-center">
 					{showWorkflow ? (
 						<>
 						
@@ -1224,7 +1272,9 @@ const handleBackToCategories = () => {
 						</div>
 					) : (
 						/* Default Grid Display */
-						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 py-0 lg:py-0 xl:py-0 ml-0 lg:ml-0 xl:ml-1">
+						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 ml-0 lg:ml-0 xl:ml-1" style={{
+							paddingTop: window.innerWidth >= 1420 ? '60px' : '0'
+						}}>
 							{/* Camera 1 - Top Left */}
 							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
@@ -1264,18 +1314,29 @@ const handleBackToCategories = () => {
 								</div>
 							</div>
 
-							{/* Empty space - Bottom Right - No hover effects */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							{/* Empty space - Bottom Right - With Cancel Button */}
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm relative ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
-								<div className="w-full h-full flex items-center justify-center p-6 text-center">
-									<div className="text-gray-400">
-										<svg className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+								{showWorkflow ? (
+									<button
+										onClick={handleReset}
+										className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+									>
+										<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 										</svg>
-										<p className="text-sm lg:text-base">Generate your design</p>
+									</button>
+								) : (
+									<div className="w-full h-full flex items-center justify-center p-6 text-center">
+										<div className="text-gray-400">
+											<svg className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+											</svg>
+											<p className="text-sm lg:text-base">Generate your design</p>
+										</div>
 									</div>
-								</div>
+								)}
 							</div>
 						</div>
 					)}

@@ -162,26 +162,9 @@ select:focus-visible {
 
 /* Responsive scaling for DesignPage left pane only */
 .left-pane-scale {
-  /* default scale applied everywhere unless overridden by breakpoints */
-  --left-pane-scale: 1;
-  transform-origin: top left;
+  /* Removed aggressive scaling - using natural responsive sizing instead */
   position: relative;
   z-index: 30;
-  transform: scale(var(--left-pane-scale));
-  height: calc(100vh / var(--left-pane-scale));
-}
-
-@media (min-width: 1400px) and (min-height: 700px) {
-  .left-pane-scale { --left-pane-scale: 1.3; }
-}
-
-@media (min-width: 1500px) and (min-height: 800px) {
-  .left-pane-scale { --left-pane-scale: 1.4; }
-}
-
-/* Scale left pane more aggressively on wider but not-so-tall screens */
-@media (min-width: 1500px) and (min-height: 650px) {
-  .left-pane-scale { --left-pane-scale: 1.27; }
 }
 
 /* Responsive scaling for DesignPage tour video */

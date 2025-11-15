@@ -518,19 +518,12 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                             alt={`Generated ${index + 1}`}
                             className="w-full h-auto rounded-lg"
                           />
-                          {/* Professional 3D select overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                            <div className="bg-black rounded-full p-4 shadow-2xl transform hover:scale-110 transition-transform border-2 border-white/20">
-                              <svg className="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7.5v9l9 4.5 9-4.5v-9" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v9" />
-                              </svg>
-                            </div>
-                          </div>
-                          {/* Professional select badge */}
-                          <div className="absolute top-3 right-3 bg-none text-[#212121] px-3 py-1 rounded-full text-xs font-medium shadow-lg opacity-90">
-                            View 3D
+
+                          {/* View 360° Button - Centered on Hover */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 bg-black/20">
+                            <button className="px-6 py-2.5 bg-white text-gray-800 rounded-full font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">
+                              View 360°
+                            </button>
                           </div>
                         </div>
                       ))}

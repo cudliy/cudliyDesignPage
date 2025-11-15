@@ -260,93 +260,73 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   };
 
   return (
-    <div className="w-full mx-auto pt-0 mt-0 px-4 md:px-0 md:max-w-4xl bg-transparentbg-transparent">
+    <div className="w-full mx-auto pt-0 mt-0 px-4 md:px-0 md:max-w-4xl bg-transparent">
 
       {/* Loading State */}
       {(isGenerating && generatedImages.length === 0) || isPrinting ? (
-        <div className="text-center py-8 h-full flex items-center justify-center min-h-[60vh] bg-transparentbg-transparent">
+        <div className="text-center py-8 h-full flex items-center justify-center min-h-[60vh] bg-transparent">
           <div className="flex flex-col items-center">
             <img
               src="/GIFS/Loading-State.gif"
               alt="Generating Images"
               className="w-48 h-48 md:w-96 md:h-96 object-contain mb-8"
             />
-            <span className="text-blacktext-white font-medium text-lg md:text-xl">
+            <span className="text-black font-medium text-lg md:text-xl">
               {isPrinting ? 'Creating 3D Model...' : 'Generating Images...'}
             </span>
           </div>
         </div>
       ) : (
         <>
-          {/* Generated Images Grid - Responsive Layout */}
+          {/* Generated Images Grid - Clean layout matching Figma */}
           {generatedImages.length > 0 && (
-        <div className="space-y-0 mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-1 lg:gap-1 xl:gap-2 h-full w-full md:ml-[-20px] lg:ml-[-15px] xl:ml-[-10px]" style={{ display: 'grid' }}>
-            {/* First 3 images in responsive grid */}
-            {generatedImages.slice(0, 3).map((image, index) => (
-                <div
-                  key={index}
-                  className={`bg-whitebg-slate-800 flex items-center justify-center h-[280px] md:h-[320px] min-h-[250px] md:min-h-[300px] transition-all duration-700 ease-out overflow-hidden rounded-lg md:rounded-none shadow-md md:shadow-none ${
-                    selectedImageIndex === index 
-                      ? 'ring-2 ring-blue-400ring-blue-500 shadow-lg' 
-                      : ''
-                  }`}
-                  onClick={() => selectImage(index)}
-                  style={{ transitionDelay: `${800 + index * 100}ms` }}
-                >
-                  <div className="w-full h-full flex items-center justify-center relative group">
-                    <img 
-                      src={image.url} 
-                      alt={`Generated image ${index + 1}`} 
-                      className="w-full h-full object-cover relative z-10"
-                      onLoad={() => {}}
-                      onError={(e) => console.error(`❌ Image ${index} failed to load:`, e, 'URL:', image.url)}
-                    />
-                    {selectedImageIndex === index && (
-                      <div className="absolute top-2 right-2 w-8 h-8 bg-black rounded-full flex items-center justify-center shadow-lg z-20">
-                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+            <div className="w-full pb-8">
+              <div className="grid grid-cols-2 grid-rows-2 gap-2 md:gap-3">
+                {/* First 3 images filling the space */}
+                {generatedImages.slice(0, 3).map((image, index) => (
+                  <div
+                    key={index}
+                    className={`bg-[#f0f0f0] flex items-center justify-center transition-all duration-300 overflow-hidden rounded-xl md:rounded-2xl relative ${
+                      index === 0 ? 'row-span-2 h-full min-h-[400px] md:min-h-[500px]' : 'h-full min-h-[195px] md:min-h-[245px]'
+                    } ${
+                      selectedImageIndex === index 
+                        ? 'ring-2 md:ring-4 ring-blue-500' 
+                        : ''
+                    }`}
+                    onClick={() => selectImage(index)}
+                  >
+                    <div className="w-full h-full relative group cursor-pointer">
+                      <img 
+                        src={image.url} 
+                        alt={`Generated image ${index + 1}`} 
+                        className="w-full h-full object-cover"
+                      />
+                      
+                      {/* View 360° Button - Centered on Hover */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <button 
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setIsPrinting(true);
+                            try {
+                              await generate3DModel();
+                            } catch (error) {
+                              console.error('3D generation failed:', error);
+                            } finally {
+                              setIsPrinting(false);
+                            }
+                          }}
+                          className="px-4 md:px-6 py-2 md:py-2.5 bg-white text-gray-800 rounded-full font-medium text-xs md:text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-10"
+                        >
+                          View 360°
+                        </button>
                       </div>
-                    )}
-                    {(image as any).processed && (
-                      <div className="absolute top-2 left-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg z-20">
-                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
-                    {/* View 3D Button - Responsive */}
-                    <div className="md:absolute md:inset-0 md:flex md:items-center md:justify-center md:opacity-0 md:group-hover:opacity-100 md:transition-all md:duration-300 md:z-20 md:backdrop-blur-sm absolute bottom-3 left-1/2 transform -translate-x-1/2 md:transform-none z-20 opacity-100 md:opacity-0">
-                      <button 
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          setIsPrinting(true);
-                          try {
-                            await generate3DModel();
-                          } catch (error) {
-                            console.error('3D generation failed:', error);
-                          } finally {
-                            setIsPrinting(false);
-                          }
-                        }}
-                        className="px-4 py-2 md:px-6 md:py-3 bg-whitebg-slate-700 text-gray-800text-white flex items-center justify-center gap-2 md:gap-3 transition-all duration-200 hover:bg-gray-50hover:bg-slate-600 hover:scale-105 shadow-lg cursor-pointer text-[12px] md:text-[14px] font-medium rounded-lg md:rounded-none"
-                      >
-                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7.5v9l9 4.5 9-4.5v-9" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v9" />
-                        </svg>
-                        <span>View 3D</span>
-                      </button>
                     </div>
                   </div>
-                </div>
-            ))}
-          </div>
-
-        </div>
-      )}
+                ))}
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
