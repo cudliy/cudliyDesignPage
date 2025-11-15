@@ -447,7 +447,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -506,7 +506,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -565,7 +565,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -624,7 +624,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -682,7 +682,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -742,7 +742,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3  w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -1015,37 +1015,73 @@ const handleBackToCategories = () => {
 						}`}>
 						<button
 							onClick={() => {
-								setPrompt("Birthday Gift for my Mom");
-								setTimeout(() => handleCreateClick(), 100);
+								const promptText = "Birthday Gift for my Mom";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
 							}}
-							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
 						>
 							Birthday Gift for my Mom
 						</button>
 						<button
 							onClick={() => {
-								setPrompt("Gift for my partner");
-								setTimeout(() => handleCreateClick(), 100);
+								const promptText = "Gift for my partner";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
 							}}
-							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
 						>
 							Gift for my partner
 						</button>
 						<button
 							onClick={() => {
-								setPrompt("Graduation gift for my Daughter");
-								setTimeout(() => handleCreateClick(), 100);
+								const promptText = "Graduation gift for my Daughter";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
 							}}
-							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
 						>
 							Graduation gift for my  Daughter
 						</button>
 						<button
 							onClick={() => {
-								setPrompt("My dog statue");
-								setTimeout(() => handleCreateClick(), 100);
+								const promptText = "My dog statue";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
 							}}
-							className="w-full text-left text-white/70 hover:text-white text-sm transition-colors"
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
 						>
 							My dog statue
 						</button>

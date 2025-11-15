@@ -423,7 +423,7 @@ export const generate3DModel = async (req, res, next) => {
           } : null
         }
       },
-      message: '3D model generated and saved to cloud storage successfully'
+      message: ''
     });
 
   } catch (error) {

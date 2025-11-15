@@ -131,7 +131,7 @@ h2, h3, h4, h5, h6, .heading {
     0 0 20px rgba(255, 255, 255, 0.3) !important;
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)) !important;
   font-weight: 900 !important;
-  letter-spacing: 0.1em !important;
+  letter-spacing: -0.02em !important;
 }
 
 /* Hide scrollbars while preserving scroll (desktop + mobile) */
