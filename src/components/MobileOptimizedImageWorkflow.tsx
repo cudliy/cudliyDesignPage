@@ -296,19 +296,21 @@ export default function MobileOptimizedImageWorkflow({
       }}>
         <div className="grid grid-cols-2 gap-2" style={{ 
           width: window.innerWidth >= 1470 ? 'min(1300px, 95vw)' : 'min(1130px, 95vw)',
-          height: window.innerWidth >= 1470 ? 'min(950px, 92vh)' : 'min(820px, 90vh)',
+          height: '100%',
           gridTemplateRows: 'repeat(2, 1fr)'
         }}>
           {generatedImages.slice(0, 3).map((image, index) => (
             <div
               key={index}
-              className={`bg-white border-2 border-gray-300 flex items-center justify-center transition-all duration-700 ease-out overflow-hidden cursor-pointer shadow-lg group ${
-                selectedImageIndex === index ? 'ring-4 ring-blue-500 shadow-2xl' : ''
+              className={`flex items-center justify-center transition-all duration-700 ease-out overflow-hidden cursor-pointer group ${
+                selectedImageIndex === index ? 'ring-4 ring-blue-500' : ''
               }`}
               onClick={() => selectImage(index)}
               style={{ 
                 transitionDelay: `${800 + index * 100}ms`,
-                borderRadius: '10px'
+                borderRadius: '10px',
+                backgroundColor: '#FFFFFF',
+                border: '0.25px solid #E8E8E8'
               }}
             >
               <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-[10px]">
@@ -321,7 +323,10 @@ export default function MobileOptimizedImageWorkflow({
                 />
                 
                 {/* Hover Overlay - Full Coverage */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/40 backdrop-blur-sm z-30 rounded-[10px]">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 rounded-[10px]" style={{
+                  backgroundColor: 'rgba(23, 23, 23, 0.31)',
+                  backdropFilter: 'blur(4px)'
+                }}>
                   <button 
                     onClick={async (e) => {
                       e.stopPropagation();
@@ -334,13 +339,23 @@ export default function MobileOptimizedImageWorkflow({
                         setIsPrinting(false);
                       }
                     }}
-                    className="bg-white text-gray-800 flex items-center justify-center gap-2 transition-all duration-200 hover:scale-105 shadow-lg cursor-pointer font-medium rounded-full"
+                    className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer"
                     style={{
-                      padding: 'clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 24px)',
-                      fontSize: 'clamp(12px, 1.2vw, 14px)'
+                      width: '162px',
+                      height: '52px',
+                      borderRadius: '26px',
+                      border: '2px solid #2C2C2C',
+                      backgroundColor: 'transparent',
+                      color: '#2C2E3D',
+                      fontFamily: 'Manrope, sans-serif',
+                      fontWeight: 700,
+                      fontSize: '16px',
+                      lineHeight: '100%',
+                      letterSpacing: '0%',
+                      textAlign: 'center' as const
                     }}
                   >
-                    <span>View 360°</span>
+                    View 360°
                   </button>
                 </div>
               </div>

@@ -86,9 +86,22 @@ export default function DesignPage() {
 		return () => clearTimeout(timer);
 	}, []);
 
-	// Detect mobile viewport
+	// Detect mobile viewport and devices (including iPads)
 	useEffect(() => {
-		const checkMobile = () => setIsMobile(window.innerWidth < 768);
+		const checkMobile = () => {
+			const width = window.innerWidth;
+			const userAgent = navigator.userAgent.toLowerCase();
+			const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+			
+			// Check for mobile devices, tablets (including iPads)
+			const isMobileDevice = /iphone|ipod|android|blackberry|windows phone/i.test(userAgent);
+			const isTablet = /ipad|android(?!.*mobile)|tablet/i.test(userAgent) || 
+							 (isTouchDevice && width >= 768 && width <= 1024);
+			
+			// Consider both mobile phones and tablets (including iPads) as "mobile"
+			setIsMobile(width < 768 || isMobileDevice || isTablet);
+		};
+		
 		checkMobile();
 		window.addEventListener('resize', checkMobile);
 		return () => window.removeEventListener('resize', checkMobile);
