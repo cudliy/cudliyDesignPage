@@ -353,10 +353,12 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         </div>
       )}
 
-      {/* Messages Container - Increased bottom padding to ensure visibility */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 pb-40 space-y-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      {/* Messages Container - Dynamic padding based on whether messages exist */}
+      <div className={`flex-1 overflow-y-auto px-4 space-y-4 transition-all duration-300 ${
+        messages.length === 0 ? 'py-6 pb-6 flex flex-col' : 'py-6 pb-40'
+      }`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center px-6 font-inter">
+          <div className="flex flex-col items-center justify-start pt-12 text-center px-6 font-inter">
             {/* Hero Title - CudliyTrademark custom font */}
             <h2 
               className="text-gray-900 mb-6 text-center capitalize" 
@@ -372,7 +374,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             </h2>
 
             {/* Example Cards - smaller, 180px width */}
-            <div className="flex flex-col gap-3 w-full items-center">
+            <div className="flex flex-col gap-3 w-full items-center mb-6">
               <button 
                 onClick={() => {
                   setInputValue("Birthday gift for my mum. She is 50 years old");
@@ -537,8 +539,12 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Container - Fixed at bottom matching image design */}
-      <div className="fixed bottom-6 left-6 right-6 z-30">
+      {/* Input Container - Centered when empty, fixed at bottom when messages exist */}
+      <div className={`left-6 right-6 z-30 transition-all duration-500 ease-in-out ${
+        messages.length === 0 
+          ? 'absolute bottom-32' 
+          : 'fixed bottom-6'
+      }`}>
         <form onSubmit={handleSubmit}>
           {/* Main input field - 118px height, 32px border radius - no visible border */}
           <div className="relative bg-[#E5E5EA]" style={{ height: '118px', borderRadius: '32px' }}>
