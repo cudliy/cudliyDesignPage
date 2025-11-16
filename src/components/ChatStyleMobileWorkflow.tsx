@@ -332,18 +332,18 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       {/* Full-Screen Loading State for 3D Generation */}
       {isGenerating && (
         <div className="absolute inset-0 bg-white z-50 flex items-center justify-center transition-colors duration-300">
-          <div className="flex flex-col items-center justify-center px-8 w-full max-w-md -mt-20">
+          <div className="flex flex-col items-center justify-center px-8 w-full max-w-md -mt-32">
             {/* Centered GIF */}
-            <div className="flex items-center justify-center mb-6">
+            <div className="flex items-center justify-center mb-5">
               <img
                 src="/GIFS/Loading-State.gif"
                 alt="Generating 3D Model"
-                className="w-56 h-56 object-contain"
+                className="w-52 h-52 object-contain"
               />
             </div>
             
             {/* Progress bar between GIF and text */}
-            <div className="w-full max-w-sm mb-5">
+            <div className="w-full max-w-sm mb-4">
               <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-[#E70D57] rounded-full animate-progress-bar"></div>
               </div>
@@ -546,7 +546,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       {/* Input Container - Centered in middle space when empty, fixed at bottom when messages exist */}
       <div className={`left-6 right-6 z-30 transition-all duration-500 ease-in-out ${
         messages.length === 0 
-          ? 'fixed top-[58%] -translate-y-1/2' 
+          ? 'fixed top-[65%] -translate-y-1/2' 
           : 'fixed bottom-6'
       }`}>
         <form onSubmit={handleSubmit}>
