@@ -332,18 +332,20 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       {/* Full-Screen Loading State for 3D Generation */}
       {isGenerating && (
         <div className="absolute inset-0 bg-white z-50 flex items-center justify-center transition-colors duration-300">
-          <div className="flex flex-col items-center justify-center px-8 max-w-md">
+          <div className="flex flex-col items-center justify-center px-8 w-full max-w-md">
             {/* Centered GIF */}
-            <img
-              src="/GIFS/Loading-State.gif"
-              alt="Generating 3D Model"
-              className="w-80 h-80 object-contain mb-8"
-            />
+            <div className="flex items-center justify-center mb-8">
+              <img
+                src="/GIFS/Loading-State.gif"
+                alt="Generating 3D Model"
+                className="w-64 h-64 object-contain"
+              />
+            </div>
             
             {/* Progress bar between GIF and text */}
-            <div className="w-full mb-6">
+            <div className="w-full max-w-sm mb-6">
               <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full rounded-full animate-progress-indeterminate" style={{ width: '30%', backgroundColor: '#E70D57' }}></div>
+                <div className="h-full bg-[#E70D57] rounded-full animate-progress-bar"></div>
               </div>
             </div>
             
@@ -355,10 +357,10 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
 
       {/* Messages Container - Dynamic padding based on whether messages exist */}
       <div className={`flex-1 overflow-y-auto px-4 space-y-4 transition-all duration-300 ${
-        messages.length === 0 ? 'py-6 pb-6 flex flex-col' : 'py-6 pb-40'
+        messages.length === 0 ? 'py-6 pb-6' : 'py-6 pb-40'
       }`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-start pt-12 text-center px-6 font-inter">
+          <div className="flex flex-col items-center justify-start pt-8 text-center px-6 font-inter">
             {/* Hero Title - CudliyTrademark custom font */}
             <h2 
               className="text-gray-900 mb-6 text-center capitalize" 
@@ -374,7 +376,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             </h2>
 
             {/* Example Cards - smaller, 180px width */}
-            <div className="flex flex-col gap-3 w-full items-center mb-6">
+            <div className="flex flex-col gap-3 w-full items-center">
               <button 
                 onClick={() => {
                   setInputValue("Birthday gift for my mum. She is 50 years old");
@@ -542,7 +544,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       {/* Input Container - Centered when empty, fixed at bottom when messages exist */}
       <div className={`left-6 right-6 z-30 transition-all duration-500 ease-in-out ${
         messages.length === 0 
-          ? 'absolute bottom-32' 
+          ? 'fixed top-1/2 -translate-y-1/2' 
           : 'fixed bottom-6'
       }`}>
         <form onSubmit={handleSubmit}>
@@ -837,19 +839,19 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
         }
-        @keyframes progress-indeterminate {
+        @keyframes progress-bar {
           0% {
-            transform: translateX(-100%);
+            width: 0%;
           }
           50% {
-            transform: translateX(350%);
+            width: 70%;
           }
           100% {
-            transform: translateX(-100%);
+            width: 95%;
           }
         }
-        .animate-progress-indeterminate {
-          animation: progress-indeterminate 1.5s ease-in-out infinite;
+        .animate-progress-bar {
+          animation: progress-bar 3s ease-out infinite;
         }
         /* Hide scrollbar for Chrome, Safari and Opera */
         *::-webkit-scrollbar {
