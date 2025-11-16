@@ -332,18 +332,18 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       {/* Full-Screen Loading State for 3D Generation */}
       {isGenerating && (
         <div className="absolute inset-0 bg-white z-50 flex items-center justify-center transition-colors duration-300">
-          <div className="flex flex-col items-center justify-center px-8 w-full max-w-md">
+          <div className="flex flex-col items-center justify-center px-8 w-full max-w-md -mt-20">
             {/* Centered GIF */}
-            <div className="flex items-center justify-center mb-8">
+            <div className="flex items-center justify-center mb-6">
               <img
                 src="/GIFS/Loading-State.gif"
                 alt="Generating 3D Model"
-                className="w-64 h-64 object-contain"
+                className="w-56 h-56 object-contain"
               />
             </div>
             
             {/* Progress bar between GIF and text */}
-            <div className="w-full max-w-sm mb-6">
+            <div className="w-full max-w-sm mb-5">
               <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-[#E70D57] rounded-full animate-progress-bar"></div>
               </div>
@@ -355,104 +355,106 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         </div>
       )}
 
-      {/* Messages Container - Dynamic padding based on whether messages exist */}
-      <div className={`flex-1 overflow-y-auto px-4 space-y-4 transition-all duration-300 ${
-        messages.length === 0 ? 'py-6 pb-6' : 'py-6 pb-40'
-      }`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-start pt-8 text-center px-6 font-inter">
-            {/* Hero Title - CudliyTrademark custom font */}
-            <h2 
-              className="text-gray-900 mb-6 text-center capitalize" 
-              style={{ 
-                fontFamily: 'CudliyTrademark, Abril Fatface, serif',
-                fontWeight: 400,
-                fontSize: '32px',
-                lineHeight: '100%',
-                letterSpacing: '0%'
+      {/* Empty State Content - Positioned at top */}
+      {messages.length === 0 && (
+        <div className="absolute top-16 left-0 right-0 z-20 flex flex-col items-center text-center px-10 font-inter">
+          {/* Hero Title - CudliyTrademark custom font */}
+          <h2 
+            className="text-gray-900 mb-6 text-center capitalize" 
+            style={{ 
+              fontFamily: 'CudliyTrademark, Abril Fatface, serif',
+              fontWeight: 400,
+              fontSize: '32px',
+              lineHeight: '100%',
+              letterSpacing: '0%'
+            }}
+          >
+            Make It<br />Memorable
+          </h2>
+
+          {/* Example Cards */}
+          <div className="flex flex-col gap-3 w-full items-center">
+            <button 
+              onClick={() => {
+                setInputValue("Birthday gift for my mum. She is 50 years old");
+                setTimeout(() => {
+                  const form = document.querySelector('form');
+                  if (form) {
+                    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                  }
+                }, 100);
+              }}
+              className="text-center hover:shadow-lg transition-all border border-gray-100"
+              style={{
+                width: '240px',
+                borderRadius: '12px',
+                paddingTop: '12px',
+                paddingRight: '16px',
+                paddingBottom: '12px',
+                paddingLeft: '16px',
+                backgroundColor: '#F6F6F6'
               }}
             >
-              Make It<br />Memorable
-            </h2>
-
-            {/* Example Cards - smaller, 180px width */}
-            <div className="flex flex-col gap-3 w-full items-center">
-              <button 
-                onClick={() => {
-                  setInputValue("Birthday gift for my mum. She is 50 years old");
-                  setTimeout(() => {
-                    const form = document.querySelector('form');
-                    if (form) {
-                      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                    }
-                  }, 100);
-                }}
-                className="text-center hover:shadow-lg transition-all border border-gray-100"
+              <h3 
+                className="text-gray-900 mb-1"
                 style={{
-                  width: '240px',
-                  borderRadius: '12px',
-                  paddingTop: '12px',
-                  paddingRight: '16px',
-                  paddingBottom: '12px',
-                  paddingLeft: '16px',
-                  backgroundColor: '#F6F6F6'
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 700,
+                  fontSize: '15px',
+                  lineHeight: '20px',
+                  letterSpacing: '-0.3px',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <h3 
-                  className="text-gray-900 mb-1"
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 700,
-                    fontSize: '15px',
-                    lineHeight: '20px',
-                    letterSpacing: '-0.3px',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Birthday gift for my mum
-                </h3>
-                <p className="text-gray-500 text-xs">She is 50 years old</p>
-              </button>
+                Birthday gift for my mum
+              </h3>
+              <p className="text-gray-500 text-xs">She is 50 years old</p>
+            </button>
 
-              <button 
-                onClick={() => {
-                  setInputValue("Anniversary Gift for my partner in New York");
-                  setTimeout(() => {
-                    const form = document.querySelector('form');
-                    if (form) {
-                      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                    }
-                  }, 100);
-                }}
-                className="text-center hover:shadow-lg transition-all border border-gray-100"
+            <button 
+              onClick={() => {
+                setInputValue("Anniversary Gift for my partner in New York");
+                setTimeout(() => {
+                  const form = document.querySelector('form');
+                  if (form) {
+                    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                  }
+                }, 100);
+              }}
+              className="text-center hover:shadow-lg transition-all border border-gray-100"
+              style={{
+                width: '240px',
+                borderRadius: '12px',
+                paddingTop: '12px',
+                paddingRight: '16px',
+                paddingBottom: '12px',
+                paddingLeft: '16px',
+                backgroundColor: '#F6F6F6'
+              }}
+            >
+              <h3 
+                className="text-gray-900 mb-1"
                 style={{
-                  width: '240px',
-                  borderRadius: '12px',
-                  paddingTop: '12px',
-                  paddingRight: '16px',
-                  paddingBottom: '12px',
-                  paddingLeft: '16px',
-                  backgroundColor: '#F6F6F6'
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 700,
+                  fontSize: '15px',
+                  lineHeight: '20px',
+                  letterSpacing: '-0.3px',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <h3 
-                  className="text-gray-900 mb-1"
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 700,
-                    fontSize: '15px',
-                    lineHeight: '20px',
-                    letterSpacing: '-0.3px',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Anniversary Gift
-                </h3>
-                <p className="text-gray-500 text-xs">for my partner in New York</p>
-              </button>
-            </div>
+                Anniversary Gift
+              </h3>
+              <p className="text-gray-500 text-xs">for my partner in New York</p>
+            </button>
           </div>
-        )}
+        </div>
+      )}
+
+      {/* Messages Container - Dynamic padding based on whether messages exist */}
+      <div className={`flex-1 overflow-y-auto px-4 space-y-4 transition-all duration-300 ${
+        messages.length === 0 ? 'opacity-0 pointer-events-none' : 'py-6 pb-40'
+      }`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
         {messages.map((message) => (
           <div
@@ -541,10 +543,10 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Container - Centered when empty, fixed at bottom when messages exist */}
+      {/* Input Container - Centered in middle space when empty, fixed at bottom when messages exist */}
       <div className={`left-6 right-6 z-30 transition-all duration-500 ease-in-out ${
         messages.length === 0 
-          ? 'fixed top-1/2 -translate-y-1/2' 
+          ? 'fixed top-[58%] -translate-y-1/2' 
           : 'fixed bottom-6'
       }`}>
         <form onSubmit={handleSubmit}>
