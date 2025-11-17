@@ -317,15 +317,6 @@ const handleBackToCategories = () => {
 
 	
 
-	const handleReset = () => {
-		setShowWorkflow(false);
-		setError(null);
-		setCompletedDesignId(null);
-		setPrompt('');
-		// Strategic Enhancement: Reset properties aggregator
-		resetProperties();
-	};
-
 	// SVG Icon Components
 	const ColorIcon = () => (
 		<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white group-hover:text-[#FA7072] transition-colors duration-300">

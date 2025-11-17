@@ -35,7 +35,6 @@ export default function MobileOptimizedImageWorkflow({
   const isGeneratingRef = useRef(false);
 
   const userId = sessionStorage.getItem('user_id') || '';
-  const token = sessionStorage.getItem('token');
   
   useEffect(() => {
     const storedUserId = sessionStorage.getItem('user_id');
