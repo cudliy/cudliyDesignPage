@@ -530,37 +530,19 @@ export default function DesignView() {
   return (
     <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100from-slate-900via-slate-800to-slate-900 overflow-hidden flex p-4 gap-4 transition-colors duration-300">
       {/* Left Pane */}
-      <aside className="left-pane-scale flex-shrink-0 h-screen bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
+      <aside className="left-pane-scale flex-shrink-0 bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
              style={{
-               width: 'clamp(320px, 24vw, 440px)',
-               borderRadius: 'clamp(20px, 4vw, 40px)',
+               width: 'clamp(400px, 476px, 476px)',
+               minWidth: '400px',
+               height: 'calc(100vh - 32px)',
+               borderRadius: 'clamp(16px, 2vw, 28px)',
+               margin: '0'
              }}>
         
         {/* Brand and title area */}
-        <div className="left-pane-content pt-[2.5rem] sm:pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
-          {/* Mode selector */}
-          <div className="mb-3 flex items-center px-1 gap-2 w-full max-w-[222px] mt-6 h-[31px] rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-lg">
-            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
-              Voice
-            </button>
-            <button className="flex-1 h-[22px] rounded-full text-xs bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
-              Chat
-            </button>
-            <button className="flex-1 h-[22px] rounded-full text-xs text-white/90 transition-all duration-300 hover:bg-white/10 font-medium">
-              Draw
-            </button>
-          </div>
-          
-          {/* Title */}
-          <h1 className="font-serif text-2xl sm:text-3xl mt-3 relative lg:text-4xl leading-tight text-center max-w-full mb-2">
-            Playground
-          </h1>
-          <p className="mt-2 lg:mt-2 opacity-80 text-xs sm:text-sm mb-6">
-            You are a Vibe Designer now
-          </p>
-
+        <div className="left-pane-content pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
           {/* Control Sliders Section */}
-          <div className="mt-6 w-full max-w-[320px] flex-grow min-h-0">
+          <div className="mt-6 w-full max-w-[360px] flex-grow min-h-0">
             <div className="space-y-6">
               {/* Lighting Slider */}
               <div>
@@ -678,7 +660,7 @@ export default function DesignView() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <button className="flex-1 max-w-[130px] py-2.5 text-sm bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
+              <button className="flex-1 max-w-[200px] py-2.5 text-sm bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
                 Save to draft
               </button>
             </div>

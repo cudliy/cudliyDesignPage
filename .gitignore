@@ -53,7 +53,7 @@ pids
 *.pid
 *.seed
 *.pid.lock
-
+*backup
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov

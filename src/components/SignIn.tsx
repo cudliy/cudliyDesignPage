@@ -322,7 +322,7 @@ const SignIn = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border-2 border-gray-200 focus:outline-none focus:border-gray-400 focus:ring-0 h-[56px] rounded-full px-6 bg-white text-black text-base"
+                className="w-full border-2 border-gray-200 focus:outline-none focus:border-gray-400 focus:ring-0 h-[56px] rounded-full px-6 bg-white text-[#212121] placeholder:text-[#212121] text-base"
                 style={{ fontSize: '16px' }}
                 required
               />
@@ -332,7 +332,7 @@ const SignIn = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border-2 border-gray-200 focus:outline-none focus:border-gray-400 focus:ring-0 h-[56px] rounded-full px-6 bg-white text-black text-base"
+                className="w-full border-2 border-gray-200 focus:outline-none focus:border-gray-400 focus:ring-0 h-[56px] rounded-full px-6 bg-white text-[#212121] placeholder:text-[#212121] text-base"
                 style={{ fontSize: '16px' }}
                 required
               />

@@ -213,7 +213,18 @@ const handleBackToCategories = () => {
 
 		console.log('🎯 Create button clicked - starting workflow');
 		setError(null);
-		setShowWorkflow(true);
+		
+		// Reset workflow to allow regeneration
+		if (showWorkflow) {
+			// If workflow is already showing, reset it to trigger new generation
+			setShowWorkflow(false);
+			setTimeout(() => {
+				setShowWorkflow(true);
+			}, 50);
+		} else {
+			setShowWorkflow(true);
+		}
+		
 		console.log('✅ showWorkflow set to true');
 	};
 
@@ -887,7 +898,7 @@ const handleBackToCategories = () => {
 				keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
 				url="/design"
 			/>
-			<div className="w-screen h-screen bg-white flex justify-center p-0 fixed inset-0 overflow-hidden">
+			<div className="w-screen h-screen bg-black flex justify-center p-0 fixed inset-0 overflow-hidden">
 			{/* Left Sidebar */}
 			<aside className={`left-pane-scale bg-[#313131] border border-white/5 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
@@ -904,6 +915,23 @@ const handleBackToCategories = () => {
 				<WorkspaceDropdown/>
 			</div>
 
+			{/* Cancel Button - Top Right */}
+			{showWorkflow && (
+				<div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+					<button
+						onClick={() => {
+							setShowWorkflow(false);
+							setError(null);
+						}}
+						className="w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all duration-200"
+					>
+						<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+							<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+			)}
+
 
 				
 							{/* Brand and title area */}
@@ -916,7 +944,7 @@ const handleBackToCategories = () => {
 					
 					{/* Title - Make It Memorable */}
 					<h1
-						className={`font-abril text-[37px] leading-[1.1] tracking-tight text-center font-normal w-full max-w-[420px] text-white transition-all duration-500 ease-out ${
+						className={`font-abril text-[47.1px] leading-[1.1] tracking-tight text-center font-normal w-full max-w-[420px] text-white transition-all duration-500 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						} ${isAdvanced ? 'mt-6' : 'mt-32'}`}
 						style={{ fontFamily: 'CudliyTrademark, Abril Fatface, serif' }}
@@ -945,20 +973,20 @@ const handleBackToCategories = () => {
 								style={{ borderRadius: '25px' }}
 							/>
 							
-							{/* Up arrow button - white when empty, #313131 when typing */}
+							{/* Up arrow button - #313131 when empty, white when typing */}
 							<button
 								onClick={handleCreateClick}
 								disabled={!prompt.trim() || !canGenerateImages}
 								className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
 									!prompt.trim() || !canGenerateImages
-										? 'bg-white cursor-not-allowed'
-										: 'bg-[#313131] hover:bg-gray-800'
+										? 'bg-[#313131] cursor-not-allowed'
+										: 'bg-white hover:bg-gray-100'
 								}`}
 							>
 								<svg className={`w-5 h-5 transition-colors ${
 									!prompt.trim() || !canGenerateImages
 										? 'text-gray-400'
-										: 'text-white'
+										: 'text-[#313131]'
 								}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
 								</svg>
@@ -1018,14 +1046,14 @@ const handleBackToCategories = () => {
 								const promptText = "Birthday Gift for my Mom";
 								setPrompt(promptText);
 								setError(null);
-								setTimeout(() => setShowWorkflow(true), 100);
+								// Don't auto-trigger workflow - let user click Create button
 							}}
 							className="w-full text-left text-white hover:text-white/80 transition-colors"
 							style={{
 								fontFamily: 'Manrope, sans-serif',
 								fontWeight: 400,
-								fontSize: '16px',
-								lineHeight: '22px',
+								fontSize: '14px',
+								lineHeight: '20px',
 								letterSpacing: '0px'
 							}}
 						>
@@ -1036,14 +1064,14 @@ const handleBackToCategories = () => {
 								const promptText = "Gift for my partner";
 								setPrompt(promptText);
 								setError(null);
-								setTimeout(() => setShowWorkflow(true), 100);
+								// Don't auto-trigger workflow - let user click Create button
 							}}
 							className="w-full text-left text-white hover:text-white/80 transition-colors"
 							style={{
 								fontFamily: 'Manrope, sans-serif',
 								fontWeight: 400,
-								fontSize: '16px',
-								lineHeight: '22px',
+								fontSize: '14px',
+								lineHeight: '20px',
 								letterSpacing: '0px'
 							}}
 						>
@@ -1054,14 +1082,14 @@ const handleBackToCategories = () => {
 								const promptText = "Graduation gift for my Daughter";
 								setPrompt(promptText);
 								setError(null);
-								setTimeout(() => setShowWorkflow(true), 100);
+								// Don't auto-trigger workflow - let user click Create button
 							}}
 							className="w-full text-left text-white hover:text-white/80 transition-colors"
 							style={{
 								fontFamily: 'Manrope, sans-serif',
 								fontWeight: 400,
-								fontSize: '16px',
-								lineHeight: '22px',
+								fontSize: '14px',
+								lineHeight: '20px',
 								letterSpacing: '0px'
 							}}
 						>
@@ -1072,14 +1100,14 @@ const handleBackToCategories = () => {
 								const promptText = "My dog statue";
 								setPrompt(promptText);
 								setError(null);
-								setTimeout(() => setShowWorkflow(true), 100);
+								// Don't auto-trigger workflow - let user click Create button
 							}}
 							className="w-full text-left text-white hover:text-white/80 transition-colors"
 							style={{
 								fontFamily: 'Manrope, sans-serif',
 								fontWeight: 400,
-								fontSize: '16px',
-								lineHeight: '22px',
+								fontSize: '14px',
+								lineHeight: '20px',
 								letterSpacing: '0px'
 							}}
 						>
@@ -1160,7 +1188,7 @@ const handleBackToCategories = () => {
 			</aside>
 
 			{/* Main Content Area */}
-			<div className="flex-1 min-w-0 flex flex-col relative bg-white border-none"
+			<div className="flex-1 min-w-0 flex flex-col relative bg-black border-none"
 				 style={{ 
 					borderRadius: 'clamp(16px, 2vw, 28px)',
 					marginTop: '4px',
@@ -1180,7 +1208,7 @@ const handleBackToCategories = () => {
 							{!showWorkflow && (
 								<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 w-full ml-0 lg:ml-0 xl:ml-0 min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 							{/* Camera 1 - Top Left - Show Loading GIF */}
-								<div className={`bg-white border border-gray-200/30 rounded-[40px] ml-0 lg:ml-1 xl:ml-1 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] ml-0 lg:ml-1 xl:ml-1 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex ml-[-25px] lg:ml[-15px] xl:ml-0 flex-col items-center justify-center p-6 text-center relative">
@@ -1189,13 +1217,13 @@ const handleBackToCategories = () => {
 										alt="Loading" 
 										className="w-24 h-24 object-contain mb-4"
 									/>
-									<h3 className="text-lg font-semibold text-gray-800 mb-2">Generating...</h3>
-									<p className="text-sm text-gray-600">Creating your design</p>
+									<h3 className="text-lg font-semibold text-gray-200 mb-2">Generating...</h3>
+									<p className="text-sm text-gray-400">Creating your design</p>
 								</div>
 							</div>
 
 							{/* Camera 2 - Top Right - Show Loading GIF */}
-								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1204,13 +1232,13 @@ const handleBackToCategories = () => {
 										alt="Loading" 
 										className="w-24 h-24 object-contain mb-4"
 									/>
-									<h3 className="text-lg font-semibold text-gray-800 mb-2">Processing...</h3>
-									<p className="text-sm text-gray-600">AI at work</p>
+									<h3 className="text-lg font-semibold text-gray-200 mb-2">Processing...</h3>
+									<p className="text-sm text-gray-400">AI at work</p>
 								</div>
 							</div>
 
 							{/* Camera 3 - Bottom Left - Show Loading GIF */}
-								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1219,25 +1247,17 @@ const handleBackToCategories = () => {
 										alt="Loading" 
 										className="w-24 h-24 object-contain mb-4"
 									/>
-									<h3 className="text-lg font-semibold text-gray-800 mb-2">Working...</h3>
-									<p className="text-sm text-gray-600">Almost done</p>
+									<h3 className="text-lg font-semibold text-gray-200 mb-2">Working...</h3>
+									<p className="text-sm text-gray-400">Almost done</p>
 								</div>
 							</div>
 
-							{/* Generate 3D Model - Bottom Right - Keep Button in Same Position */}
-								<div className={`bg-white border border-gray-200/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							{/* Empty 4th Grid - Bottom Right - Clean loading state */}
+								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
-									<button
-										onClick={handleReset}
-										disabled={true}
-										className={`px-8 py-3 font-medium rounded-full transition-all duration-300 shadow-lg text-lg ${
-											'bg-gray-400 text-gray-200 cursor-not-allowed'
-										}`}
-									>
-										Generating...
-									</button>
+									{/* Empty space - no button */}
 								</div>
 							</div>
 						</div>
@@ -1246,6 +1266,7 @@ const handleBackToCategories = () => {
 						{/* Workflow Component - Replace the loading grid when active */}
 						{showWorkflow && (
 							<MobileOptimizedImageWorkflow
+								key={prompt}
 								prompt={prompt}
 								enhancedPrompt={hasProperties() ? generateEnhancedPrompt(prompt) : undefined}
 								quality={selectedQuality as 'fast' | 'medium' | 'good'}
@@ -1362,42 +1383,32 @@ const handleBackToCategories = () => {
 									/>
 								</div>
 							</div>
-
-							{/* Empty space - Bottom Right - With Cancel Button */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm relative ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '1100ms' }}>
-								{showWorkflow ? (
-									<button
-										onClick={handleReset}
-										className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
-									>
-										<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-										</svg>
-									</button>
-								) : (
-									<div className="w-full h-full flex items-center justify-center p-6 text-center">
-										<div className="text-gray-400">
-											<svg className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-											</svg>
-											<p className="text-sm lg:text-base">Generate your design</p>
-										</div>
-									</div>
-								)}
-							</div>
 						</div>
 					)}
 				</div>
 			</div>
 			
-			{/* Floating help button */}
-			<button className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-2xl overflow-hidden transition-all duration-700 delay-1200 ease-out hover:scale-110 z-20 border-2 border-white hover:border-[#E70D57] ${
-				isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-			}`}>
-				<img src="/icon.png" alt="Help" className="w-full h-full object-cover" />
-			</button>
+			{/* Floating mail button */}
+			<a 
+				href="mailto:support@cudliy.com"
+				className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl transition-all duration-700 delay-1200 ease-out hover:scale-110 z-20 bg-[#313131] hover:bg-[#414141] flex items-center justify-center ${
+					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+				}`}
+			>
+				<svg 
+					className="w-7 h-7 sm:w-8 sm:h-8 text-white" 
+					fill="none" 
+					stroke="currentColor" 
+					viewBox="0 0 24 24"
+				>
+					<path 
+						strokeLinecap="round" 
+						strokeLinejoin="round" 
+						strokeWidth={2} 
+						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
+					/>
+				</svg>
+			</a>
 
 			{/* Intro Popup for New Users */}
 			{showIntroPopup && (

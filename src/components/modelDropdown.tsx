@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface ModelDropdownProps {
   selectedQuality: string;
@@ -8,13 +9,32 @@ export interface ModelDropdownProps {
 
 export default function ModelDropdown({ selectedQuality, onQualityChange, use3DIcon = false }: ModelDropdownProps): React.ReactElement {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Calculate dropdown position when opened - position ABOVE the button
+  useEffect(() => {
+    if (open && buttonRef.current && dropdownRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const dropdownHeight = 240; // Approximate height of dropdown
+      setPosition({
+        top: rect.top - dropdownHeight - 8, // Position above button with 8px gap
+        left: rect.right - 220 // 220px is dropdown width, align right edge
+      });
+    }
+  }, [open]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current && 
+        !containerRef.current.contains(event.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -87,6 +107,7 @@ export default function ModelDropdown({ selectedQuality, onQualityChange, use3DI
       <div className='relative text-left model-dropdown-container' style={{ zIndex: 999999 }} ref={containerRef}>
         {/* 3D Box Icon Button */}
         <button 
+          ref={buttonRef}
           className="flex items-center justify-center bg-transparent hover:opacity-80 border-none text-gray-300 hover:text-white p-0 transition-all duration-200" 
           onClick={(e) => {
             e.stopPropagation();
@@ -109,27 +130,25 @@ export default function ModelDropdown({ selectedQuality, onQualityChange, use3DI
           )}
         </button>
         
-        {/* Professional Elegant Dropdown Menu */}
-        {open && (
+        {/* Professional Elegant Dropdown Menu - Using Portal */}
+        {open && createPortal(
           <div
-            className="fixed inset-0 z-[99999]"
-            onClick={() => setOpen(false)}
+            className="dropdown-animate model-dropdown-menu"
+            style={{ 
+              position: 'fixed',
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+              width: '220px',
+              backgroundColor: '#313131',
+              borderRadius: '12px',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+              zIndex: 999999999,
+              overflow: 'hidden',
+              pointerEvents: 'auto'
+            }}
+            ref={dropdownRef}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="absolute dropdown-animate model-dropdown-menu"
-              style={{ 
-                right: '0px',
-                top: '60px',
-                width: '220px',
-                backgroundColor: '#2A2A2A',
-                borderRadius: '12px',
-                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-                zIndex: 99999,
-                overflow: 'hidden'
-              }}
-              ref={dropdownRef}
-              onClick={(e) => e.stopPropagation()}
-            >
               {/* Header */}
               <div className="px-4 py-3 border-b border-white/10">
                 <h3 className="text-xs font-semibold text-white/90 uppercase tracking-wider">Model Quality</h3>
@@ -143,7 +162,7 @@ export default function ModelDropdown({ selectedQuality, onQualityChange, use3DI
                     onClick={() => handleOptionClick(option.value)}
                     className="px-4 py-3 cursor-pointer transition-all duration-200 group"
                     style={{
-                      backgroundColor: selectedQuality === option.value ? 'rgba(231, 13, 87, 0.15)' : 'transparent'
+                      backgroundColor: selectedQuality === option.value ? '#FFFFFF' : 'transparent'
                     }}
                     onMouseEnter={(e) => {
                       if (selectedQuality !== option.value) {
@@ -159,17 +178,19 @@ export default function ModelDropdown({ selectedQuality, onQualityChange, use3DI
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className={`text-sm font-medium mb-0.5 ${
-                          selectedQuality === option.value ? 'text-[#E70D57]' : 'text-white'
+                          selectedQuality === option.value ? 'text-[#313131]' : 'text-white'
                         }`}>
                           {option.label}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className={`text-xs ${
+                          selectedQuality === option.value ? 'text-gray-600' : 'text-gray-400'
+                        }`}>
                           {option.description}
                         </div>
                       </div>
                       {selectedQuality === option.value && (
                         <div className="ml-3">
-                          <svg className="w-5 h-5 text-[#E70D57]" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-5 h-5 text-[#313131]" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
                         </div>
@@ -186,8 +207,8 @@ export default function ModelDropdown({ selectedQuality, onQualityChange, use3DI
                   <span className="text-white font-medium capitalize">{selectedQuality}</span>
                 </div>
               </div>
-            </div>
-          </div>
+            </div>,
+          document.body
         )}
       </div>
     </>

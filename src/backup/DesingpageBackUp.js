@@ -12,13 +12,25 @@ import SEO from "@/components/SEO";
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import ImageGenerationWorkflow from "../components/ImageGenerationWorkflow";
+import { toast } from '@/lib/sonner';
+import MobileOptimizedImageWorkflow from "../components/MobileOptimizedImageWorkflow";
+import ChatStyleMobileWorkflow from "../components/ChatStyleMobileWorkflow";
 
 export default function DesignPage() {
 	const modalVideoRef = useRef<HTMLVideoElement>(null);
 	const [isModalPlaying, setIsModalPlaying] = useState(false);
 	const [showTourModal, setShowTourModal] = useState(false);
 	const [isLoaded, setIsLoaded] = useState(false);
+	const [showIntroPopup, setShowIntroPopup] = useState(false);
+
+	// Check if intro should be shown (for new signups)
+	useEffect(() => {
+		const shouldShowIntro = sessionStorage.getItem('show_intro');
+		if (shouldShowIntro === 'true') {
+			setShowIntroPopup(true);
+			sessionStorage.removeItem('show_intro');
+		}
+	}, []);
 	const [isAdvanced, setIsAdvanced] = useState(false);
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [selectedSize, setSelectedSize] = useState('M');
@@ -33,6 +45,7 @@ export default function DesignPage() {
 	const [showWorkflow, setShowWorkflow] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [completedDesignId, setCompletedDesignId] = useState<string | null>(null);
+	const [isMobile, setIsMobile] = useState(false);
 
 	// Strategic Properties Aggregation System
 	const {
@@ -71,6 +84,27 @@ export default function DesignPage() {
 	useEffect(() => {
 		const timer = setTimeout(() => setIsLoaded(true), 100);
 		return () => clearTimeout(timer);
+	}, []);
+
+	// Detect mobile viewport and devices (including iPads)
+	useEffect(() => {
+		const checkMobile = () => {
+			const width = window.innerWidth;
+			const userAgent = navigator.userAgent.toLowerCase();
+			const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+			
+			// Check for mobile devices, tablets (including iPads)
+			const isMobileDevice = /iphone|ipod|android|blackberry|windows phone/i.test(userAgent);
+			const isTablet = /ipad|android(?!.*mobile)|tablet/i.test(userAgent) || 
+							 (isTouchDevice && width >= 768 && width <= 1024);
+			
+			// Consider both mobile phones and tablets (including iPads) as "mobile"
+			setIsMobile(width < 768 || isMobileDevice || isTablet);
+		};
+		
+		checkMobile();
+		window.addEventListener('resize', checkMobile);
+		return () => window.removeEventListener('resize', checkMobile);
 	}, []);
 
 	// Debug: Track showWorkflow changes
@@ -413,7 +447,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -472,7 +506,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -531,7 +565,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -590,7 +624,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -648,7 +682,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -708,7 +742,7 @@ const handleBackToCategories = () => {
 						className={`px-6 py-3  w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-[#575757] hover:bg-[#676767] text-white shadow-lg'
+								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -739,9 +773,9 @@ const handleBackToCategories = () => {
 		};
 
 		return (
-			<div className="flex flex-col items-center text-center">
+			<div className="flex flex-col items-center justify-center text-center w-full h-full">
 				{/* Category Icons Grid */}
-				<div className={`mt-6 grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[300px] transition-all duration-700 delay-300 ease-out ${
+				<div className={`grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[320px] mx-auto transition-all duration-700 delay-300 ease-out ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 				}`}>
 					{Object.entries(sections).map(([key, section], index) => {
@@ -774,7 +808,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Create Button with Back */}
-				<div className="mt-2 flex items-center justify-center gap-3">
+				<div className="mt-8 flex items-center justify-center gap-3">
 					<button 
 						onClick={handleBackToCategories}
 						className="w-10 h-10 rounded-full border border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
@@ -799,6 +833,52 @@ const handleBackToCategories = () => {
 		);
 	};
 	
+	// Mobile Chat View
+	if (isMobile) {
+		return (
+			<>
+				<SEO 
+					title="Design Playground - Create Your Toy"
+					description="Use our AI-powered playground to design custom 3D toys. Choose colors, materials, styles and bring your imagination to life with advanced or basic mode."
+					keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
+					url="/design"
+				/>
+				<div className="w-screen h-screen bg-white flex flex-col fixed inset-0 overflow-hidden">
+					{/* Mobile Header - Clean with Inter font */}
+					<div className="bg-white text-[#212121] px-4 py-3 flex items-center gap-2">
+						<button
+							onClick={() => window.location.href = '/dashboard'}
+							className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+						>
+							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+							</svg>
+						</button>
+						<h1 className="text-lg font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
+					</div>
+
+					{/* Chat Interface */}
+					<div className="flex-1 overflow-hidden">
+						<ChatStyleMobileWorkflow onError={setError} />
+					</div>
+
+					{/* Error Toast */}
+					{error && (
+						<div className="absolute bottom-4 left-4 right-4 bg-red-500 text-white px-4 py-3 rounded-xl shadow-lg flex items-center justify-between">
+							<span className="text-sm">{error}</span>
+							<button onClick={() => setError(null)} className="ml-2">
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</button>
+						</div>
+					)}
+				</div>
+			</>
+		);
+	}
+
+	// Desktop View
 	return (
 		<>
 			<SEO 
@@ -809,12 +889,15 @@ const handleBackToCategories = () => {
 			/>
 			<div className="w-screen h-screen bg-white flex justify-center p-0 fixed inset-0 overflow-hidden">
 			{/* Left Sidebar */}
-			<aside className={`left-pane-scale h-screen mt-1 sm:mt-1 lg:mt-1 mb-2 sm:mb-4 lg:mb-2 bg-[#313131] border border-white/5 ml-1 sm:ml-1 lg:ml-1 ${
+			<aside className={`left-pane-scale bg-[#313131] border border-white/5 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
 			} transition-all duration-500 relative flex-shrink-0 overflow-hidden`}
 			style={{
-				width: 'clamp(300px, 24vw, 380px)',
-				borderRadius: 'clamp(24px, 3vw, 32px)',
+				width: 'clamp(400px, 476px, 476px)',
+				minWidth: '400px',
+				height: 'calc(100vh - 8px)',
+				borderRadius: 'clamp(16px, 2vw, 28px)',
+				margin: '4px 0 4px 4px'
 			}}>
 				{/* Workspace Dropdown */}
 			<div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
@@ -824,101 +907,186 @@ const handleBackToCategories = () => {
 
 				
 							{/* Brand and title area */}
-			<div className="left-pane-content pt-[5.5rem] sm:pt-[5.5rem] px-4 sm:px-6 lg:px-8 pb-2 text-white flex flex-col items-center text-center h-full overflow-hidden">
-					{/* Mode selector */}
-					<div className={`absolute top-[70px] left-1/2 -translate-x-1/2 flex items-center px-1 gap-2 w-[120px] h-[28px] rounded-[50px] bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-700 delay-200 ease-out shadow-lg ${
-						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
-						<button className="flex-1 h-[20px] rounded-full text-[10px] sm:text-[10px] lg:text-[11px] bg-gradient-to-r from-white to-gray-100 text-black transition-all duration-300 font-medium shadow-lg">
-							Chat
-						</button>
-					</div>
+			<div className="left-pane-content pt-[5.5rem] pb-2 text-white flex flex-col h-full overflow-hidden" style={{ 
+				scrollbarWidth: 'none', 
+				msOverflowStyle: 'none',
+				paddingLeft: 'clamp(20px, 2vw, 40px)',
+				paddingRight: 'clamp(20px, 2vw, 40px)'
+			}}>
 					
-					{/* Title */}
+					{/* Title - Make It Memorable */}
 					<h1
-						className={`font-abril mt-6 lg:mt-7 text-[40px] leading-[1] tracking-[1px] text-center font-extrabold max-w-full transition-all duration-700 delay-300 ease-out ${
+						className={`font-abril text-[37px] leading-[1.1] tracking-tight text-center font-normal w-full max-w-[420px] text-white transition-all duration-500 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-						}`}
+						} ${isAdvanced ? 'mt-6' : 'mt-32'}`}
+						style={{ fontFamily: 'CudliyTrademark, Abril Fatface, serif' }}
 					>
-						Playground
+						Make It Memorable
 					</h1>
-					<p className={`mt-0 sm:mt-1 lg:mt-2 opacity-80 text-[12px] sm:text-[13px] lg:text-[14px] transition-all duration-700 delay-400 ease-out ${
-						isLoaded ? 'opacity-80 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
-						You are a Vibe Designer now
-					</p>
 					
 					{/* Input Field with Icon Dropdown */}
-					<div className={`mt-3 w-full max-w-[320px] transition-all duration-700 delay-500 ease-out ${
+					<div className={`w-full max-w-[420px] transition-all duration-500 ease-out ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					}`}>
-						{/* Main Input Container */}
-						<div className="relative w-full rounded-[28px] bg-[#2a2a2a]">
-							<div className="relative px-4 py-4 min-h-[60px]">
-								{/* Input Field */}
-								<input
-									placeholder="Turn landscape into portrait"
-									value={prompt}
-									onChange={(e) => setPrompt(e.target.value)}
-									onKeyDown={(e) => {
-										console.log('Key pressed:', e.key);
-										if (e.key === 'Enter' && !e.shiftKey) {
-											console.log('Enter key detected, calling handleCreateClick');
-											e.preventDefault();
-											handleCreateClick();
-										}
-									}}
-									className="w-full bg-transparent text-white text-[15px] outline-none placeholder:text-gray-500 pr-16 pb-6"
-									style={{ caretColor: '#E70D57' }}
-								/>
-								
-								{/* Bottom Right Icons */}
-								<div className="absolute bottom-3 right-3 flex items-center gap-2">
-									{/* Settings Icon as Dropdown */}
+					} ${isAdvanced ? 'mt-3' : 'mt-4'}`}>
+						{/* Main Input Container - Dark Style */}
+						<div className="relative w-full bg-[#515151]" style={{ height: '100px', borderRadius: '25px' }}>
+							{/* Input Field - Top portion */}
+							<input
+								placeholder="Ask Cudliy"
+								value={prompt}
+								onChange={(e) => setPrompt(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter' && !e.shiftKey) {
+										e.preventDefault();
+										handleCreateClick();
+									}
+								}}
+								className="w-full pt-3 pb-10 pl-6 pr-20 bg-transparent text-white placeholder-gray-400 border-none focus:outline-none text-sm"
+								style={{ borderRadius: '25px' }}
+							/>
+							
+							{/* Up arrow button - white when empty, #313131 when typing */}
+							<button
+								onClick={handleCreateClick}
+								disabled={!prompt.trim() || !canGenerateImages}
+								className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+									!prompt.trim() || !canGenerateImages
+										? 'bg-white cursor-not-allowed'
+										: 'bg-[#313131] hover:bg-gray-800'
+								}`}
+							>
+								<svg className={`w-5 h-5 transition-colors ${
+									!prompt.trim() || !canGenerateImages
+										? 'text-gray-400'
+										: 'text-white'
+								}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+								</svg>
+							</button>
+
+							{/* Bottom row with icons - INSIDE the field */}
+							<div className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-4">
+								{/* Plus button - left */}
+								<button
+									type="button"
+									onClick={() => toast.info('Image upload coming soon!')}
+									className="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-white transition-colors"
+								>
+									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+										<path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+									</svg>
+								</button>
+
+								{/* Right side icons */}
+								<div className="flex items-center gap-1">
+									{/* Model selector with 3D box icon */}
 									<div className="relative" style={{ zIndex: 9999999 }}>
 										<ModelDropdown 
 											selectedQuality={selectedQuality}
 											onQualityChange={handleQualityChange}
+											use3DIcon={true}
 										/>
 									</div>
-									
-									{/* Submit Button */}
-									<button 
-										onClick={handleCreateClick}
-										disabled={!canGenerateImages}
-										className={`transition-all duration-300 ${
-											!canGenerateImages
-												? 'text-gray-600 cursor-not-allowed'
-												: 'text-gray-400 hover:text-white'
+
+									{/* Advanced settings icon */}
+									<button
+										type="button"
+										onClick={handleAdvancedClick}
+										className={`w-7 h-7 flex items-center justify-center transition-all ${
+											isAdvanced || hasProperties()
+												? 'text-white'
+												: 'text-gray-300'
 										}`}
 									>
-										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+											<path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
 										</svg>
 									</button>
 								</div>
 							</div>
 						</div>
-						
-						{/* Advanced Toggle - Below Input */}
-						<div className={`mt-3 flex items-center gap-2 px-2 transition-all duration-700 delay-600 ease-out ${
+
+					</div>
+
+					{/* Example Prompts - Only show in basic mode */}
+					{!isAdvanced && (
+						<div className={`mt-6 w-full max-w-[420px] space-y-3 transition-all duration-700 delay-600 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}>
-							<button
-								onClick={handleAdvancedClick}
-								className={`relative inline-flex h-4 w-8 items-center rounded-full transition-all duration-300 focus:outline-none ${
-									isAdvanced ? 'bg-gradient-to-r from-[#E70D57] to-[#d10c50]' : 'bg-white/20 hover:bg-white/30'
-								}`}
-							>
-								<span
-									className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${
-										isAdvanced ? 'translate-x-4' : 'translate-x-0.5'
-									}`}
-								/>
-							</button>
-							<span className="text-white/70 text-[11px] sm:text-[12px] font-normal">Advanced</span>
+						<button
+							onClick={() => {
+								const promptText = "Birthday Gift for my Mom";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
+							}}
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
+						>
+							Birthday Gift for my Mom
+						</button>
+						<button
+							onClick={() => {
+								const promptText = "Gift for my partner";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
+							}}
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
+						>
+							Gift for my partner
+						</button>
+						<button
+							onClick={() => {
+								const promptText = "Graduation gift for my Daughter";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
+							}}
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
+						>
+							Graduation gift for my  Daughter
+						</button>
+						<button
+							onClick={() => {
+								const promptText = "My dog statue";
+								setPrompt(promptText);
+								setError(null);
+								setTimeout(() => setShowWorkflow(true), 100);
+							}}
+							className="w-full text-left text-white hover:text-white/80 transition-colors"
+							style={{
+								fontFamily: 'Manrope, sans-serif',
+								fontWeight: 400,
+								fontSize: '16px',
+								lineHeight: '22px',
+								letterSpacing: '0px'
+							}}
+						>
+							My dog statue
+						</button>
 						</div>
-					</div>
+					)}
 
 					{/* Usage Limits Banner */}
 					{usageLimits && (!canGenerateImages || !canGenerateModels) && (
@@ -963,7 +1131,7 @@ const handleBackToCategories = () => {
 					{/* Content based on mode */}
 					{isAdvanced ? (
 						/* Advanced Mode Content - Show 6 categories */
-						<div className={`mt-1 w-full max-w-[320px] flex-grow hover:text-[#FA7072] transition-all duration-700 delay-600 ease-out ${
+						<div className={`w-full flex-grow flex items-center justify-center hover:text-[#FA7072] transition-all duration-700 delay-600 ease-out ${
 							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
 						}`}>
 							{selectedCategory === 'color' ? (
@@ -992,24 +1160,19 @@ const handleBackToCategories = () => {
 			</aside>
 
 			{/* Main Content Area */}
-			<div className="flex-1 min-w-0 flex flex-col relative bg-white ml-0 lg:ml-0 xl:ml-0 border border-none overflow-hidden"
-				 style={{ borderRadius: 'clamp(24px, 3vw, 32px)' }}>
-				{/* Cancel Button - Only show during workflow */}
-				{showWorkflow && (
-					<div className="absolute top-4 right-4 z-20">
-						<button
-							onClick={handleReset}
-							className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
-						>
-							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-							</svg>
-						</button>
-					</div>
-				)}
+			<div className="flex-1 min-w-0 flex flex-col relative bg-white border-none"
+				 style={{ 
+					borderRadius: 'clamp(16px, 2vw, 28px)',
+					marginTop: '4px',
+					marginRight: '4px',
+					marginBottom: '4px',
+					marginLeft: '4px',
+					height: 'calc(100vh - 8px)'
+				 }}>
+
 				
-				{/* Content - Scrollable */}
-				<div className="flex-1 pl-0 pr-0 sm:pr-0 lg:pr-0 pb-2 sm:pb-2 lg:pb-4 overflow-y-hidden overflow-x-hidden">
+				{/* Content - No scroll */}
+				<div className="flex-1 pl-0 pr-0 sm:pr-0 lg:pr-0 pb-2 sm:pb-2 lg:pb-4 overflow-hidden flex items-center justify-center">
 					{showWorkflow ? (
 						<>
 						
@@ -1082,7 +1245,7 @@ const handleBackToCategories = () => {
 						
 						{/* Workflow Component - Replace the loading grid when active */}
 						{showWorkflow && (
-							<ImageGenerationWorkflow
+							<MobileOptimizedImageWorkflow
 								prompt={prompt}
 								enhancedPrompt={hasProperties() ? generateEnhancedPrompt(prompt) : undefined}
 								quality={selectedQuality as 'fast' | 'medium' | 'good'}
@@ -1158,7 +1321,9 @@ const handleBackToCategories = () => {
 						</div>
 					) : (
 						/* Default Grid Display */
-						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 py-0 lg:py-0 xl:py-0 ml-0 lg:ml-0 xl:ml-1">
+						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 ml-0 lg:ml-0 xl:ml-1" style={{
+							paddingTop: window.innerWidth >= 1420 ? '60px' : '0'
+						}}>
 							{/* Camera 1 - Top Left */}
 							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
@@ -1198,18 +1363,29 @@ const handleBackToCategories = () => {
 								</div>
 							</div>
 
-							{/* Empty space - Bottom Right - No hover effects */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							{/* Empty space - Bottom Right - With Cancel Button */}
+							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm relative ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
-								<div className="w-full h-full flex items-center justify-center p-6 text-center">
-									<div className="text-gray-400">
-										<svg className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+								{showWorkflow ? (
+									<button
+										onClick={handleReset}
+										className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+									>
+										<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
 										</svg>
-										<p className="text-sm lg:text-base">Generate your design</p>
+									</button>
+								) : (
+									<div className="w-full h-full flex items-center justify-center p-6 text-center">
+										<div className="text-gray-400">
+											<svg className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+											</svg>
+											<p className="text-sm lg:text-base">Generate your design</p>
+										</div>
 									</div>
-								</div>
+								)}
 							</div>
 						</div>
 					)}
@@ -1222,6 +1398,131 @@ const handleBackToCategories = () => {
 			}`}>
 				<img src="/icon.png" alt="Help" className="w-full h-full object-cover" />
 			</button>
+
+			{/* Intro Popup for New Users */}
+			{showIntroPopup && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					{/* Backdrop */}
+					<div 
+						className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-500 ease-out"
+						style={{
+							animation: showIntroPopup ? 'fadeIn 0.5s ease-out' : 'fadeOut 0.3s ease-in'
+						}}
+					></div>
+					
+					{/* Modal */}
+					<div 
+						className="relative bg-gradient-to-br from-white via-gray-50 to-white rounded-[32px] flex flex-col items-center gap-[30px] z-10 shadow-2xl border border-gray-200/50 transition-all duration-700 ease-out max-w-[90vw] md:max-w-[773px]"
+						style={{
+							width: '90vw',
+							maxWidth: '773px',
+							height: 'auto',
+							maxHeight: '90vh',
+							transform: showIntroPopup ? 'rotate(-0.03deg) scale(1)' : 'rotate(-0.03deg) scale(0.9)',
+							opacity: showIntroPopup ? 1 : 0,
+							paddingTop: '40px',
+							paddingRight: '20px',
+							paddingBottom: '40px',
+							paddingLeft: '20px',
+							animation: showIntroPopup ? 'modalSlideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'modalSlideOut 0.3s ease-in'
+						}}
+					>
+						{/* Close button */}
+						<button 
+							onClick={() => setShowIntroPopup(false)}
+							className="absolute top-6 right-6 w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-300 hover:scale-110 shadow-md border border-gray-200/50"
+						>
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+							</svg>
+						</button>
+
+						{/* Title */}
+						<h2 className="font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent text-2xl" style={{ fontFamily: 'Nohemi' }}>
+							Welcome to Cudliy! 👋
+						</h2>
+
+						{/* Subtitle */}
+						<p 
+							style={{ 
+								fontFamily: 'Manrope',
+								fontWeight: 500,
+								fontSize: '18px',
+								lineHeight: '140%',
+								letterSpacing: '-0.01em',
+								textAlign: 'center',
+								maxWidth: '100%',
+								color: '#666'
+							}}
+						>
+							Let's show you around. Become a designer in 5 minutes.
+						</p>
+
+						{/* Video container */}
+						<div 
+							className="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-300 overflow-hidden relative flex-shrink-0 shadow-lg cursor-pointer w-full"
+							style={{
+								maxWidth: '677px',
+								height: 'auto',
+								aspectRatio: '16/9',
+								transform: 'rotate(0.27deg)',
+								opacity: 1,
+								borderRadius: '11.13px',
+								borderWidth: '1.85px'
+							}}
+							onClick={() => {
+								if (modalVideoRef.current) {
+									if (isModalPlaying) {
+										modalVideoRef.current.pause();
+										setIsModalPlaying(false);
+									} else {
+										modalVideoRef.current.play();
+										setIsModalPlaying(true);
+									}
+								}
+							}}
+						>
+							<video 
+								ref={modalVideoRef}
+								src="/final 2.mp4" 
+								className="w-full h-full object-cover" 
+								loop 
+								muted 
+								playsInline 
+							/>
+							{!isModalPlaying && (
+								<button 
+									aria-label="Play intro video" 
+									className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-black/80 pointer-events-none"
+								>
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M8 5v14l11-7L8 5z" fill="#fff" />
+									</svg>
+								</button>
+							)}
+						</div>
+
+						{/* Buttons */}
+						<div className="flex gap-3">
+							<button 
+								onClick={() => setShowIntroPopup(false)}
+								className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium text-base transition-all duration-300 hover:scale-105 shadow-md px-6 py-3 rounded-full"
+							>
+								Skip
+							</button>
+							<button 
+								onClick={() => {
+									setShowIntroPopup(false);
+									setShowTourModal(true);
+								}}
+								className="bg-gradient-to-r from-[#E70D57] to-[#d10c50] text-white font-medium text-base transition-all duration-300 hover:scale-105 hover:shadow-lg px-6 py-3 rounded-full"
+							>
+								Watch Tour
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 
 			{/* Enhanced Tour Modal */}
 			{showTourModal && (

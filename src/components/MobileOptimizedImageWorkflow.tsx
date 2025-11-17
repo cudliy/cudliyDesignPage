@@ -32,21 +32,18 @@ export default function MobileOptimizedImageWorkflow({
   const [hasStarted, setHasStarted] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const generateImagesRef = useRef<(() => Promise<void>) | null>(null);
-  const isGeneratingRef = useRef(false); // Prevent double generation in StrictMode
-
-  // Debug: Track generatedImages changes
-  useEffect(() => {
-    console.log('🔄 generatedImages state changed:', generatedImages.length, generatedImages);
-  }, [generatedImages]);
+  const isGeneratingRef = useRef(false);
 
   const userId = sessionStorage.getItem('user_id') || '';
   const token = sessionStorage.getItem('token');
   
   useEffect(() => {
-    if (!userId || !token) {
+    const storedUserId = sessionStorage.getItem('user_id');
+    const storedToken = sessionStorage.getItem('token');
+    if (!storedUserId || !storedToken) {
       window.location.href = '/signin';
     }
-  }, [userId, token]);
+  }, []);
 
   const { canGenerateImages, canGenerateModels, checkLimits } = useUsageLimits(userId);
 
@@ -148,13 +145,11 @@ export default function MobileOptimizedImageWorkflow({
           console.log('✅ Setting generated images:', response.data.images);
           console.log('✅ Number of images:', response.data.images.length);
           
-          // Set images first
           setGeneratedImages(response.data.images);
           setSessionId(response.data.session_id);
           
           console.log('✅ Images state updated');
           
-          // Track usage after setting images (don't let this affect image display)
           try {
             await apiService.trackUsage(userId, 'image', response.data.images.length);
             await checkLimits(true);
@@ -184,23 +179,25 @@ export default function MobileOptimizedImageWorkflow({
     }
   }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
 
-  // Store the latest generateImages function in ref
   useEffect(() => {
     generateImagesRef.current = generateImages;
   }, [generateImages]);
 
-  // Trigger generation only once when component mounts with a prompt
+  useEffect(() => {
+    isGeneratingRef.current = false;
+    setHasStarted(false);
+  }, []);
+
   useEffect(() => {
     console.log('🔍 useEffect triggered - hasStarted:', hasStarted, 'prompt:', prompt, 'isGeneratingRef:', isGeneratingRef.current);
     
-    // Prevent double generation in React StrictMode
     if (!hasStarted && prompt.trim() && generateImagesRef.current && !isGeneratingRef.current) {
       console.log('▶️ Starting generation for the first time');
       isGeneratingRef.current = true;
       setHasStarted(true);
       generateImagesRef.current();
     }
-  }, [prompt, hasStarted]); // Removed generateImages from dependencies!
+  }, [prompt, hasStarted]);
 
   const selectImage = (index: number) => {
     console.log('🖱️ Image selected:', index);
@@ -267,37 +264,38 @@ export default function MobileOptimizedImageWorkflow({
     }
   };
 
-  // Loading State
   if ((isGenerating && generatedImages.length === 0) || isPrinting) {
     return (
-      <div className="text-center flex items-center justify-center py-8 min-h-[60vh] md:h-full">
+      <div className="text-center flex items-center justify-center py-8 min-h-[60vh] md:h-full bg-black">
         <div className="flex flex-col items-center">
           <img
             src="/GIFS/Loading-State.gif"
             alt="Generating Images"
             className="object-contain mb-8 w-32 h-32 md:w-48 md:h-48 lg:w-96 lg:h-96"
           />
-          <span className="text-black font-medium text-base md:text-lg lg:text-xl">
+          <span className="text-white font-medium text-base md:text-lg lg:text-xl">
             {isPrinting ? 'Creating 3D Model...' : 'Generating Images...'}
           </span>
         </div>
       </div>
     );
   }
+  
   if (generatedImages.length > 0) {
     console.log('🖼️ Rendering images. Total count:', generatedImages.length);
     console.log('🖼️ Images:', generatedImages);
     
     return (
-      <div className="w-full h-full flex items-center relative" style={{
+      <div className="w-full h-full flex items-center relative bg-black" style={{
         justifyContent: window.innerWidth >= 1470 ? 'flex-start' : 'center',
         paddingLeft: window.innerWidth >= 1470 ? '8px' : '8px',
-        paddingRight: '8px'
+        paddingRight: '8px',
+        paddingTop: '8px',
+        paddingBottom: '8px'
       }}>
-        <div className="grid grid-cols-2 gap-2" style={{ 
+        <div className="grid grid-cols-2 gap-2 auto-rows-fr" style={{ 
           width: window.innerWidth >= 1470 ? 'min(1300px, 95vw)' : 'min(1130px, 95vw)',
-          height: '100%',
-          gridTemplateRows: 'repeat(2, 1fr)'
+          maxHeight: '100%'
         }}>
           {generatedImages.slice(0, 3).map((image, index) => (
             <div
@@ -309,20 +307,19 @@ export default function MobileOptimizedImageWorkflow({
               style={{ 
                 transitionDelay: `${800 + index * 100}ms`,
                 borderRadius: '10px',
-                backgroundColor: '#FFFFFF',
-                border: '0.25px solid #E8E8E8'
+                backgroundColor: '#1a1a1a',
+                border: '0.25px solid #333333'
               }}
             >
               <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-[10px]">
                 <img 
                   src={image.url} 
                   alt={`Generated image ${index + 1}`} 
-                  className="w-full h-full object-contain relative z-10"
+                  className="w-full h-full object-cover relative z-10"
                   loading="eager"
                   style={{ imageRendering: '-webkit-optimize-contrast' as any }}
                 />
                 
-                {/* Hover Overlay - Full Coverage */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 rounded-[10px]" style={{
                   backgroundColor: 'rgba(23, 23, 23, 0.31)',
                   backdropFilter: 'blur(4px)'
@@ -330,6 +327,7 @@ export default function MobileOptimizedImageWorkflow({
                   <button 
                     onClick={async (e) => {
                       e.stopPropagation();
+                      setSelectedImageIndex(index);
                       setIsPrinting(true);
                       try {
                         await generate3DModel();
@@ -362,16 +360,8 @@ export default function MobileOptimizedImageWorkflow({
             </div>
           ))}
           
-          {/* Cancel Button - 4th Grid Item */}
           <div className="flex items-center justify-center">
-            <button
-              onClick={() => window.location.reload()}
-              className="w-16 h-16 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
-            >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            {/* Empty space */}
           </div>
         </div>
       </div>
