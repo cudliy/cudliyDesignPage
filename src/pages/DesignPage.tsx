@@ -57,7 +57,6 @@ export default function DesignPage() {
 		addDetails,
 		generateEnhancedPrompt,
 		getProperties,
-		resetProperties,
 		hasProperties
 	} = usePropertiesAggregator();
 
