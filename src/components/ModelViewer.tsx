@@ -130,6 +130,9 @@ export default function ModelViewer({
         modelViewer.setAttribute('ar', '');
         modelViewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
         
+        // CRITICAL: Enable CORS for texture loading from external sources
+        modelViewer.setAttribute('crossorigin', 'anonymous');
+        
         // Set styles
         modelViewer.style.width = '100%';
         modelViewer.style.height = '100%';
@@ -190,12 +193,27 @@ export default function ModelViewer({
   const updateControls = (modelViewer: any) => {
     if (!modelViewer) return;
 
-    // Ensure textures are always enabled
+    // Ensure textures are always enabled and properly loaded
     modelViewer.setAttribute('shadow-intensity', '1');
     modelViewer.setAttribute('shadow-softness', '0.5');
     modelViewer.setAttribute('tone-mapping', 'commerce');
-    modelViewer.setAttribute('material-variant', 'default');
-    modelViewer.setAttribute('variant', 'default');
+    
+    // Force texture loading by ensuring the model is fully rendered
+    if (modelViewer.model) {
+      const materials = modelViewer.model.materials;
+      if (materials) {
+        materials.forEach((material: any) => {
+          if (material.pbrMetallicRoughness) {
+            // Ensure base color texture is loaded
+            if (material.pbrMetallicRoughness.baseColorTexture) {
+              material.pbrMetallicRoughness.baseColorTexture.setTexture(
+                material.pbrMetallicRoughness.baseColorTexture.texture
+              );
+            }
+          }
+        });
+      }
+    }
 
     // Lighting (0-100) -> Controls exposure
     const lightingNormalized = lighting / 100;
@@ -315,6 +333,7 @@ export default function ModelViewer({
         'ios-src': modelUrl,
         ar: '',
         'ar-modes': 'webxr scene-viewer quick-look',
+        crossorigin: 'anonymous',
         style: {
           width: '100%',
           height: '100%',

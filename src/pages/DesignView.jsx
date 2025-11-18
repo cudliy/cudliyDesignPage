@@ -540,9 +540,9 @@ export default function DesignView() {
              }}>
         
         {/* Brand and title area */}
-        <div className="left-pane-content pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto">
+        <div className="left-pane-content pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full">
           {/* Control Sliders Section */}
-          <div className="mt-6 w-full max-w-[360px] flex-grow min-h-0">
+          <div className="mt-32 w-full max-w-[360px]">
             <div className="space-y-6">
               {/* Lighting Slider */}
               <div>
@@ -649,21 +649,21 @@ export default function DesignView() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="mt-auto pt-8 pb-6 flex gap-3 items-center justify-center">
-              <button 
-                onClick={() => navigate(-1)}
-                className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center bg-white/5 hover:bg-white/10 backdrop-blur-sm"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button className="flex-1 max-w-[200px] py-2.5 text-sm bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
-                Save to draft
-              </button>
-            </div>
+          {/* Action Buttons */}
+          <div className="w-full max-w-[360px] mt-12 pt-8 pb-6 flex gap-3 items-center justify-center">
+            <button 
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center bg-white/5 hover:bg-white/10 backdrop-blur-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button className="flex-1 max-w-[200px] py-2.5 text-sm bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
+              Save to draft
+            </button>
           </div>
         </div>
       </aside>
