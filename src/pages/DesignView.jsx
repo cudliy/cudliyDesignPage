@@ -651,7 +651,7 @@ export default function DesignView() {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-8 flex gap-3 items-center justify-center">
+            <div className="mt-auto pt-8 pb-6 flex gap-3 items-center justify-center">
               <button 
                 onClick={() => navigate(-1)}
                 className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center bg-white/5 hover:bg-white/10 backdrop-blur-sm"
