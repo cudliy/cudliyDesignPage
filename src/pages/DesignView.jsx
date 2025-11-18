@@ -20,7 +20,7 @@ export default function DesignView() {
   
   // Control states - matching the image positions
   const [lighting, setLighting] = useState(30);
-  const [background, setBackground] = useState(100);
+  const [background, setBackground] = useState(0);
   const [size, setSize] = useState(50);
   const [cameraAngle, setCameraAngle] = useState(50);
   
@@ -528,7 +528,7 @@ export default function DesignView() {
 
   // Desktop View
   return (
-    <div className="w-screen h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100from-slate-900via-slate-800to-slate-900 overflow-hidden flex p-4 gap-4 transition-colors duration-300">
+    <div className="w-screen h-screen bg-black overflow-hidden flex p-4 gap-4 transition-colors duration-300">
       {/* Left Pane */}
       <aside className="left-pane-scale flex-shrink-0 bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
              style={{
@@ -669,7 +669,7 @@ export default function DesignView() {
       </aside>
 
       {/* Center Panel - 3D Model */}
-      <div className="flex-1 bg-white flex flex-col overflow-hidden shadow-xl border border-gray-200/50">
+      <div className="flex-1 bg-[#1a1a1a] flex flex-col overflow-hidden shadow-xl border border-white/5">
         {/* 3D Model Area */}
         <div className="flex-1 flex items-center justify-center p-8 relative">
           {testModelUrl && !modelLoadError ? (
@@ -772,15 +772,15 @@ export default function DesignView() {
             <button 
               onClick={handleDownload}
               disabled={!getValidModelUrl()}
-              className="px-10 py-2 bg-gradient-to-r rounded-full from-black to-gray-800 text-white font-normal"
+              className="px-10 py-2 bg-white rounded-full text-black font-normal hover:bg-gray-100 transition-colors"
             >
               Download
             </button>
             <button 
               onClick={handleMakeOrder}
-              className="px-8 py-3 rounded-full font-normal transition-all duration-300 bg-[#212121] text-white hover:bg-[#2a2a2a] hover:scale-105"
+              className="px-8 py-3 rounded-full font-normal transition-all duration-300 bg-white text-black hover:bg-gray-100 hover:scale-105"
             >
-              Make
+              Make Order
             </button>
           </div>
         </div>

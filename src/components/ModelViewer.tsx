@@ -136,7 +136,7 @@ export default function ModelViewer({
         // Set styles
         modelViewer.style.width = '100%';
         modelViewer.style.height = '100%';
-        modelViewer.style.backgroundColor = 'transparent';
+        modelViewer.style.backgroundColor = '#1a1a1a'; // Dark background
         
         // Add event listeners
         modelViewer.addEventListener('load', () => {
@@ -337,7 +337,7 @@ export default function ModelViewer({
         style: {
           width: '100%',
           height: '100%',
-          backgroundColor: '#ffffff' // Start with white, will be controlled by background slider
+          backgroundColor: '#1a1a1a' // Start with dark, will be controlled by background slider
         },
         onLoad: handleLoad,
         onError: handleError
@@ -348,7 +348,7 @@ export default function ModelViewer({
         ref={modelViewerRef}
         className="w-full h-full"
         style={{ 
-          backgroundColor: '#ffffff',
+          backgroundColor: '#1a1a1a',
           display: loadingState === 'error' || !modelUrl || !isModelViewerAvailable ? 'block' : 'none'
         }}
       />

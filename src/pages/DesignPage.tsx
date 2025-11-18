@@ -897,7 +897,7 @@ const handleBackToCategories = () => {
 				width: 'clamp(400px, 476px, 476px)',
 				minWidth: '400px',
 				height: 'calc(100vh - 8px)',
-				borderRadius: 'clamp(16px, 2vw, 28px)',
+				borderRadius: '10px',
 				margin: '4px 0 4px 4px'
 			}}>
 				{/* Workspace Dropdown */}

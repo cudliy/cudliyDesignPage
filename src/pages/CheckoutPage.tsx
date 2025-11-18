@@ -461,26 +461,29 @@ export default function CheckoutPage() {
                 {/* Small */}
                 <button
                   onClick={() => setSelectedSize('S')}
-                  className={`w-40 h-28 rounded-full border transition-all text-left p-4 shadow-sm ${selectedSize==='S' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-24 border transition-all text-left p-4 shadow-sm ${selectedSize==='S' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  style={{ borderRadius: '10px' }}
                 >
-                  <div className="font-semibold mb-1">Small</div>
-                  <div className={`text-xs ${selectedSize==='S' ? 'text-gray-600' : 'text-gray-500'}`}>1–4 inch<br/>perfect for tiny<br/>gifts or keepsakes.</div>
+                  <div className="font-semibold mb-0.5">Small</div>
+                  <div className={`text-xs leading-tight ${selectedSize==='S' ? 'text-gray-600' : 'text-gray-500'}`}>1–4 inch<br/>perfect for tiny<br/>gifts or keepsakes.</div>
                 </button>
                 {/* Medium */}
                 <button
                   onClick={() => setSelectedSize('M')}
-                  className={`w-40 h-28 rounded-full border transition-all text-left p-4 shadow-sm ${selectedSize==='M' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-24 border transition-all text-left p-4 shadow-sm ${selectedSize==='M' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  style={{ borderRadius: '10px' }}
                 >
-                  <div className="font-semibold mb-1">Medium</div>
-                  <div className={`text-xs ${selectedSize==='M' ? 'text-gray-600' : 'text-gray-500'}`}>5–6 inch<br/>great for small<br/>vases or desk pieces.</div>
+                  <div className="font-semibold mb-0.5">Medium</div>
+                  <div className={`text-xs leading-tight ${selectedSize==='M' ? 'text-gray-600' : 'text-gray-500'}`}>5–6 inch<br/>great for small<br/>vases or desk pieces.</div>
                 </button>
                 {/* Large */}
                 <button
                   onClick={() => setSelectedSize('L')}
-                  className={`w-40 h-28 rounded-full border transition-all text-left p-4 shadow-sm ${selectedSize==='L' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  className={`w-40 h-24 border transition-all text-left p-4 shadow-sm ${selectedSize==='L' ? 'bg-gray-200 text-black border-gray-300 shadow-lg' : 'bg-white text-black border-gray-200 hover:border-gray-300 hover:shadow'}`}
+                  style={{ borderRadius: '10px' }}
                 >
-                  <div className="font-semibold mb-1">Large</div>
-                  <div className={`text-xs ${selectedSize==='L' ? 'text-gray-600' : 'text-gray-500'}`}>7–8 inch<br/>ideal for display<br/>or special gifts.</div>
+                  <div className="font-semibold mb-0.5">Large</div>
+                  <div className={`text-xs leading-tight ${selectedSize==='L' ? 'text-gray-600' : 'text-gray-500'}`}>7–8 inch<br/>ideal for display<br/>or special gifts.</div>
                 </button>
               </div>
               {/* Inch selector for Medium/Large */}
@@ -547,7 +550,7 @@ export default function CheckoutPage() {
               <button
                 onClick={handleProceedToPayment}
                 disabled={orderProcessing}
-                className={`w-full mt-6 font-semibold py-4 px-6 rounded-lg transition-all duration-200 ${
+                className={`w-full mt-6 font-semibold py-4 px-6 rounded-full transition-all duration-200 ${
                   orderProcessing
                     ? 'bg-[#000000] text-gray-500 cursor-not-allowed'
                     : 'bg-[#000000] hover:bg-[#000000] text-white shadow-md hover:shadow-lg'
@@ -560,8 +563,8 @@ export default function CheckoutPage() {
 
           {/* Right Side - Product preview */}
           <div className="lg:pl-8">
-            <div className="bg-white rounded-3xl overflow-auto w-full max-w-md border border-gray-200 shadow-xl p-4">
-              <div className="bg-[#f2f2f2] aspect-square rounded-2xl flex items-center justify-center">
+            <div className="bg-white overflow-auto w-full max-w-md border border-gray-200 shadow-xl p-4" style={{ borderRadius: '1px' }}>
+              <div className="bg-[#f2f2f2] aspect-square flex items-center justify-center" style={{ borderRadius: '1px' }}>
                 {previewImageUrl ? (
                   <img
                     src={previewImageUrl}
