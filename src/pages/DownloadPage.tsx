@@ -341,7 +341,7 @@ export default function DownloadPage() {
           <p className="text-gray-600 mb-4">{error || 'Design not found'}</p>
           <button 
             onClick={handleBack}
-            className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
+            className="px-6 py-2 bg-[#212121] hover:bg-[#313131] text-white font-medium rounded-full transition-colors"
           >
             Go Back
           </button>
@@ -370,7 +370,7 @@ export default function DownloadPage() {
     if (error) {
       return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-          <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+          <div className="bg-[#212121] text-white px-4 py-3 flex items-center justify-between">
             <button onClick={handleBack} className="p-2 hover:bg-white/20 rounded-lg">
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -388,7 +388,7 @@ export default function DownloadPage() {
               <p className="text-sm text-gray-600 mb-4">{error}</p>
               <button 
                 onClick={handleBack}
-                className="px-6 py-2 bg-pink-500 text-white rounded-full"
+                className="px-6 py-2 bg-[#212121] text-white rounded-full"
               >
                 Go Back
               </button>
@@ -401,7 +401,7 @@ export default function DownloadPage() {
     return (
       <div className="h-screen bg-white-900 flex flex-col overflow-hidden transition-colors duration-300">
         {/* Mobile Header */}
-        <div className="bg-white text-[#212121]text-slate-100 px-4 py-3 flex items-center justify-between shadow-sm transition-colors duration-300">
+        <div className="bg-white text-[#212121] px-4 py-3 flex items-center justify-between transition-colors duration-300">
           <div className="flex items-center gap-2">
             <button onClick={handleBack} className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5 text-[#212121]text-slate-100" />
@@ -460,14 +460,14 @@ export default function DownloadPage() {
           </div>
 
           {/* Format Selection */}
-          <div className="bg-white rounded-2xl p-4 shadow-md transition-colors duration-300">
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 transition-colors duration-300">
             <label className="block text-sm font-medium text-gray-700text-slate-300 mb-2">
               Choose Format
             </label>
             <select
               value={selectedFormat}
               onChange={(e) => handleFormatChange(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300-600 rounded-lg focus:ring-2 focus:ring-pink-500 bg-white text-[#212121]text-slate-100 transition-colors duration-300"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#212121] bg-white text-[#212121] transition-colors duration-300"
             >
               {availableFormats.map((format) => (
                 <option key={format} value={format}>{format}</option>
@@ -476,7 +476,7 @@ export default function DownloadPage() {
           </div>
 
           {/* Social Sharing */}
-          <div className="bg-white rounded-2xl p-4 shadow-md transition-colors duration-300">
+          <div className="bg-white rounded-2xl p-4 border border-gray-200 transition-colors duration-300">
             <h3 className="text-sm font-medium text-gray-800text-slate-200 mb-3">Share Your Design</h3>
             <div className="flex gap-3 justify-center">
               <button onClick={() => handleSocialShare('instagram')} className="w-12 h-12 bg-gray-100bg-slate-700 rounded-full flex items-center justify-center hover:bg-gray-200hover:bg-slate-600 transition-colors">
@@ -496,7 +496,7 @@ export default function DownloadPage() {
         </div>
 
         {/* Fixed Bottom Button */}
-        <div className="bg-white p-4 shadow-lg transition-colors duration-300">
+        <div className="bg-white p-4 border-t border-gray-200 transition-colors duration-300">
           <button
             onClick={handleDownload}
             disabled={downloading || !modelUrl || isProcessing}
@@ -548,7 +548,7 @@ export default function DownloadPage() {
         <div className="flex-1 flex flex-col items-center justify-center space-y-8">
           {/* Progress Indicator */}
           <div className="text-center">
-            <div className="text-8xl font-bold text-[#E70D57] mb-4">
+            <div className="text-8xl font-bold text-[#212121] mb-4">
               {Math.round(progress)}%
             </div>
             <p className="text-gray-600 text-lg mb-4">
@@ -559,7 +559,7 @@ export default function DownloadPage() {
             <div className="w-full max-w-sm mx-auto">
               <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                 <div 
-                  className="bg-[#E70D57] h-2 rounded-full transition-all duration-500 ease-out"
+                  className="bg-[#212121] h-2 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -574,7 +574,7 @@ export default function DownloadPage() {
             <select
               value={selectedFormat}
               onChange={(e) => handleFormatChange(e.target.value)}
-              className="w-full px-4 py-3 border-black rounded-full bg-white/10 focus:ring-2 focus:ring-[#E70D57] cursor-pointer"
+              className="w-full px-4 py-3 border-black rounded-full bg-white/10 focus:ring-2 focus:ring-[#212121] cursor-pointer"
             >
               {availableFormats.map((format) => (
                 <option key={format} value={format}>
@@ -588,7 +588,7 @@ export default function DownloadPage() {
           <button
             onClick={handleDownload}
             disabled={downloading || !modelUrl || isProcessing}
-            className="w-[233px] max-w-sm px-8 py-4 bg-[#E70D57] rounded-full hover:bg-[#d10c50] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-normal rounded-full transition-all duration-300 flex items-center justify-center gap-2"
+            className="w-[233px] max-w-sm px-8 py-4 bg-[#212121] rounded-full hover:bg-[#313131] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-normal transition-all duration-300 flex items-center justify-center gap-2"
           >
             {downloading ? (
               <>
@@ -686,28 +686,28 @@ export default function DownloadPage() {
                 onClick={() => handleSocialShare('instagram')}
                 className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors group"
               >
-                <Instagram className="w-5 h-5 text-gray-600 group-hover:text-[#E70D57]" />
+                <Instagram className="w-5 h-5 text-gray-600 group-hover:text-[#212121]" />
               </button>
               
               <button
                 onClick={() => handleSocialShare('linkedin')}
                 className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors group"
               >
-                <Linkedin className="w-5 h-5 text-gray-600 group-hover:text-[#E70D57]" />
+                <Linkedin className="w-5 h-5 text-gray-600 group-hover:text-[#212121]" />
               </button>
               
               <button
                 onClick={() => handleSocialShare('twitter')}
                 className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors group"
               >
-                <Twitter className="w-5 h-5 text-gray-600 group-hover:text-[#E70D57]" />
+                <Twitter className="w-5 h-5 text-gray-600 group-hover:text-[#212121]" />
               </button>
               
               <button
                 onClick={() => handleSocialShare('facebook')}
                 className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors group"
               >
-                <Facebook className="w-5 h-5 text-gray-600 group-hover:text-[#E70D57]" />
+                <Facebook className="w-5 h-5 text-gray-600 group-hover:text-[#212121]" />
               </button>
             </div>
           </div>

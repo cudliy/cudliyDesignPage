@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/api';
 import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
@@ -9,6 +9,7 @@ interface MobileOptimizedImageWorkflowProps {
   quality?: 'fast' | 'medium' | 'good';
   onComplete: (designId: string) => void;
   onError: (error: string) => void;
+  generationTrigger?: number; // Use a counter to trigger generation
 }
 
 interface GeneratedImage {
@@ -22,17 +23,16 @@ export default function MobileOptimizedImageWorkflow({
   enhancedPrompt, 
   quality = 'medium', 
   onComplete, 
-  onError 
+  onError,
+  generationTrigger = 0
 }: MobileOptimizedImageWorkflowProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
   const [creationId, setCreationId] = useState<string>('');
-  const [hasStarted, setHasStarted] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  const generateImagesRef = useRef<(() => Promise<void>) | null>(null);
-  const isGeneratingRef = useRef(false);
+  const [lastTriggerCount, setLastTriggerCount] = useState(0); // Track trigger count
 
   const userId = sessionStorage.getItem('user_id') || '';
   
@@ -104,11 +104,13 @@ export default function MobileOptimizedImageWorkflow({
 
     console.log('🚀 Starting image generation...');
     setIsGenerating(true);
-    setGeneratedImages([]);
+    setGeneratedImages([]); // Clear previous images
     setSelectedImageIndex(null);
+    setSessionId(''); // Clear previous session
+    setCreationId(''); // Clear previous creation ID
 
     try {
-      const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       setCreationId(newCreationId);
       
       const request: GenerateImagesRequest = {
@@ -118,7 +120,7 @@ export default function MobileOptimizedImageWorkflow({
           if (authed) return authed;
           const storedUserId = sessionStorage.getItem('guest_user_id');
           if (storedUserId) return storedUserId;
-          const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
           sessionStorage.setItem('guest_user_id', newUserId);
           return newUserId;
         })(),
@@ -178,25 +180,16 @@ export default function MobileOptimizedImageWorkflow({
     }
   }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
 
-  useEffect(() => {
-    generateImagesRef.current = generateImages;
-  }, [generateImages]);
+  // Removed useEffects that were causing unnecessary re-renders
 
+  // Generate when trigger count changes
   useEffect(() => {
-    isGeneratingRef.current = false;
-    setHasStarted(false);
-  }, []);
-
-  useEffect(() => {
-    console.log('🔍 useEffect triggered - hasStarted:', hasStarted, 'prompt:', prompt, 'isGeneratingRef:', isGeneratingRef.current);
-    
-    if (!hasStarted && prompt.trim() && generateImagesRef.current && !isGeneratingRef.current) {
-      console.log('▶️ Starting generation for the first time');
-      isGeneratingRef.current = true;
-      setHasStarted(true);
-      generateImagesRef.current();
+    if (generationTrigger > lastTriggerCount && prompt.trim() && !isGenerating) {
+      console.log('🚀 Manual generation triggered - count:', generationTrigger);
+      setLastTriggerCount(generationTrigger);
+      generateImages();
     }
-  }, [prompt, hasStarted]);
+  }, [generationTrigger, lastTriggerCount, prompt, isGenerating, generateImages]);
 
   const selectImage = (index: number) => {
     console.log('🖱️ Image selected:', index);
@@ -219,7 +212,7 @@ export default function MobileOptimizedImageWorkflow({
     try {
       const selectedImage = generatedImages[imageIndex];
       
-      const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       if (!sessionStorage.getItem('guest_user_id') && !sessionStorage.getItem('user_id')) {
         sessionStorage.setItem('guest_user_id', userId);
       }
@@ -265,7 +258,7 @@ export default function MobileOptimizedImageWorkflow({
 
   if ((isGenerating && generatedImages.length === 0) || isPrinting) {
     return (
-      <div className="text-center flex items-center justify-center py-8 min-h-[60vh] md:h-full bg-black">
+      <div className="text-center flex items-center justify-center py-8 min-h-[60vh] md:h-full bg-[#212121]">
         <div className="flex flex-col items-center">
           <img
             src="/GIFS/Loading-State.gif"
@@ -282,10 +275,11 @@ export default function MobileOptimizedImageWorkflow({
   
   if (generatedImages.length > 0) {
     console.log('🖼️ Rendering images. Total count:', generatedImages.length);
-    console.log('🖼️ Images:', generatedImages);
+    console.log('🖼️ Images to render:', generatedImages.slice(0, 3));
+    console.log('🖼️ All images:', generatedImages);
     
     return (
-      <div className="w-full h-full flex items-center relative bg-black" style={{
+      <div className="w-full h-full flex items-center relative bg-[#212121]" style={{
         justifyContent: window.innerWidth >= 1470 ? 'flex-start' : 'center',
         paddingLeft: window.innerWidth >= 1470 ? '8px' : '8px',
         paddingRight: '8px',
@@ -296,7 +290,7 @@ export default function MobileOptimizedImageWorkflow({
           width: window.innerWidth >= 1470 ? 'min(1300px, 95vw)' : 'min(1130px, 95vw)',
           maxHeight: '100%'
         }}>
-          {generatedImages.slice(0, 3).map((image, index) => (
+          {generatedImages.length > 0 && generatedImages.slice(0, 3).map((image, index) => (
             <div
               key={index}
               className={`flex items-center justify-center transition-all duration-700 ease-out overflow-hidden cursor-pointer group ${
@@ -336,7 +330,7 @@ export default function MobileOptimizedImageWorkflow({
                         setIsPrinting(false);
                       }
                     }}
-                    className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer"
+                    className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                     style={{
                       width: '162px',
                       height: '52px',

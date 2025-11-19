@@ -94,11 +94,19 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
   }
 
   async generateImageVariations(basePrompt, count = 3) {
-    const variations = [
+    // Ensure we always have exactly 3 variations for consistency
+    const baseVariations = [
       `${basePrompt}, front view, centered, professional lighting`,
       `${basePrompt}, three-quarter view, soft shadows, detailed texture`,
       `${basePrompt}, side profile, clean lines, minimal background`
     ];
+    
+    // If count is different from 3, adjust variations accordingly
+    const variations = count === 3 ? baseVariations : 
+      count < 3 ? baseVariations.slice(0, count) :
+      [...baseVariations, ...Array(count - 3).fill(0).map((_, i) => 
+        `${basePrompt}, angle ${i + 4}, artistic perspective, detailed rendering`
+      )];
 
     const generateSingleImage = async (prompt, index, retryCount = 0) => {
       const maxRetries = 2;

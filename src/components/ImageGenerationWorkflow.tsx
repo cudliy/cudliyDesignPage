@@ -111,7 +111,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
 
     try {
       // Generate a unique creation ID
-      const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       setCreationId(newCreationId);
       
       const request: GenerateImagesRequest = {
@@ -121,7 +121,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
           if (authed) return authed;
           const storedUserId = sessionStorage.getItem('guest_user_id');
           if (storedUserId) return storedUserId;
-          const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
           sessionStorage.setItem('guest_user_id', newUserId);
           return newUserId;
         })(),
@@ -176,13 +176,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
     }
   }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
 
-  // Auto-start generation when component mounts
-  useEffect(() => {
-    if (!hasStarted && prompt.trim()) {
-      setHasStarted(true);
-      generateImages();
-    }
-  }, [prompt, hasStarted, generateImages]);
+  // Manual generation only - no auto-generation
 
 
   const selectImage = (index: number) => {
@@ -208,7 +202,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
     try {
       const selectedImage = generatedImages[imageIndex];
       
-      const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id') || `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       if (!sessionStorage.getItem('guest_user_id') && !sessionStorage.getItem('user_id')) {
         sessionStorage.setItem('guest_user_id', userId);
       }
@@ -286,7 +280,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                 {generatedImages.slice(0, 3).map((image, index) => (
                   <div
                     key={index}
-                    className={`bg-[#f0f0f0] flex items-center justify-center transition-all duration-300 overflow-hidden rounded-xl md:rounded-2xl relative ${
+                    className={`bg-[#f0f0f0] flex items-center justify-center transition-all duration-300 overflow-hidden rounded-[10px] relative ${
                       index === 0 ? 'row-span-2 h-full min-h-[400px] md:min-h-[500px]' : 'h-full min-h-[195px] md:min-h-[245px]'
                     } ${
                       selectedImageIndex === index 
@@ -316,7 +310,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
                               setIsPrinting(false);
                             }
                           }}
-                          className="px-4 md:px-6 py-2 md:py-2.5 bg-white text-gray-800 rounded-full font-medium text-xs md:text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-10"
+                          className="px-4 md:px-6 py-2 md:py-2.5 bg-white text-gray-800 rounded-full font-medium text-xs md:text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                         >
                           View 360°
                         </button>

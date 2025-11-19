@@ -43,6 +43,7 @@ export default function DesignPage() {
 	const [selectedQuality, setSelectedQuality] = useState('medium');
 	const [prompt, setPrompt] = useState('');
 	const [showWorkflow, setShowWorkflow] = useState(false);
+	const [generationCounter, setGenerationCounter] = useState(0);
 	const [error, setError] = useState<string | null>(null);
 	const [completedDesignId, setCompletedDesignId] = useState<string | null>(null);
 	const [isMobile, setIsMobile] = useState(false);
@@ -213,18 +214,11 @@ const handleBackToCategories = () => {
 		console.log('🎯 Create button clicked - starting workflow');
 		setError(null);
 		
-		// Reset workflow to allow regeneration
-		if (showWorkflow) {
-			// If workflow is already showing, reset it to trigger new generation
-			setShowWorkflow(false);
-			setTimeout(() => {
-				setShowWorkflow(true);
-			}, 50);
-		} else {
-			setShowWorkflow(true);
-		}
+		// Increment generation counter to trigger new generation
+		setGenerationCounter(prev => prev + 1);
+		setShowWorkflow(true);
 		
-		console.log('✅ showWorkflow set to true');
+		console.log('✅ Generation triggered with counter:', generationCounter + 1);
 	};
 
 	const handleWorkflowComplete = (designId: string) => {
@@ -288,7 +282,7 @@ const handleBackToCategories = () => {
 			animate={{ opacity: 1, scale: 1, y: 0 }}
 			exit={{ opacity: 0, scale: 0.95, y: -10 }}
 			transition={{ duration: 0.2, ease: "easeOut" }}
-			className="absolute mt-3 w-48 left-0 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden"
+			className="absolute mt-3 w-48 left-0 bg-[#313131] rounded-lg shadow-lg border border-gray-600 z-50 overflow-hidden"
 		  >
 			<div className="py-1">
 			  <a 
@@ -791,7 +785,7 @@ const handleBackToCategories = () => {
 								onClick={() => handleCategoryClick(key)}
 							>
 								{isSelected && (
-									<div className="absolute -top-1 right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center">
+									<div className="absolute -top-1 right-1 w-3 h-3 bg-[#313131] rounded-full flex items-center justcenter">
 										<svg className="w-1.5 h-1.5 text-black" fill="currentColor" viewBox="0 0 20 20">
 											<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
 										</svg>
@@ -844,9 +838,9 @@ const handleBackToCategories = () => {
 					keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
 					url="/design"
 				/>
-				<div className="w-screen h-screen bg-white flex flex-col fixed inset-0 overflow-hidden">
+				<div className="w-screen h-screen bg-[#2c2c2c] flex flex-col fixed inset-0 overflow-hidden">
 					{/* Mobile Header - Clean with Inter font */}
-					<div className="bg-white text-[#212121] px-4 py-3 flex items-center gap-2">
+					<div className="bg-[#2c2c2c] text-white px-4 py-3 flex items-center gap-2">
 						<button
 							onClick={() => window.location.href = '/dashboard'}
 							className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -888,7 +882,7 @@ const handleBackToCategories = () => {
 				keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
 				url="/design"
 			/>
-			<div className="w-screen h-screen bg-black flex justify-center p-0 fixed inset-0 overflow-hidden">
+			<div className="w-screen h-screen bg-[#212121] flex justify-center p-0 fixed inset-0 overflow-hidden">
 			{/* Left Sidebar */}
 			<aside className={`left-pane-scale bg-[#313131] border border-white/5 ${
 				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
@@ -897,7 +891,7 @@ const handleBackToCategories = () => {
 				width: 'clamp(400px, 476px, 476px)',
 				minWidth: '400px',
 				height: 'calc(100vh - 8px)',
-				borderRadius: '10px',
+				borderRadius: '20px',
 				margin: '4px 0 4px 4px'
 			}}>
 				{/* Workspace Dropdown */}
@@ -970,13 +964,13 @@ const handleBackToCategories = () => {
 								className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
 									!prompt.trim() || !canGenerateImages
 										? 'bg-[#313131] cursor-not-allowed'
-										: 'bg-white hover:bg-gray-100'
+										: 'bg-[#313131] hover:bg-[#414141]'
 								}`}
 							>
 								<svg className={`w-5 h-5 transition-colors ${
 									!prompt.trim() || !canGenerateImages
 										? 'text-gray-400'
-										: 'text-[#313131]'
+										: 'text-white'
 								}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
 								</svg>
@@ -1178,7 +1172,7 @@ const handleBackToCategories = () => {
 			</aside>
 
 			{/* Main Content Area */}
-			<div className="flex-1 min-w-0 flex flex-col relative bg-black border-none"
+			<div className="flex-1 min-w-0 flex flex-col relative bg-[2C2C2C] border-none"
 				 style={{ 
 					borderRadius: 'clamp(16px, 2vw, 28px)',
 					marginTop: '4px',
@@ -1198,7 +1192,7 @@ const handleBackToCategories = () => {
 							{!showWorkflow && (
 								<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 w-full ml-0 lg:ml-0 xl:ml-0 min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 							{/* Camera 1 - Top Left - Show Loading GIF */}
-								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] ml-0 lg:ml-1 xl:ml-1 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-[#1a1a1a] rounded-[40px] ml-0 lg:ml-1 xl:ml-1 flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex ml-[-25px] lg:ml[-15px] xl:ml-0 flex-col items-center justify-center p-6 text-center relative">
@@ -1213,7 +1207,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 2 - Top Right - Show Loading GIF */}
-								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-[#1a1a1a] rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1228,7 +1222,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Camera 3 - Bottom Left - Show Loading GIF */}
-								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-[#1a1a1a] rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1243,7 +1237,7 @@ const handleBackToCategories = () => {
 							</div>
 
 							{/* Empty 4th Grid - Bottom Right - Clean loading state */}
-								<div className={`bg-[#1a1a1a] border border-gray-700/30 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
+								<div className={`bg-[#1a1a1a] rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1100ms' }}>
 								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative">
@@ -1256,119 +1250,54 @@ const handleBackToCategories = () => {
 						{/* Workflow Component - Replace the loading grid when active */}
 						{showWorkflow && (
 							<MobileOptimizedImageWorkflow
-								key={prompt}
 								prompt={prompt}
 								enhancedPrompt={hasProperties() ? generateEnhancedPrompt(prompt) : undefined}
 								quality={selectedQuality as 'fast' | 'medium' | 'good'}
 								onComplete={handleWorkflowComplete}
 								onError={handleWorkflowError}
+								generationTrigger={generationCounter}
 							/>
 						)}
 						</>
-					) : completedDesignId ? (
-						/* Success Display - Maintain Grid Layout */
-						<div className="grid grid-cols-2 gap-4 w-full min-h-[600px] py-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-							{/* Camera 1 - Top Left - Show Success Message */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '800ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
-									<div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-										<svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-										</svg>
-									</div>
-									<h3 className="text-lg font-semibold text-gray-800 mb-2">Success!</h3>
-									<p className="text-sm text-gray-600">Design created</p>
-								</div>
-							</div>
-
-							{/* Camera 2 - Top Right - Show Success Message */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '900ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
-									<div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-										<svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-										</svg>
-									</div>
-									<h3 className="text-lg font-semibold text-gray-800 mb-2">Success!</h3>
-									<p className="text-sm text-gray-600">Design created</p>
-								</div>
-							</div>
-
-							{/* Camera 3 - Bottom Left - Show Success Message */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '1000ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
-									<div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-										<svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-										</svg>
-									</div>
-									<h3 className="text-lg font-semibold text-gray-800 mb-2">Success!</h3>
-									<p className="text-sm text-gray-600">Design created</p>
-								</div>
-							</div>
-
-							{/* Generate 3D Model - Bottom Right - Keep Button in Same Position */}
-							<div className={`bg-white border border-gray-200/50 rounded-[40px] flex items-center justify-center h-[280px] min-h-[250px] transition-all duration-700 ease-out hover:scale-[1.02] hover:shadow-2xl hover:border-[#E70D57]/30 backdrop-blur-sm ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '1100ms' }}>
-								<div className="w-full h-full flex flex-col items-center justify-center p-6 text-center relative group">
-									<div className="absolute inset-0 bg-gradient-to-br from-[#E70D57]/5 to-[#F4900C]/5 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-									<button
-										onClick={handleViewDesign}
-										className={`px-8 py-3 font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl text-lg relative z-10 ${
-											'bg-gradient-to-r from-[#E70D57] to-[#F4900C] text-white'
-										}`}
-									>
-										View Design
-									</button>
-								</div>
-							</div>
-						</div>
 					) : (
 						/* Default Grid Display */
 						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 ml-0 lg:ml-0 xl:ml-1" style={{
 							paddingTop: window.innerWidth >= 1420 ? '60px' : '0'
 						}}>
 							{/* Camera 1 - Top Left */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '800ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
 									<img 
-										src="/camera1.png" 
-										alt="Toy camera design 1" 
+										src="/image1.png" 
+										alt="Toy design 1" 
 										className="max-w-full max-h-full object-contain rounded-[16px]" 
 									/>
 								</div>
 							</div>
 
 							{/* Camera 2 - Top Right */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+							<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '900ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
 									<img 
-										src="/camera2.png" 
-										alt="Toy camera design 2" 
+										src="/image2.png" 
+										alt="Toy design 2" 
 										className="max-w-full max-h-full object-contain rounded-[16px]" 
 									/>
 								</div>
 							</div>
 
 							{/* Camera 3 - Bottom Left */}
-							<div className={`bg-white border border-gray-200/30 rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
+							<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
 								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 							}`} style={{ transitionDelay: '1000ms' }}>
 								<div className="w-full h-full flex items-center justify-center p-0 relative">
 									<img 
-										src="/camera3.png" 
-										alt="Toy camera design 3" 
+										src="/image3.png" 
+										alt="Toy design 3" 
 										className="max-w-full max-h-full object-contain rounded-[16px]" 
 									/>
 								</div>
@@ -1378,26 +1307,18 @@ const handleBackToCategories = () => {
 				</div>
 			</div>
 			
-			{/* Floating mail button */}
+			{/* Floating live chat button */}
 			<a 
 				href="mailto:support@cudliy.com"
-				className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl transition-all duration-700 delay-1200 ease-out hover:scale-110 z-20 bg-[#313131] hover:bg-[#414141] flex items-center justify-center ${
+				className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl transition-all duration-700 delay-1200 ease-out hover:scale-110 z-20 bg-transparent flex items-center justify-center ${
 					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 				}`}
 			>
-				<svg 
-					className="w-7 h-7 sm:w-8 sm:h-8 text-white" 
-					fill="none" 
-					stroke="currentColor" 
-					viewBox="0 0 24 24"
-				>
-					<path 
-						strokeLinecap="round" 
-						strokeLinejoin="round" 
-						strokeWidth={2} 
-						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
-					/>
-				</svg>
+				<img 
+					src="/live-chat (1).png" 
+					alt="Live Chat Support" 
+					className="w-full h-full object-contain"
+				/>
 			</a>
 
 			{/* Intro Popup for New Users */}

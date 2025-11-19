@@ -351,7 +351,7 @@ export default function DesignView() {
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Design</h2>
           <p className="text-gray-600 mb-4">{error || 'Design not found'}</p>
           <button 
-            onClick={() => window.history.back()}
+            onClick={() => navigate('/dashboard')}
             className="px-6 py-2 bg-[#E70D57] hover:bg-[#d10c50] text-white font-medium rounded-full transition-colors"
           >
             Go Back
@@ -369,7 +369,7 @@ export default function DesignView() {
         <div className="bg-white px-4 py-3 flex items-center justify-between shadow-sm z-20 transition-colors duration-300">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/dashboard')}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -528,7 +528,7 @@ export default function DesignView() {
 
   // Desktop View
   return (
-    <div className="w-screen h-screen bg-black overflow-hidden flex p-4 gap-4 transition-colors duration-300">
+    <div className="w-screen h-screen bg-[#2c2c2c] overflow-hidden flex p-4 gap-4 transition-colors duration-300">
       {/* Left Pane */}
       <aside className="left-pane-scale flex-shrink-0 bg-[#313131] border border-white/5 relative overflow-hidden shadow-2xl"
              style={{
@@ -654,7 +654,7 @@ export default function DesignView() {
           {/* Action Buttons */}
           <div className="w-full max-w-[360px] mt-12 pt-8 pb-6 flex gap-3 items-center justify-center">
             <button 
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/dashboard')}
               className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center bg-white/5 hover:bg-white/10 backdrop-blur-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -669,7 +669,7 @@ export default function DesignView() {
       </aside>
 
       {/* Center Panel - 3D Model */}
-      <div className="flex-1 bg-[#1a1a1a] flex flex-col overflow-hidden shadow-xl border border-white/5">
+      <div className="flex-1 bg-[#1a1a1a] flex flex-col overflow-hidden shadow-xl border border-white/5 rounded-[10px]">
         {/* 3D Model Area */}
         <div className="flex-1 flex items-center justify-center p-8 relative">
           {testModelUrl && !modelLoadError ? (
