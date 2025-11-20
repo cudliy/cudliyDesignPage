@@ -45,7 +45,7 @@ export default function DesignPage() {
 	const [showWorkflow, setShowWorkflow] = useState(false);
 	const [generationCounter, setGenerationCounter] = useState(0);
 	const [error, setError] = useState<string | null>(null);
-	const [completedDesignId, setCompletedDesignId] = useState<string | null>(null);
+
 	const [isMobile, setIsMobile] = useState(false);
 
 	// Strategic Properties Aggregation System
@@ -221,8 +221,7 @@ const handleBackToCategories = () => {
 		console.log('✅ Generation triggered with counter:', generationCounter + 1);
 	};
 
-	const handleWorkflowComplete = (designId: string) => {
-		setCompletedDesignId(designId);
+	const handleWorkflowComplete = () => {
 		setShowWorkflow(false);
 	};
 

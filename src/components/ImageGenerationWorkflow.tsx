@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
-import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
+import type { Generate3DModelRequest } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
 
 interface ImageGenerationWorkflowProps {
@@ -17,12 +17,12 @@ interface GeneratedImage {
   index: number;
 }
 
-export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, quality = 'medium', onComplete, onError }: ImageGenerationWorkflowProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
+export default function ImageGenerationWorkflow({ quality = 'medium', onComplete, onError }: ImageGenerationWorkflowProps) {
+  const [isGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImageIndex, setIsSelectedImageIndex] = useState<number | null>(null);
-  const [sessionId, setSessionId] = useState<string>('');
-  const [creationId, setCreationId] = useState<string>('');
+  const [sessionId] = useState<string>('');
+  const [creationId] = useState<string>('');
   const [isPrinting, setIsPrinting] = useState(false);
 
     // Get user ID for usage limits (authenticated users only)
@@ -37,7 +37,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
     }, [userId, token]);
 
   const {
-    canGenerateImages,
     canGenerateModels,
     checkLimits
   } = useUsageLimits(userId);
@@ -88,92 +87,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
         };
     }
   };
-
-  const handleGenerateImages = useCallback(async () => {
-    // Strategic Enhancement: Use enhanced prompt if available, otherwise fallback to original
-    const finalPrompt = enhancedPrompt || prompt;
-    
-    if (!finalPrompt.trim()) {
-      onError('Please enter a prompt first');
-      return;
-    }
-
-    // Check usage limits before generating images
-    if (!canGenerateImages) {
-      onError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
-      return;
-    }
-
-    setIsGenerating(true);
-    setGeneratedImages([]);
-    setIsSelectedImageIndex(null);
-
-    try {
-      // Generate a unique creation ID
-      const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-      setCreationId(newCreationId);
-      
-      const request: GenerateImagesRequest = {
-        text: finalPrompt, // Strategic Enhancement: Send enhanced prompt to backend
-        user_id: (() => {
-          const authed = sessionStorage.getItem('user_id');
-          if (authed) return authed;
-          const storedUserId = sessionStorage.getItem('guest_user_id');
-          if (storedUserId) return storedUserId;
-          const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-          sessionStorage.setItem('guest_user_id', newUserId);
-          return newUserId;
-        })(),
-        creation_id: newCreationId,
-        color: '#FF6B6B',
-        size: 'M',
-        style: 'realistic',
-        material: 'plastic',
-        production: 'digital',
-        details: []
-      };
-
-      // Add timeout and progress tracking
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
-
-      try {
-        const response = await apiService.generateImages(request);
-        
-        if (response.success && response.data) {
-          setGeneratedImages(response.data.images);
-          setSessionId(response.data.session_id);
-          
-          // Track usage after successful generation (non-blocking for Studio users)
-          try {
-            await apiService.trackUsage(userId, 'image', response.data.images.length);
-            // Force refresh usage limits to get updated counts immediately
-            await checkLimits(true);
-          } catch (trackingError) {
-            // Don't fail the generation if tracking fails - Studio users have unlimited access
-            // Just refresh limits without tracking
-            try {
-              await checkLimits(true);
-            } catch (limitsError) {
-              // Limits check failed, but generation succeeded
-            }
-          }
-        } else {
-          throw new Error(response.error || 'Failed to generate images');
-        }
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        onError('Image generation timed out. Please try again with a simpler prompt.');
-      } else {
-        onError(error instanceof Error ? error.message : 'Failed to generate images');
-      }
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
 
   // Manual generation only - no auto-generation
 
