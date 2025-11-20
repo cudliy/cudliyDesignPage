@@ -23,7 +23,6 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
   const [selectedImageIndex, setIsSelectedImageIndex] = useState<number | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
   const [creationId, setCreationId] = useState<string>('');
-  const [hasStarted, setHasStarted] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
 
     // Get user ID for usage limits (authenticated users only)
@@ -90,7 +89,7 @@ export default function ImageGenerationWorkflow({ prompt, enhancedPrompt, qualit
     }
   };
 
-  const generateImages = useCallback(async () => {
+  const handleGenerateImages = useCallback(async () => {
     // Strategic Enhancement: Use enhanced prompt if available, otherwise fallback to original
     const finalPrompt = enhancedPrompt || prompt;
     

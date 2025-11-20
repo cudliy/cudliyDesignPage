@@ -226,11 +226,7 @@ const handleBackToCategories = () => {
 		setShowWorkflow(false);
 	};
 
-	const handleViewDesign = () => {
-		if (completedDesignId) {
-			window.location.href = `/design/${completedDesignId}`;
-		}
-	};
+
 
 	const handleWorkflowError = (errorMessage: string) => {
 		setError(errorMessage);
