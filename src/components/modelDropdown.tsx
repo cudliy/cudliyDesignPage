@@ -5,26 +5,37 @@ export interface ModelDropdownProps {
   selectedQuality: string;
   onQualityChange: (quality: string) => void;
   use3DIcon?: boolean;
+  renderDown?: boolean; // New prop to control dropdown direction
 }
 
-export default function ModelDropdown({ selectedQuality, onQualityChange, use3DIcon = false }: ModelDropdownProps): React.ReactElement {
+export default function ModelDropdown({ selectedQuality, onQualityChange, use3DIcon = false, renderDown = false }: ModelDropdownProps): React.ReactElement {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Calculate dropdown position when opened - position ABOVE the button
+  // Calculate dropdown position when opened - position based on renderDown prop
   useEffect(() => {
     if (open && buttonRef.current && dropdownRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const dropdownHeight = 240; // Approximate height of dropdown
-      setPosition({
-        top: rect.top - dropdownHeight - 8, // Position above button with 8px gap
-        left: rect.right - 220 // 220px is dropdown width, align right edge
-      });
+      
+      if (renderDown) {
+        // Position BELOW the button
+        setPosition({
+          top: rect.bottom + 8, // Position below button with 8px gap
+          left: rect.right - 220 // 220px is dropdown width, align right edge
+        });
+      } else {
+        // Position ABOVE the button (default)
+        setPosition({
+          top: rect.top - dropdownHeight - 8, // Position above button with 8px gap
+          left: rect.right - 220 // 220px is dropdown width, align right edge
+        });
+      }
     }
-  }, [open]);
+  }, [open, renderDown]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

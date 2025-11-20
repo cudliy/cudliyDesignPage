@@ -7,7 +7,7 @@ interface MobileOptimizedImageWorkflowProps {
   prompt: string;
   enhancedPrompt?: string;
   quality?: 'fast' | 'medium' | 'good';
-  onComplete: (designId: string) => void;
+  onComplete: (designId: string, designData?: any) => void;
   onError: (error: string) => void;
   generationTrigger?: number; // Use a counter to trigger generation
 }
@@ -246,8 +246,9 @@ export default function MobileOptimizedImageWorkflow({
             : img
         ));
         
-        window.location.href = `/design/${response.data.design_id}`;
-        onComplete(response.data.design_id);
+        // Don't navigate automatically, let parent handle it
+        // window.location.href = `/design/${response.data.design_id}`;
+        onComplete(response.data.design_id, response.data);
       } else {
         throw new Error(response.error || 'Failed to generate 3D model');
       }

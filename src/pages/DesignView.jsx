@@ -3,6 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Upload, Download, Loader2 } from 'lucide-react';
 import { testApiConnection } from '../utils/testApiConnection';
+import ModelDropdown from '../components/modelDropdown';
+import ColorPicker from '../components/ColorPicker';
+import SizeSelector from '../components/SizeSelector';
+import ProductionSelector from '../components/ProductionSelector';
+import StyleSelector from '../components/StyleSelector';
+import MaterialSelector from '../components/MaterialSelector';
+import DetailSelector from '../components/DetailSelector';
+import { DesignViewAdvancedSection } from '../components/DesignViewAdvancedSection';
 
 // Lazy load ModelViewer to improve initial load time
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
@@ -36,6 +44,68 @@ export default function DesignView() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // State for text field input
+  const [newPrompt, setNewPrompt] = useState('');
+  const [selectedQuality, setSelectedQuality] = useState('medium');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  
+  // Advanced section states
+  const [selectedSize, setSelectedSize] = useState('M');
+  const [customWidth, setCustomWidth] = useState('');
+  const [customHeight, setCustomHeight] = useState('');
+  const [selectedProduction, setSelectedProduction] = useState('');
+  const [selectedStyle, setSelectedStyle] = useState('');
+  const [selectedMaterial, setSelectedMaterial] = useState('');
+  const [selectedDetails, setSelectedDetails] = useState([]);
+
+  const handleQualityChange = (quality) => {
+    setSelectedQuality(quality);
+  };
+
+  const toggleAdvanced = () => {
+    setShowAdvanced(!showAdvanced);
+    setSelectedCategory(null); // Reset category when toggling
+  };
+
+  const handleCategoryClick = (categoryKey) => {
+    setSelectedCategory(categoryKey);
+  };
+
+  const handleBackToCategories = () => {
+    setSelectedCategory(null);
+  };
+
+  // Advanced section handlers
+  const handleColorChange = (color) => {
+    console.log('Color selected:', color);
+  };
+
+  const handleSizeChange = (size) => {
+    setSelectedSize(size);
+  };
+
+  const handleCustomSizeChange = (width, height) => {
+    setCustomWidth(width);
+    setCustomHeight(height);
+  };
+
+  const handleProductionChange = (production) => {
+    setSelectedProduction(production);
+  };
+
+  const handleStyleChange = (style) => {
+    setSelectedStyle(style);
+  };
+
+  const handleMaterialChange = (material) => {
+    setSelectedMaterial(material);
+  };
+
+  const handleDetailChange = (details) => {
+    setSelectedDetails(details);
+  };
 
   // Memoized helper function to get valid model URL - prioritize GLB files
   const getValidModelUrl = useCallback(() => {
@@ -289,12 +359,11 @@ export default function DesignView() {
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="w-full h-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
             <div className="text-center">
-              <img
-                src="/GIFS/Loading-State.gif"
-                alt="Loading 3D model"
-                className="w-64 h-64 object-contain mx-auto mb-4"
-              />
-              <p className="text-gray-600">Loading your 3D model...</p>
+              <div className="relative">
+                {/* Animated spinner */}
+                <div className="w-20 h-20 border-4 border-[#3a3a3a] border-t-[#E70D57] rounded-full animate-spin mx-auto mb-6"></div>
+              </div>
+              <p className="text-white/70 text-base">Loading your 3D model...</p>
             </div>
           </div>
         </div>
@@ -394,8 +463,11 @@ export default function DesignView() {
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={
-                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                  <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-64 h-64" />
+                <div className="w-full h-full bg-[#2C2C2C] flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-20 h-20 border-4 border-[#3a3a3a] border-t-[#E70D57] rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-white/70 text-sm">Loading model...</p>
+                  </div>
                 </div>
               }>
                 <ModelViewer
@@ -540,10 +612,101 @@ export default function DesignView() {
              }}>
         
         {/* Brand and title area */}
-        <div className="left-pane-content pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full">
-          {/* Control Sliders Section */}
-          <div className="mt-32 w-full max-w-[360px]">
-            <div className="space-y-6">
+        <div className="left-pane-content pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          
+          {/* Generate New Design Section - Exact copy from DesignPage */}
+          <div className="mt-12 w-full max-w-[360px] mb-4">
+            {/* Main Input Container - Dark Style - Exact copy from DesignPage */}
+            <div className="relative w-full bg-[#515151]" style={{ height: '100px', borderRadius: '25px' }}>
+              {/* Input Field - Top portion */}
+              <input
+                placeholder="Ask Cudliy"
+                value={newPrompt}
+                onChange={(e) => setNewPrompt(e.target.value)}
+                className="w-full pt-3 pb-10 pl-6 pr-20 bg-transparent text-white placeholder-gray-400 border-none focus:outline-none text-sm"
+                style={{ borderRadius: '25px' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey && newPrompt.trim()) {
+                    e.preventDefault();
+                    sessionStorage.setItem('new_design_prompt', newPrompt.trim());
+                    sessionStorage.setItem('from_design_view', 'true');
+                    window.location.href = '/design';
+                  }
+                }}
+              />
+              
+              {/* Up arrow button - changes to white background when typing */}
+              <button
+                onClick={() => {
+                  if (newPrompt.trim()) {
+                    sessionStorage.setItem('new_design_prompt', newPrompt.trim());
+                    sessionStorage.setItem('from_design_view', 'true');
+                    window.location.href = '/design';
+                  }
+                }}
+                disabled={!newPrompt.trim()}
+                className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  newPrompt.trim()
+                    ? 'bg-white hover:bg-gray-100'
+                    : 'bg-[#313131] cursor-not-allowed'
+                }`}
+              >
+                <svg className={`w-5 h-5 transition-colors ${
+                  newPrompt.trim()
+                    ? 'text-black'
+                    : 'text-gray-400'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+              </button>
+
+              {/* Bottom row with icons - INSIDE the field */}
+              <div className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-4">
+                {/* Plus button - left */}
+                <button
+                  type="button"
+                  className="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-white transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+
+                {/* Right side icons */}
+                <div className="flex items-center gap-1">
+                  {/* Model selector with 3D box icon */}
+                  <div className="relative" style={{ zIndex: 9999999 }}>
+                    <ModelDropdown 
+                      selectedQuality={selectedQuality}
+                      onQualityChange={handleQualityChange}
+                      use3DIcon={true}
+                      renderDown={true}
+                    />
+                  </div>
+
+                  {/* Advanced settings icon - toggles advanced section */}
+                  <button
+                    type="button"
+                    onClick={toggleAdvanced}
+                    className={`w-7 h-7 flex items-center justify-center transition-all ${
+                      showAdvanced ? 'text-white' : 'text-gray-300 hover:text-white'
+                    }`}
+                    title="Advanced settings"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Conditional Content - Control Sliders or Advanced Section */}
+          {!showAdvanced ? (
+            /* Control Sliders Section */
+            <div className="mt-8 w-full max-w-[360px]">
+              <div className="space-y-6">
               {/* Lighting Slider */}
               <div>
                 <div className="flex justify-between items-center mb-3">
@@ -648,8 +811,12 @@ export default function DesignView() {
                   ></div>
                 </div>
               </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Advanced Section with all 6 categories */
+            <DesignViewAdvancedSection onBack={toggleAdvanced} />
+          )}
 
           {/* Action Buttons */}
           <div className="w-full max-w-[360px] mt-12 pt-8 pb-6 flex gap-3 items-center justify-center">
@@ -788,6 +955,11 @@ export default function DesignView() {
 
 
       <style>{`
+        /* Hide scrollbar for left pane */
+        .left-pane-content::-webkit-scrollbar {
+          display: none;
+        }
+        
         .slider {
           background: transparent !important;
         }

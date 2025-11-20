@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/lib/sonner';
 import MobileOptimizedImageWorkflow from "../components/MobileOptimizedImageWorkflow";
 import ChatStyleMobileWorkflow from "../components/ChatStyleMobileWorkflow";
+import Simple3DViewer from "../components/Simple3DViewer";
+import DesignViewLeftPane from "../components/DesignViewLeftPane";
 
 export default function DesignPage() {
 	const modalVideoRef = useRef<HTMLVideoElement>(null);
@@ -29,6 +31,28 @@ export default function DesignPage() {
 		if (shouldShowIntro === 'true') {
 			setShowIntroPopup(true);
 			sessionStorage.removeItem('show_intro');
+		}
+
+		// Check if there's a new design prompt from DesignView
+		const newDesignPrompt = sessionStorage.getItem('new_design_prompt');
+		const fromDesignView = sessionStorage.getItem('from_design_view');
+		
+		if (newDesignPrompt) {
+			console.log('🎯 Found new design prompt from DesignView:', newDesignPrompt);
+			setPrompt(newDesignPrompt);
+			sessionStorage.removeItem('new_design_prompt');
+			
+			// Auto-trigger generation after a short delay
+			setTimeout(() => {
+				console.log('✅ Auto-triggering generation for new prompt');
+				setGenerationCounter(prev => prev + 1);
+				setShowWorkflow(true);
+			}, 500);
+		}
+		
+		// Store the flag for later use in completion handler
+		if (fromDesignView === 'true') {
+			console.log('📍 User came from DesignView - will auto-navigate to new design');
 		}
 	}, []);
 	const [isAdvanced, setIsAdvanced] = useState(false);
@@ -45,6 +69,14 @@ export default function DesignPage() {
 	const [showWorkflow, setShowWorkflow] = useState(false);
 	const [generationCounter, setGenerationCounter] = useState(0);
 	const [error, setError] = useState<string | null>(null);
+	const [show3DViewer, setShow3DViewer] = useState(false);
+	const [completedDesign, setCompletedDesign] = useState<any>(null);
+	
+	// 3D Viewer control states
+	const [lighting3D, setLighting3D] = useState(30);
+	const [background3D, setBackground3D] = useState(0);
+	const [size3D, setSize3D] = useState(50);
+	const [cameraAngle3D, setCameraAngle3D] = useState(50);
 
 	const [isMobile, setIsMobile] = useState(false);
 
@@ -221,8 +253,25 @@ const handleBackToCategories = () => {
 		console.log('✅ Generation triggered with counter:', generationCounter + 1);
 	};
 
-	const handleWorkflowComplete = () => {
+	const handleWorkflowComplete = (designId: string, designData?: any) => {
 		setShowWorkflow(false);
+		
+		// Check if user came from DesignView
+		const fromDesignView = sessionStorage.getItem('from_design_view');
+		
+		if (fromDesignView === 'true') {
+			// User came from DesignView - navigate to the new design view page
+			console.log('🎯 Auto-navigating to new design view:', designId);
+			sessionStorage.removeItem('from_design_view');
+			window.location.href = `/design/${designId}`;
+		} else if (designData && designData.modelFiles) {
+			// Normal flow: show the 3D viewer in the integrated view
+			setCompletedDesign(designData);
+			setShow3DViewer(true);
+		} else {
+			// Fallback: navigate to design view if no model data
+			window.location.href = `/design/${designId}`;
+		}
 	};
 
 
@@ -230,6 +279,41 @@ const handleBackToCategories = () => {
 	const handleWorkflowError = (errorMessage: string) => {
 		setError(errorMessage);
 		setShowWorkflow(false);
+	};
+
+	const handle3DViewerClose = () => {
+		setShow3DViewer(false);
+		setCompletedDesign(null);
+	};
+
+	const handle3DMakeOrder = (designId: string) => {
+		// Navigate to checkout with the design data
+		window.location.href = `/checkout/${designId}`;
+	};
+
+	const handle3DDownload = (designId: string) => {
+		// Navigate to download page with the design data
+		window.location.href = `/download/${designId}`;
+	};
+
+	const handleGenerateNewFromViewer = (newPrompt: string) => {
+		console.log('🎯 Generating new design from 3D viewer with prompt:', newPrompt);
+		
+		// Switch back to image generation mode
+		setShow3DViewer(false);
+		setCompletedDesign(null);
+		setShowWorkflow(false);
+		
+		// Update the prompt and trigger new generation
+		setPrompt(newPrompt);
+		setError(null);
+		
+		// Small delay to ensure state is updated before triggering workflow
+		setTimeout(() => {
+			console.log('✅ Triggering new generation workflow');
+			setGenerationCounter(prev => prev + 1);
+			setShowWorkflow(true);
+		}, 200);
 	};
 
 	const handleQualityChange = (quality: string) => {
@@ -389,9 +473,7 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center text-center w-full px-3">
 				{/* Breadcrumb Navigation */}
-				<div className={`mb-0 flex items-center gap-1 text-[10px] transition-all duration-700 delay-200 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="mb-0 flex items-center gap-1 text-[10px]">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -403,9 +485,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Size Selector */}
-				<div className={`mb-4 transition-all duration-700 delay-300 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="mb-4">
 					<SizeSelector
 						selectedSize={selectedSize}
 						onSizeChange={handleSizeChange}
@@ -451,9 +531,7 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className={`mb-0 flex items-center gap-1 text-[10px] transition-all duration-700 delay-200 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="mb-0 flex items-center gap-1 text-[10px]">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -465,9 +543,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Production Selector */}
-				<div className={`transition-all duration-700 delay-300 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div>
 					<ProductionSelector
 						selectedProduction={selectedProduction}
 						onProductionChange={handleProductionChange}
@@ -510,9 +586,7 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className={`mb-0 flex items-center gap-1 text-[10px] transition-all duration-700 delay-200 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="mb-0 flex items-center gap-1 text-[10px]">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -524,9 +598,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Style Selector */}
-				<div className={`transition-all duration-700 delay-300 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div>
 					<StyleSelector
 						selectedStyle={selectedStyle}
 						onStyleChange={handleStyleChange}
@@ -569,9 +641,7 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className={`mb-0 flex items-center gap-1 text-[10px] transition-all duration-700 delay-200 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="mb-0 flex items-center gap-1 text-[10px]">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -583,9 +653,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Material Selector */}
-				<div className={`transition-all duration-700 delay-300 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div>
 					<MaterialSelector
 						selectedMaterial={selectedMaterial}
 						onMaterialChange={handleMaterialChange}
@@ -627,9 +695,7 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className={`mb-0 flex items-center gap-1 text-[10px] transition-all duration-700 delay-200 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="mb-0 flex items-center gap-1 text-[10px]">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -641,9 +707,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Detail Selector */}
-				<div className={`transition-all duration-700 delay-300 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div>
 					<DetailSelector
 						selectedDetails={selectedDetails}
 						onDetailChange={handleDetailChange}
@@ -686,9 +750,7 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className={`mb-0 flex items-center gap-1 text-[10px] transition-all duration-700 delay-200 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="mb-0 flex items-center gap-1 text-[10px]">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -700,9 +762,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* iro.js Color Picker */}
-				<div className={`transition-all duration-700 delay-300 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div>
 					<div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', overflow: 'hidden' }}>
 						<ColorPicker
 						onColorChange={handleColorChange}
@@ -765,9 +825,7 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center justify-center text-center w-full h-full">
 				{/* Category Icons Grid */}
-				<div className={`grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[320px] mx-auto transition-all duration-700 delay-300 ease-out ${
-					isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-				}`}>
+				<div className="grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[320px] mx-auto">
 					{Object.entries(sections).map(([key, section], index) => {
 						const isSelected = categoryStatus[key as keyof typeof categoryStatus];
 						return (
@@ -878,17 +936,34 @@ const handleBackToCategories = () => {
 				url="/design"
 			/>
 			<div className="w-screen h-screen bg-[#212121] flex justify-center p-0 fixed inset-0 overflow-hidden">
-			{/* Left Sidebar */}
-			<aside className={`left-pane-scale bg-[#313131] border border-white/5 ${
-				isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
-			} transition-all duration-500 relative flex-shrink-0 overflow-hidden`}
-			style={{
-				width: 'clamp(400px, 476px, 476px)',
-				minWidth: '400px',
-				height: 'calc(100vh - 8px)',
-				borderRadius: '20px',
-				margin: '4px 0 4px 4px'
-			}}>
+			
+			{/* Conditional Left Sidebar */}
+			{show3DViewer && completedDesign ? (
+				/* DesignView Style Left Pane for 3D Controls */
+				<DesignViewLeftPane
+					lighting={lighting3D}
+					setLighting={setLighting3D}
+					background={background3D}
+					setBackground={setBackground3D}
+					size={size3D}
+					setSize={setSize3D}
+					cameraAngle={cameraAngle3D}
+					setCameraAngle={setCameraAngle3D}
+					onClose={handle3DViewerClose}
+					onGenerateNew={handleGenerateNewFromViewer}
+				/>
+			) : (
+				/* Original DesignPage Left Sidebar */
+				<aside className={`left-pane-scale bg-[#313131] border border-white/5 ${
+					isLoaded ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform -translate-x-8'
+				} transition-all duration-500 relative flex-shrink-0 overflow-hidden`}
+				style={{
+					width: 'clamp(400px, 476px, 476px)',
+					minWidth: '400px',
+					height: 'calc(100vh - 8px)',
+					borderRadius: '20px',
+					margin: '4px 0 4px 4px'
+				}}>
 				{/* Workspace Dropdown */}
 			<div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
 				<WorkspaceDropdown/>
@@ -959,13 +1034,13 @@ const handleBackToCategories = () => {
 								className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
 									!prompt.trim() || !canGenerateImages
 										? 'bg-[#313131] cursor-not-allowed'
-										: 'bg-[#313131] hover:bg-[#414141]'
+										: 'bg-white hover:bg-gray-100'
 								}`}
 							>
 								<svg className={`w-5 h-5 transition-colors ${
 									!prompt.trim() || !canGenerateImages
 										? 'text-gray-400'
-										: 'text-white'
+										: 'text-black'
 								}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
 								</svg>
@@ -1138,9 +1213,7 @@ const handleBackToCategories = () => {
 					{/* Content based on mode */}
 					{isAdvanced ? (
 						/* Advanced Mode Content - Show 6 categories */
-						<div className={`w-full flex-grow flex items-center justify-center hover:text-[#FA7072] transition-all duration-700 delay-600 ease-out ${
-							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-						}`}>
+						<div className="w-full flex-grow flex items-center justify-center">
 							{selectedCategory === 'color' ? (
 								renderColorPalette()
 							) : selectedCategory === 'size' ? (
@@ -1165,6 +1238,7 @@ const handleBackToCategories = () => {
 					)}
 				</div>
 			</aside>
+			)}
 
 			{/* Main Content Area */}
 			<div className="flex-1 min-w-0 flex flex-col relative bg-[2C2C2C] border-none"
@@ -1180,7 +1254,45 @@ const handleBackToCategories = () => {
 				
 				{/* Content - No scroll */}
 				<div className="flex-1 pl-0 pr-0 sm:pr-0 lg:pr-0 pb-2 sm:pb-2 lg:pb-4 overflow-hidden flex items-center justify-center">
-					{showWorkflow ? (
+					{show3DViewer && completedDesign ? (
+						/* 3D Viewer Mode - Center panel only */
+						<div className="flex-1 bg-[#1a1a1a] flex flex-col overflow-hidden shadow-xl border border-white/5 rounded-[10px]">
+							{/* 3D Model Area */}
+							<div className="flex-1 flex items-center justify-center p-8 relative">
+								<Simple3DViewer
+									design={completedDesign}
+									lighting={lighting3D}
+									background={background3D}
+									size={size3D}
+									cameraAngle={cameraAngle3D}
+								/>
+							</div>
+
+							{/* Bottom Section */}
+							<div className="p-6 space-y-4 flex-shrink-0">
+								{/* Interaction Hint */}
+								<div className="flex items-center justify-center gap-2 text-gray-600 mb-4">
+									<span className="text-sm">Click & hold to rotate</span>
+								</div>
+
+								{/* Action Buttons */}
+								<div className="flex justify-center gap-4">
+									<button 
+										onClick={() => handle3DDownload(completedDesign.id)}
+										className="px-10 py-2 bg-white rounded-full text-black font-normal hover:bg-gray-100 transition-colors"
+									>
+										Download
+									</button>
+									<button 
+										onClick={() => handle3DMakeOrder(completedDesign.id)}
+										className="px-8 py-3 rounded-full font-normal transition-all duration-300 bg-white text-black hover:bg-gray-100 hover:scale-105"
+									>
+										Make Order
+									</button>
+								</div>
+							</div>
+						</div>
+					) : showWorkflow ? (
 						<>
 						
 							{/* Workflow Display - Show Loading State in Grid (hidden when workflow is active) */}
