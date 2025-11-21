@@ -397,24 +397,24 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="bg-white rounded-xl p-3 border border-gray-200">
-            <h3 className="text-sm font-medium text-[#212121] mb-2">Order Summary</h3>
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <span className="text-[#212121] opacity-70">Subtotal</span>
-                <span className="font-medium text-[#212121]">{formatCurrency(uiSubtotal)}</span>
+          <div className="rounded-xl p-3 border border-gray-200 bg-gray-50">
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Order Summary</h3>
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700">Subtotal</span>
+                <span className="text-sm font-semibold text-gray-900">${uiSubtotal?.toFixed(2) || '0.00'}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[#212121] opacity-70">Tax</span>
-                <span className="font-medium text-[#212121]">{formatCurrency(uiTax)}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700">Tax</span>
+                <span className="text-sm font-semibold text-gray-900">${uiTax?.toFixed(2) || '0.00'}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[#212121] opacity-70">Shipping</span>
-                <span className="font-medium text-[#212121]">{formatCurrency(uiShipping)}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700">Shipping</span>
+                <span className="text-sm font-semibold text-gray-900">${uiShipping?.toFixed(2) || '0.00'}</span>
               </div>
-              <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between">
-                <span className="font-semibold text-[#212121]">Total</span>
-                <span className="font-bold text-lg text-[#212121]">{formatCurrency(uiTotal)}</span>
+              <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between items-center">
+                <span className="text-sm font-bold text-gray-900">Total</span>
+                <span className="text-xl font-bold text-gray-900">${uiTotal?.toFixed(2) || '0.00'}</span>
               </div>
             </div>
           </div>
@@ -523,26 +523,26 @@ export default function CheckoutPage() {
             {/* Order summary */}
             <div className="bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-6 w-full max-w-xl shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-gray-500">Selected</span>
-                <span className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-700">Size: {selectedSize === 'S' ? 'Small' : selectedSize === 'M' ? 'Medium' : 'Large'}</span>
+                <span className="text-sm text-gray-700">Selected</span>
+                <span className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-900 bg-gray-50">Size: {selectedSize === 'S' ? 'Small' : selectedSize === 'M' ? 'Medium' : 'Large'}</span>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Sub Total</span>
-                  <span className="font-medium">{formatCurrency(uiSubtotal)}</span>
+                  <span className="text-gray-700">Sub Total</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(uiSubtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">{formatCurrency(uiTax)}</span>
+                  <span className="text-gray-700">Tax</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(uiTax)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">{formatCurrency(uiShipping)}</span>
+                  <span className="text-gray-700">Shipping</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(uiShipping)}</span>
                 </div>
-                <div className="border-t pt-3">
+                <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total</span>
-                    <span className="text-lg font-bold">{formatCurrency(uiTotal)}</span>
+                    <span className="text-sm text-gray-700">Total</span>
+                    <span className="text-lg font-bold text-gray-900">{formatCurrency(uiTotal)}</span>
                   </div>
                 </div>
               </div>
