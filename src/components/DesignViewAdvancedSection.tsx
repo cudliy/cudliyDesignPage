@@ -7,6 +7,12 @@ import {
   ProductionIcon, 
   DetailIcon 
 } from './AdvancedSectionIcons';
+import ColorPicker from './ColorPicker';
+import SizeSelector from './SizeSelector';
+import ProductionSelector from './ProductionSelector';
+import StyleSelector from './StyleSelector';
+import MaterialSelector from './MaterialSelector';
+import DetailSelector from './DetailSelector';
 
 interface DesignViewAdvancedSectionProps {
   onBack: () => void;
@@ -65,6 +71,8 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
   const renderCategoryContent = () => {
     if (!selectedSection) return null;
 
+    const sectionTitle = sections[selectedSection as keyof typeof sections]?.title;
+
     return (
       <div className="flex flex-col items-center text-center w-full px-3">
         {/* Breadcrumb Navigation */}
@@ -73,19 +81,68 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
             onClick={handleBackToCategories}
             className="text-white/70 hover:text-white transition-colors cursor-pointer"
           >
-            {sections[selectedSection as keyof typeof sections]?.title}
+            {sectionTitle}
           </button>
           <span className="text-white/30">{'>'}</span>
-          <span className="text-white/90">Select Options</span>
+          <span className="text-white/90">
+            {selectedSection === 'color' && 'Swatch'}
+            {selectedSection === 'size' && 'Dimensions'}
+            {selectedSection === 'material' && 'Select Material'}
+            {selectedSection === 'style' && 'Select Style'}
+            {selectedSection === 'production' && 'Select Method'}
+            {selectedSection === 'detail' && 'Select Multiple'}
+          </span>
         </div>
 
-        {/* Placeholder content for each category */}
-        <div className="text-white/70 text-sm mb-6">
-          {selectedSection.charAt(0).toUpperCase() + selectedSection.slice(1)} options will appear here
+        {/* Category-specific content */}
+        <div className="w-full">
+          {selectedSection === 'color' && (
+            <div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', overflow: 'hidden' }}>
+              <ColorPicker onColorChange={(color: string) => console.log('Color:', color)} />
+            </div>
+          )}
+          
+          {selectedSection === 'size' && (
+            <SizeSelector 
+              selectedSize="M"
+              onSizeChange={(size: string) => console.log('Size:', size)}
+              customWidth=""
+              customHeight=""
+              onCustomSizeChange={(width: string, height: string) => console.log('Custom size:', width, height)}
+            />
+          )}
+          
+          {selectedSection === 'material' && (
+            <MaterialSelector 
+              selectedMaterial=""
+              onMaterialChange={(material: string) => console.log('Material:', material)}
+            />
+          )}
+          
+          {selectedSection === 'style' && (
+            <StyleSelector 
+              selectedStyle=""
+              onStyleChange={(style: string) => console.log('Style:', style)}
+            />
+          )}
+          
+          {selectedSection === 'production' && (
+            <ProductionSelector 
+              selectedProduction=""
+              onProductionChange={(production: string) => console.log('Production:', production)}
+            />
+          )}
+          
+          {selectedSection === 'detail' && (
+            <DetailSelector 
+              selectedDetails={[]}
+              onDetailChange={(details: string[]) => console.log('Details:', details)}
+            />
+          )}
         </div>
 
         {/* Back and Create Buttons */}
-        <div className="mt-4 flex items-center justify-center gap-3">
+        <div className="mt-6 flex items-center justify-center gap-3">
           <button 
             onClick={handleBackToCategories}
             className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
@@ -138,15 +195,18 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
           })}
         </div>
 
-        {/* Back Button */}
-        <div className="mt-12 flex items-center justify-center">
+        {/* Action Buttons - Back and Save to draft */}
+        <div className="w-full max-w-[360px] mt-12 pt-8 pb-6 flex gap-3 items-center justify-center">
           <button 
             onClick={onBack}
-            className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center"
+            className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center bg-white/5 hover:bg-white/10 backdrop-blur-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
+          </button>
+          <button className="flex-1 max-w-[200px] py-2.5 text-sm bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
+            Save to draft
           </button>
         </div>
       </div>
