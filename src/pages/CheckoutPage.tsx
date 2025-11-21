@@ -318,7 +318,7 @@ export default function CheckoutPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold">Cudliy</h1>
+            <h1 className="text-lg font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
           </div>
         </div>
 

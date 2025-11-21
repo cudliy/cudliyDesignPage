@@ -528,12 +528,12 @@ export default function DesignView() {
           </div>
 
           {/* Expandable Controls */}
-          <div id="mobile-controls" className="hidden px-4 pb-4 space-y-4 max-h-64 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div id="mobile-controls" className="hidden px-4 pb-4 space-y-4 max-h-64 overflow-y-auto bg-[#212121] rounded-lg" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {/* Lighting */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-medium text-gray-700">Lighting</span>
-                <span className="text-xs text-gray-500">{lighting}%</span>
+                <span className="text-xs font-medium text-white">Lighting</span>
+                <span className="text-xs text-white/70">{lighting}%</span>
               </div>
               <input
                 type="range"
@@ -541,15 +541,15 @@ export default function DesignView() {
                 max="100"
                 value={lighting}
                 onChange={(e) => setLighting(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+                className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer accent-pink-500"
               />
             </div>
 
             {/* Background */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-medium text-gray-700">Background</span>
-                <span className="text-xs text-gray-500">{background}%</span>
+                <span className="text-xs font-medium text-white">Background</span>
+                <span className="text-xs text-white/70">{background}%</span>
               </div>
               <input
                 type="range"
@@ -557,15 +557,15 @@ export default function DesignView() {
                 max="100"
                 value={background}
                 onChange={(e) => setBackground(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+                className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer accent-pink-500"
               />
             </div>
 
             {/* Size */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-medium text-gray-700">Size</span>
-                <span className="text-xs text-gray-500">{Math.round(size * 0.8)}</span>
+                <span className="text-xs font-medium text-white">Size</span>
+                <span className="text-xs text-white/70">{Math.round(size * 0.8)}</span>
               </div>
               <input
                 type="range"
@@ -573,15 +573,15 @@ export default function DesignView() {
                 max="100"
                 value={size}
                 onChange={(e) => setSize(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+                className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer accent-pink-500"
               />
             </div>
 
             {/* Camera Angle */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-medium text-gray-700">Camera Angle</span>
-                <span className="text-xs text-gray-500">{cameraAngle}°</span>
+                <span className="text-xs font-medium text-white">Camera Angle</span>
+                <span className="text-xs text-white/70">{cameraAngle}°</span>
               </div>
               <input
                 type="range"
@@ -589,7 +589,7 @@ export default function DesignView() {
                 max="100"
                 value={cameraAngle}
                 onChange={(e) => setCameraAngle(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-pink-500"
+                className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer accent-pink-500"
               />
             </div>
           </div>

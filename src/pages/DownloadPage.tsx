@@ -406,7 +406,7 @@ export default function DownloadPage() {
             <button onClick={handleBack} className="p-2 hover:bg-gray-100-700 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5 text-[#212121]text-slate-100" />
             </button>
-            <h1 className="text-lg font-semibold text-[#212121]text-slate-100">Cudliy</h1>
+            <h1 className="text-lg font-bold text-[#212121]" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
           </div>
         </div>
 
