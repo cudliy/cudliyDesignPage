@@ -328,10 +328,10 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-gray-50 relative overflow-hidden transition-colors duration-300">
+    <div className="flex flex-col h-full w-full bg-[#212121] relative overflow-hidden transition-colors duration-300">
       {/* Full-Screen Loading State for 3D Generation */}
       {isGenerating && (
-        <div className="absolute inset-0 bg-white z-50 flex items-center justify-center transition-colors duration-300">
+        <div className="absolute inset-0 bg-[#212121] z-50 flex items-center justify-center transition-colors duration-300">
           <div className="flex flex-col items-center justify-center px-8 w-full max-w-md -mt-32">
             {/* Centered GIF */}
             <div className="flex items-center justify-center mb-5">
@@ -350,17 +350,17 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             </div>
             
             {/* Text */}
-            <p className="text-xl font-medium text-gray-800">Generating 3D...</p>
+            <p className="text-xl font-medium text-white">Generating 3D...</p>
           </div>
         </div>
       )}
 
-      {/* Empty State Content - Just the title at top */}
+      {/* Empty State Content - Title closer to input */}
       {messages.length === 0 && (
-        <div className="absolute top-16 left-0 right-0 z-20 flex flex-col items-center text-center px-10 font-inter">
+        <div className="absolute bottom-[200px] left-0 right-0 z-20 flex flex-col items-center text-center px-10 font-inter">
           {/* Hero Title - CudliyTrademark custom font */}
           <h2 
-            className="text-gray-900 mb-6 text-center capitalize" 
+            className="text-white mb-6 text-center capitalize" 
             style={{ 
               fontFamily: 'CudliyTrademark, Abril Fatface, serif',
               fontWeight: 400,
@@ -386,15 +386,21 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             style={{ opacity: 1, visibility: 'visible' }}
           >
             <div
-              className={`max-w-[85%] relative px-4 py-3 ${
+              className={`max-w-[85%] relative ${
                 message.type === 'user'
-                  ? 'bg-white text-black rounded-[18px] shadow-sm border border-gray-200'
-                  : 'bg-gray-100 text-black rounded-[4px] shadow-none border border-gray-100'
+                  ? 'bg-white text-black rounded-[18px] shadow-sm border border-gray-200 px-4 py-3'
+                  : message.images && message.images.length > 0
+                    ? 'bg-transparent text-white p-0'
+                    : 'bg-white text-black rounded-[4px] shadow-none border border-gray-100 px-4 py-3'
               } transition-colors duration-300`}
               style={message.type === 'user' ? {
                 borderBottomRightRadius: '4px',
                 backgroundColor: '#ffffff !important',
                 color: '#000000 !important'
+              } : message.images && message.images.length > 0 ? {
+                backgroundColor: 'transparent !important',
+                border: 'none',
+                padding: 0
               } : {
                 borderBottomLeftRadius: '4px',
                 backgroundColor: '#ffffff !important',
@@ -428,28 +434,30 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               
               {!message.isGenerating && (
                 <>
-                  <p className="text-sm whitespace-pre-wrap text-black" style={{ color: '#000000 !important' }}>{message.content}</p>
+                  <p className={`text-sm whitespace-pre-wrap ${message.images && message.images.length > 0 ? 'text-white' : 'text-black'}`} style={{ color: message.images && message.images.length > 0 ? '#ffffff !important' : '#000000 !important' }}>{message.content}</p>
                   
                   {message.images && message.images.length > 0 && (
                     <div className="mt-3 grid grid-cols-1 gap-3">
                       {message.images.map((imageUrl, index) => (
                         <div
                           key={index}
-                          className="relative overflow-hidden cursor-pointer transition-all hover:opacity-90 rounded-lg"
+                          className="relative cursor-pointer transition-all hover:opacity-90"
                           onClick={() => {
                             if (message.sessionId && message.creationId) {
                               generate3DModel(imageUrl, message.sessionId, message.creationId);
                             }
                           }}
+                          style={{ backgroundColor: 'transparent', padding: 0, margin: 0, border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', overflow: 'hidden' }}
                         >
                           <img
                             src={imageUrl}
                             alt={`Generated ${index + 1}`}
-                            className="w-full h-auto rounded-lg"
+                            className="w-full h-auto"
+                            style={{ display: 'block', borderRadius: '10px' }}
                           />
 
                           {/* View 360° Button - Centered on Hover */}
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 bg-black/20">
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
                             <button className="px-6 py-2.5 bg-white text-gray-800 rounded-full font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">
                               View 360°
                             </button>
@@ -473,8 +481,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
           : 'fixed bottom-6'
       }`}>
         <form onSubmit={handleSubmit}>
-          {/* Main input field - 118px height, 32px border radius - no visible border */}
-          <div className="relative bg-[#E5E5EA]" style={{ height: '118px', borderRadius: '32px' }}>
+          {/* Main input field - 118px height, 32px border radius - matching DesignPage */}
+          <div className="relative bg-[#515151]" style={{ height: '118px', borderRadius: '32px' }}>
             {/* Text input area - top portion */}
             <input
               type="text"
@@ -487,25 +495,25 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 }
               }}
               placeholder="Ask Cudliy"
-              className="w-full pt-4 pb-12 pl-6 pr-20 bg-transparent text-gray-800 placeholder-gray-400 border-none focus:outline-none text-sm"
+              className="w-full pt-4 pb-12 pl-6 pr-20 bg-transparent text-white placeholder-gray-400 border-none focus:outline-none text-sm"
               style={{ borderRadius: '32px' }}
               disabled={isGenerating}
             />
             
-            {/* Up arrow button - white when empty, #313131 when typing */}
+            {/* Up arrow button - #313131 when empty, white when typing */}
             <button
               type="submit"
               disabled={!inputValue.trim() || isGenerating || !canGenerateImages}
               className={`absolute right-4 top-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                 !inputValue.trim() || isGenerating || !canGenerateImages
-                  ? 'bg-white cursor-not-allowed'
-                  : 'bg-[#313131] hover:bg-gray-800'
+                  ? 'bg-[#313131] cursor-not-allowed'
+                  : 'bg-white hover:bg-gray-100'
               }`}
             >
               <svg className={`w-5 h-5 transition-colors ${
                 !inputValue.trim() || isGenerating || !canGenerateImages
                   ? 'text-gray-400'
-                  : 'text-white'
+                  : 'text-black'
               }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
               </svg>
@@ -513,11 +521,11 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
 
             {/* Bottom row with icons - INSIDE the field - scaled down */}
             <div className="absolute bottom-4 left-0 right-0 flex items-center justify-between px-4">
-              {/* Plus button - left - dark - smaller - shows toast */}
+              {/* Plus button - left - white - smaller - shows toast */}
               <button
                 type="button"
                 onClick={() => toast.info('Image upload coming soon!')}
-                className="w-7 h-7 flex items-center justify-center text-gray-800 hover:text-black transition-colors"
+                className="w-7 h-7 flex items-center justify-center text-white hover:text-white/80 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -530,7 +538,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 <button
                   type="button"
                   onClick={() => setShowModelDropdown(!showModelDropdown)}
-                  className="w-7 h-7 flex items-center justify-center text-gray-800 hover:text-black transition-colors"
+                  className="w-7 h-7 flex items-center justify-center text-white hover:text-white/80 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-4.5-9 4.5 9 4.5 9-4.5z" />
@@ -539,14 +547,14 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   </svg>
                 </button>
 
-                {/* Settings/sliders icon - dark - smaller */}
+                {/* Settings/sliders icon - white - smaller */}
                 <button
                   type="button"
                   onClick={() => setShowAdvanced(!showAdvanced)}
                   className={`w-7 h-7 flex items-center justify-center transition-all ${
                     showAdvanced || hasProperties()
-                      ? 'text-black'
-                      : 'text-gray-800'
+                      ? 'text-white'
+                      : 'text-white/80'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>

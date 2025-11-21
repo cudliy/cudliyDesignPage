@@ -410,7 +410,7 @@ export default function DesignView() {
 
   if (error || !design) {
     return (
-      <div className="min-h-screen bg-gray-50bg-slate-900 flex items-center justify-center transition-colors duration-300">
+      <div className="min-h-screen bg-[#212121] flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -433,33 +433,33 @@ export default function DesignView() {
   // Mobile View
   if (isMobile) {
     return (
-      <div className="w-screen h-screen bg-white-900 flex flex-col transition-colors duration-300">
+      <div className="w-screen h-screen bg-[#212121] flex flex-col transition-colors duration-300">
         {/* Mobile Header - Matching ChatStyleMobile */}
-        <div className="bg-white px-4 py-3 flex items-center justify-between shadow-sm z-20 transition-colors duration-300">
+        <div className="bg-[#212121] px-4 py-3 flex items-center justify-between shadow-sm z-20 transition-colors duration-300 border-b border-white/10">
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/dashboard')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-black" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
+            <h1 className="text-lg font-semibold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownload}
               disabled={!getValidModelUrl()}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
             >
-              <Download className="w-5 h-5 text-black" />
+              <Download className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
 
         {/* 3D Model Viewer - 70% of screen */}
-        <div className="bg-white-900 p-4 transition-colors duration-300" style={{ height: '70vh' }}>
+        <div className="bg-[#212121] p-4 transition-colors duration-300" style={{ height: '70vh' }}>
           {testModelUrl && !modelLoadError ? (
             <div className="w-full h-full">
               <Suspense fallback={

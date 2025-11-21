@@ -282,74 +282,66 @@ export default function MobileOptimizedImageWorkflow({
     return (
       <div className="w-full h-full flex items-center relative bg-[#212121]" style={{
         justifyContent: window.innerWidth >= 1470 ? 'flex-start' : 'center',
-        paddingLeft: window.innerWidth >= 1470 ? '8px' : '8px',
-        paddingRight: '8px',
-        paddingTop: '8px',
-        paddingBottom: '8px'
+        padding: '0'
       }}>
-        <div className="grid grid-cols-2 gap-2 auto-rows-fr" style={{ 
+        <div className="grid grid-cols-2 gap-0 auto-rows-fr" style={{ 
           width: window.innerWidth >= 1470 ? 'min(1300px, 95vw)' : 'min(1130px, 95vw)',
           maxHeight: '100%'
         }}>
           {generatedImages.length > 0 && generatedImages.slice(0, 3).map((image, index) => (
             <div
               key={index}
-              className={`flex items-center justify-center transition-all duration-700 ease-out overflow-hidden cursor-pointer group ${
+              className={`relative flex items-center justify-center transition-all duration-700 ease-out cursor-pointer group ${
                 selectedImageIndex === index ? 'ring-4 ring-blue-500' : ''
               }`}
               onClick={() => selectImage(index)}
               style={{ 
                 transitionDelay: `${800 + index * 100}ms`,
-                borderRadius: '10px',
-                backgroundColor: '#1a1a1a',
-                border: '0.25px solid #333333'
+                padding: '0',
+                margin: '0',
+                backgroundColor: 'transparent'
               }}
             >
-              <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-[10px]">
-                <img 
-                  src={image.url} 
-                  alt={`Generated image ${index + 1}`} 
-                  className="w-full h-full object-cover relative z-10"
-                  loading="eager"
-                  style={{ imageRendering: '-webkit-optimize-contrast' as any }}
-                />
+              <img 
+                src={image.url} 
+                alt={`Generated image ${index + 1}`} 
+                className="w-full h-full object-cover"
+                loading="eager"
+                style={{ imageRendering: '-webkit-optimize-contrast' as any }}
+              />
                 
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 rounded-[10px]" style={{
-                  backgroundColor: 'rgba(23, 23, 23, 0.31)',
-                  backdropFilter: 'blur(4px)'
-                }}>
-                  <button 
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      setSelectedImageIndex(index);
-                      setIsPrinting(true);
-                      try {
-                        await generate3DModel();
-                      } catch (error) {
-                        console.error('3D generation failed:', error);
-                      } finally {
-                        setIsPrinting(false);
-                      }
-                    }}
-                    className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                    style={{
-                      width: '162px',
-                      height: '52px',
-                      borderRadius: '26px',
-                      border: '2px solid #2C2C2C',
-                      backgroundColor: 'transparent',
-                      color: '#2C2E3D',
-                      fontFamily: 'Manrope, sans-serif',
-                      fontWeight: 700,
-                      fontSize: '16px',
-                      lineHeight: '100%',
-                      letterSpacing: '0%',
-                      textAlign: 'center' as const
-                    }}
-                  >
-                    View 360°
-                  </button>
-                </div>
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30">
+                <button 
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    setSelectedImageIndex(index);
+                    setIsPrinting(true);
+                    try {
+                      await generate3DModel();
+                    } catch (error) {
+                      console.error('3D generation failed:', error);
+                    } finally {
+                      setIsPrinting(false);
+                    }
+                  }}
+                  className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer"
+                  style={{
+                    width: '162px',
+                    height: '52px',
+                    borderRadius: '26px',
+                    border: '2px solid #ffffff',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    color: '#000000',
+                    fontFamily: 'Manrope, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '16px',
+                    lineHeight: '100%',
+                    letterSpacing: '0%',
+                    textAlign: 'center' as const
+                  }}
+                >
+                  View 360°
+                </button>
               </div>
             </div>
           ))}

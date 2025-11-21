@@ -40,7 +40,7 @@ class AIService {
   async generateEnhancedPrompt(userSelections) {
     const { text, color, size, style, material, production, details } = userSelections;
     
-    const systemPrompt = `You are a helpful assistant that create standard prompt for image generation. The background of the image must always be pure white and the characters described must be fully within the frame of the image. DO NOT CREATE THE IMAGE YOU MUST ONLY WRITE A PROMPT. ONLY IN ALPHABETS NO NUMBERS OR SYMBOLS.`;
+    const systemPrompt = `You are a helpful assistant that create standard prompt for image generation. The background of the image must be completely transparent or removed, with no background at all. The characters described must be fully within the frame of the image. DO NOT CREATE THE IMAGE YOU MUST ONLY WRITE A PROMPT. ONLY IN ALPHABETS NO NUMBERS OR SYMBOLS.`;
 
     try {
       // Try Google Gemini 2.0 Flash first (priority)

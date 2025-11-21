@@ -359,7 +359,7 @@ export default function Dashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
-              <h1 className="text-lg font-semibold text-[#212121]">Cudliy</h1>
+              <h1 className="text-lg font-bold text-[#212121]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>Cudliy</h1>
             </div>
           </div>
 
