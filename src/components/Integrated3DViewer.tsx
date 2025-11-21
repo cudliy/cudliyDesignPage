@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { Download } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 // Lazy load ModelViewer to improve initial load time
 const ModelViewer = lazy(() => import('./ModelViewer'));
@@ -28,8 +27,6 @@ export default function Integrated3DViewer({
   size: externalSize,
   cameraAngle: externalCameraAngle
 }: Integrated3DViewerProps) {
-  const navigate = useNavigate();
-  
   // Control states - use external values if provided, otherwise internal state
   const [lighting, setLighting] = useState(externalLighting ?? 30);
   const [background, setBackground] = useState(externalBackground ?? 0);
@@ -44,9 +41,6 @@ export default function Integrated3DViewer({
   
   // Model loading states
   const [modelLoadError, setModelLoadError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const [regenerating, setRegenerating] = useState(false);
-  const maxRetries = 3;
 
   // Mobile detection
   const [isMobile, setIsMobile] = useState(false);

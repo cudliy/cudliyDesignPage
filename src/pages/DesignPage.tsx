@@ -254,8 +254,6 @@ const handleBackToCategories = () => {
 	};
 
 	const handleWorkflowComplete = (designId: string, designData?: any) => {
-		setShowWorkflow(false);
-		
 		// Check if user came from DesignView
 		const fromDesignView = sessionStorage.getItem('from_design_view');
 		
@@ -266,8 +264,10 @@ const handleBackToCategories = () => {
 			window.location.href = `/design/${designId}`;
 		} else if (designData && designData.modelFiles) {
 			// Normal flow: show the 3D viewer in the integrated view
+			// Set 3D viewer state BEFORE hiding workflow to prevent flash
 			setCompletedDesign(designData);
 			setShow3DViewer(true);
+			setShowWorkflow(false);
 		} else {
 			// Fallback: navigate to design view if no model data
 			window.location.href = `/design/${designId}`;
