@@ -355,9 +355,9 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         </div>
       )}
 
-      {/* Empty State Content - Title closer to input */}
+      {/* Empty State Content - Title above input */}
       {messages.length === 0 && (
-        <div className="absolute bottom-[200px] left-0 right-0 z-20 flex flex-col items-center text-center px-10 font-inter">
+        <div className="fixed top-[30%] left-0 right-0 z-20 flex flex-col items-center text-center px-10 font-inter">
           {/* Hero Title - CudliyTrademark custom font */}
           <h2 
             className="text-white mb-6 text-center capitalize" 
