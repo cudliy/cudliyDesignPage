@@ -2,43 +2,33 @@ import React, { useState } from 'react';
 
 type FaqItem = { question: string; answer: string };
 
-const FAQRow: React.FC<{ item: FaqItem; index: number }> = ({ item, index }) => {
+const FAQRow: React.FC<{ item: FaqItem; index: number }> = ({ item }) => {
   const [open, setOpen] = useState(false);
 
-  const toggleOpen = () => {
-    setOpen(!open);
-  };
-
   return (
-    <div className="py-3 border-b border-gray-100 last:border-b-0">
+    <div className="border-b border-gray-200 last:border-b-0">
       <button
         type="button"
-        aria-expanded={open}
-        aria-controls={`faq-panel-${index}`}
-        className="w-full text-left py-2 flex items-start justify-between gap-4 group hover:bg-gray-50 rounded-lg px-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#E70A55] focus:ring-opacity-20"
-        onClick={toggleOpen}
+        className="w-full text-left py-4 px-6 flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:bg-gray-50"
+        onClick={() => setOpen(!open)}
       >
-        <span className="text-base sm:text-lg font-semibold text-gray-900 group-hover:text-[#E70A55] transition-colors duration-200 flex-1 pr-4">
+        <span className="text-base sm:text-lg font-semibold text-gray-900 hover:text-[#E70A55] transition-colors duration-200 flex-1 pr-4">
           {item.question}
         </span>
-        <span className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-300 text-gray-600 font-bold text-lg ${open ? 'rotate-45' : 'rotate-0'}`}>
-          ＋
+        <span className={`flex-shrink-0 text-2xl font-bold text-gray-500 transition-transform duration-200 ${open ? 'rotate-45' : ''}`}>
+          +
         </span>
       </button>
-      <div
-        id={`faq-panel-${index}`}
-        role="region"
-        aria-labelledby={`faq-button-${index}`}
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="px-3 pb-4 pt-2">
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            {item.answer}
-          </p>
+      
+      {open && (
+        <div className="px-6 pb-4">
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed mt-3">
+              {item.answer}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -68,12 +58,12 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-gray-50">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black text-center mb-8 sm:mb-12 md:mb-16">
+    <section className="py-16 px-4 sm:px-6 md:px-8 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-bold text-black text-center mb-12">
           Frequently Asked Questions
         </h2>
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {faqs.map((faq, index) => (
             <FAQRow key={index} item={faq} index={index} />
           ))}
