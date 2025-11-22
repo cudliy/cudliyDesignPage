@@ -211,19 +211,7 @@ const PricingPage = () => {
         <div className="max-w-7xl mx-auto">
           {/* Mobile Swiper */}
           <div className={`md:hidden transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            <div className="relative">
-              {/* Navigation Arrows */}
-              <button className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-              
+            <div className="relative px-2">
               <div 
                 className="overflow-x-auto scrollbar-hide pb-6"
                 style={{
@@ -232,7 +220,7 @@ const PricingPage = () => {
                   scrollSnapType: 'x mandatory'
                 }}
               >
-                <div className="flex gap-6 px-4" style={{ width: 'max-content' }}>
+                <div className="flex gap-4 px-2" style={{ width: 'max-content' }}>
                   {pricingPlans.map((plan, index) => (
                     <div
                       key={plan.name}
@@ -240,72 +228,89 @@ const PricingPage = () => {
                         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
                       }`}
                       style={{
-                        width: '300px',
+                        width: '280px',
                         height: 'auto',
-                        minHeight: '520px',
-                        borderRadius: '24px',
+                        minHeight: '480px',
+                        borderRadius: '20px',
                         backgroundColor: index === 0 || index === 1 || index === 3 ? '#313030' : 'white',
                         border: plan.isPopular ? '2px solid #E70A55' : '1px solid rgba(0, 0, 0, 0.1)',
                         scrollSnapAlign: 'center',
-                        transitionDelay: `${600 + index * 100}ms`
+                        transitionDelay: `${600 + index * 100}ms`,
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
                       }}
                     >
                       {plan.isPopular && (
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                          <div className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white text-sm font-bold px-6 py-2 rounded-full shadow-lg">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                          <div className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
                             ⭐ Most Popular
                           </div>
                         </div>
                       )}
                       
-                      <div className="p-8 h-full flex flex-col">
-                        <div className="text-center mb-8">
-                          <h3 className={`text-2xl font-bold mb-3 ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="p-6 h-full flex flex-col">
+                        <div className="text-center mb-6">
+                          <h3 className={`text-xl font-bold mb-2 ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
                             {plan.name}
                           </h3>
-                          <p className={`text-sm mb-6 leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <p className={`text-xs mb-4 leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-600'}`}>
                             {plan.description}
                           </p>
-                          <div className="flex items-baseline justify-center gap-2 mb-2">
-                            <span className={`text-4xl font-bold ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
-                              {plan.price === 'Free' ? 'Free' : `$${isYearly && 'yearlyPrice' in plan ? plan.yearlyPrice : plan.price}`}
+                          <div className="flex items-baseline justify-center gap-1 mb-2">
+                            <span className={`text-2xl font-bold ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
+                              {plan.price === 'Free' ? 'Free' : `${isYearly && 'yearlyPrice' in plan ? plan.yearlyPrice : plan.price}`}
                             </span>
-                            {plan.price !== 'Free' && (
-                              <span className={`text-lg ${index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {plan.price !== 'Free' && plan.price !== 'Contact us for Pricing' && (
+                              <span className={`text-xs ${index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'}`}>
                                 /{isYearly ? 'year' : 'month'}
                               </span>
                             )}
                           </div>
-                          {isYearly && plan.price !== 'Free' && (
-                            <p className="text-green-600 text-sm font-medium">Save 20% annually</p>
+                          {isYearly && plan.price !== 'Free' && plan.price !== 'Contact us for Pricing' && (
+                            <p className="text-green-600 text-xs font-medium">Save 20% annually</p>
                           )}
                         </div>
 
                         <div className="flex-1">
-                          <ul className="space-y-4 mb-8">
-                            {plan.features.map((feature, featureIndex) => (
-                              <li key={featureIndex} className="flex items-start gap-3">
-                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                                  <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <ul className="space-y-2 mb-6">
+                            {plan.features.slice(0, 5).map((feature, featureIndex) => (
+                              <li key={featureIndex} className="flex items-start gap-2">
+                                <div className="flex-shrink-0 w-4 h-4 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                                  <svg className="w-2.5 h-2.5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
                                 </div>
-                                <span className={`text-sm leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <span className={`text-xs leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-700'}`}>
                                   {feature}
                                 </span>
                               </li>
                             ))}
+                            {plan.features.length > 5 && (
+                              <li className={`text-xs ${index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'} text-center pt-2`}>
+                                +{plan.features.length - 5} more features
+                              </li>
+                            )}
                           </ul>
                         </div>
 
                         <button 
-                          className={`w-full py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl font-semibold md:font-bold text-sm md:text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+                          className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                             plan.isPopular 
                               ? 'bg-gradient-to-r from-[#E70A55] to-[#F4900C] hover:from-[#d10950] hover:to-[#e8850b] text-white' 
                               : index === 0 || index === 1 || index === 3 
                                 ? 'bg-white text-gray-900 hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-300' 
                                 : 'bg-gray-900 text-white hover:bg-gray-800'
                           }`}
+                          onClick={() => {
+                            if (!isAuthenticated) {
+                              navigate('/signin');
+                            } else if (plan.name === 'Free Plan') {
+                              navigate('/dashboard');
+                            } else if (plan.name === 'Creator Plan' || plan.name === 'Studio Plan') {
+                              handleSubscriptionUpgrade(plan.name);
+                            } else if (plan.name === 'Enterprise & EDU') {
+                              window.location.href = 'mailto:sales@cudliy.com?subject=Enterprise Pricing Inquiry';
+                            }
+                          }}
                         >
                           {plan.buttonText}
                         </button>
@@ -315,13 +320,13 @@ const PricingPage = () => {
                 </div>
               </div>
               
-              {/* Professional scroll indicators */}
-              <div className="flex justify-center mt-6">
-                <div className="flex gap-2 bg-gray-100 rounded-full p-2">
+              {/* Scroll indicators */}
+              <div className="flex justify-center mt-4">
+                <div className="flex gap-1.5">
                   {pricingPlans.map((_, index) => (
                     <div 
                       key={index} 
-                      className="w-2 h-2 rounded-full bg-gray-400 transition-all duration-300"
+                      className="w-2 h-2 rounded-full bg-gray-300 transition-all duration-300"
                     ></div>
                   ))}
                 </div>
@@ -442,29 +447,27 @@ const PricingPage = () => {
       </section>
 
       {/* Student Plan */}
-      <section className="py-16 px-4 md:px-8 bg-gray-50">
+      <section className="py-12 md:py-16 px-4 md:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <div className={`bg-white rounded-2xl p-4 md:p-8 transform transition-all duration-1000 delay-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} style={{
+          <div className={`bg-white rounded-2xl p-6 md:p-8 transform transition-all duration-1000 delay-1000 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} style={{
             maxWidth: '100%',
             width: '100%',
             height: 'auto',
             borderRadius: '20px',
-            boxShadow: '-8px 4.81px 45px 0px rgba(0, 0, 0, 0.15)'
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
           }}>
-            <div className="flex flex-col lg:flex-row gap-4 md:gap-8 h-full">
+            <div className="flex flex-col lg:flex-row gap-6 md:gap-8 h-full">
               {/* Left side - Title, pricing, and button */}
-              <div className="lg:w-1/3 flex flex-col justify-center">
-                <h3 className="text-xl md:text-2xl font-bold text-black mb-3 md:mb-4">{studentPlan.name}</h3>
-                <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">{studentPlan.offer}</p>
+              <div className="lg:w-1/3 flex flex-col justify-center text-center lg:text-left">
+                <h3 className="text-lg md:text-2xl font-bold text-black mb-3 md:mb-4">{studentPlan.name}</h3>
+                <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6 leading-relaxed">{studentPlan.offer}</p>
                 <Button 
-                  className="bg-black text-white px-6 md:px-9 py-3 md:py-4 rounded-2xl font-semibold text-sm w-full md:w-auto" 
+                  className="bg-black text-white px-6 md:px-9 py-3 md:py-4 rounded-2xl font-semibold text-sm w-full lg:w-auto mx-auto lg:mx-0" 
                   style={{maxWidth: '211.81px', height: '53.10px'}}
                   onClick={() => {
                     if (!isAuthenticated) {
-                      // Not logged in - redirect to signin
                       navigate('/signin');
                     } else {
-                      // Handle student plan upgrade
                       alert('Student plan upgrade - please contact sales@cudliy.com with your .edu email for verification');
                     }
                   }}
@@ -473,13 +476,17 @@ const PricingPage = () => {
                 </Button>
               </div>
 
-              {/* Right side - Features in two columns */}
+              {/* Right side - Features in responsive grid */}
               <div className="lg:w-2/3 flex items-center">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 w-full">
                   {studentPlan.features.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <img src="/check 1.png" alt="check" className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+                    <div key={index} className="flex items-start gap-2 md:gap-3">
+                      <div className="flex-shrink-0 w-4 h-4 md:w-5 md:h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <svg className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-xs md:text-sm text-gray-700 leading-relaxed">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -490,31 +497,35 @@ const PricingPage = () => {
       </section>
 
       {/* Consultation Section */}
-      <section className="py-16 px-4 md:px-8">
+      <section className="py-12 md:py-16 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className={`bg-white rounded-2xl p-4 md:p-8 shadow-lg transform transition-all duration-1000 delay-1200 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-            <div className="flex flex-col lg:flex-row justify-between gap-6 md:gap-8 items-center">
-              {/* Left content constrained to design width to preserve space for CTA */}
-              <div className="flex-1 w-full text-left md:text-left" style={{maxWidth: '821px'}}>
-                <h2 className="font-extrabold text-black mb-4 text-2xl md:text-4xl" style={{lineHeight: '120%', textTransform: 'capitalize'}}>
+          <div className={`bg-white rounded-2xl p-6 md:p-8 shadow-lg transform transition-all duration-1000 delay-1200 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+            <div className="flex flex-col lg:flex-row justify-between gap-6 md:gap-8 items-center text-center lg:text-left">
+              {/* Left content */}
+              <div className="flex-1 w-full" style={{maxWidth: '821px'}}>
+                <h2 className="font-extrabold text-black mb-4 text-xl md:text-4xl leading-tight">
                   Let's chat to get the best{" "}
-                  <span className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] bg-clip-text text-transparent block md:inline md:ml-0">
+                  <span className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] bg-clip-text text-transparent block sm:inline">
                     Fit for you
                   </span>
                 </h2>
-                <p className="text-sm md:text-base text-gray-600 mb-6">
+                <p className="text-sm md:text-base text-gray-600 mb-6 leading-relaxed">
                   Cudliy scales as you grow. Let's find the right plan that fits your company size.
                 </p>
               </div>
               
               {/* Right side - Button and contact info */}
               <div className="flex flex-col items-center lg:items-end space-y-4 w-full lg:w-auto">
-                <Button className="bg-black text-white px-6 md:px-9 py-3 md:py-4 rounded-2xl font-semibold w-full md:w-auto" style={{maxWidth: '211.81px', height: '53.10px'}}>
+                <Button 
+                  className="bg-black text-white px-6 md:px-9 py-3 md:py-4 rounded-2xl font-semibold w-full sm:w-auto transition-all duration-300 hover:bg-gray-800" 
+                  style={{maxWidth: '211.81px', height: '53.10px'}}
+                  onClick={() => window.location.href = 'mailto:sales@cudliy.com?subject=Consultation Request'}
+                >
                   Talk to us
                 </Button>
-                <div className="text-center lg:text-right space-y-2">
-                  <p className="text-sm text-gray-500">Get 24/7 Consultation</p>
-                  <p className="text-sm text-gray-500">Sales@cudliy.com</p>
+                <div className="text-center lg:text-right space-y-1">
+                  <p className="text-xs md:text-sm text-gray-500">Get 24/7 Consultation</p>
+                  <p className="text-xs md:text-sm text-gray-500 font-medium">Sales@cudliy.com</p>
                 </div>
               </div>
             </div>
