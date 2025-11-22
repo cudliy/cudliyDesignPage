@@ -171,12 +171,11 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
             return (
               <div
                 key={key}
-                className={`flex flex-col items-center gap-3 p-3 transition-all duration-200 cursor-pointer relative group rounded-lg ${
-                  isSelected ? 'bg-white/5' : 'hover:bg-white/5'
-                }`}
+                className="flex flex-col items-center justify-center gap-3 p-3 transition-all duration-200 cursor-pointer relative group rounded-lg"
                 style={{ 
                   transitionDelay: `${400 + index * 50}ms`,
-                  width: 'calc(33.333% - 4px)'
+                  width: 'calc(33.333% - 4px)',
+                  textAlign: 'center'
                 }}
                 onClick={() => handleCategoryClick(key)}
               >
@@ -187,10 +186,10 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
                     </svg>
                   </div>
                 )}
-                <div className="w-12 h-12 mx-auto transition-colors duration-200 group-hover:text-white text-white/90" style={{ transform: 'scale(1.3)' }}>
+                <div className="w-12 h-12 transition-colors duration-200 group-hover:text-white text-white/90" style={{ transform: 'scale(1.3)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {section.icon}
                 </div>
-                <span className="text-[12px] font-normal text-white/70 group-hover:text-white/90 transition-colors duration-200">
+                <span className="text-[12px] font-normal text-white/70 group-hover:text-white/90 transition-colors duration-200" style={{ textAlign: 'center', width: '100%', display: 'block' }}>
                   {section.title}
                 </span>
               </div>

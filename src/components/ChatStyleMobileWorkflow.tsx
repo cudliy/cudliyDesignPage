@@ -568,7 +568,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
 
         {/* Example Cards - Positioned below input field when empty */}
         {messages.length === 0 && (
-          <div className="flex flex-col gap-3 w-full items-center mt-6">
+          <div className="flex flex-row gap-3 w-full justify-center mt-6">
             <button 
               onClick={() => {
                 setInputValue("Birthday gift for my mum. She is 50 years old");
@@ -579,31 +579,31 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   }
                 }, 100);
               }}
-              className="text-center hover:shadow-lg transition-all border border-gray-100"
+              className="text-center hover:shadow-lg transition-all"
               style={{
-                width: '240px',
+                width: '160px',
                 borderRadius: '12px',
                 paddingTop: '12px',
-                paddingRight: '16px',
+                paddingRight: '12px',
                 paddingBottom: '12px',
-                paddingLeft: '16px',
-                backgroundColor: '#F6F6F6'
+                paddingLeft: '12px',
+                backgroundColor: '#515151'
               }}
             >
               <h3 
-                className="text-gray-900 mb-1"
+                className="mb-1"
                 style={{
                   fontFamily: 'Inter, sans-serif',
                   fontWeight: 700,
-                  fontSize: '15px',
-                  lineHeight: '20px',
+                  fontSize: '13px',
+                  lineHeight: '18px',
                   letterSpacing: '-0.3px',
-                  whiteSpace: 'nowrap'
+                  color: '#ffffff'
                 }}
               >
                 Birthday gift for my mum
               </h3>
-              <p className="text-gray-500 text-xs">She is 50 years old</p>
+              <p style={{ color: '#ffffff', fontSize: '11px', opacity: 0.8 }}>She is 50 years old</p>
             </button>
 
             <button 
@@ -616,31 +616,31 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   }
                 }, 100);
               }}
-              className="text-center hover:shadow-lg transition-all border border-gray-100"
+              className="text-center hover:shadow-lg transition-all"
               style={{
-                width: '240px',
+                width: '160px',
                 borderRadius: '12px',
                 paddingTop: '12px',
-                paddingRight: '16px',
+                paddingRight: '12px',
                 paddingBottom: '12px',
-                paddingLeft: '16px',
-                backgroundColor: '#F6F6F6'
+                paddingLeft: '12px',
+                backgroundColor: '#515151'
               }}
             >
               <h3 
-                className="text-gray-900 mb-1"
+                className="mb-1"
                 style={{
                   fontFamily: 'Inter, sans-serif',
                   fontWeight: 700,
-                  fontSize: '15px',
-                  lineHeight: '20px',
+                  fontSize: '13px',
+                  lineHeight: '18px',
                   letterSpacing: '-0.3px',
-                  whiteSpace: 'nowrap'
+                  color: '#ffffff'
                 }}
               >
                 Anniversary Gift
               </h3>
-              <p className="text-gray-500 text-xs">for my partner in New York</p>
+              <p style={{ color: '#ffffff', fontSize: '11px', opacity: 0.8 }}>for my partner in New York</p>
             </button>
           </div>
         )}
