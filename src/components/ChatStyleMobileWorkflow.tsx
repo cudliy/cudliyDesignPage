@@ -581,8 +581,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               }}
               className="text-center hover:shadow-lg transition-all"
               style={{
-                width: '160px',
-                borderRadius: '12px',
+                width: '200px',
+                borderRadius: '5px',
                 paddingTop: '12px',
                 paddingRight: '12px',
                 paddingBottom: '12px',
@@ -598,7 +598,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   fontSize: '13px',
                   lineHeight: '18px',
                   letterSpacing: '-0.3px',
-                  color: '#ffffff'
+                  color: '#ffffff',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 Birthday gift for my mum
@@ -618,8 +619,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               }}
               className="text-center hover:shadow-lg transition-all"
               style={{
-                width: '160px',
-                borderRadius: '12px',
+                width: '200px',
+                borderRadius: '5px',
                 paddingTop: '12px',
                 paddingRight: '12px',
                 paddingBottom: '12px',
@@ -635,7 +636,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   fontSize: '13px',
                   lineHeight: '18px',
                   letterSpacing: '-0.3px',
-                  color: '#ffffff'
+                  color: '#ffffff',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 Anniversary Gift

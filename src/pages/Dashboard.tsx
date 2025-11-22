@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService, type Design } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
-import SubscriptionDebug from '../components/SubscriptionDebug';
+
 import SEO from '@/components/SEO';
 
 
@@ -1071,7 +1071,23 @@ export default function Dashboard() {
             </div>
           ) : currentView === 'credits' ? (
             <div className="py-12 space-y-8">
-              <SubscriptionDebug userId={userId || ''} />
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Model Credits</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Models Remaining:</span>
+                    <span className="font-semibold text-gray-900">
+                      {usageLimits?.remaining?.models ?? 0} / {usageLimits?.limits?.modelsPerMonth === -1 ? '∞' : usageLimits?.limits?.modelsPerMonth ?? 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Images Remaining:</span>
+                    <span className="font-semibold text-gray-900">
+                      {usageLimits?.remaining?.images ?? 0} / {usageLimits?.limits?.imagesPerMonth === -1 ? '∞' : usageLimits?.limits?.imagesPerMonth ?? 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : currentView === 'edu' ? (
             <div className="py-12 text-center text-gray-600">

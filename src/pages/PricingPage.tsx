@@ -167,7 +167,7 @@ const PricingPage = () => {
         keywords="pricing, subscription plans, toy design pricing, 3D printing plans, creator plan, studio plan, student discount, enterprise pricing"
         url="/pricing"
       />
-      <div className="min-h-screen bg-white dark:bg-slate-900 overflow-x-hidden transition-colors duration-300">
+      <div className="min-h-screen bg-white overflow-x-hidden transition-colors duration-300">
         <GlassNav />
       {/* Hero Section */}
       <section className="pt-32 md:pt-40 pb-16 md:pb-24 px-4 md:px-8 overflow-x-hidden">
@@ -209,7 +209,128 @@ const PricingPage = () => {
       {/* Pricing Cards */}
       <section className="py-16 px-4 md:px-8 overflow-x-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className={`flex flex-col md:flex-row md:flex-wrap justify-center gap-4 md:gap-1 transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
+          {/* Mobile Swiper */}
+          <div className={`md:hidden transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
+            <div className="relative">
+              {/* Navigation Arrows */}
+              <button className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              
+              <div 
+                className="overflow-x-auto scrollbar-hide pb-6"
+                style={{
+                  scrollBehavior: 'smooth',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory'
+                }}
+              >
+                <div className="flex gap-6 px-4" style={{ width: 'max-content' }}>
+                  {pricingPlans.map((plan, index) => (
+                    <div
+                      key={plan.name}
+                      className={`relative transform transition-all duration-700 ease-out flex-shrink-0 ${
+                        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                      }`}
+                      style={{
+                        width: '300px',
+                        height: 'auto',
+                        minHeight: '520px',
+                        borderRadius: '24px',
+                        backgroundColor: index === 0 || index === 1 || index === 3 ? '#313030' : 'white',
+                        border: plan.isPopular ? '2px solid #E70A55' : '1px solid rgba(0, 0, 0, 0.1)',
+                        scrollSnapAlign: 'center',
+                        transitionDelay: `${600 + index * 100}ms`
+                      }}
+                    >
+                      {plan.isPopular && (
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                          <div className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white text-sm font-bold px-6 py-2 rounded-full shadow-lg">
+                            ⭐ Most Popular
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="p-8 h-full flex flex-col">
+                        <div className="text-center mb-8">
+                          <h3 className={`text-2xl font-bold mb-3 ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
+                            {plan.name}
+                          </h3>
+                          <p className={`text-sm mb-6 leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {plan.description}
+                          </p>
+                          <div className="flex items-baseline justify-center gap-2 mb-2">
+                            <span className={`text-4xl font-bold ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
+                              {plan.price === 'Free' ? 'Free' : `$${isYearly ? plan.yearlyPrice : plan.price}`}
+                            </span>
+                            {plan.price !== 'Free' && (
+                              <span className={`text-lg ${index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'}`}>
+                                /{isYearly ? 'year' : 'month'}
+                              </span>
+                            )}
+                          </div>
+                          {isYearly && plan.price !== 'Free' && (
+                            <p className="text-green-600 text-sm font-medium">Save 20% annually</p>
+                          )}
+                        </div>
+
+                        <div className="flex-1">
+                          <ul className="space-y-4 mb-8">
+                            {plan.features.map((feature, featureIndex) => (
+                              <li key={featureIndex} className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                                  <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <span className={`text-sm leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-700'}`}>
+                                  {feature}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <button 
+                          className={`w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+                            plan.isPopular 
+                              ? 'bg-gradient-to-r from-[#E70A55] to-[#F4900C] hover:from-[#d10950] hover:to-[#e8850b] text-white' 
+                              : index === 0 || index === 1 || index === 3 
+                                ? 'bg-white text-gray-900 hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-300' 
+                                : 'bg-gray-900 text-white hover:bg-gray-800'
+                          }`}
+                        >
+                          {plan.buttonText}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Professional scroll indicators */}
+              <div className="flex justify-center mt-6">
+                <div className="flex gap-2 bg-gray-100 rounded-full p-2">
+                  {pricingPlans.map((_, index) => (
+                    <div 
+                      key={index} 
+                      className="w-2 h-2 rounded-full bg-gray-400 transition-all duration-300"
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className={`hidden md:flex md:flex-row md:flex-wrap justify-center gap-4 md:gap-1 transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
             {pricingPlans.map((plan, index) => (
               <div
                 key={plan.name}
