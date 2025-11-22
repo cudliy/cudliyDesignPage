@@ -268,7 +268,7 @@ const PricingPage = () => {
                           </p>
                           <div className="flex items-baseline justify-center gap-2 mb-2">
                             <span className={`text-4xl font-bold ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
-                              {plan.price === 'Free' ? 'Free' : `$${isYearly ? plan.yearlyPrice : plan.price}`}
+                              {plan.price === 'Free' ? 'Free' : `$${isYearly && 'yearlyPrice' in plan ? plan.yearlyPrice : plan.price}`}
                             </span>
                             {plan.price !== 'Free' && (
                               <span className={`text-lg ${index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'}`}>
