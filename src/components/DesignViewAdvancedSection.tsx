@@ -163,9 +163,9 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
 
   const renderAdvancedCategories = () => {
     return (
-      <div className="flex flex-col items-center justify-center text-center w-full h-full">
+      <div className="flex flex-col items-center justify-start text-center w-full h-full pt-8">
         {/* Category Icons Grid */}
-        <div className="flex flex-wrap justify-between gap-y-8 w-full max-w-[420px] mx-auto">
+        <div className="flex flex-wrap justify-between gap-y-8 w-full max-w-[480px] mx-auto">
           {Object.entries(sections).map(([key, section], index) => {
             const isSelected = selectedCategories[key];
             return (
@@ -176,7 +176,7 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
                 }`}
                 style={{ 
                   transitionDelay: `${400 + index * 50}ms`,
-                  width: 'calc(33.333% - 8px)'
+                  width: 'calc(33.333% - 4px)'
                 }}
                 onClick={() => handleCategoryClick(key)}
               >
@@ -187,7 +187,7 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
                     </svg>
                   </div>
                 )}
-                <div className="w-9 h-9 mx-auto transition-colors duration-200 group-hover:text-white text-white/90">
+                <div className="w-12 h-12 mx-auto transition-colors duration-200 group-hover:text-white text-white/90" style={{ transform: 'scale(1.3)' }}>
                   {section.icon}
                 </div>
                 <span className="text-[12px] font-normal text-white/70 group-hover:text-white/90 transition-colors duration-200">

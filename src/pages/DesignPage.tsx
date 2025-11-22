@@ -823,9 +823,9 @@ const handleBackToCategories = () => {
 		};
 
 		return (
-			<div className="flex flex-col items-center justify-center text-center w-full h-full">
+			<div className="flex flex-col items-center justify-start text-center w-full h-full pt-8">
 				{/* Category Icons Grid */}
-				<div className="flex flex-wrap justify-between gap-y-8 w-full max-w-[420px] mx-auto">
+				<div className="flex flex-wrap justify-between gap-y-8 w-full max-w-[480px] mx-auto">
 					{Object.entries(sections).map(([key, section], index) => {
 						const isSelected = categoryStatus[key as keyof typeof categoryStatus];
 						return (
@@ -836,7 +836,7 @@ const handleBackToCategories = () => {
 								}`}
 								style={{ 
 									transitionDelay: `${400 + index * 50}ms`,
-									width: 'calc(33.333% - 8px)'
+									width: 'calc(33.333% - 4px)'
 								}}
 								onClick={() => handleCategoryClick(key)}
 							>
@@ -847,7 +847,7 @@ const handleBackToCategories = () => {
 										</svg>
 									</div>
 								)}
-							<div className="w-9 h-9 mx-auto transition-colors duration-200 group-hover:text-white text-white/90">
+							<div className="w-12 h-12 mx-auto transition-colors duration-200 group-hover:text-white text-white/90" style={{ transform: 'scale(1.3)' }}>
 									{section.icon}
 								</div>
 							<span className="text-[12px] font-normal text-white/70 group-hover:text-white/90 transition-colors duration-200">
@@ -999,20 +999,22 @@ const handleBackToCategories = () => {
 				paddingRight: 'clamp(20px, 2vw, 40px)'
 			}}>
 					
-					{/* Title - Make It Memorable */}
-					<h1
-						className={`font-abril text-[47.1px] leading-[1.1] tracking-tight text-center font-normal w-full max-w-[420px] text-white transition-all duration-500 ease-out ${
-							isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-						} ${isAdvanced ? 'mt-6' : 'mt-32'}`}
-						style={{ fontFamily: 'CudliyTrademark, Abril Fatface, serif' }}
-					>
-						Make It Memorable
-					</h1>
-					
-					{/* Input Field with Icon Dropdown */}
+					{/* Title and Input Container - Same Width */}
 					<div className={`w-full max-w-[420px] transition-all duration-500 ease-out ${
 						isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
-					} ${isAdvanced ? 'mt-3' : 'mt-4'}`}>
+					} ${isAdvanced ? 'mt-6' : 'mt-32'}`}>
+						{/* Title - Make It Memorable */}
+						<h1
+							className="font-abril leading-[1.1] tracking-tight text-center font-normal w-full text-white mb-4"
+							style={{ 
+								fontFamily: 'CudliyTrademark, Abril Fatface, serif',
+								fontSize: 'clamp(30px, 7vw, 42.5px)'
+							}}
+						>
+							Make It Memorable
+						</h1>
+						
+						{/* Input Field with Icon Dropdown */}
 						{/* Main Input Container - Dark Style */}
 						<div className="relative w-full bg-[#515151]" style={{ height: '100px', borderRadius: '25px' }}>
 							{/* Input Field - Top portion */}
