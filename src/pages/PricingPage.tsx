@@ -74,7 +74,8 @@ const PricingPage = () => {
   const pricingPlans = [
     {
       name: "Free Plan",
-      price: isYearly ? "$0" : "$0",
+      monthlyPrice: "$0",
+      yearlyPrice: "$0",
       period: isYearly ? "/year" : "/month",
       description: "Perfect for discovering the joy of making.",
       buttonText: isAuthenticated ? "Current Plan" : "Create a free account",
@@ -89,8 +90,10 @@ const PricingPage = () => {
     },
     {
       name: "Creator Plan",
-      price: isYearly ? "$12.99" : "$9.99",
-      period: isYearly ? "/month billed yearly ($155.88/year)" : "/1st month then $14.99/month",
+      monthlyPrice: "$14.99",
+      yearlyPrice: "$12.99",
+      period: isYearly ? "/month (billed yearly)" : "/month",
+      yearlyNote: isYearly ? "Save $24 annually" : "First month $9.99",
       description: "For everyday creators, who want to design with heart.",
       buttonText: isAuthenticated ? "Upgrade Now" : "Create a free account",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",
@@ -106,8 +109,10 @@ const PricingPage = () => {
     },
     {
       name: "Studio Plan",
-      price: isYearly ? "$59.99" : "$49.99",
-      period: isYearly ? "/month billed yearly ($719.88/year)" : "/month",
+      monthlyPrice: "$49.99",
+      yearlyPrice: "$39.99",
+      period: isYearly ? "/month (billed yearly)" : "/month",
+      yearlyNote: isYearly ? "Save $120 annually" : "",
       description: "Perfect for studios, and Professional who want to scale their work.",
       buttonText: isAuthenticated ? "Upgrade Now" : "Create a free account",
       buttonStyle: "bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white",
@@ -125,7 +130,8 @@ const PricingPage = () => {
     },
     {
       name: "Enterprise & EDU",
-      price: "Contact us for Pricing",
+      monthlyPrice: "Contact us for Pricing",
+      yearlyPrice: "Contact us for Pricing",
       period: "",
       description: "For Offices, schools, Labs, and educators to spark creativity.",
       buttonText: "Contact Us",
@@ -209,129 +215,132 @@ const PricingPage = () => {
       {/* Pricing Cards */}
       <section className="py-16 px-4 md:px-8 overflow-x-hidden">
         <div className="max-w-7xl mx-auto">
-          {/* Mobile Swiper */}
-          <div className={`md:hidden transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            <div className="relative px-2">
-              <div 
-                className="overflow-x-auto scrollbar-hide pb-6"
+          {/* Mobile Cards - Stack Layout */}
+          <div className={`md:hidden space-y-6 px-4 transform transition-all duration-1000 delay-500 ease-out ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
+            {pricingPlans.map((plan, index) => (
+              <div
+                key={plan.name}
+                className={`relative w-full max-w-sm mx-auto transform transition-all duration-700 ease-out ${
+                  isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                }`}
                 style={{
-                  scrollBehavior: 'smooth',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory'
+                  transitionDelay: `${600 + index * 150}ms`
                 }}
               >
-                <div className="flex gap-4 px-2" style={{ width: 'max-content' }}>
-                  {pricingPlans.map((plan, index) => (
-                    <div
-                      key={plan.name}
-                      className={`relative transform transition-all duration-700 ease-out flex-shrink-0 ${
-                        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-                      }`}
-                      style={{
-                        width: '280px',
-                        height: 'auto',
-                        minHeight: '480px',
-                        borderRadius: '20px',
-                        backgroundColor: index === 0 || index === 1 || index === 3 ? '#313030' : 'white',
-                        border: plan.isPopular ? '2px solid #E70A55' : '1px solid rgba(0, 0, 0, 0.1)',
-                        scrollSnapAlign: 'center',
-                        transitionDelay: `${600 + index * 100}ms`,
-                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
-                      }}
-                    >
-                      {plan.isPopular && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <div className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                            ⭐ Most Popular
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="p-6 h-full flex flex-col">
-                        <div className="text-center mb-6">
-                          <h3 className={`text-xl font-bold mb-2 ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
-                            {plan.name}
-                          </h3>
-                          <p className={`text-xs mb-4 leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-600'}`}>
-                            {plan.description}
-                          </p>
-                          <div className="flex items-baseline justify-center gap-1 mb-2">
-                            <span className={`text-2xl font-bold ${index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'}`}>
-                              {plan.price === 'Free' ? 'Free' : `${isYearly && 'yearlyPrice' in plan ? plan.yearlyPrice : plan.price}`}
-                            </span>
-                            {plan.price !== 'Free' && plan.price !== 'Contact us for Pricing' && (
-                              <span className={`text-xs ${index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'}`}>
-                                /{isYearly ? 'year' : 'month'}
-                              </span>
-                            )}
-                          </div>
-                          {isYearly && plan.price !== 'Free' && plan.price !== 'Contact us for Pricing' && (
-                            <p className="text-green-600 text-xs font-medium">Save 20% annually</p>
-                          )}
-                        </div>
-
-                        <div className="flex-1">
-                          <ul className="space-y-2 mb-6">
-                            {plan.features.slice(0, 5).map((feature, featureIndex) => (
-                              <li key={featureIndex} className="flex items-start gap-2">
-                                <div className="flex-shrink-0 w-4 h-4 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                                  <svg className="w-2.5 h-2.5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
-                                <span className={`text-xs leading-relaxed ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-700'}`}>
-                                  {feature}
-                                </span>
-                              </li>
-                            ))}
-                            {plan.features.length > 5 && (
-                              <li className={`text-xs ${index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'} text-center pt-2`}>
-                                +{plan.features.length - 5} more features
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-
-                        <button 
-                          className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 active:scale-95 ${
-                            plan.isPopular 
-                              ? 'bg-gradient-to-r from-[#E70A55] to-[#F4900C] hover:from-[#d10950] hover:to-[#e8850b] text-white' 
-                              : index === 0 || index === 1 || index === 3 
-                                ? 'bg-white text-gray-900 hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-300' 
-                                : 'bg-gray-900 text-white hover:bg-gray-800'
-                          }`}
-                          onClick={() => {
-                            if (!isAuthenticated) {
-                              navigate('/signin');
-                            } else if (plan.name === 'Free Plan') {
-                              navigate('/dashboard');
-                            } else if (plan.name === 'Creator Plan' || plan.name === 'Studio Plan') {
-                              handleSubscriptionUpgrade(plan.name);
-                            } else if (plan.name === 'Enterprise & EDU') {
-                              window.location.href = 'mailto:sales@cudliy.com?subject=Enterprise Pricing Inquiry';
-                            }
-                          }}
-                        >
-                          {plan.buttonText}
-                        </button>
+                <div
+                  className={`relative rounded-2xl overflow-hidden ${
+                    plan.isPopular 
+                      ? 'bg-gradient-to-br from-white to-gray-50 border-2 border-[#E70A55] shadow-xl' 
+                      : index === 0 || index === 1 || index === 3
+                        ? 'bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 shadow-lg'
+                        : 'bg-white border border-gray-200 shadow-lg'
+                  }`}
+                >
+                  {/* Popular Badge */}
+                  {plan.isPopular && (
+                    <div className="absolute -top-2 -right-2 z-10">
+                      <div className="bg-gradient-to-r from-[#E70A55] to-[#F4900C] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg transform rotate-12">
+                        ⭐ Most Popular
                       </div>
                     </div>
-                  ))}
+                  )}
+                  
+                  <div className="p-6">
+                    {/* Header */}
+                    <div className="text-center mb-6">
+                      <h3 className={`text-xl font-bold mb-2 ${
+                        index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {plan.name}
+                      </h3>
+                      
+                      {/* Price */}
+                      <div className="mb-3">
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className={`text-3xl font-bold ${
+                            index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'
+                          }`}>
+                            {plan.monthlyPrice === 'Contact us for Pricing' ? 'Custom' : (isYearly ? plan.yearlyPrice : plan.monthlyPrice)}
+                          </span>
+                          {plan.monthlyPrice !== '$0' && plan.monthlyPrice !== 'Contact us for Pricing' && (
+                            <span className={`text-sm ${
+                              index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-500'
+                            }`}>
+                              {plan.period}
+                            </span>
+                          )}
+                        </div>
+                        {plan.yearlyNote && (
+                          <p className="text-green-600 text-xs font-medium mt-1">{plan.yearlyNote}</p>
+                        )}
+                      </div>
+                      
+                      <p className={`text-sm leading-relaxed ${
+                        index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-600'
+                      }`}>
+                        {plan.description}
+                      </p>
+                    </div>
+
+                    {/* Features */}
+                    <div className="mb-6">
+                      <h4 className={`text-sm font-semibold mb-3 ${
+                        index === 0 || index === 1 || index === 3 ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        What's included:
+                      </h4>
+                      <ul className="space-y-2.5">
+                        {plan.features.slice(0, 6).map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                              <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            <span className={`text-sm leading-relaxed ${
+                              index === 0 || index === 1 || index === 3 ? 'text-gray-200' : 'text-gray-700'
+                            }`}>
+                              {feature}
+                            </span>
+                          </li>
+                        ))}
+                        {plan.features.length > 6 && (
+                          <li className={`text-sm ${
+                            index === 0 || index === 1 || index === 3 ? 'text-gray-400' : 'text-gray-500'
+                          } text-center pt-2 font-medium`}>
+                            +{plan.features.length - 6} more features
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* CTA Button */}
+                    <button 
+                      className={`w-full py-4 px-6 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${
+                        plan.isPopular 
+                          ? 'bg-gradient-to-r from-[#E70A55] to-[#F4900C] hover:from-[#d10950] hover:to-[#e8850b] text-white shadow-pink-200' 
+                          : index === 0 || index === 1 || index === 3 
+                            ? 'bg-white text-gray-900 hover:bg-gray-50 border-2 border-white hover:border-gray-100' 
+                            : 'bg-gray-900 text-white hover:bg-gray-800 shadow-gray-300'
+                      }`}
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          navigate('/signin');
+                        } else if (plan.name === 'Free Plan') {
+                          navigate('/dashboard');
+                        } else if (plan.name === 'Creator Plan' || plan.name === 'Studio Plan') {
+                          handleSubscriptionUpgrade(plan.name);
+                        } else if (plan.name === 'Enterprise & EDU') {
+                          window.location.href = 'mailto:sales@cudliy.com?subject=Enterprise Pricing Inquiry';
+                        }
+                      }}
+                    >
+                      {plan.buttonText}
+                    </button>
+                  </div>
                 </div>
               </div>
-              
-              {/* Scroll indicators */}
-              <div className="flex justify-center mt-4">
-                <div className="flex gap-1.5">
-                  {pricingPlans.map((_, index) => (
-                    <div 
-                      key={index} 
-                      className="w-2 h-2 rounded-full bg-gray-300 transition-all duration-300"
-                    ></div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Desktop Layout */}
@@ -381,9 +390,12 @@ const PricingPage = () => {
                       fontSize: index === 3 ? '12px' : '24px',
                       lineHeight: '100%',
                       letterSpacing: '0%'
-                    }}>{plan.price}</span>
+                    }}>{isYearly ? plan.yearlyPrice : plan.monthlyPrice}</span>
                     <span className={`text-sm ${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-600'}`}>{plan.period}</span>
                   </div>
+                  {plan.yearlyNote && (
+                    <p className="text-green-600 text-xs font-medium mb-2">{plan.yearlyNote}</p>
+                  )}
                   <div className={`mt-4 mb-4 border-t ${index === 0 || index === 1 || index === 3 ? 'border-gray-600' : 'border-gray-200'}`}></div>
                   <p className={`${index === 0 || index === 1 || index === 3 ? 'text-gray-300' : 'text-gray-600'}`} style={{
                     fontFamily: 'Inter',

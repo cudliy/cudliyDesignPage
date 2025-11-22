@@ -5,26 +5,36 @@ type FaqItem = { question: string; answer: string };
 const FAQRow: React.FC<{ item: FaqItem; index: number }> = ({ item, index }) => {
   const [open, setOpen] = useState(false);
 
+  const toggleOpen = () => {
+    setOpen(!open);
+  };
+
   return (
-    <div className="py-2">
+    <div className="py-3 border-b border-gray-100 last:border-b-0">
       <button
+        type="button"
         aria-expanded={open}
         aria-controls={`faq-panel-${index}`}
-        className="w-full text-left py-3 flex items-start justify-between gap-4 group hover:bg-gray-50 rounded-lg px-2 transition-colors duration-200"
-        onClick={() => setOpen(!open)}
+        className="w-full text-left py-2 flex items-start justify-between gap-4 group hover:bg-gray-50 rounded-lg px-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#E70A55] focus:ring-opacity-20"
+        onClick={toggleOpen}
       >
-        <span className="text-base sm:text-lg font-semibold text-gray-900 group-hover:text-[#E70A55] transition-colors duration-200">
+        <span className="text-base sm:text-lg font-semibold text-gray-900 group-hover:text-[#E70A55] transition-colors duration-200 flex-1 pr-4">
           {item.question}
         </span>
-        <span className={`mt-1 shrink-0 transition-transform duration-300 text-gray-600 font-bold ${open ? 'rotate-45' : ''}`}>＋</span>
+        <span className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-300 text-gray-600 font-bold text-lg ${open ? 'rotate-45' : 'rotate-0'}`}>
+          ＋
+        </span>
       </button>
       <div
         id={`faq-panel-${index}`}
         role="region"
-        className={`overflow-hidden transition-[max-height] duration-300 ease-out ${open ? 'max-h-96' : 'max-h-0'}`}
+        aria-labelledby={`faq-button-${index}`}
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
       >
-        <div className="px-2 pb-4">
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed pr-8">
+        <div className="px-3 pb-4 pt-2">
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
             {item.answer}
           </p>
         </div>
@@ -58,14 +68,14 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-white">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-gray-50">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black text-center mb-8 sm:mb-12 md:mb-16">FAQs</h2>
-        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 sm:p-6 space-y-1">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black text-center mb-8 sm:mb-12 md:mb-16">
+          Frequently Asked Questions
+        </h2>
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-lg overflow-hidden">
           {faqs.map((faq, index) => (
-            <div key={index} className="border-b border-gray-100 last:border-b-0">
-              <FAQRow item={faq} index={index} />
-            </div>
+            <FAQRow key={index} item={faq} index={index} />
           ))}
         </div>
       </div>
