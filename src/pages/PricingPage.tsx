@@ -299,7 +299,7 @@ const PricingPage = () => {
                         </div>
 
                         <button 
-                          className={`w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+                          className={`w-full py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl font-semibold md:font-bold text-sm md:text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                             plan.isPopular 
                               ? 'bg-gradient-to-r from-[#E70A55] to-[#F4900C] hover:from-[#d10950] hover:to-[#e8850b] text-white' 
                               : index === 0 || index === 1 || index === 3 
