@@ -102,7 +102,7 @@ export default function MobileOptimizedImageWorkflow({
       return;
     }
 
-    console.log('🚀 Starting image generation...');
+    console.log('ðŸš€ Starting image generation...');
     setIsGenerating(true);
     setGeneratedImages([]); // Clear previous images
     setSelectedImageIndex(null);
@@ -139,28 +139,28 @@ export default function MobileOptimizedImageWorkflow({
       try {
         const response = await apiService.generateImages(request);
         
-        console.log('📥 API Response:', response);
-        console.log('📥 Images received:', response.data?.images?.length);
+        console.log('ðŸ“¥ API Response:', response);
+        console.log('ðŸ“¥ Images received:', response.data?.images?.length);
         
         if (response.success && response.data) {
-          console.log('✅ Setting generated images:', response.data.images);
-          console.log('✅ Number of images:', response.data.images.length);
+          console.log('âœ… Setting generated images:', response.data.images);
+          console.log('âœ… Number of images:', response.data.images.length);
           
           setGeneratedImages(response.data.images);
           setSessionId(response.data.session_id);
           
-          console.log('✅ Images state updated');
+          console.log('âœ… Images state updated');
           
           try {
             await apiService.trackUsage(userId, 'image', response.data.images.length);
             await checkLimits(true);
-            console.log('✅ Usage tracked successfully');
+            console.log('âœ… Usage tracked successfully');
           } catch (trackingError) {
-            console.warn('⚠️ Usage tracking failed:', trackingError);
+            console.warn('âš ï¸ Usage tracking failed:', trackingError);
             try {
               await checkLimits(true);
             } catch (limitsError) {
-              console.warn('⚠️ Limits check failed:', limitsError);
+              console.warn('âš ï¸ Limits check failed:', limitsError);
             }
           }
         } else {
@@ -185,14 +185,14 @@ export default function MobileOptimizedImageWorkflow({
   // Generate when trigger count changes
   useEffect(() => {
     if (generationTrigger > lastTriggerCount && prompt.trim() && !isGenerating) {
-      console.log('🚀 Manual generation triggered - count:', generationTrigger);
+      console.log('ðŸš€ Manual generation triggered - count:', generationTrigger);
       setLastTriggerCount(generationTrigger);
       generateImages();
     }
   }, [generationTrigger, lastTriggerCount, prompt, isGenerating, generateImages]);
 
   const selectImage = (index: number) => {
-    console.log('🖱️ Image selected:', index);
+    console.log('ðŸ–±ï¸ Image selected:', index);
     setSelectedImageIndex(index);
   };
 
@@ -275,73 +275,83 @@ export default function MobileOptimizedImageWorkflow({
   }
   
   if (generatedImages.length > 0) {
-    console.log('🖼️ Rendering images. Total count:', generatedImages.length);
-    console.log('🖼️ Images to render:', generatedImages.slice(0, 3));
-    console.log('🖼️ All images:', generatedImages);
+    console.log('ðŸ–¼ï¸ Rendering images. Total count:', generatedImages.length);
+    console.log('ðŸ–¼ï¸ Images to render:', generatedImages.slice(0, 3));
+    console.log('ðŸ–¼ï¸ All images:', generatedImages);
     
     return (
       <div className="w-full h-full flex items-center relative bg-[#212121]" style={{
-        justifyContent: window.innerWidth >= 1470 ? 'flex-start' : 'center',
-        padding: '0'
+        justifyContent: 'flex-start',
+        paddingLeft: '2px',
+        paddingRight: '8px',
+        paddingTop: '8px',
+        paddingBottom: '8px'
       }}>
-        <div className="grid grid-cols-2 gap-0 auto-rows-fr" style={{ 
+        <div className="grid grid-cols-2 auto-rows-fr" style={{ 
           width: window.innerWidth >= 1470 ? 'min(1300px, 95vw)' : 'min(1130px, 95vw)',
-          maxHeight: '100%'
+          maxHeight: '100%',
+          gap: '2px',
+          gridTemplateRows: 'repeat(auto-fit, minmax(280px, 1fr))'
         }}>
           {generatedImages.length > 0 && generatedImages.slice(0, 3).map((image, index) => (
             <div
               key={index}
-              className={`relative flex items-center justify-center transition-all duration-700 ease-out cursor-pointer group ${
+              className={`flex items-center justify-center transition-all duration-700 ease-out overflow-hidden cursor-pointer group ${
                 selectedImageIndex === index ? 'ring-4 ring-blue-500' : ''
               }`}
               onClick={() => selectImage(index)}
               style={{ 
                 transitionDelay: `${800 + index * 100}ms`,
-                padding: '0',
-                margin: '0',
-                backgroundColor: 'transparent'
+                borderRadius: '10px',
+                backgroundColor: '#1a1a1a',
+                border: '0.25px solid #333333'
               }}
             >
-              <img 
-                src={image.url} 
-                alt={`Generated image ${index + 1}`} 
-                className="w-full h-full object-cover"
-                loading="eager"
-                style={{ imageRendering: '-webkit-optimize-contrast' as any }}
-              />
+              <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-[10px]">
+                <img 
+                  src={image.url} 
+                  alt={`Generated image ${index + 1}`} 
+                  className="w-full h-full object-cover relative z-10"
+                  loading="eager"
+                  style={{ imageRendering: '-webkit-optimize-contrast' as any }}
+                />
                 
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30">
-                <button 
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    setSelectedImageIndex(index);
-                    setIsPrinting(true);
-                    try {
-                      await generate3DModel();
-                    } catch (error) {
-                      console.error('3D generation failed:', error);
-                    } finally {
-                      setIsPrinting(false);
-                    }
-                  }}
-                  className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer"
-                  style={{
-                    width: '162px',
-                    height: '52px',
-                    borderRadius: '26px',
-                    border: '2px solid #ffffff',
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    color: '#000000',
-                    fontFamily: 'Manrope, sans-serif',
-                    fontWeight: 700,
-                    fontSize: '16px',
-                    lineHeight: '100%',
-                    letterSpacing: '0%',
-                    textAlign: 'center' as const
-                  }}
-                >
-                  View 360°
-                </button>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 rounded-[10px]" style={{
+                  backgroundColor: 'rgba(23, 23, 23, 0.31)',
+                  backdropFilter: 'blur(4px)'
+                }}>
+                  <button 
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setSelectedImageIndex(index);
+                      setIsPrinting(true);
+                      try {
+                        await generate3DModel();
+                      } catch (error) {
+                        console.error('3D generation failed:', error);
+                      } finally {
+                        setIsPrinting(false);
+                      }
+                    }}
+                    className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                    style={{
+                      width: '162px',
+                      height: '52px',
+                      borderRadius: '26px',
+                      border: '2px solid #2C2C2C',
+                      backgroundColor: 'transparent',
+                      color: '#2C2E3D',
+                      fontFamily: 'Manrope, sans-serif',
+                      fontWeight: 700,
+                      fontSize: '16px',
+                      lineHeight: '100%',
+                      letterSpacing: '0%',
+                      textAlign: 'center' as const
+                    }}
+                  >
+                    View 360Â°
+                  </button>
+                </div>
               </div>
             </div>
           ))}

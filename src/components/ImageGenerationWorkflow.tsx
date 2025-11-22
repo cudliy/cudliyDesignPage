@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/api';
-import type { Generate3DModelRequest } from '../services/api';
+import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
 
 interface ImageGenerationWorkflowProps {
   prompt: string;
-  enhancedPrompt?: string; // Strategic Enhancement: Accept enhanced prompt
-  quality?: 'fast' | 'medium' | 'good'; // Quality setting for 3D generation
-  onComplete: (designId: string) => void;
+  enhancedPrompt?: string;
+  quality?: 'fast' | 'medium' | 'good';
+  onComplete: (designId: string, designData?: any) => void;
   onError: (error: string) => void;
 }
 
@@ -17,36 +17,35 @@ interface GeneratedImage {
   index: number;
 }
 
-export default function ImageGenerationWorkflow({ quality = 'medium', onComplete, onError }: ImageGenerationWorkflowProps) {
-  const [isGenerating] = useState(false);
+export default function ImageGenerationWorkflow({ 
+  prompt, 
+  enhancedPrompt, 
+  quality = 'medium', 
+  onComplete, 
+  onError
+}: ImageGenerationWorkflowProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
-  const [selectedImageIndex, setIsSelectedImageIndex] = useState<number | null>(null);
-  const [sessionId] = useState<string>('');
-  const [creationId] = useState<string>('');
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [sessionId, setSessionId] = useState<string>('');
+  const [creationId, setCreationId] = useState<string>('');
   const [isPrinting, setIsPrinting] = useState(false);
 
-    // Get user ID for usage limits (authenticated users only)
-    const userId = sessionStorage.getItem('user_id') || '';
-    const token = sessionStorage.getItem('token');
-    
-    // Redirect to login if not authenticated
-    useEffect(() => {
-      if (!userId || !token) {
-        window.location.href = '/signin';
-      }
-    }, [userId, token]);
+  const userId = sessionStorage.getItem('user_id') || '';
+  const token = sessionStorage.getItem('token');
+  
+  useEffect(() => {
+    if (!userId || !token) {
+      window.location.href = '/signin';
+    }
+  }, [userId, token]);
 
-  const {
-    canGenerateModels,
-    checkLimits
-  } = useUsageLimits(userId);
+  const { canGenerateImages, canGenerateModels, checkLimits } = useUsageLimits(userId);
 
-  // Get 3D generation options based on quality setting
   const get3DOptions = (quality: 'fast' | 'medium' | 'good') => {
     switch (quality) {
       case 'fast':
         return {
-          // Fast: fal.ai Hunyuan3D v2 mini/turbo
           texture_size: 1024 as const,
           mesh_simplify: 0.3,
           ss_sampling_steps: 15,
@@ -56,7 +55,6 @@ export default function ImageGenerationWorkflow({ quality = 'medium', onComplete
         };
       case 'medium':
         return {
-          // Medium: fal.ai TripoSR
           texture_size: 2048 as const,
           mesh_simplify: 0.2,
           ss_sampling_steps: 30,
@@ -66,7 +64,6 @@ export default function ImageGenerationWorkflow({ quality = 'medium', onComplete
         };
       case 'good':
         return {
-          // Good: Replicate Trellis (highest quality)
           texture_size: 4096 as const,
           mesh_simplify: 0.1,
           generate_normal: true,
@@ -88,15 +85,97 @@ export default function ImageGenerationWorkflow({ quality = 'medium', onComplete
     }
   };
 
-  // Manual generation only - no auto-generation
+  const generateImages = useCallback(async () => {
+    const finalPrompt = enhancedPrompt || prompt;
+    
+    if (!finalPrompt.trim()) {
+      onError('Please enter a prompt first');
+      return;
+    }
 
+    if (!canGenerateImages) {
+      onError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
+      return;
+    }
+
+    console.log('🚀 Starting image generation...');
+    setIsGenerating(true);
+    setGeneratedImages([]);
+    setSelectedImageIndex(null);
+    setSessionId('');
+    setCreationId('');
+
+    try {
+      const newCreationId = `creation_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+      setCreationId(newCreationId);
+      
+      const request: GenerateImagesRequest = {
+        text: finalPrompt,
+        user_id: userId || (() => {
+          const storedUserId = sessionStorage.getItem('guest_user_id');
+          if (storedUserId) return storedUserId;
+          const newUserId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+          sessionStorage.setItem('guest_user_id', newUserId);
+          return newUserId;
+        })(),
+        creation_id: newCreationId,
+        color: '#FF6B6B',
+        size: 'M',
+        style: 'realistic',
+        material: 'plastic',
+        production: 'digital',
+        details: []
+      };
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300000);
+
+      try {
+        const response = await apiService.generateImages(request);
+        
+        if (response.success && response.data) {
+          setGeneratedImages(response.data.images);
+          setSessionId(response.data.session_id);
+          
+          try {
+            await apiService.trackUsage(userId, 'image', response.data.images.length);
+            await checkLimits(true);
+          } catch (trackingError) {
+            try {
+              await checkLimits(true);
+            } catch (limitsError) {
+              // Limits check failed
+            }
+          }
+        } else {
+          throw new Error(response.error || 'Failed to generate images');
+        }
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        onError('Image generation timed out. Please try again with a simpler prompt.');
+      } else {
+        onError(error instanceof Error ? error.message : 'Failed to generate images');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [enhancedPrompt, prompt, onError, canGenerateImages, userId, checkLimits]);
+
+  // Auto-generate on mount
+  useEffect(() => {
+    if (prompt.trim() && !isGenerating && generatedImages.length === 0) {
+      generateImages();
+    }
+  }, []);
 
   const selectImage = (index: number) => {
-    setIsSelectedImageIndex(index);
+    setSelectedImageIndex(index);
   };
 
   const generate3DModel = async () => {
-    // Auto-select first image if no image is selected
     const imageIndex = selectedImageIndex !== null ? selectedImageIndex : 0;
     
     if (generatedImages.length === 0) {
@@ -104,12 +183,10 @@ export default function ImageGenerationWorkflow({ quality = 'medium', onComplete
       return;
     }
 
-    // Check usage limits before generating 3D model
     if (!canGenerateModels) {
       onError(`You have reached your monthly model generation limit. Please upgrade your plan to continue.`);
       return;
     }
-
 
     try {
       const selectedImage = generatedImages[imageIndex];
@@ -128,7 +205,6 @@ export default function ImageGenerationWorkflow({ quality = 'medium', onComplete
           generate_color: true,
           generate_model: true,
           randomize_seed: true,
-          // Use quality-based options
           ...get3DOptions(quality)
         }
       };
@@ -136,105 +212,127 @@ export default function ImageGenerationWorkflow({ quality = 'medium', onComplete
       const response = await apiService.generate3DModel(request);
       
       if (response.success && response.data) {
-        // Track usage after successful 3D model generation
         try {
           await apiService.trackUsage(userId, 'model', 1);
-          // Force refresh usage limits to get updated counts immediately
           await checkLimits(true);
         } catch (trackingError) {
           // Don't fail the generation if tracking fails
         }
         
-        // Mark the selected image as successfully processed
         setGeneratedImages(prev => prev.map((img, index) => 
           index === imageIndex 
             ? { ...img, processed: true }
             : img
         ));
         
-        // Navigate directly to design view
-        window.location.href = `/design/${response.data.design_id}`;
-        
-        onComplete(response.data.design_id);
+        onComplete(response.data.design_id, response.data);
       } else {
         throw new Error(response.error || 'Failed to generate 3D model');
       }
     } catch (error) {
       onError(error instanceof Error ? error.message : 'Failed to generate 3D model');
-    } finally {
     }
   };
 
-  return (
-    <div className="w-full mx-auto pt-0 mt-0 px-4 md:px-0 md:max-w-4xl bg-transparent">
-
-      {/* Loading State */}
-      {(isGenerating && generatedImages.length === 0) || isPrinting ? (
-        <div className="text-center py-8 h-full flex items-center justify-center min-h-[60vh] bg-transparent">
-          <div className="flex flex-col items-center">
-            <img
-              src="/GIFS/Loading-State.gif"
-              alt="Generating Images"
-              className="w-48 h-48 md:w-96 md:h-96 object-contain mb-8"
-            />
-            <span className="text-black font-medium text-lg md:text-xl">
-              {isPrinting ? 'Creating 3D Model...' : 'Generating Images...'}
-            </span>
-          </div>
+  // Loading State
+  if ((isGenerating && generatedImages.length === 0) || isPrinting) {
+    return (
+      <div className="text-center flex items-center justify-center py-8 h-full">
+        <div className="flex flex-col items-center">
+          <img
+            src="/GIFS/Loading-State.gif"
+            alt="Generating Images"
+            className="object-contain mb-8 w-96 h-96"
+          />
+          <span className="text-white font-medium text-xl">
+            {isPrinting ? 'Creating 3D Model...' : 'Generating Images...'}
+          </span>
         </div>
-      ) : (
-        <>
-          {/* Generated Images Grid - Clean layout matching Figma */}
-          {generatedImages.length > 0 && (
-            <div className="w-full pb-8">
-              <div className="grid grid-cols-2 grid-rows-2 gap-2 md:gap-3">
-                {/* First 3 images filling the space */}
-                {generatedImages.slice(0, 3).map((image, index) => (
-                  <div
-                    key={index}
-                    className={`bg-[#f0f0f0] flex items-center justify-center transition-all duration-300 overflow-hidden rounded-[10px] relative ${
-                      index === 0 ? 'row-span-2 h-full min-h-[400px] md:min-h-[500px]' : 'h-full min-h-[195px] md:min-h-[245px]'
-                    } ${
-                      selectedImageIndex === index 
-                        ? 'ring-2 md:ring-4 ring-blue-500' 
-                        : ''
-                    }`}
-                    onClick={() => selectImage(index)}
-                  >
-                    <div className="w-full h-full relative group cursor-pointer">
-                      <img 
-                        src={image.url} 
-                        alt={`Generated image ${index + 1}`} 
-                        className="w-full h-full object-cover"
-                      />
-                      
-                      {/* View 360° Button - Centered on Hover */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <button 
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            setIsPrinting(true);
-                            try {
-                              await generate3DModel();
-                            } catch (error) {
-                              console.error('3D generation failed:', error);
-                            } finally {
-                              setIsPrinting(false);
-                            }
-                          }}
-                          className="px-4 md:px-6 py-2 md:py-2.5 bg-white text-gray-800 rounded-full font-medium text-xs md:text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                        >
-                          View 360°
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+      </div>
+    );
+  }
+
+  // Generated Images Grid - NO GAP, 10px border radius, transparent overlay
+  if (generatedImages.length > 0) {
+    return (
+      <div className="w-full h-full flex items-center relative bg-[#212121]" style={{
+        justifyContent: window.innerWidth >= 1470 ? 'flex-start' : 'center',
+        padding: '0'
+      }}>
+        <div className="grid grid-cols-2 auto-rows-fr" style={{ 
+          width: window.innerWidth >= 1470 ? 'min(1300px, 95vw)' : 'min(1130px, 95vw)',
+          maxHeight: '100%',
+          gap: '0'
+        }}>
+          {generatedImages.slice(0, 3).map((image, index) => (
+            <div
+              key={index}
+              className={`relative flex items-center justify-center transition-all duration-700 ease-out cursor-pointer group overflow-hidden ${
+                selectedImageIndex === index ? 'ring-4 ring-blue-500' : ''
+              }`}
+              onClick={() => selectImage(index)}
+              style={{ 
+                transitionDelay: `${800 + index * 100}ms`,
+                padding: '0',
+                margin: '0',
+                backgroundColor: 'transparent',
+                borderRadius: '10px'
+              }}
+            >
+              <img 
+                src={image.url} 
+                alt={`Generated image ${index + 1}`} 
+                className="w-full h-full object-cover"
+                loading="eager"
+                style={{ 
+                  imageRendering: '-webkit-optimize-contrast' as any,
+                  borderRadius: '10px'
+                }}
+              />
+                
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 bg-transparent">
+                <button 
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    setSelectedImageIndex(index);
+                    setIsPrinting(true);
+                    try {
+                      await generate3DModel();
+                    } catch (error) {
+                      console.error('3D generation failed:', error);
+                    } finally {
+                      setIsPrinting(false);
+                    }
+                  }}
+                  className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer"
+                  style={{
+                    width: '162px',
+                    height: '52px',
+                    borderRadius: '26px',
+                    border: '2px solid #212121',
+                    backgroundColor: 'transparent',
+                    color: '#ffffff',
+                    fontFamily: 'Manrope, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '16px',
+                    lineHeight: '100%',
+                    letterSpacing: '0%',
+                    textAlign: 'center' as const
+                  }}
+                >
+                  View 360°
+                </button>
               </div>
             </div>
-          )}
-        </>
-      )}
-    </div>
-  );
+          ))}
+          
+          <div className="flex items-center justify-center">
+            {/* Empty space */}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }

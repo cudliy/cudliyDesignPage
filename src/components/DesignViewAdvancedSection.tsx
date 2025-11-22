@@ -76,7 +76,7 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
     return (
       <div className="flex flex-col items-center text-center w-full px-3">
         {/* Breadcrumb Navigation */}
-        <div className="mb-4 flex items-center gap-1 text-[10px]">
+        <div className="mb-4 flex items-center gap-1 text-base font-thin">
           <button 
             onClick={handleBackToCategories}
             className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -165,16 +165,19 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
     return (
       <div className="flex flex-col items-center justify-center text-center w-full h-full">
         {/* Category Icons Grid */}
-        <div className="grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[320px] mx-auto">
+        <div className="flex flex-wrap justify-between gap-y-8 w-full max-w-[420px] mx-auto">
           {Object.entries(sections).map(([key, section], index) => {
             const isSelected = selectedCategories[key];
             return (
               <div
                 key={key}
-                className={`flex flex-col items-center gap-3 p-3 transition-all duration-300 hover:scale-105 cursor-pointer relative group ${
-                  isSelected ? 'rounded-lg' : ''
+                className={`flex flex-col items-center gap-3 p-3 transition-all duration-200 cursor-pointer relative group rounded-lg ${
+                  isSelected ? 'bg-white/5' : 'hover:bg-white/5'
                 }`}
-                style={{ transitionDelay: `${400 + index * 50}ms` }}
+                style={{ 
+                  transitionDelay: `${400 + index * 50}ms`,
+                  width: 'calc(33.333% - 8px)'
+                }}
                 onClick={() => handleCategoryClick(key)}
               >
                 {isSelected && (
@@ -184,10 +187,10 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
                     </svg>
                   </div>
                 )}
-                <div className="w-9 h-9 mx-auto transition-all duration-300 hover:scale-110">
+                <div className="w-9 h-9 mx-auto transition-colors duration-200 group-hover:text-white text-white/90">
                   {section.icon}
                 </div>
-                <span className="text-[12px] font-normal text-white/70">
+                <span className="text-[12px] font-normal text-white/70 group-hover:text-white/90 transition-colors duration-200">
                   {section.title}
                 </span>
               </div>
@@ -196,7 +199,7 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
         </div>
 
         {/* Action Buttons - Back and Save to draft */}
-        <div className="w-full max-w-[360px] mt-12 pt-8 pb-6 flex gap-3 items-center justify-center">
+        <div className="w-full max-w-[420px] mt-8 pt-6 pb-6 flex gap-3 items-center justify-center">
           <button 
             onClick={onBack}
             className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center bg-white/5 hover:bg-white/10 backdrop-blur-sm"

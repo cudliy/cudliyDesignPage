@@ -70,7 +70,7 @@ export default function ProductionSelector({
                   />
               </div>
             </button>
-                         <span className={`text-sm font-medium mt-3 text-center ${
+                         <span className={`text-sm font-thin mt-3 text-center ${
                selectedProduction === option.key ? 'text-[#E70D57]' : 'text-[#CCCCCC]'
              }`}>
                {option.label}
@@ -94,7 +94,7 @@ export default function ProductionSelector({
                className="w-4 h-4 object-contain"
              />
           </div>
-          <span className="text-white/90 text-sm font-medium">
+          <span className="text-white/90 text-sm font-thin">
             {productionOptions.find(opt => opt.key === selectedProduction)?.label}
           </span>
         </div>

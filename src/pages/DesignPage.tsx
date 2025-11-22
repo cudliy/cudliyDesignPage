@@ -346,7 +346,7 @@ const handleBackToCategories = () => {
 	  {/*Dropdown Button*/}
 	  <Button 
 		variant="ghost" 
-		className="flex items-center gap-2 bg-transparent hover:bg-transparent text-white px-2 py-2 transition-all duration-300" 
+		className="flex items-center gap-2 bg-transparent hover:bg-white/5 text-white px-2 py-2 transition-all duration-200 rounded-lg" 
 		onClick={() => setOpen(!open)}
 	  >
 	   <img className="w-5 h-5" src="Asset 13.svg" alt="Workspace"/> 
@@ -366,13 +366,13 @@ const handleBackToCategories = () => {
 			<div className="py-1">
 			  <a 
 				href="/dashboard" 
-				className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-all duration-200 group"
+				className="flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-white/5 transition-all duration-200 group rounded-lg"
 			  >
-				<svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg className="w-4 h-4 text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
 				  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
 				</svg>
-				<span className="font-medium">Back to Workspace</span>
+				<span className="font-medium text-white">Back to Workspace</span>
 			  </a>
 			</div>
 		  </motion.div>
@@ -471,9 +471,9 @@ const handleBackToCategories = () => {
 
 	const renderSizeSelector = () => {
 		return (
-			<div className="flex flex-col items-center text-center w-full px-3">
+			<div className="flex flex-col items-center text-center w-full px-3" style={{ transform: 'scale(0.99)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className="mb-0 flex items-center gap-1 text-[10px]">
+				<div className="mb-4 flex items-center gap-1 text-base font-thin">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -529,9 +529,9 @@ const handleBackToCategories = () => {
 
 	const renderProductionSelector = () => {
 		return (
-			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
+			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.99)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className="mb-0 flex items-center gap-1 text-[10px]">
+				<div className="mb-4 flex items-center gap-1 text-base font-thin">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -584,9 +584,9 @@ const handleBackToCategories = () => {
 
 	const renderStyleSelector = () => {
 		return (
-			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
+			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.99)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className="mb-0 flex items-center gap-1 text-[10px]">
+				<div className="mb-4 flex items-center gap-1 text-base font-thin">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -639,9 +639,9 @@ const handleBackToCategories = () => {
 
 	const renderMaterialSelector = () => {
 		return (
-			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
+			<div className="flex flex-col items-center text-center w-full px-3" style={{ transform: 'scale(0.99)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className="mb-0 flex items-center gap-1 text-[10px]">
+				<div className="mb-2 flex items-center gap-1 text-base font-thin">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -661,7 +661,7 @@ const handleBackToCategories = () => {
 				</div>
 
 				{/* Create Button with Arrow */}
-				<div className="mt-4 flex items-center justify-center gap-3 relative z-50">
+				<div className="mt-2 flex items-center justify-center gap-3 relative z-50">
 					<button 
 						onClick={(e) => {
 							e.preventDefault();
@@ -693,9 +693,9 @@ const handleBackToCategories = () => {
 	};
 	const renderDetailSelector = () => {
 		return (
-			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
+			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.99)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className="mb-0 flex items-center gap-1 text-[10px]">
+				<div className="mb-4 flex items-center gap-1 text-base font-thin">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -748,9 +748,9 @@ const handleBackToCategories = () => {
 
 	const renderColorPalette = () => {
 		return (
-			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
+			<div className="flex flex-col items-center text-center w-full" style={{ transform: 'scale(0.99)', transformOrigin: 'top center' }}>
 				{/* Breadcrumb Navigation */}
-				<div className="mb-0 flex items-center gap-1 text-[10px]">
+				<div className="mb-4 flex items-center gap-1 text-base font-thin">
 					<button 
 						onClick={handleBackToCategories}
 						className="text-white/70 hover:text-white transition-colors cursor-pointer"
@@ -825,29 +825,32 @@ const handleBackToCategories = () => {
 		return (
 			<div className="flex flex-col items-center justify-center text-center w-full h-full">
 				{/* Category Icons Grid */}
-				<div className="grid grid-cols-3 gap-x-10 gap-y-8 w-full max-w-[320px] mx-auto">
+				<div className="flex flex-wrap justify-between gap-y-8 w-full max-w-[420px] mx-auto">
 					{Object.entries(sections).map(([key, section], index) => {
 						const isSelected = categoryStatus[key as keyof typeof categoryStatus];
 						return (
 							<div
 								key={key}
-								className={`flex flex-col items-center gap-3 p-3 transition-all duration-300 hover:scale-105 cursor-pointer relative group ${
-									isSelected ? 'rounded-lg' : ''
+								className={`flex flex-col items-center gap-3 p-3 transition-all duration-200 cursor-pointer relative group rounded-lg ${
+									isSelected ? 'bg-white/5' : 'hover:bg-white/5'
 								}`}
-								style={{ transitionDelay: `${400 + index * 50}ms` }}
+								style={{ 
+									transitionDelay: `${400 + index * 50}ms`,
+									width: 'calc(33.333% - 8px)'
+								}}
 								onClick={() => handleCategoryClick(key)}
 							>
 								{isSelected && (
-									<div className="absolute -top-1 right-1 w-3 h-3 bg-[#313131] rounded-full flex items-center justcenter">
-										<svg className="w-1.5 h-1.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+									<div className="absolute -top-1 right-1 w-3 h-3 bg-[#313131] rounded-full flex items-center justify-center">
+										<svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
 											<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
 										</svg>
 									</div>
 								)}
-							<div className="w-9 h-9 mx-auto transition-all duration-300 hover:scale-110">
+							<div className="w-9 h-9 mx-auto transition-colors duration-200 group-hover:text-white text-white/90">
 									{section.icon}
 								</div>
-							<span className="text-[12px] font-normal text-white/70">
+							<span className="text-[12px] font-normal text-white/70 group-hover:text-white/90 transition-colors duration-200">
 									{section.title}
 								</span>
 							</div>

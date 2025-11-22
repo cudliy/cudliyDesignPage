@@ -615,7 +615,7 @@ export default function DesignView() {
         <div className="left-pane-content pt-[3rem] px-4 sm:px-6 pb-4 text-white flex flex-col items-center text-center h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           
           {/* Generate New Design Section - Exact copy from DesignPage */}
-          <div className="mt-12 w-full max-w-[360px] mb-4">
+          <div className="mt-12 w-full max-w-[420px] mb-3">
             {/* Main Input Container - Dark Style - Exact copy from DesignPage */}
             <div className="relative w-full bg-[#515151]" style={{ height: '100px', borderRadius: '25px' }}>
               {/* Input Field - Top portion */}
@@ -705,7 +705,7 @@ export default function DesignView() {
           {/* Conditional Content - Control Sliders or Advanced Section */}
           {!showAdvanced ? (
             /* Control Sliders Section */
-            <div className="mt-8 w-full max-w-[360px]">
+            <div className="mt-6 w-full max-w-[420px]">
               <div className="space-y-6">
               {/* Lighting Slider */}
               <div>

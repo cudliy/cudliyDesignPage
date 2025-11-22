@@ -88,7 +88,7 @@ export default function DetailSelector({
       )}
 
       {/* Categories and Options Layout - Reduced height */}
-      <div className="w-full max-w-[800px] flex-1 bg-gray-900/20 rounded-lg p-3">
+      <div className="w-full max-w-[800px] flex-1 p-3">
         <div className="grid grid-cols-2 gap-6 h-full">
           {/* Left Column - Scrollable Categories */}
           <div className="h-full">
@@ -104,14 +104,14 @@ export default function DetailSelector({
                 {detailCategories.map((category) => (
                   <div
                     key={category.key}
-                    className={`min-h-[30px] flex items-center px-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                    className={`min-h-[30px] flex items-center px-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-white/5 ${
                       activeCategory === category.key
-                        ? 'bg-[#E70D57]/20 text-[#E70D57]'
-                        : 'text-white/70 hover:text-white/90 hover:bg-white/5'
+                        ? 'text-[#E70D57]'
+                        : 'text-white/70 hover:text-white/90'
                     }`}
                     onClick={() => setActiveCategory(category.key)}
                   >
-                    <span className="text-base font-medium">{category.label}</span>
+                    <span className="text-lg font-thin">{category.label}</span>
                   </div>
                 ))}
               </div>
@@ -126,13 +126,13 @@ export default function DetailSelector({
                   <button
                     key={option}
                     onClick={() => handleDetailToggle(option)}
-                    className={`w-full text-left p-2 rounded-lg transition-all duration-200 ${
+                    className={`w-full text-left p-2 rounded-lg transition-all duration-200 hover:bg-white/5 ${
                       selectedDetails.includes(option)
-                        ? 'bg-[#E70D57]/20 text-[#E70D57]'
-                        : 'text-white/70 hover:text-white/90 hover:bg-white/5'
+                        ? 'text-[#E70D57]'
+                        : 'text-white/70 hover:text-white/90'
                     }`}
                   >
-                    <span className="text-sm">{option}</span>
+                    <span className="text-sm font-thin">{option}</span>
                   </button>
                 ))}
               </div>

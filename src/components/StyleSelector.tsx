@@ -85,7 +85,7 @@ export default function StyleSelector({
                  />
               </div>
             </button>
-                                      <span className={`text-sm font-medium mt-2 text-center ${
+                                      <span className={`text-sm font-thin mt-2 text-center ${
                  selectedStyle === option.key ? 'text-[#E70D57]' : 'text-[#CCCCCC]'
                }`}>
                {option.label}
@@ -139,7 +139,7 @@ export default function StyleSelector({
                    />
                  </div>
                </button>
-               <span className={`text-sm font-medium mt-2 text-center ${
+               <span className={`text-sm font-thin mt-2 text-center ${
                  selectedStyle === option.key ? 'text-[#E70D57]' : 'text-[#CCCCCC]'
                }`}>
                  {option.label}
@@ -164,7 +164,7 @@ export default function StyleSelector({
               className="w-4 h-4 object-contain"
             />
           </div>
-          <span className="text-white/90 text-sm font-medium">
+          <span className="text-white/90 text-sm font-thin">
             {styleOptions.find(opt => opt.key === selectedStyle)?.label}
           </span>
         </div>
