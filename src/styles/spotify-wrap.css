@@ -1,0 +1,240 @@
+/* Spotify Wrap Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Apply animations */
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.8s ease-out forwards;
+}
+
+.animate-zoomIn {
+  animation: zoomIn 0.8s ease-out forwards;
+}
+
+.animate-rotateIn {
+  animation: rotateIn 0.8s ease-out forwards;
+}
+
+.animate-bounceIn {
+  animation: bounceIn 1s ease-out forwards;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Spotify Wrap specific styles */
+.spotify-wrap-slide {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spotify-wrap-slide.entering {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.spotify-wrap-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.spotify-wrap-slide.exiting {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+/* Gradient backgrounds */
+.gradient-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-pink {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+/* Text effects */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Interactive elements */
+.interactive-hover {
+  transition: all 0.3s ease;
+}
+
+.interactive-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .spotify-wrap-slide {
+    font-size: 0.9rem;
+  }
+  
+  .spotify-wrap-slide h1 {
+    font-size: 2rem;
+  }
+  
+  .spotify-wrap-slide h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeInUp,
+  .animate-slideInLeft,
+  .animate-slideInRight,
+  .animate-zoomIn,
+  .animate-rotateIn,
+  .animate-bounceIn,
+  .animate-pulse,
+  .animate-float,
+  .animate-shimmer {
+    animation: none;
+  }
+  
+  .spotify-wrap-slide {
+    transition: none;
+  }
+}

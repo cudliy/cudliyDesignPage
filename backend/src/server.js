@@ -24,6 +24,8 @@ import authRoutes from './routes/authRoutes.js';
 import checkoutRoutes from './routes/checkoutRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import slant3dRoutes from './routes/slant3dRoutes.js';
+import shareRoutes from './routes/shareRoutes.js';
+import giftRoutes from './routes/giftRoutes.js';
 
 // Environment variables are loaded in index.js
 
@@ -303,6 +305,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/checkout', checkoutRoutes);
 app.use('/api/slant3d', slant3dRoutes);
+app.use('/api/share', shareRoutes);
+app.use('/api/gifts', giftRoutes);
 
 // Error handling middleware
 app.use(globalErrorHandler);

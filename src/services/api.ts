@@ -590,6 +590,56 @@ class ApiService {
       body: JSON.stringify(updates),
     });
   }
+
+  // Sharing methods
+  async generateShareData(designId: string, userId?: string): Promise<ApiResponse<any>> {
+    const params = userId ? `?userId=${userId}` : '';
+    return this.request(`/share/designs/${designId}/share-data${params}`);
+  }
+
+  async getShareAnalytics(designId: string): Promise<ApiResponse<any>> {
+    return this.request(`/share/designs/${designId}/share-analytics`);
+  }
+
+  async trackShare(designId: string, platform: string, slideIndex: number, userId?: string): Promise<ApiResponse<any>> {
+    return this.request(`/share/designs/${designId}/track-share`, {
+      method: 'POST',
+      body: JSON.stringify({ platform, slideIndex, userId }),
+    });
+  }
+
+  // Gift methods
+  async createGift(designId: string, senderName: string, recipientName: string, recipientEmail: string, message?: string, senderId?: string): Promise<ApiResponse<any>> {
+    return this.request('/gifts/create', {
+      method: 'POST',
+      body: JSON.stringify({ designId, senderName, recipientName, recipientEmail, message, senderId }),
+    });
+  }
+
+  async getGift(giftId: string): Promise<ApiResponse<any>> {
+    return this.request(`/gifts/${giftId}`);
+  }
+
+  async trackGiftDownload(giftId: string): Promise<ApiResponse<any>> {
+    return this.request(`/gifts/${giftId}/download`, {
+      method: 'POST',
+    });
+  }
+
+  async getGiftAnalytics(giftId: string, senderId?: string): Promise<ApiResponse<any>> {
+    const params = senderId ? `?senderId=${senderId}` : '';
+    return this.request(`/gifts/${giftId}/analytics${params}`);
+  }
+
+  async sendGiftEmail(giftId: string): Promise<ApiResponse<any>> {
+    return this.request(`/gifts/${giftId}/send-email`, {
+      method: 'POST',
+    });
+  }
+
+  async getUserGifts(userId: string, page: number = 1, limit: number = 10): Promise<ApiResponse<any>> {
+    return this.request(`/gifts/user/${userId}/gifts?page=${page}&limit=${limit}`);
+  }
 }
 
 export const apiService = new ApiService();

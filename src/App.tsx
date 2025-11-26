@@ -15,6 +15,9 @@ import PrivacyPage from './pages/PrivacyPage'
 import BlogPage from './pages/BlogPage'
 import PricingPage from './pages/PricingPage'
 import Toaster from '@/components/ui/Toaster'
+import SpotifyWrapDemo from './components/SpotifyWrapDemo'
+import SendGiftPage from './pages/SendGiftPage'
+import GiftViewPage from './pages/GiftViewPage'
 
 function App() {
   return (
@@ -37,6 +40,9 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/demo/spotify-wrap" element={<SpotifyWrapDemo />} />
+          <Route path="/send-gift/:designId" element={<SendGiftPage />} />
+          <Route path="/gift/:giftId" element={<GiftViewPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
