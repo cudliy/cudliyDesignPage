@@ -410,7 +410,7 @@ export default function SendGiftPage() {
                 onChange={(e) => setRecipientName(e.target.value)}
                 placeholder="Recipient Name"
                 required
-                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
+                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-300"
                 style={{
                   height: '40px',
                   borderRadius: '25px',
@@ -435,7 +435,7 @@ export default function SendGiftPage() {
                 value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
                 placeholder="Recipient Email (Optional)"
-                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
+                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-300"
                 style={{
                   height: '40px',
                   borderRadius: '25px',
@@ -459,7 +459,7 @@ export default function SendGiftPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Write a short note they will see first"
-                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
+                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-300"
                 style={{
                   height: '112px',
                   borderRadius: '25px',
