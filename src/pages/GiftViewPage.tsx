@@ -15,13 +15,13 @@ interface GiftData {
 }
 
 const VIDEO_TEMPLATES = [
-  'https://assets.mixkit.co/videos/preview/mixkit-abstract-blue-background-with-particles-5052-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-colorful-gradient-background-26068-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-purple-and-pink-gradient-background-26069-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-neon-lights-background-26070-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-blue-abstract-waves-1040-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-golden-particles-background-26071-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-colorful-bokeh-lights-1167-large.mp4',
+  '/Wrap vid1.mp4',
+  '/Wrap vid 2.mp4',
+  '/Wrap vid3.mp4',
+  '/Wrap vid1.mp4',
+  '/Wrap vid 2.mp4',
+  '/Wrap vid3.mp4',
+  '/Wrap vid1.mp4',
 ];
 
 export default function GiftViewPage() {
@@ -70,12 +70,10 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[0],
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         content: (
-          <div className="text-center space-y-8 animate-fade-in">
-            <div className="text-7xl mb-4">🎁</div>
-            <h1 className="text-6xl font-bold text-white mb-4">
-              {gift.senderName}
-            </h1>
-            <p className="text-3xl text-white/90">sent you something special</p>
+          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+              {gift.senderName} sent you something special
+            </p>
           </div>
         )
       },
@@ -84,11 +82,10 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[1],
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
         content: (
-          <div className="text-center space-y-8 animate-fade-in">
-            <p className="text-4xl text-white/80">For</p>
-            <h1 className="text-7xl font-bold text-white">
-              {gift.recipientName}
-            </h1>
+          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+              For {gift.recipientName}
+            </p>
           </div>
         )
       },
@@ -97,12 +94,10 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[2],
         gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
         content: gift.message ? (
-          <div className="text-center space-y-8 animate-fade-in max-w-3xl mx-auto">
-            <div className="text-6xl mb-4">💌</div>
-            <p className="text-4xl text-white italic leading-relaxed">
-              "{gift.message}"
+          <div className="text-center space-y-4 max-w-3xl mx-auto px-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+              "{gift.message}" - {gift.senderName}
             </p>
-            <p className="text-2xl text-white/70">- {gift.senderName}</p>
           </div>
         ) : null
       },
@@ -111,12 +106,10 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[3],
         gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
         content: (
-          <div className="text-center space-y-8 animate-fade-in">
-            <div className="text-7xl mb-4">🎨</div>
-            <h1 className="text-6xl font-bold text-white mb-4">
-              Your 3D Design
-            </h1>
-            <p className="text-3xl text-white/90">Created just for you</p>
+          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+              Your 3D model created just for you
+            </p>
           </div>
         )
       },
@@ -125,8 +118,17 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[4],
         gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
         content: (
-          <div className="text-center space-y-6 animate-fade-in w-full px-4">
-            {design.modelFiles?.originalImage || design.images?.[0]?.url ? (
+          <div className="text-center space-y-6 w-full px-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            {design.modelFiles?.glbFile ? (
+              <div className="w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto aspect-square">
+                <div 
+                  dangerouslySetInnerHTML={{
+                    __html: `<model-viewer src="${design.modelFiles.glbFile}" alt="3D Model" auto-rotate camera-controls style="width: 100%; height: 100%;" class="rounded-3xl"></model-viewer>`
+                  }}
+                  style={{ width: '100%', height: '100%' }}
+                />
+              </div>
+            ) : design.modelFiles?.originalImage || design.images?.[0]?.url ? (
               <div className="w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto aspect-square rounded-3xl overflow-hidden shadow-2xl">
                 <img
                   src={design.modelFiles?.originalImage || design.images[0].url}
@@ -136,7 +138,7 @@ export default function GiftViewPage() {
               </div>
             ) : null}
             {design.originalText && design.originalText !== 'Creator' && (
-              <p className="text-2xl md:text-3xl lg:text-4xl text-white font-semibold px-4 line-clamp-2">
+              <p className="text-2xl md:text-3xl text-white font-bold px-4" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
                 {design.originalText}
               </p>
             )}
@@ -146,23 +148,20 @@ export default function GiftViewPage() {
       {
         id: 'download',
         video: VIDEO_TEMPLATES[5],
+        gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
         content: (
-          <div className="text-center space-y-8 animate-fade-in">
-            <div className="text-7xl mb-4">📥</div>
-            <h1 className="text-6xl font-bold text-white mb-4">
-              Ready to Download?
-            </h1>
-            <p className="text-2xl text-white/90 mb-8">
-              Get your 3D model in multiple formats
+          <div className="text-center space-y-6" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+              Ready to download your 3D model?
             </p>
             <button
               onClick={() => {
                 if (giftId) apiService.trackGiftDownload(giftId);
                 navigate(`/download/${design.id}`);
               }}
-              className="px-12 py-6 bg-white text-black rounded-full text-2xl font-bold hover:scale-105 transition-transform flex items-center gap-4 mx-auto"
+              className="px-12 py-5 bg-white text-black rounded-full text-xl font-black flex items-center gap-3 mx-auto"
             >
-              <Download className="w-8 h-8" />
+              <Download className="w-7 h-7" />
               Download Now
             </button>
           </div>
@@ -171,16 +170,13 @@ export default function GiftViewPage() {
       {
         id: 'thanks',
         video: VIDEO_TEMPLATES[6],
+        gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: (
-          <div className="text-center space-y-8 animate-fade-in">
-            <div className="text-7xl mb-4">✨</div>
-            <h1 className="text-6xl font-bold text-white mb-4">
-              Thank You!
-            </h1>
-            <p className="text-3xl text-white/90">
-              From {gift.senderName}
+          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+              Thank you from {gift.senderName}
             </p>
-            <p className="text-xl text-white/70 mt-8">
+            <p className="text-xl md:text-2xl text-white font-bold" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
               Created with Cudliy
             </p>
           </div>
@@ -235,7 +231,6 @@ export default function GiftViewPage() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-6">❌</div>
           <h1 className="text-4xl font-bold text-white mb-4">Oops!</h1>
           <p className="text-xl text-gray-400 mb-8">{error || 'Gift not found'}</p>
           <button
@@ -254,19 +249,26 @@ export default function GiftViewPage() {
   const currentSlideData = slides[currentSlide];
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden">
+    <div className="fixed inset-0 overflow-hidden" style={{ background: currentSlideData.gradient || '#000' }}>
       <video
         key={currentSlideData.video}
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover opacity-100"
+        onError={(e) => {
+          console.error('Video failed to load:', currentSlideData.video);
+          e.currentTarget.style.display = 'none';
+        }}
+        onLoadedData={() => {
+          console.log('Video loaded successfully:', currentSlideData.video);
+        }}
       >
         <source src={currentSlideData.video} type="video/mp4" />
       </video>
 
-      <div className="absolute inset-0 bg-black/40" />
+
 
       <div className="relative z-10 h-full flex items-center justify-center p-8">
         {currentSlideData.content}
@@ -279,53 +281,20 @@ export default function GiftViewPage() {
         <X className="w-6 h-6" />
       </button>
 
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className="relative h-1 bg-white/30 rounded-full overflow-hidden transition-all"
-            style={{ width: index === currentSlide ? '48px' : '24px' }}
-          >
-            {index === currentSlide && !isPaused && (
-              <div
-                className="absolute inset-0 bg-white rounded-full animate-progress"
-                style={{ animation: 'progress 4s linear' }}
-              />
-            )}
-            {index < currentSlide && (
-              <div className="absolute inset-0 bg-white rounded-full" />
-            )}
-          </button>
-        ))}
-      </div>
-
-      <button
-        onClick={() => setIsPaused(!isPaused)}
-        className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-20 text-white/50 text-sm"
-      >
-        {isPaused ? 'Tap to resume' : 'Tap to pause'}
-      </button>
-
       <style>{`
-        @keyframes progress {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(0); }
+        @keyframes typing {
+          from { width: 0; }
+          to { width: 100%; }
         }
-        
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
+        .typing-text {
+          overflow: hidden;
+          white-space: nowrap;
+          animation: typing 2s steps(40, end);
+          display: inidden;
+          border-right: 2px solid white;
+          white-space: nowrap;
+          animation: typing 2s steps(40, end);
+          display: inline-block;
         }
       `}</style>
     </div>

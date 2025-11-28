@@ -53,6 +53,7 @@ const corsOptions = {
         'https://www.cudliy.com',
         'https://cudliy.com',
         'http://localhost:5173',
+        'http://localhost:5174',
         'http://localhost:3000',
         'https://accounts.google.com',
         'https://accounts.google.com:443'
@@ -72,7 +73,7 @@ const corsOptions = {
     }
     
     // Allow localhost for development
-    if (origin && (origin.includes('localhost:5173') || origin.includes('localhost:3000'))) {
+    if (origin && (origin.includes('localhost:5173') || origin.includes('localhost:5174') || origin.includes('localhost:3000'))) {
       return callback(null, true);
     }
     
@@ -128,7 +129,8 @@ app.options('*', (req, res) => {
     [
       'https://www.cudliy.com',
       'https://cudliy.com',
-      'http://localhost:5173'
+      'http://localhost:5173',
+      'http://localhost:5174'
     ];
   
   console.log('Allowed origins:', allowedOrigins);
@@ -136,6 +138,7 @@ app.options('*', (req, res) => {
   // Allow cudliy.com domains
   const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com') 
   || (origin && origin.includes('http://localhost:5173'))
+  || (origin && origin.includes('http://localhost:5174'))
 ) 
   
   console.log('Is origin allowed?', isAllowed);
@@ -250,10 +253,11 @@ app.use('/api/designs', (req, res, next) => {
       'https://www.cudliy.com',
       'https://cudliy.com',
       'http://localhost:5173',
+      'http://localhost:5174',
     ];
   
   // Set CORS headers for all requests to designs route
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('http://localhost:5173'));
+  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('http://localhost:5173')) || (origin && origin.includes('http://localhost:5174'));
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
@@ -277,11 +281,13 @@ app.options('/api/designs/*', (req, res) => {
     [
       'https://www.cudliy.com',
       'https://cudliy.com',
-      'http:localhost:5173'
+      'http://localhost:5173',
+      'http://localhost:5174'
     ];
   
   const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com')) 
-   || (origin && origin.includes('localhost:5173'));
+   || (origin && origin.includes('localhost:5173'))
+   || (origin && origin.includes('localhost:5174'));
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
