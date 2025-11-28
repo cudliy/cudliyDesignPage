@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Download, X } from 'lucide-react';
 import { apiService } from '../services/api';
+import ModelViewer from '../components/ModelViewer';
 
 interface GiftData {
   gift: {
@@ -61,6 +62,32 @@ export default function GiftViewPage() {
     fetchGift();
   }, [giftId]);
 
+  // Auto-play background audio
+  useEffect(() => {
+    if (!loading && !error && slides.length > 0) {
+      const audio = new Audio('/final 2.mp4'); // Using the existing audio file
+      audio.loop = true;
+      audio.volume = 0.3; // Playful but not overwhelming
+      
+      const playAudio = async () => {
+        try {
+          await audio.play();
+        } catch (err) {
+          console.log('Audio autoplay blocked by browser');
+        }
+      };
+
+      // Try to play audio after a short delay
+      const timer = setTimeout(playAudio, 1000);
+
+      return () => {
+        clearTimeout(timer);
+        audio.pause();
+        audio.currentTime = 0;
+      };
+    }
+  }, [loading, error, slides.length]);
+
   const generateSlides = (data: GiftData) => {
     const { gift, design } = data;
 
@@ -70,8 +97,8 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[0],
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         content: (
-          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               {gift.senderName} sent you something special
             </p>
           </div>
@@ -82,8 +109,8 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[1],
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
         content: (
-          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               For {gift.recipientName}
             </p>
           </div>
@@ -94,54 +121,46 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[2],
         gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
         content: gift.message ? (
-          <div className="text-center space-y-4 max-w-3xl mx-auto px-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
-              "{gift.message}" - {gift.senderName}
-            </p>
+          <div className="flex items-center justify-center h-full px-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <div className="text-center max-w-4xl mx-auto">
+              <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
+                "{gift.message}" - {gift.senderName}
+              </p>
+            </div>
           </div>
         ) : null
       },
-      {
-        id: 'design-intro',
-        video: VIDEO_TEMPLATES[3],
-        gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        content: (
-          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
-              Your 3D model created just for you
-            </p>
-          </div>
-        )
-      },
+
       {
         id: 'design-image',
         video: VIDEO_TEMPLATES[4],
         gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
         content: (
-          <div className="text-center space-y-6 w-full px-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            {design.modelFiles?.glbFile ? (
-              <div className="w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto aspect-square">
-                <div 
-                  dangerouslySetInnerHTML={{
-                    __html: `<model-viewer src="${design.modelFiles.glbFile}" alt="3D Model" auto-rotate camera-controls style="width: 100%; height: 100%;" class="rounded-3xl"></model-viewer>`
-                  }}
-                  style={{ width: '100%', height: '100%' }}
+          <div className="flex items-center justify-center w-full h-full px-4">
+            <div className="w-full max-w-lg aspect-square">
+              {design.modelFiles?.modelFile || design.modelFiles?.storedModelUrl || design.generated3DModel?.url ? (
+                <ModelViewer
+                  modelUrl={design.modelFiles?.modelFile || design.modelFiles?.storedModelUrl || design.generated3DModel?.url}
+                  className=""
+                  lighting={70}
+                  background={0}
+                  size={20}
+                  cameraAngle={50}
                 />
-              </div>
-            ) : design.modelFiles?.originalImage || design.images?.[0]?.url ? (
-              <div className="w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto aspect-square rounded-3xl overflow-hidden shadow-2xl">
-                <img
-                  src={design.modelFiles?.originalImage || design.images[0].url}
-                  alt="Design"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : null}
-            {design.originalText && design.originalText !== 'Creator' && (
-              <p className="text-2xl md:text-3xl text-white font-bold px-4" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
-                {design.originalText}
-              </p>
-            )}
+              ) : design.modelFiles?.originalImage || design.images?.[0]?.url ? (
+                <div className="w-full h-full">
+                  <img
+                    src={design.modelFiles?.originalImage || design.images[0].url}
+                    alt="Design"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-full bg-transparent flex items-center justify-center">
+                  <p className="text-white">No model available</p>
+                </div>
+              )}
+            </div>
           </div>
         )
       },
@@ -150,8 +169,8 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[5],
         gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
         content: (
-          <div className="text-center space-y-6" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+          <div className="text-center space-y-6 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               Ready to download your 3D model?
             </p>
             <button
@@ -159,9 +178,9 @@ export default function GiftViewPage() {
                 if (giftId) apiService.trackGiftDownload(giftId);
                 navigate(`/download/${design.id}`);
               }}
-              className="px-12 py-5 bg-white text-black rounded-full text-xl font-black flex items-center gap-3 mx-auto"
+              className="px-8 md:px-12 py-4 md:py-5 bg-white text-black rounded-full text-lg md:text-xl font-black flex items-center gap-3 mx-auto"
             >
-              <Download className="w-7 h-7" />
+              <Download className="w-6 h-6 md:w-7 md:h-7" />
               Download Now
             </button>
           </div>
@@ -172,11 +191,11 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[6],
         gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: (
-          <div className="text-center space-y-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            <p className="text-3xl md:text-4xl lg:text-5xl text-white font-black typing-text" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               Thank you from {gift.senderName}
             </p>
-            <p className="text-xl md:text-2xl text-white font-bold" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+            <p className="text-lg md:text-xl lg:text-2xl text-white font-bold" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
               Created with Cudliy
             </p>
           </div>
@@ -190,12 +209,16 @@ export default function GiftViewPage() {
   useEffect(() => {
     if (slides.length === 0 || isPaused) return;
 
+    // Use longer duration for the 3D model slide (20 seconds), shorter for others (4 seconds)
+    const currentSlideId = slides[currentSlide]?.id;
+    const duration = currentSlideId === 'design-image' ? 20000 : 4000;
+
     const timer = setTimeout(() => {
       setCurrentSlide((prev) => {
         if (prev === slides.length - 1) return prev;
         return prev + 1;
       });
-    }, 4000);
+    }, duration);
 
     return () => clearTimeout(timer);
   }, [currentSlide, slides.length, isPaused]);
@@ -250,15 +273,24 @@ export default function GiftViewPage() {
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: currentSlideData.gradient || '#000' }}>
+      {/* Background Video */}
       <video
         key={currentSlideData.video}
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-100"
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ 
+          minWidth: '100%', 
+          minHeight: '100%',
+          objectFit: 'cover',
+          zIndex: 1
+        }}
         onError={(e) => {
           console.error('Video failed to load:', currentSlideData.video);
+          // Show gradient background if video fails
           e.currentTarget.style.display = 'none';
         }}
         onLoadedData={() => {
@@ -268,9 +300,19 @@ export default function GiftViewPage() {
         <source src={currentSlideData.video} type="video/mp4" />
       </video>
 
+      {/* Gradient Fallback */}
+      <div 
+        className="absolute inset-0" 
+        style={{ 
+          background: currentSlideData.gradient,
+          zIndex: 1,
+          display: 'none'
+        }}
+        id="gradient-fallback"
+      />
 
-
-      <div className="relative z-10 h-full flex items-center justify-center p-8">
+      {/* Content Overlay */}
+      <div className="relative z-10 h-full flex items-center justify-center p-4 md:p-8">
         {currentSlideData.content}
       </div>
 
@@ -281,22 +323,7 @@ export default function GiftViewPage() {
         <X className="w-6 h-6" />
       </button>
 
-      <style>{`
-        @keyframes typing {
-          from { width: 0; }
-          to { width: 100%; }
-        }
-        .typing-text {
-          overflow: hidden;
-          white-space: nowrap;
-          animation: typing 2s steps(40, end);
-          display: inidden;
-          border-right: 2px solid white;
-          white-space: nowrap;
-          animation: typing 2s steps(40, end);
-          display: inline-block;
-        }
-      `}</style>
+
     </div>
   );
 }

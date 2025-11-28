@@ -410,7 +410,7 @@ export default function SendGiftPage() {
                 onChange={(e) => setRecipientName(e.target.value)}
                 placeholder="Recipient Name"
                 required
-                className="w-full focus:ring-2 focus:ring-black focus:border-transparent"
+                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
                 style={{
                   height: '40px',
                   borderRadius: '25px',
@@ -420,7 +420,11 @@ export default function SendGiftPage() {
                   paddingRight: '20px',
                   fontSize: '15px',
                   outline: 'none',
-                  backgroundColor: 'white'
+                  backgroundColor: 'white',
+                  color: '#111827 !important',
+                  WebkitTextFillColor: '#111827 !important',
+                  WebkitOpacity: '1 !important',
+                  opacity: '1 !important'
                 }}
               />
             </div>
@@ -432,7 +436,7 @@ export default function SendGiftPage() {
                 value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
                 placeholder="Recipient Email (Optional)"
-                className="w-full focus:ring-2 focus:ring-black focus:border-transparent"
+                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
                 style={{
                   height: '40px',
                   borderRadius: '25px',
@@ -442,7 +446,11 @@ export default function SendGiftPage() {
                   paddingRight: '20px',
                   fontSize: '15px',
                   outline: 'none',
-                  backgroundColor: 'white'
+                  backgroundColor: 'white',
+                  color: '#111827 !important',
+                  WebkitTextFillColor: '#111827 !important',
+                  WebkitOpacity: '1 !important',
+                  opacity: '1 !important'
                 }}
               />
             </div>
@@ -453,7 +461,7 @@ export default function SendGiftPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Write a short note they will see first"
-                className="w-full focus:ring-2 focus:ring-black focus:border-transparent"
+                className="w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-500"
                 style={{
                   height: '112px',
                   borderRadius: '25px',
@@ -463,7 +471,11 @@ export default function SendGiftPage() {
                   fontSize: '15px',
                   outline: 'none',
                   backgroundColor: 'white',
-                  resize: 'none'
+                  resize: 'none',
+                  color: '#111827 !important',
+                  WebkitTextFillColor: '#111827 !important',
+                  WebkitOpacity: '1 !important',
+                  opacity: '1 !important'
                 }}
               />
             </div>

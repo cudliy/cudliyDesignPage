@@ -114,14 +114,14 @@ export default function DownloadPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex h-[calc(100vh-120px)] px-6 pb-6 gap-8">
+      <div className="flex flex-col lg:flex-row min-h-[calc(100vh-120px)] px-4 lg:px-6 pb-6 gap-6 lg:gap-8">
         {/* Left Side - Download Section */}
-        <div className="flex-1 flex flex-col items-center justify-center space-y-8">
+        <div className="flex-1 flex flex-col items-center justify-center space-y-6 lg:space-y-8 py-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Your Design is Ready
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm md:text-base">
               Download your 3D model in your preferred format
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function DownloadPage() {
             <select
               value={selectedFormat}
               onChange={(e) => setSelectedFormat(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-full bg-white focus:ring-2 focus:ring-black outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-full bg-white focus:ring-2 focus:ring-black outline-none text-base"
             >
               {availableFormats.map((format) => (
                 <option key={format} value={format}>{format}</option>
@@ -146,7 +146,7 @@ export default function DownloadPage() {
           <button
             onClick={handleDownload}
             disabled={downloading || !modelUrl}
-            className="w-full max-w-sm px-8 py-4 bg-black text-white rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2"
+            className="w-full max-w-sm px-6 md:px-8 py-3 md:py-4 bg-black text-white rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 text-sm md:text-base"
           >
             {downloading ? (
               <>
@@ -164,7 +164,7 @@ export default function DownloadPage() {
           {/* Send as Gift Button */}
           <button
             onClick={() => navigate(`/send-gift/${designId}`)}
-            className="w-full max-w-sm px-8 py-4 bg-black text-white rounded-full font-semibold flex items-center justify-center gap-2"
+            className="w-full max-w-sm px-6 md:px-8 py-3 md:py-4 bg-black text-white rounded-full font-semibold flex items-center justify-center gap-2 text-sm md:text-base"
           >
             🎁 Send as Gift
           </button>
@@ -172,10 +172,10 @@ export default function DownloadPage() {
 
         {/* Right Side - 3D Model Preview */}
         <div 
-          className="flex-1 rounded-[32px] p-6 flex items-center justify-center"
+          className="flex-1 min-h-[300px] lg:min-h-0 rounded-[24px] lg:rounded-[32px] p-4 lg:p-6 flex items-center justify-center"
           style={{ 
             backgroundColor: 'white',
-            border: '10px solid #F5F5F5'
+            border: '6px solid #F5F5F5'
           }}
         >
           {modelUrl ? (

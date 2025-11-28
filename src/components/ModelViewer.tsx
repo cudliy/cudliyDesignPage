@@ -136,7 +136,7 @@ export default function ModelViewer({
         // Set styles
         modelViewer.style.width = '100%';
         modelViewer.style.height = '100%';
-        modelViewer.style.backgroundColor = '#1a1a1a'; // Dark background
+        modelViewer.style.backgroundColor = 'transparent'; // Transparent by default
         
         // Add event listeners
         modelViewer.addEventListener('load', () => {
@@ -226,23 +226,44 @@ export default function ModelViewer({
     const backgroundIntensity = background / 100;
     
     // Set background color without using skybox images
-    if (backgroundIntensity < 0.2) {
+    if (backgroundIntensity === 0) {
+      modelViewer.style.backgroundColor = 'transparent'; // Fully transparent
+      if (modelViewer.parentElement) {
+        modelViewer.parentElement.style.backgroundColor = 'transparent';
+      }
+    } else if (backgroundIntensity < 0.2) {
       modelViewer.style.backgroundColor = '#1a1a1a'; // Dark
+      const bgColor = Math.round(backgroundIntensity * 255);
+      const containerBg = `rgb(${bgColor}, ${bgColor}, ${bgColor})`;
+      if (modelViewer.parentElement) {
+        modelViewer.parentElement.style.backgroundColor = containerBg;
+      }
     } else if (backgroundIntensity < 0.4) {
       modelViewer.style.backgroundColor = '#404040'; // Medium-dark
+      const bgColor = Math.round(backgroundIntensity * 255);
+      const containerBg = `rgb(${bgColor}, ${bgColor}, ${bgColor})`;
+      if (modelViewer.parentElement) {
+        modelViewer.parentElement.style.backgroundColor = containerBg;
+      }
     } else if (backgroundIntensity < 0.6) {
       modelViewer.style.backgroundColor = '#808080'; // Medium
+      const bgColor = Math.round(backgroundIntensity * 255);
+      const containerBg = `rgb(${bgColor}, ${bgColor}, ${bgColor})`;
+      if (modelViewer.parentElement) {
+        modelViewer.parentElement.style.backgroundColor = containerBg;
+      }
     } else if (backgroundIntensity < 0.8) {
       modelViewer.style.backgroundColor = '#c0c0c0'; // Light
+      const bgColor = Math.round(backgroundIntensity * 255);
+      const containerBg = `rgb(${bgColor}, ${bgColor}, ${bgColor})`;
+      if (modelViewer.parentElement) {
+        modelViewer.parentElement.style.backgroundColor = containerBg;
+      }
     } else {
       modelViewer.style.backgroundColor = '#ffffff'; // White
-    }
-    
-    // Also set the container background to match
-    const bgColor = Math.round(backgroundIntensity * 255);
-    const containerBg = `rgb(${bgColor}, ${bgColor}, ${bgColor})`;
-    if (modelViewer.parentElement) {
-      modelViewer.parentElement.style.backgroundColor = containerBg;
+      if (modelViewer.parentElement) {
+        modelViewer.parentElement.style.backgroundColor = '#ffffff';
+      }
     }
     
     // Size (0-100) -> Field of View (60deg - 15deg) - REVERSED so higher = bigger
@@ -348,7 +369,7 @@ export default function ModelViewer({
         ref={modelViewerRef}
         className="w-full h-full"
         style={{ 
-          backgroundColor: '#1a1a1a',
+          backgroundColor: 'transparent',
           display: loadingState === 'error' || !modelUrl || !isModelViewerAvailable ? 'block' : 'none'
         }}
       />
