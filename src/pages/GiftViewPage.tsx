@@ -97,7 +97,7 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[0],
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         content: (
-          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto animate-fade-in-up" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', animation: 'fadeInUp 0.8s ease-out forwards' }}>
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               {gift.senderName} sent you something special
             </p>
@@ -109,7 +109,7 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[1],
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
         content: (
-          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', animation: 'fadeInUp 0.8s ease-out forwards' }}>
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               For {gift.recipientName}
             </p>
@@ -122,7 +122,7 @@ export default function GiftViewPage() {
         gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
         content: gift.message ? (
           <div className="flex items-center justify-center h-full px-4" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
-            <div className="text-center max-w-4xl mx-auto">
+            <div className="text-center max-w-4xl mx-auto" style={{ animation: 'fadeInScale 0.8s ease-out forwards' }}>
               <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
                 "{gift.message}" - {gift.senderName}
               </p>
@@ -137,7 +137,7 @@ export default function GiftViewPage() {
         gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
         content: (
           <div className="flex items-center justify-center w-full h-full px-4">
-            <div className="w-full max-w-lg aspect-square">
+            <div className="w-full max-w-lg aspect-square" style={{ animation: 'fadeInScale 1s ease-out forwards' }}>
               {design.modelFiles?.modelFile || design.modelFiles?.storedModelUrl || design.generated3DModel?.url ? (
                 <ModelViewer
                   modelUrl={design.modelFiles?.modelFile || design.modelFiles?.storedModelUrl || design.generated3DModel?.url}
@@ -169,7 +169,7 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[5],
         gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
         content: (
-          <div className="text-center space-y-6 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+          <div className="text-center space-y-6 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', animation: 'fadeInUp 0.8s ease-out forwards' }}>
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               Ready to download your 3D model?
             </p>
@@ -178,7 +178,8 @@ export default function GiftViewPage() {
                 if (giftId) apiService.trackGiftDownload(giftId);
                 navigate(`/download/${design.id}`);
               }}
-              className="px-8 md:px-12 py-4 md:py-5 bg-white text-black rounded-full text-lg md:text-xl font-black flex items-center gap-3 mx-auto"
+              className="px-8 md:px-12 py-4 md:py-5 bg-white text-black rounded-full text-lg md:text-xl font-black flex items-center gap-3 mx-auto hover:scale-110 transition-transform"
+              style={{ animation: 'fadeInScale 1s ease-out 0.3s forwards', opacity: 0 }}
             >
               <Download className="w-6 h-6 md:w-7 md:h-7" />
               Download Now
@@ -191,11 +192,11 @@ export default function GiftViewPage() {
         video: VIDEO_TEMPLATES[6],
         gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: (
-          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', animation: 'fadeInUp 0.8s ease-out forwards' }}>
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               Thank you from {gift.senderName}
             </p>
-            <p className="text-lg md:text-xl lg:text-2xl text-white font-bold" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+            <p className="text-lg md:text-xl lg:text-2xl text-white font-bold" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', animation: 'fadeInUp 0.8s ease-out 0.3s forwards', opacity: 0 }}>
               Created with Cudliy
             </p>
           </div>
@@ -272,8 +273,32 @@ export default function GiftViewPage() {
   const currentSlideData = slides[currentSlide];
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: currentSlideData.gradient || '#000' }}>
-      {/* Background Video */}
+    <>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
+      <div className="fixed inset-0 overflow-hidden" style={{ background: currentSlideData.gradient || '#000' }}>
+        {/* Background Video */}
       <video
         key={currentSlideData.video}
         autoPlay
@@ -324,6 +349,7 @@ export default function GiftViewPage() {
       </button>
 
 
-    </div>
+      </div>
+    </>
   );
 }
