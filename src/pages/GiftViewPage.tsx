@@ -297,44 +297,41 @@ export default function GiftViewPage() {
           }
         }
       `}</style>
-      <div className="fixed inset-0 overflow-hidden" style={{ background: currentSlideData.gradient || '#000' }}>
+      <div className="fixed inset-0 overflow-hidden bg-black">
+        {/* Gradient Fallback - Behind video */}
+        <div 
+          className="absolute inset-0" 
+          style={{ 
+            background: currentSlideData.gradient,
+            zIndex: 0
+          }}
+        />
+        
         {/* Background Video */}
-      <video
-        key={currentSlideData.video}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ 
-          minWidth: '100%', 
-          minHeight: '100%',
-          objectFit: 'cover',
-          zIndex: 1
-        }}
-        onError={(e) => {
-          console.error('Video failed to load:', currentSlideData.video);
-          // Show gradient background if video fails
-          e.currentTarget.style.display = 'none';
-        }}
-        onLoadedData={() => {
-          console.log('Video loaded successfully:', currentSlideData.video);
-        }}
-      >
-        <source src={currentSlideData.video} type="video/mp4" />
-      </video>
-
-      {/* Gradient Fallback */}
-      <div 
-        className="absolute inset-0" 
-        style={{ 
-          background: currentSlideData.gradient,
-          zIndex: 1,
-          display: 'none'
-        }}
-        id="gradient-fallback"
-      />
+        <video
+          key={currentSlideData.video}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ 
+            minWidth: '100%', 
+            minHeight: '100%',
+            objectFit: 'cover',
+            zIndex: 1
+          }}
+          onError={() => {
+            console.error('Video failed to load:', currentSlideData.video);
+            // Video will be transparent, gradient shows through
+          }}
+          onLoadedData={() => {
+            console.log('Video loaded successfully:', currentSlideData.video);
+          }}
+        >
+          <source src={currentSlideData.video} type="video/mp4" />
+        </video>
 
       {/* Content Overlay */}
       <div className="relative z-10 h-full flex items-center justify-center p-4 md:p-8">

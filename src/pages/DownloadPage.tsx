@@ -115,64 +115,9 @@ export default function DownloadPage() {
 
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row min-h-[calc(100vh-120px)] px-4 lg:px-6 pb-6 gap-6 lg:gap-8">
-        {/* Left Side - Download Section */}
-        <div className="flex-1 flex flex-col items-center justify-center space-y-6 lg:space-y-8 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Your Design is Ready
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base">
-              Download your 3D model in your preferred format
-            </p>
-          </div>
-
-          {/* Format Selection */}
-          <div className="w-full max-w-sm">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Choose Format
-            </label>
-            <select
-              value={selectedFormat}
-              onChange={(e) => setSelectedFormat(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-full bg-white focus:ring-2 focus:ring-black outline-none text-base"
-            >
-              {availableFormats.map((format) => (
-                <option key={format} value={format}>{format}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Download Button */}
-          <button
-            onClick={handleDownload}
-            disabled={downloading || !modelUrl}
-            className="w-full max-w-sm px-6 md:px-8 py-3 md:py-4 bg-black text-white rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 text-sm md:text-base"
-          >
-            {downloading ? (
-              <>
-                <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-5 h-5" />
-                Downloading...
-              </>
-            ) : (
-              <>
-                <Download className="w-5 h-5" />
-                Download Now
-              </>
-            )}
-          </button>
-
-          {/* Send as Gift Button */}
-          <button
-            onClick={() => navigate(`/send-gift/${designId}`)}
-            className="w-full max-w-sm px-6 md:px-8 py-3 md:py-4 bg-black text-white rounded-full font-semibold flex items-center justify-center gap-2 text-sm md:text-base"
-          >
-            🎁 Send as Gift
-          </button>
-        </div>
-
-        {/* Right Side - 3D Model Preview */}
+        {/* Right Side - 3D Model Preview (First on mobile) */}
         <div 
-          className="flex-1 min-h-[300px] lg:min-h-0 rounded-[24px] lg:rounded-[32px] p-4 lg:p-6 flex items-center justify-center"
+          className="w-full lg:flex-1 h-[400px] md:h-[500px] lg:min-h-0 rounded-[24px] lg:rounded-[32px] p-4 lg:p-6 flex items-center justify-center order-1 lg:order-2"
           style={{ 
             backgroundColor: 'white',
             border: '6px solid #F5F5F5'
@@ -204,6 +149,65 @@ export default function DownloadPage() {
               <p className="text-sm">3D model not available</p>
             </div>
           )}
+        </div>
+
+        {/* Left Side - Download Section (Second on mobile) */}
+        <div className="w-full lg:flex-1 flex flex-col items-center justify-center space-y-6 lg:space-y-8 py-8 order-2 lg:order-1">
+          <div className="text-center px-4">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+              Your Design is Ready
+            </h1>
+            <p className="text-gray-600 text-sm md:text-base">
+              Download your 3D model in your preferred format
+            </p>
+          </div>
+
+          {/* Format Selection */}
+          <div className="w-full max-w-sm px-4">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Choose Format
+            </label>
+            <select
+              value={selectedFormat}
+              onChange={(e) => setSelectedFormat(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-full bg-white focus:ring-2 focus:ring-black outline-none text-base"
+            >
+              {availableFormats.map((format) => (
+                <option key={format} value={format}>{format}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Download Button */}
+          <div className="w-full max-w-sm px-4">
+            <button
+              onClick={handleDownload}
+              disabled={downloading || !modelUrl}
+              className="w-full px-6 md:px-8 py-3 md:py-4 bg-black text-white rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 text-sm md:text-base hover:bg-gray-800 transition-colors"
+            >
+              {downloading ? (
+                <>
+                  <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-5 h-5" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <Download className="w-5 h-5" />
+                  Download Now
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Send as Gift Button */}
+          <div className="w-full max-w-sm px-4">
+            <button
+              onClick={() => navigate(`/send-gift/${designId}`)}
+              className="w-full px-6 md:px-8 py-3 md:py-4 bg-black text-white rounded-full font-semibold flex items-center justify-center gap-2 text-sm md:text-base hover:bg-gray-800 transition-colors"
+            >
+              🎁 Send as Gift
+            </button>
+          </div>
         </div>
       </div>
     </div>
