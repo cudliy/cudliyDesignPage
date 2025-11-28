@@ -421,11 +421,10 @@ export default function SendGiftPage() {
                   fontSize: '15px',
                   outline: 'none',
                   backgroundColor: 'white',
-                  color: '#111827 !important',
-                  WebkitTextFillColor: '#111827 !important',
-                  WebkitOpacity: '1 !important',
-                  opacity: '1 !important'
-                }}
+                  color: '#111827',
+                  WebkitTextFillColor: '#111827',
+                  opacity: 1
+                } as React.CSSProperties}
               />
             </div>
 
@@ -447,11 +446,10 @@ export default function SendGiftPage() {
                   fontSize: '15px',
                   outline: 'none',
                   backgroundColor: 'white',
-                  color: '#111827 !important',
-                  WebkitTextFillColor: '#111827 !important',
-                  WebkitOpacity: '1 !important',
-                  opacity: '1 !important'
-                }}
+                  color: '#111827',
+                  WebkitTextFillColor: '#111827',
+                  opacity: 1
+                } as React.CSSProperties}
               />
             </div>
 
@@ -472,11 +470,10 @@ export default function SendGiftPage() {
                   outline: 'none',
                   backgroundColor: 'white',
                   resize: 'none',
-                  color: '#111827 !important',
-                  WebkitTextFillColor: '#111827 !important',
-                  WebkitOpacity: '1 !important',
-                  opacity: '1 !important'
-                }}
+                  color: '#111827',
+                  WebkitTextFillColor: '#111827',
+                  opacity: 1
+                } as React.CSSProperties}
               />
             </div>
 
