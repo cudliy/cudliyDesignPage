@@ -4,11 +4,18 @@ import { AppError } from '../utils/errorHandler.js';
 import Gift from '../models/Gift.js';
 import Design from '../models/Design.js';
 import User from '../models/User.js';
+import emailService from '../services/emailService.js';
+
+// Helper functions for environment variables
+const getResendApiKey = () => process.env.RESEND_API_KEY;
+const getDefaultFrom = () => process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
 // Create a gift share link
 export const createGift = async (req, res, next) => {
   try {
     const { designId, senderName, recipientName, recipientEmail, message, senderId } = req.body;
+
+    logger.info(`Gift creation request: ${senderName} → ${recipientName} (${recipientEmail || 'no email'})`);
 
     // Validate required fields
     if (!designId || !senderName || !recipientName) {
@@ -41,6 +48,34 @@ export const createGift = async (req, res, next) => {
     await gift.save();
 
     logger.info(`Gift created: ${giftId} from ${senderName} to ${recipientName}`);
+
+    // Send gift email if recipient email is provided
+    if (recipientEmail && recipientEmail.trim() !== '') {
+      try {
+        const designImageUrl = design.images?.[0]?.url || '';
+        const emailResult = await emailService.sendGiftEmail({
+          to: recipientEmail.trim(),
+          senderName,
+          recipientName,
+          message: message || '',
+          giftLink: shareLink,
+          designImageUrl
+        });
+        
+        if (emailResult.error) {
+          logger.error(`Gift email failed: ${emailResult.message}`);
+        } else if (emailResult.skipped) {
+          logger.warn('Gift email was skipped (API key not configured)');
+        } else {
+          logger.info(`Gift email sent successfully to: ${recipientEmail}`);
+        }
+      } catch (emailError) {
+        logger.error('Failed to send gift email:', emailError);
+        // Don't fail the gift creation if email fails
+      }
+    } else {
+      logger.info('No recipient email provided, skipping email notification');
+    }
 
     res.json({
       success: true,
@@ -202,17 +237,38 @@ export const sendGiftEmail = async (req, res, next) => {
       return next(new AppError('Gift not found', 404));
     }
 
-    // TODO: Implement email sending service
-    // For now, just return success
-    logger.info(`Gift email would be sent to: ${gift.recipientEmail}`);
+    if (!gift.recipientEmail) {
+      return next(new AppError('No recipient email found for this gift', 400));
+    }
 
-    res.json({
-      success: true,
-      data: {
-        message: 'Gift notification email sent',
-        recipientEmail: gift.recipientEmail
-      }
-    });
+    // Get design for image
+    const design = await Design.findOne({ id: gift.designId });
+    const designImageUrl = design?.images?.[0]?.url || '';
+
+    // Send gift email
+    try {
+      await emailService.sendGiftEmail({
+        to: gift.recipientEmail,
+        senderName: gift.senderName,
+        recipientName: gift.recipientName,
+        message: gift.message || '',
+        giftLink: gift.shareLink,
+        designImageUrl
+      });
+
+      logger.info(`Gift email sent to: ${gift.recipientEmail}`);
+
+      res.json({
+        success: true,
+        data: {
+          message: 'Gift notification email sent successfully',
+          recipientEmail: gift.recipientEmail
+        }
+      });
+    } catch (emailError) {
+      logger.error('Failed to send gift email:', emailError);
+      return next(new AppError('Failed to send gift email', 500));
+    }
 
   } catch (error) {
     logger.error('Send Gift Email Error:', error);

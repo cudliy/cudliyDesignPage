@@ -63,7 +63,9 @@ const userSchema = new mongoose.Schema({
     imagesGenerated: { type: Number, default: 0 },
     modelsGenerated: { type: Number, default: 0 },
     lastUsed: Date
-  }
+  },
+  passwordResetToken: String,
+  passwordResetExpiry: Date
 }, {
   timestamps: true
 });

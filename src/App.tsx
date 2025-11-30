@@ -18,6 +18,8 @@ import Toaster from '@/components/ui/Toaster'
 import SpotifyWrapDemo from './components/SpotifyWrapDemo'
 import SendGiftPage from './pages/SendGiftPage'
 import GiftViewPage from './pages/GiftViewPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
           <Route path="/" element={<SignInPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/terms" element={<TermsPage />} />

@@ -3,6 +3,7 @@ import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 import { AppError } from '../utils/errorHandler.js';
 import { createSendToken } from '../middleware/auth.js';
+import emailService from '../services/emailService.js';
 
 // Initialize Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -31,6 +32,18 @@ export const signup = async (req, res, next) => {
       password: hashed,
       profile: { firstName, lastName }
     });
+
+    // Send welcome email
+    try {
+      await emailService.sendWelcomeEmail({
+        to: email,
+        userName: firstName || finalUsername,
+        userEmail: email
+      });
+    } catch (emailError) {
+      console.warn('Failed to send welcome email:', emailError);
+      // Don't fail signup if email fails
+    }
 
     createSendToken(user, 201, res);
   } catch (err) {
@@ -132,6 +145,18 @@ export const googleAuth = async (req, res, next) => {
         // No password needed for Google auth users
         password: await bcrypt.hash(Math.random().toString(36), 12) // Random password as fallback
       });
+
+      // Send welcome email for new Google users
+      try {
+        await emailService.sendWelcomeEmail({
+          to: email,
+          userName: firstName || name?.split(' ')[0] || username,
+          userEmail: email
+        });
+      } catch (emailError) {
+        console.warn('Failed to send welcome email:', emailError);
+        // Don't fail signup if email fails
+      }
     }
 
     // Create and send token
@@ -209,6 +234,18 @@ export const appleAuth = async (req, res, next) => {
         // No password needed for Apple auth users
         password: await bcrypt.hash(Math.random().toString(36), 12) // Random password as fallback
       });
+
+      // Send welcome email for new Apple users
+      try {
+        await emailService.sendWelcomeEmail({
+          to: email,
+          userName: appleUser?.firstName || username,
+          userEmail: email
+        });
+      } catch (emailError) {
+        console.warn('Failed to send welcome email:', emailError);
+        // Don't fail signup if email fails
+      }
     }
 
     // Create and send token
@@ -216,6 +253,96 @@ export const appleAuth = async (req, res, next) => {
   } catch (err) {
     console.error('Apple Auth Error:', err);
     next(new AppError('Apple authentication failed. Please try again.', 500));
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return next(new AppError('Email is required', 400));
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Don't reveal if email exists or not for security
+      return res.json({ 
+        success: true, 
+        message: 'If an account with that email exists, we have sent a password reset link.' 
+      });
+    }
+
+    // Generate reset token
+    const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Save reset token to user
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpiry = resetTokenExpiry;
+    await user.save();
+
+    // Create reset link
+    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+
+    // Send reset email
+    try {
+      await emailService.sendPasswordResetEmail({
+        to: email,
+        userName: user.profile?.firstName || user.username,
+        resetLink
+      });
+    } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError);
+      return next(new AppError('Failed to send password reset email. Please try again.', 500));
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'If an account with that email exists, we have sent a password reset link.' 
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return next(new AppError('Token and new password are required', 400));
+    }
+
+    if (newPassword.length < 6) {
+      return next(new AppError('Password must be at least 6 characters long', 400));
+    }
+
+    // Find user with valid reset token
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetExpiry: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return next(new AppError('Invalid or expired reset token', 400));
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update user password and clear reset token
+    user.password = hashedPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpiry = undefined;
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      message: 'Password has been reset successfully. You can now log in with your new password.' 
+    });
+  } catch (err) {
+    next(err);
   }
 };
 

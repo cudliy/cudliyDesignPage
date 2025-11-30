@@ -14,6 +14,7 @@ export default function SendGiftPage() {
   const [recipientName, setRecipientName] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   // UI state
@@ -72,9 +73,12 @@ export default function SendGiftPage() {
 
     try {
       setLoading(true);
+      
+
+      
       const response = await apiService.createGift(
         designId,
-        senderName,
+        isAnonymous ? 'Anonymous' : senderName,
         recipientName,
         recipientEmail,
         message,
@@ -402,6 +406,54 @@ export default function SendGiftPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Sender Name */}
+            <div className="w-full max-w-[406.4px] mx-auto">
+              <input
+                type="text"
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
+                placeholder="Your Name"
+                required={!isAnonymous}
+                disabled={isAnonymous}
+                className={`w-full focus:ring-2 focus:ring-black focus:border-transparent text-gray-900 placeholder-gray-300 ${isAnonymous ? 'bg-gray-100 text-gray-400' : ''}`}
+                style={{
+                  height: '40px',
+                  borderRadius: '25px',
+                  borderWidth: '0.5px',
+                  borderColor: '#D1D5DB',
+                  paddingLeft: '20px',
+                  paddingRight: '20px',
+                  fontSize: '15px',
+                  outline: 'none',
+                  backgroundColor: isAnonymous ? '#f3f4f6' : 'white',
+                  color: isAnonymous ? '#9ca3af' : '#111827',
+                  WebkitTextFillColor: isAnonymous ? '#9ca3af' : '#111827',
+                  opacity: 1
+                } as React.CSSProperties}
+              />
+            </div>
+
+            {/* Anonymous Option */}
+            <div className="flex items-center gap-3 max-w-[406.4px] mx-auto">
+              <input
+                type="checkbox"
+                id="anonymous"
+                checked={isAnonymous}
+                onChange={(e) => {
+                  setIsAnonymous(e.target.checked);
+                  if (e.target.checked) {
+                    setSenderName('');
+                  } else {
+                    setSenderName(getUserName());
+                  }
+                }}
+                className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-black"
+              />
+              <label htmlFor="anonymous" className="text-[13px] text-gray-600 cursor-pointer">
+                Send anonymously (recipient won't see your name)
+              </label>
+            </div>
+
             {/* Recipient Name */}
             <div className="w-full max-w-[406.4px] mx-auto">
               <input

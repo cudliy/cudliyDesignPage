@@ -338,6 +338,16 @@ const SignIn = () => {
               />
             </div>
 
+            <div className="text-right mb-4">
+              <button
+                type="button"
+                onClick={() => navigate('/forgot-password')}
+                className="text-sm text-[#E70A55] hover:text-[#E70A55]/80 transition-colors duration-200 font-medium"
+              >
+                Forgot password?
+              </button>
+            </div>
+
             <div className="flex justify-center">
               <Button
                 type="submit"
