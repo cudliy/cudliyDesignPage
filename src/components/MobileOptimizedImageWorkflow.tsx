@@ -349,7 +349,7 @@ export default function MobileOptimizedImageWorkflow({
                       textAlign: 'center' as const
                     }}
                   >
-                    View 360Â°
+                    View 360°
                   </button>
                 </div>
               </div>
