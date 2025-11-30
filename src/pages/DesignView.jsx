@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
-import { Upload, Download, Loader2 } from 'lucide-react';
+import { Upload, Share, Loader2 } from 'lucide-react';
 import { testApiConnection } from '../utils/testApiConnection';
 import ModelDropdown from '../components/modelDropdown';
 import ColorPicker from '../components/ColorPicker';
@@ -309,15 +309,15 @@ export default function DesignView() {
     }
   }, [designId, testModelUrl, modelUrl, design, navigate]);
 
-  // Memoized download function - navigate to download page
-  const handleDownload = useCallback(() => {
+  // Memoized share function - navigate to download page
+  const handleShare = useCallback(() => {
     if (!design) return;
 
     // Get the best available model URL
     const modelUrl = getValidModelUrl();
     
     if (modelUrl) {
-      // Navigate to download page with model URL
+      // Navigate to share/download page with model URL
       navigate(`/download/${designId}`, {
         state: {
           modelUrl: modelUrl,
@@ -449,11 +449,11 @@ export default function DesignView() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={handleDownload}
+              onClick={handleShare}
               disabled={!getValidModelUrl()}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
             >
-              <Download className="w-5 h-5 text-white" />
+              <Share className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
@@ -939,11 +939,11 @@ export default function DesignView() {
           {/* Action Buttons */}
           <div className="flex justify-center gap-4">
             <button 
-              onClick={handleDownload}
+              onClick={handleShare}
               disabled={!getValidModelUrl()}
               className="px-10 py-2 bg-white rounded-full text-black font-normal hover:bg-gray-100 transition-colors"
             >
-              Download
+              Share
             </button>
             <button 
               onClick={handleMakeOrder}

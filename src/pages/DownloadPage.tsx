@@ -158,7 +158,7 @@ export default function DownloadPage() {
               Your Design is Ready
             </h1>
             <p className="text-gray-600 text-sm md:text-base">
-              Download your 3D model in your preferred format
+              Share your creation as a gift or download for personal use
             </p>
           </div>
 
@@ -178,28 +178,7 @@ export default function DownloadPage() {
             </select>
           </div>
 
-          {/* Download Button */}
-          <div className="w-full max-w-sm px-4">
-            <button
-              onClick={handleDownload}
-              disabled={downloading || !modelUrl}
-              className="w-full px-6 md:px-8 py-3 md:py-4 bg-black text-white rounded-full disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2 text-sm md:text-base hover:bg-gray-800 transition-colors"
-            >
-              {downloading ? (
-                <>
-                  <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-5 h-5" />
-                  Downloading...
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5" />
-                  Download Now
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Send as Gift Button */}
+          {/* Send as Gift Button - Primary Action */}
           <div className="w-full max-w-sm px-4">
             <button
               onClick={() => navigate(`/send-gift/${designId}`)}
@@ -207,6 +186,23 @@ export default function DownloadPage() {
             >
               🎁 Send as Gift
             </button>
+          </div>
+
+          {/* Download Icon Button - Secondary Action */}
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={handleDownload}
+              disabled={downloading || !modelUrl}
+              className="w-12 h-12 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-full flex items-center justify-center transition-colors group"
+              title={`Download as ${selectedFormat}`}
+            >
+              {downloading ? (
+                <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-5 h-5" />
+              ) : (
+                <Download className="w-5 h-5 text-gray-700 group-hover:text-gray-900" />
+              )}
+            </button>
+            <span className="text-xs text-gray-500 font-medium">Download {selectedFormat}</span>
           </div>
         </div>
       </div>
