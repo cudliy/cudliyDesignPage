@@ -309,7 +309,25 @@ const SignUp = () => {
               {currentStep > 0 && (
                 <Button
                   onClick={handleBack}
-                  className="font-medium transition-colors bg-transparent border-2 border-[#E70A55] text-[#E70A55] !rounded-full h-[42px] px-6 sm:px-10 hover:bg-[#E70A55] hover:text-white"
+                  className="font-medium transition-all duration-200 !rounded-full h-[42px] px-6 sm:px-10"
+                  style={{ 
+                    backgroundColor: '#ffffff',
+                    borderWidth: '2px',
+                    borderStyle: 'solid',
+                    borderColor: '#E70A55',
+                    color: '#E70A55',
+                    fontWeight: '600',
+                    opacity: 1,
+                    minWidth: '80px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E70A55';
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ffffff';
+                    e.currentTarget.style.color = '#E70A55';
+                  }}
                 >
                   Back
                 </Button>
