@@ -211,7 +211,7 @@ function buildPasswordResetEmailHtml({ userName, resetLink }) {
 }
 
 // Gift notification email template
-function buildGiftEmailHtml({ senderName, recipientName, message, giftLink, designImageUrl }) {
+function buildGiftEmailHtml({ senderName, recipientName, message, giftLink }) {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -238,12 +238,6 @@ function buildGiftEmailHtml({ senderName, recipientName, message, giftLink, desi
           <div style="background:#f8f9fa; padding:20px; border-radius:8px; margin:20px 0; border-left:4px solid #313131;">
             <h3 style="color:#313131; margin-top:0; font-size:16px; font-weight:bold;">Personal Message:</h3>
             <p style="margin:0; font-style:italic; color:#555; line-height:1.5;">"${message}"</p>
-          </div>
-        ` : ''}
-        
-        ${designImageUrl ? `
-          <div style="text-align:center; margin:30px 0;">
-            <img src="${designImageUrl}" alt="Your 3D design gift" style="max-width:300px; height:auto; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1);"/>
           </div>
         ` : ''}
         
@@ -431,8 +425,8 @@ Visit: https://cudliy.com
 }
 
 // Gift notification email
-export async function sendGiftEmail({ to, senderName, recipientName, message, giftLink, designImageUrl }) {
-  const html = buildGiftEmailHtml({ senderName, recipientName, message, giftLink, designImageUrl });
+export async function sendGiftEmail({ to, senderName, recipientName, message, giftLink }) {
+  const html = buildGiftEmailHtml({ senderName, recipientName, message, giftLink });
   const text = `
 Hi ${recipientName || 'there'}!
 

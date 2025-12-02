@@ -152,7 +152,7 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
             </svg>
           </button>
           <button 
-            className="px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg bg-[#313131] hover:bg-[#414141] text-white"
+            className="px-6 py-3 w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg bg-[#313131] hover:bg-[#414141] text-white"
           >
             Create
           </button>

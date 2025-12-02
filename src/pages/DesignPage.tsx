@@ -514,7 +514,7 @@ const handleBackToCategories = () => {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						className={`px-6 py-3 w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
 								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
@@ -569,7 +569,7 @@ const handleBackToCategories = () => {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						className={`px-6 py-3 w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
 								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
@@ -624,7 +624,7 @@ const handleBackToCategories = () => {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						className={`px-6 py-3 w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
 								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
@@ -679,7 +679,7 @@ const handleBackToCategories = () => {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						className={`px-6 py-3 w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
 								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
@@ -733,7 +733,7 @@ const handleBackToCategories = () => {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-6 py-3 w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						className={`px-6 py-3 w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
 								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
@@ -789,7 +789,7 @@ const handleBackToCategories = () => {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`px-6 py-3  w-[133px] h-[39px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
+						className={`px-6 py-3  w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-300 ease-out hover:scale-105 shadow-lg ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
 								: 'bg-[#313131] hover:bg-[#414141] text-white shadow-lg'
@@ -870,10 +870,10 @@ const handleBackToCategories = () => {
 					<button 
 						onClick={handleCreateClick}
 						disabled={!canGenerateImages}
-						className={`w-[110px] h-[36px] rounded-[24px] font-medium text-sm transition-all duration-700 delay-600 ease-out ${
+						className={`w-[133px] h-[54px] rounded-[40px] font-medium text-sm transition-all duration-700 delay-600 ease-out ${
 							!canGenerateImages
 								? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-								: 'bg-gradient-to-r from-[#E70D57] to-[#d10c50] hover:from-[#d10c50] hover:to-[#E70D57] text-white'
+								: 'bg-[#313131] hover:bg-[#414141] text-white'
 						} ${isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
 					>
 						Create
@@ -1283,13 +1283,13 @@ const handleBackToCategories = () => {
 								<div className="flex justify-center gap-4">
 									<button 
 										onClick={() => handle3DDownload(completedDesign.id)}
-										className="px-10 py-2 bg-white rounded-full text-black font-normal hover:bg-gray-100 transition-colors"
+										className="px-10 h-[54px] bg-white rounded-full text-black font-normal hover:bg-gray-100 transition-colors flex items-center justify-center"
 									>
 										Download
 									</button>
 									<button 
 										onClick={() => handle3DMakeOrder(completedDesign.id)}
-										className="px-8 py-3 rounded-full font-normal transition-all duration-300 bg-white text-black hover:bg-gray-100 hover:scale-105"
+										className="px-8 h-[54px] rounded-full font-normal transition-all duration-300 bg-[#313131] text-white hover:bg-[#414141] hover:scale-105 flex items-center justify-center"
 									>
 										Make Order
 									</button>

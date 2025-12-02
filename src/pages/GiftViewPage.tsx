@@ -35,6 +35,8 @@ export default function GiftViewPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState<any[]>([]);
   const [isPaused, setIsPaused] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
 
   useEffect(() => {
     const fetchGift = async () => {
@@ -131,9 +133,33 @@ export default function GiftViewPage() {
         ) : null
       },
 
+
+      {
+        id: 'download',
+        video: VIDEO_TEMPLATES[4],
+        gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+        content: (
+          <div className="text-center space-y-6 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', animation: 'fadeInUp 0.8s ease-out forwards' }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
+              Ready to download your 3D model?
+            </p>
+            <button
+              onClick={() => {
+                if (giftId) apiService.trackGiftDownload(giftId);
+                navigate(`/download/${design.id}`);
+              }}
+              className="px-8 md:px-12 py-4 md:py-5 bg-white text-black rounded-full text-lg md:text-xl font-black flex items-center gap-3 mx-auto hover:scale-110 transition-transform"
+              style={{ animation: 'fadeInScale 1s ease-out 0.3s forwards', opacity: 0 }}
+            >
+              <Download className="w-6 h-6 md:w-7 md:h-7" />
+              Download Now
+            </button>
+          </div>
+        )
+      },
       {
         id: 'design-image',
-        video: VIDEO_TEMPLATES[4],
+        video: VIDEO_TEMPLATES[5],
         gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
         content: (
           <div className="flex items-center justify-center w-full h-full px-4">
@@ -161,29 +187,6 @@ export default function GiftViewPage() {
                 </div>
               )}
             </div>
-          </div>
-        )
-      },
-      {
-        id: 'download',
-        video: VIDEO_TEMPLATES[5],
-        gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-        content: (
-          <div className="text-center space-y-6 px-4 max-w-4xl mx-auto" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif', animation: 'fadeInUp 0.8s ease-out forwards' }}>
-            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              Ready to download your 3D model?
-            </p>
-            <button
-              onClick={() => {
-                if (giftId) apiService.trackGiftDownload(giftId);
-                navigate(`/download/${design.id}`);
-              }}
-              className="px-8 md:px-12 py-4 md:py-5 bg-white text-black rounded-full text-lg md:text-xl font-black flex items-center gap-3 mx-auto hover:scale-110 transition-transform"
-              style={{ animation: 'fadeInScale 1s ease-out 0.3s forwards', opacity: 0 }}
-            >
-              <Download className="w-6 h-6 md:w-7 md:h-7" />
-              Download Now
-            </button>
           </div>
         )
       },
@@ -223,6 +226,11 @@ export default function GiftViewPage() {
 
     return () => clearTimeout(timer);
   }, [currentSlide, slides.length, isPaused]);
+
+  // Reset video loading state when slide changes
+  useEffect(() => {
+    setVideoLoaded(false);
+  }, [currentSlide]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -298,9 +306,9 @@ export default function GiftViewPage() {
         }
       `}</style>
       <div className="fixed inset-0 overflow-hidden bg-black">
-        {/* Gradient Fallback - Behind video */}
+        {/* Gradient Background - Always visible */}
         <div 
-          className="absolute inset-0" 
+          className="absolute inset-0 transition-all duration-1000 ease-in-out" 
           style={{ 
             background: currentSlideData.gradient,
             zIndex: 0
@@ -315,23 +323,36 @@ export default function GiftViewPage() {
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
           style={{ 
             minWidth: '100%', 
             minHeight: '100%',
             objectFit: 'cover',
             zIndex: 1
           }}
+          onLoadStart={() => {
+            setVideoLoaded(false);
+          }}
+          onCanPlay={() => {
+            setVideoLoaded(true);
+          }}
           onError={() => {
             console.error('Video failed to load:', currentSlideData.video);
-            // Video will be transparent, gradient shows through
-          }}
-          onLoadedData={() => {
-            console.log('Video loaded successfully:', currentSlideData.video);
+            setVideoLoaded(true); // Show gradient background
           }}
         >
           <source src={currentSlideData.video} type="video/mp4" />
         </video>
+
+        {/* Preload next video */}
+        {currentSlide < slides.length - 1 && (
+          <video
+            src={slides[currentSlide + 1]?.video}
+            preload="auto"
+            muted
+            className="hidden"
+          />
+        )}
 
       {/* Content Overlay */}
       <div className="relative z-10 h-full flex items-center justify-center p-4 md:p-8">

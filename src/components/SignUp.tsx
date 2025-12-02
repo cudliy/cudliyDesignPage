@@ -309,7 +309,7 @@ const SignUp = () => {
               {currentStep > 0 && (
                 <Button
                   onClick={handleBack}
-                  className="font-medium transition-all duration-200 !rounded-full h-[42px] px-6 sm:px-10"
+                  className="font-medium transition-all duration-200 !rounded-full h-[54px] px-6 sm:px-10"
                   style={{ 
                     backgroundColor: '#ffffff',
                     borderWidth: '2px',
@@ -335,7 +335,7 @@ const SignUp = () => {
               <Button
                 onClick={handleNext}
                 disabled={isLoading}
-                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black !rounded-full h-[42px] w-[120px] px-[40px] py-[14px] gap-[10px]"
+                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black !rounded-full h-[54px] w-[120px] px-[40px] py-[14px] gap-[10px]"
                 style={{ opacity: 1 }}
               >
                 {isLoading ? (

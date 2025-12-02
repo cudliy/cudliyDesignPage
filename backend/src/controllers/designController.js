@@ -20,13 +20,37 @@ const saveImagesToS3 = async (imageUrls) => {
   for (const imageUrl of imageUrls) {
     try {
       if (skipS3Uploads) {
-        logger.info('S3 uploads disabled via environment variable, using original URLs');
-        savedImages.push({
-          originalUrl: imageUrl,
-          s3Url: imageUrl, // Use original URL
-          fileName: null,
-          skipReason: 'S3 uploads disabled'
-        });
+        logger.info('S3 uploads disabled, converting image to base64 for permanent storage');
+        
+        // Convert image to base64 to avoid temporary URL expiration
+        try {
+          const response = await axios.get(imageUrl, { 
+            responseType: 'arraybuffer',
+            timeout: 30000 // 30 second timeout
+          });
+          
+          const base64 = Buffer.from(response.data, 'binary').toString('base64');
+          const mimeType = response.headers['content-type'] || 'image/jpeg';
+          const base64Url = `data:${mimeType};base64,${base64}`;
+          
+          savedImages.push({
+            originalUrl: imageUrl,
+            s3Url: base64Url, // Use base64 URL for permanent storage
+            fileName: null,
+            skipReason: 'S3 uploads disabled, using base64'
+          });
+          
+          logger.info(`Image converted to base64 for permanent storage: ${imageUrl.substring(0, 50)}...`);
+        } catch (conversionError) {
+          logger.error(`Failed to convert image to base64: ${imageUrl}`, conversionError);
+          // Fallback to original URL if conversion fails
+          savedImages.push({
+            originalUrl: imageUrl,
+            s3Url: imageUrl, // Use original URL as fallback
+            fileName: null,
+            skipReason: 'S3 uploads disabled, base64 conversion failed'
+          });
+        }
         continue;
       }
 

@@ -336,9 +336,9 @@ export default function MobileOptimizedImageWorkflow({
                     className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                     style={{
                       width: '162px',
-                      height: '52px',
-                      borderRadius: '26px',
-                      border: '2px solid #2C2C2C',
+                      height: '54px',
+                      borderRadius: '27px',
+                      border: '2px solid #313131',
                       backgroundColor: 'transparent',
                       color: '#2C2E3D',
                       fontFamily: 'Manrope, sans-serif',

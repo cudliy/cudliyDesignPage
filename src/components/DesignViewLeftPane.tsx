@@ -221,7 +221,7 @@ export default function DesignViewLeftPane({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <button className="flex-1 max-w-[200px] py-2.5 text-sm bg-gradient-to-r from-[#575757] to-[#676767] hover:from-[#676767] hover:to-[#575757] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
+          <button className="flex-1 max-w-[200px] h-[54px] text-sm bg-[#313131] hover:bg-[#414141] text-white font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center">
             Save to draft
           </button>
         </div>

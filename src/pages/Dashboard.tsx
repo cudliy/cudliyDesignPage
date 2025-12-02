@@ -272,13 +272,16 @@ export default function Dashboard() {
     if (design.images && design.images.length > 0) {
       const imageUrl = design.images[0].url;
       
-      // Prefer external URLs over base64 data
-      if (imageUrl && !imageUrl.startsWith('data:')) {
+      // Return any valid image URL (base64 or external)
+      if (imageUrl && (imageUrl.startsWith('data:') || imageUrl.startsWith('http'))) {
         return imageUrl;
       }
-      
-      // If we have a base64 image, use it but prefer external URLs
-      if (imageUrl && imageUrl.startsWith('data:')) {
+    }
+    
+    // Check generatedImages as fallback
+    if (design.generatedImages && design.generatedImages.length > 0) {
+      const imageUrl = design.generatedImages[0].url;
+      if (imageUrl && (imageUrl.startsWith('data:') || imageUrl.startsWith('http'))) {
         return imageUrl;
       }
     }
@@ -1292,6 +1295,11 @@ export default function Dashboard() {
                         src={getDesignImage(design)}
                         alt={getDesignTitle(design)}
                         className="w-14 sm:w-16 lg:w-20 xl:w-24 h-14 sm:h-16 lg:h-20 xl:h-24 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110"
+                        onError={(e) => {
+                          // Fallback to placeholder if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBVbmF2YWlsYWJsZTwvdGV4dD4KPC9zdmc+';
+                        }}
                       />
                     </div>
                   </div>

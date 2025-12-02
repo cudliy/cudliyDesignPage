@@ -425,7 +425,7 @@ export default function CheckoutPage() {
           <button
             onClick={handleProceedToPayment}
             disabled={orderProcessing}
-            className={`w-full h-[42px] rounded-full font-medium transition-all ${
+            className={`w-full h-[54px] rounded-full font-medium transition-all ${
               orderProcessing
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                 : 'bg-black text-white hover:bg-gray-800'

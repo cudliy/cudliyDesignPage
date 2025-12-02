@@ -352,7 +352,7 @@ const SignIn = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black !rounded-full h-[42px] w-[120px] px-[40px] py-[14px] gap-[10px]"
+                className="text-white font-medium transition-all duration-200 hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed bg-black !rounded-full h-[54px] w-[120px] px-[40px] py-[14px] gap-[10px]"
                 style={{ opacity: 1 }}
               >
                 {isLoading ? (

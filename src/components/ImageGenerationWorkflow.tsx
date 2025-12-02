@@ -307,9 +307,9 @@ export default function ImageGenerationWorkflow({
                   className="flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer"
                   style={{
                     width: '162px',
-                    height: '52px',
-                    borderRadius: '26px',
-                    border: '2px solid #212121',
+                    height: '54px',
+                    borderRadius: '27px',
+                    border: '2px solid #313131',
                     backgroundColor: 'transparent',
                     color: '#ffffff',
                     fontFamily: 'Manrope, sans-serif',
