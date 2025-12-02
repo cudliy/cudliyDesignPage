@@ -278,14 +278,6 @@ export default function Dashboard() {
       }
     }
     
-    // Check generatedImages as fallback
-    if (design.generatedImages && design.generatedImages.length > 0) {
-      const imageUrl = design.generatedImages[0].url;
-      if (imageUrl && (imageUrl.startsWith('data:') || imageUrl.startsWith('http'))) {
-        return imageUrl;
-      }
-    }
-    
     // Fallback placeholder
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+';
   };
