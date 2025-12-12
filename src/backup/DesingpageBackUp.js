@@ -109,7 +109,7 @@ export default function DesignPage() {
 
 	// Debug: Track showWorkflow changes
 	useEffect(() => {
-		console.log('🔄 showWorkflow changed:', showWorkflow);
+		// showWorkflow changed
 	}, [showWorkflow]);
 
 	// Strategic Enhancement: Sync initial state with properties aggregator
@@ -154,7 +154,6 @@ export default function DesignPage() {
 	};
 
 const handleBackToCategories = () => {
-	console.log('Back button clicked - current selectedCategory:', selectedCategory);
 	// Always return to Advanced section with no subcategory selected
 	if (!isAdvanced) setIsAdvanced(true);
 	setSelectedCategory(null);

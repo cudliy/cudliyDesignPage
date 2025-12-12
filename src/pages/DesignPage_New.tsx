@@ -43,7 +43,7 @@ export default function DesignPage() {
 
 		setError(null);
 		// Handle generation logic here
-		console.log('Creating with prompt:', prompt);
+
 	};
 
 	// Mobile Chat View

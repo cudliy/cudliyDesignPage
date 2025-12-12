@@ -5,6 +5,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import axios from 'axios';
 import logger from '../utils/logger.js';
 import { fal } from '@fal-ai/client';
+import contentFilter from '../utils/contentFilter.js';
 
 class AIService {
   constructor() {
@@ -40,7 +41,22 @@ class AIService {
   async generateEnhancedPrompt(userSelections) {
     const { text, color, size, style, material, production, details } = userSelections;
     
-    const systemPrompt = `You are a helpful assistant that create standard prompt for image generation. The background of the image must be completely transparent or removed, with no background at all. The characters described must be fully within the frame of the image. DO NOT CREATE THE IMAGE YOU MUST ONLY WRITE A PROMPT. ONLY IN ALPHABETS NO NUMBERS OR SYMBOLS.`;
+    // CONTENT FILTERING - Double-check before AI processing
+    const contentCheck = contentFilter.checkFullContent(userSelections);
+    if (contentCheck.isInappropriate) {
+      throw new Error(`Content policy violation: ${contentCheck.reason}`);
+    }
+    
+    const systemPrompt = `You are a helpful assistant that creates standard prompts for image generation. The background of the image must be completely transparent or removed, with no background at all. The characters described must be fully within the frame of the image. 
+
+IMPORTANT CONTENT GUIDELINES:
+- Generate only family-friendly, appropriate content
+- All subjects must be fully clothed and appropriate for all audiences
+- No suggestive, explicit, or inappropriate content
+- Focus on artistic, creative, and wholesome imagery
+- If the request seems inappropriate, create a safe, family-friendly alternative
+
+DO NOT CREATE THE IMAGE YOU MUST ONLY WRITE A PROMPT. ONLY IN ALPHABETS NO NUMBERS OR SYMBOLS.`;
 
     try {
       // Try Google Gemini 2.0 Flash first (priority)
@@ -63,6 +79,17 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
       const geminiResponse = await geminiResult.response;
       const geminiText = geminiResponse.text();
       
+      // CONTENT FILTERING - Check AI-generated prompt
+      const promptCheck = contentFilter.checkContent(geminiText);
+      if (promptCheck.isInappropriate) {
+        logger.warn('AI-generated prompt contained inappropriate content, sanitizing...');
+        const sanitizedPrompt = contentFilter.sanitizeText(geminiText);
+        if (!sanitizedPrompt.trim()) {
+          throw new Error('Generated prompt was entirely inappropriate. Please modify your request.');
+        }
+        return sanitizedPrompt.trim();
+      }
+      
       logger.info('Google Gemini 2.0 Flash prompt generation successful');
       return geminiText.trim();
       
@@ -83,8 +110,21 @@ Generate a comprehensive prompt that incorporates all these elements naturally.`
           temperature: 0.7
         });
 
+        const openaiText = response.choices[0].message.content.trim();
+        
+        // CONTENT FILTERING - Check AI-generated prompt
+        const promptCheck = contentFilter.checkContent(openaiText);
+        if (promptCheck.isInappropriate) {
+          logger.warn('AI-generated prompt contained inappropriate content, sanitizing...');
+          const sanitizedPrompt = contentFilter.sanitizeText(openaiText);
+          if (!sanitizedPrompt.trim()) {
+            throw new Error('Generated prompt was entirely inappropriate. Please modify your request.');
+          }
+          return sanitizedPrompt.trim();
+        }
+        
         logger.info('OpenAI prompt generation successful');
-        return response.choices[0].message.content.trim();
+        return openaiText;
         
       } catch (openaiError) {
         logger.error('Both Google Gemini and OpenAI failed:', { geminiError: geminiError.message, openaiError: openaiError.message });

@@ -79,7 +79,7 @@ export default function DesignView() {
 
   // Advanced section handlers
   const handleColorChange = (color) => {
-    console.log('Color selected:', color);
+
   };
 
   const handleSizeChange = (size) => {

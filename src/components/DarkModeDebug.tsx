@@ -5,9 +5,7 @@ export default function DarkModeDebug() {
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    console.log('🐛 DarkModeDebug mounted');
-    console.log('🐛 Current theme:', theme);
-    console.log('🐛 HTML classes:', document.documentElement.className);
+    // Debug component mounted
   }, [theme]);
 
   return (
@@ -24,7 +22,6 @@ export default function DarkModeDebug() {
         </div>
         <button
           onClick={() => {
-            console.log('🐛 Debug toggle clicked');
             toggleTheme();
           }}
           className="w-full px-3 py-2 bg-black dark:bg-white text-white dark:text-black rounded text-sm font-medium hover:opacity-80 transition-opacity"

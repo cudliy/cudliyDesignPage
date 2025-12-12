@@ -156,11 +156,11 @@ export default function ModelViewer({
         });
         
         modelViewer.addEventListener('model-visibility', (event) => {
-          console.log('ModelViewer: Model visibility changed:', event);
+          // Model visibility changed
         });
         
         modelViewer.addEventListener('progress', (event) => {
-          console.log('ModelViewer: Loading progress:', event);
+          // Loading progress
         });
         
         // Store reference to model element for controls
@@ -286,7 +286,6 @@ export default function ModelViewer({
   }, [lighting, background, size, cameraAngle]);
 
   const handleLoad = () => {
-    console.log('ModelViewer: Model loaded successfully');
     setLoadingState('loaded');
     // Clear timeout on successful load
     if (timeoutRef.current) {

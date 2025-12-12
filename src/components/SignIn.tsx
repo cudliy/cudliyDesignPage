@@ -84,11 +84,10 @@ const SignIn = () => {
     try {
       // Get Google credential token using modern Google Identity Services
       const credential = await modernGoogleAuthService.signIn();
-      console.log('Got credential from Google, sending to backend...');
+
       
       // Send credential to backend for authentication
       const response = await apiService.googleAuth(credential);
-      console.log('Backend response:', response);
       
       // Handle both response formats: {success: true} and {status: 'success'}
       const isSuccess = response.success || (response as any).status === 'success';
@@ -191,7 +190,7 @@ const SignIn = () => {
       
       // Get Apple credential
       const appleResponse = await appleAuthService.signIn();
-      console.log('Got credential from Apple, sending to backend...');
+
       
       // Send credential to backend for authentication
       const response = await apiService.appleAuth(

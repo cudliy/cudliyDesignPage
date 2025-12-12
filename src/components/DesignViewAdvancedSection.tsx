@@ -98,45 +98,45 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
         <div className="w-full">
           {selectedSection === 'color' && (
             <div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', overflow: 'hidden' }}>
-              <ColorPicker onColorChange={(color: string) => console.log('Color:', color)} />
+              <ColorPicker onColorChange={(color: string) => {}} />
             </div>
           )}
           
           {selectedSection === 'size' && (
             <SizeSelector 
               selectedSize="M"
-              onSizeChange={(size: string) => console.log('Size:', size)}
+              onSizeChange={(size: string) => {}}
               customWidth=""
               customHeight=""
-              onCustomSizeChange={(width: string, height: string) => console.log('Custom size:', width, height)}
+              onCustomSizeChange={(width: string, height: string) => {}}
             />
           )}
           
           {selectedSection === 'material' && (
             <MaterialSelector 
               selectedMaterial=""
-              onMaterialChange={(material: string) => console.log('Material:', material)}
+              onMaterialChange={(material: string) => {}}
             />
           )}
           
           {selectedSection === 'style' && (
             <StyleSelector 
               selectedStyle=""
-              onStyleChange={(style: string) => console.log('Style:', style)}
+              onStyleChange={(style: string) => {}}
             />
           )}
           
           {selectedSection === 'production' && (
             <ProductionSelector 
               selectedProduction=""
-              onProductionChange={(production: string) => console.log('Production:', production)}
+              onProductionChange={(production: string) => {}}
             />
           )}
           
           {selectedSection === 'detail' && (
             <DetailSelector 
               selectedDetails={[]}
-              onDetailChange={(details: string[]) => console.log('Details:', details)}
+              onDetailChange={(details: string[]) => {}}
             />
           )}
         </div>

@@ -80,8 +80,7 @@ const corsOptions = {
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
+
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -95,10 +94,8 @@ app.use(cors(corsOptions));
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.originalUrl} from origin: ${req.headers.origin}`);
   if (req.method === 'OPTIONS') {
-    console.log('CORS Preflight request from:', req.headers.origin);
-    console.log('Request headers:', req.headers);
+    // CORS Preflight request
   }
   next();
 });
@@ -121,8 +118,7 @@ app.use('/api/', generalLimiter);
 // Global CORS preflight handler - MUST be before routes
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
-  console.log('CORS Preflight OPTIONS request from origin:', origin);
-  console.log('Requested URL:', req.originalUrl);
+
   
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
@@ -133,7 +129,7 @@ app.options('*', (req, res) => {
       'http://localhost:5174'
     ];
   
-  console.log('Allowed origins:', allowedOrigins);
+
   
   // Allow cudliy.com domains
   const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com') 
@@ -141,7 +137,7 @@ app.options('*', (req, res) => {
   || (origin && origin.includes('http://localhost:5174'))
 ) 
   
-  console.log('Is origin allowed?', isAllowed);
+
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
@@ -149,10 +145,10 @@ app.options('*', (req, res) => {
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Max-Age', '86400'); // 24 hours
-    console.log('CORS headers set for origin:', origin);
+
     res.status(200).end();
   } else {
-    console.log('CORS blocked origin:', origin);
+
     res.status(403).json({ error: 'CORS policy violation' });
   }
 });
@@ -245,7 +241,7 @@ app.get('/api/models/*', (req, res) => {
 // Specific CORS handler for designs route
 app.use('/api/designs', (req, res, next) => {
   const origin = req.headers.origin;
-  console.log(`Designs route ${req.method} ${req.originalUrl} from origin: ${origin}`);
+
   
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
@@ -264,9 +260,9 @@ app.use('/api/designs', (req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     res.header('Access-Control-Allow-Credentials', 'true');
-    console.log('CORS headers set for designs route, origin:', origin);
+
   } else {
-    console.log('CORS blocked for designs route, origin:', origin);
+
   }
   next();
 });
@@ -274,7 +270,7 @@ app.use('/api/designs', (req, res, next) => {
 // Specific OPTIONS handler for designs route
 app.options('/api/designs/*', (req, res) => {
   const origin = req.headers.origin;
-  console.log('Designs OPTIONS request from origin:', origin);
+
   
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
@@ -295,10 +291,10 @@ app.options('/api/designs/*', (req, res) => {
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Max-Age', '86400');
-    console.log('Designs OPTIONS CORS headers set for origin:', origin);
+
     res.status(200).end();
   } else {
-    console.log('Designs OPTIONS CORS blocked origin:', origin);
+
     res.status(403).json({ error: 'CORS policy violation' });
   }
 });
@@ -313,6 +309,10 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/slant3d', slant3dRoutes);
 app.use('/api/share', shareRoutes);
 app.use('/api/gifts', giftRoutes);
+
+// Import admin routes
+import adminRoutes from './routes/adminRoutes.js';
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
 app.use(globalErrorHandler);

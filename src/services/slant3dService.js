@@ -5,16 +5,12 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:3001/api' : 'https://cudliydesign-production.up.railway.app/api');
 
 // Debug logging for Slant3D service
-console.log('Slant3D API_BASE_URL:', API_BASE_URL);
-console.log('Slant3D Environment:', import.meta.env.MODE);
-console.log('Slant3D VITE_API_URL:', import.meta.env.VITE_API_URL);
 
 class Slant3DService {
   // Upload model to Slant3D using backend proxy
   async uploadModel(modelUrl, options = {}) {
     try {
-      console.log('Uploading model to Slant3D:', modelUrl);
-      console.log('Using backend proxy:', API_BASE_URL);
+
       
       // Validate URL before sending to backend
       if (modelUrl && modelUrl.startsWith('blob:')) {
@@ -44,7 +40,7 @@ class Slant3DService {
       }
 
       const result = await response.json();
-      console.log('Upload result:', result);
+
       
       if (!result.success) {
         throw new Error(result.message || 'Model upload failed');
@@ -66,8 +62,7 @@ class Slant3DService {
   // Get pricing for a model using the backend proxy
   async getPricing(modelUrl, options = {}) {
     try {
-      console.log('Getting Slant3D pricing for:', modelUrl);
-      console.log('Using backend proxy:', API_BASE_URL);
+
 
       // Call backend proxy
       const response = await fetch(`${API_BASE_URL}/slant3d/pricing/estimate`, {
@@ -145,9 +140,7 @@ class Slant3DService {
   // Create order using backend proxy
   async createOrder(modelUrl, options = {}, customerData = {}) {
     try {
-      console.log('Creating Slant3D order for:', modelUrl);
-      console.log('Order options:', options);
-      console.log('Customer data:', customerData);
+
       
       // Validate URL before sending to backend
       if (modelUrl && modelUrl.startsWith('blob:')) {
@@ -177,7 +170,7 @@ class Slant3DService {
       }
 
       const result = await response.json();
-      console.log('Order creation result:', result);
+
       
       if (!result.success) {
         throw new Error(result.message || 'Order creation failed');
@@ -193,7 +186,7 @@ class Slant3DService {
   // Get shipping estimate using backend proxy
   async getShippingEstimate(modelUrl, options = {}, customerData = {}) {
     try {
-      console.log('Getting Slant3D shipping estimate for:', modelUrl);
+
 
       const response = await fetch(`${API_BASE_URL}/slant3d/shipping/estimate`, {
         method: 'POST',

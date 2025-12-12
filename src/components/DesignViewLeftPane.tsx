@@ -28,8 +28,7 @@ export default function DesignViewLeftPane({
   const [newPrompt, setNewPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Debug logging
-  console.log('🔍 DesignViewLeftPane rendered with onGenerateNew:', !!onGenerateNew);
+
 
   const handleGenerateNew = () => {
     if (newPrompt.trim() && onGenerateNew) {

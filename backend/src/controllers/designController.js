@@ -9,6 +9,8 @@ import Subscription from '../models/Subscription.js';
 import aiService from '../services/aiService.js';
 import storageService from '../services/storageService.js';
 import awsService from '../services/awsService.js';
+import contentFilter from '../utils/contentFilter.js';
+import requestTracker from '../utils/requestTracker.js';
 
 // Helper function to save images to AWS S3
 const saveImagesToS3 = async (imageUrls) => {
@@ -162,6 +164,71 @@ export const generateImages = async (req, res, next) => {
     } = req.body;
 
     logger.info(`Starting image generation for guest user: ${user_id || 'anonymous'}`);
+
+    // REQUEST TRACKING - Check for blocked request patterns
+    const requestCheck = await requestTracker.checkRequest({
+      userId: user_id,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent'),
+      prompt: text,
+      endpoint: req.originalUrl,
+      timestamp: new Date()
+    });
+
+    if (requestCheck.shouldBlock) {
+      logger.warn('Request blocked by request tracker:', {
+        userId: user_id?.substring(0, 10) + '...',
+        reason: requestCheck.reason,
+        violationType: requestCheck.violationType
+      });
+      
+      return next(new AppError(requestCheck.reason, 403));
+    }
+
+    // CONTENT FILTERING - Check for inappropriate content
+    const userSelections = { text, color, size, style, material, production, details };
+    const contentCheck = contentFilter.checkFullContent(userSelections);
+    
+    if (contentCheck.isInappropriate) {
+      // Record the violation
+      const violationResult = await contentFilter.recordViolation(
+        user_id,
+        text,
+        contentCheck.foundTerms || [],
+        req.ip,
+        req.get('User-Agent')
+      );
+
+      logger.warn('Inappropriate content blocked and violation recorded:', {
+        userId: user_id?.substring(0, 10) + '...',
+        reason: contentCheck.reason,
+        foundTerms: contentCheck.foundTerms?.length || 0,
+        action: violationResult.action,
+        severity: violationResult.severity
+      });
+      
+      // Customize error message based on severity
+      let errorMessage = `Content not allowed: ${contentCheck.reason}`;
+      if (violationResult.severity === 'critical') {
+        errorMessage = 'Your account has been flagged for policy violations. Please contact support if you believe this is an error.';
+      } else if (violationResult.action === 'blocked') {
+        errorMessage = 'Multiple policy violations detected. Please use family-friendly content only.';
+      } else {
+        errorMessage += ` Please try: ${contentCheck.suggestions?.join(', ') || 'family-friendly descriptions'}`;
+      }
+      
+      return next(new AppError(errorMessage, violationResult.shouldBlock ? 403 : 400));
+    }
+
+    // Additional user history check
+    const userHistoryCheck = await contentFilter.checkUserHistory(user_id, text);
+    if (userHistoryCheck.shouldBlock) {
+      logger.warn('User blocked due to content violation history:', { 
+        userId: user_id,
+        violationCount: userHistoryCheck.violationCount
+      });
+      return next(new AppError('Account temporarily restricted due to repeated policy violations. Please contact support.', 403));
+    }
 
     // No user authentication or usage limits for guest access
     // All users can generate images without restrictions

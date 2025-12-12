@@ -36,7 +36,7 @@ class ModernGoogleAuthService {
               use_fedcm_for_prompt: false, // Disable FedCM to avoid issues
             });
             this.isInitialized = true;
-            console.log('Google Identity Services initialized successfully');
+
             resolve();
           } catch (error) {
             console.error('Failed to initialize Google Identity Services:', error);
@@ -58,7 +58,7 @@ class ModernGoogleAuthService {
         script.async = true;
         script.defer = true;
         script.onload = () => {
-          console.log('Google Identity Services script loaded');
+
           setTimeout(initializeGIS, 100);
         };
         script.onerror = () => {
@@ -72,7 +72,7 @@ class ModernGoogleAuthService {
 
   // Handle credential response from Google
   private handleCredentialResponse(response: CredentialResponse): void {
-    console.log('Received credential response from Google');
+
     if (this.currentResolve) {
       this.currentResolve(response.credential);
       this.currentResolve = null;
@@ -116,7 +116,7 @@ class ModernGoogleAuthService {
         window.google?.accounts.id.prompt((notification: PromptMomentNotification) => {
           if (notification.isNotDisplayed()) {
             const reason = notification.getNotDisplayedReason();
-            console.log('Google One Tap not displayed:', reason);
+
             
             let errorMessage = 'Google sign-in is not available.';
             switch (reason) {
@@ -146,7 +146,7 @@ class ModernGoogleAuthService {
             }
           } else if (notification.isSkippedMoment()) {
             const reason = notification.getSkippedReason();
-            console.log('Google One Tap skipped:', reason);
+
             
             let errorMessage = 'Google sign-in was cancelled.';
             switch (reason) {
@@ -196,7 +196,7 @@ class ModernGoogleAuthService {
 
     try {
       window.google?.accounts.id.renderButton(element, buttonOptions);
-      console.log('Google Sign-In button rendered successfully');
+
     } catch (error) {
       console.error('Failed to render Google Sign-In button:', error);
       throw new Error('Failed to render Google sign-in button');
@@ -208,7 +208,7 @@ class ModernGoogleAuthService {
     try {
       if (window.google?.accounts?.id) {
         window.google.accounts.id.disableAutoSelect();
-        console.log('Google sign-out completed');
+
       }
     } catch (error) {
       console.error('Error during Google sign-out:', error);

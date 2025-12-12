@@ -302,7 +302,7 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
-      console.log('API Request:', url, options.method || 'GET');
+
       
       // Get JWT token from sessionStorage
       const token = sessionStorage.getItem('token');
@@ -323,9 +323,7 @@ class ApiService {
         ...options,
       });
 
-      console.log('API Response status:', response.status, response.statusText);
       const data = await response.json();
-      console.log('API Response data:', data);
 
       if (!response.ok) {
         const errorMessage = data.error || data.message || `HTTP ${response.status}`;

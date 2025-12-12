@@ -21,17 +21,17 @@ export default function AdminOrders() {
         setLoading(true)
         // For demo/admin, try to load current (guest) user's orders if available
         const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('guest_user_id')
-        console.log('AdminOrders: Looking for orders for userId:', userId)
+
         
         if (!userId) {
-          console.log('AdminOrders: No userId found in session storage')
+
           setOrders([])
           setLoading(false)
           return
         }
         
         const res = await apiService.getUserOrders(userId)
-        console.log('AdminOrders: API response:', res)
+
         
         if (res.success && res.data?.orders) {
           const mapped: OrderRow[] = (res.data.orders as any[]).map((o: any) => ({
@@ -42,10 +42,10 @@ export default function AdminOrders() {
             createdAt: o.createdAt,
             items: o.items
           }))
-          console.log('AdminOrders: Mapped orders:', mapped)
+
           setOrders(mapped)
         } else {
-          console.log('AdminOrders: No orders found or API error:', res)
+
           setError('Failed to load orders')
         }
       } catch (e: any) {

@@ -55,9 +55,6 @@ export default function DetailSelector({
       container.addEventListener('scroll', handleScroll);
       
       // Debug info
-      console.log('Scroll container setup:', {
-        scrollHeight: container.scrollHeight,
-        clientHeight: container.clientHeight,
         hasScroll: container.scrollHeight > container.clientHeight
       });
       

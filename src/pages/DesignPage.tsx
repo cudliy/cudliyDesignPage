@@ -17,6 +17,7 @@ import MobileOptimizedImageWorkflow from "../components/MobileOptimizedImageWork
 import ChatStyleMobileWorkflow from "../components/ChatStyleMobileWorkflow";
 import Simple3DViewer from "../components/Simple3DViewer";
 import DesignViewLeftPane from "../components/DesignViewLeftPane";
+import contentFilter from "../utils/contentFilter";
 
 export default function DesignPage() {
 	const modalVideoRef = useRef<HTMLVideoElement>(null);
@@ -38,13 +39,13 @@ export default function DesignPage() {
 		const fromDesignView = sessionStorage.getItem('from_design_view');
 		
 		if (newDesignPrompt) {
-			console.log('🎯 Found new design prompt from DesignView:', newDesignPrompt);
+
 			setPrompt(newDesignPrompt);
 			sessionStorage.removeItem('new_design_prompt');
 			
 			// Auto-trigger generation after a short delay
 			setTimeout(() => {
-				console.log('✅ Auto-triggering generation for new prompt');
+
 				setGenerationCounter(prev => prev + 1);
 				setShowWorkflow(true);
 			}, 500);
@@ -52,7 +53,7 @@ export default function DesignPage() {
 		
 		// Store the flag for later use in completion handler
 		if (fromDesignView === 'true') {
-			console.log('📍 User came from DesignView - will auto-navigate to new design');
+
 		}
 	}, []);
 	const [isAdvanced, setIsAdvanced] = useState(false);
@@ -141,7 +142,7 @@ export default function DesignPage() {
 
 	// Debug: Track showWorkflow changes
 	useEffect(() => {
-		console.log('🔄 showWorkflow changed:', showWorkflow);
+		// showWorkflow changed
 	}, [showWorkflow]);
 
 	// Strategic Enhancement: Sync initial state with properties aggregator
@@ -186,11 +187,11 @@ export default function DesignPage() {
 	};
 
 const handleBackToCategories = () => {
-	console.log('Back button clicked - current selectedCategory:', selectedCategory);
+
 	// Always return to Advanced section with no subcategory selected
 	if (!isAdvanced) setIsAdvanced(true);
 	setSelectedCategory(null);
-	console.log('Back button clicked - set selectedCategory to null');
+
 };
 
 
@@ -237,20 +238,35 @@ const handleBackToCategories = () => {
 			return;
 		}
 
+		// CLIENT-SIDE CONTENT FILTERING
+		const userSelections = {
+			text: prompt,
+			style: selectedStyle,
+			material: selectedMaterial,
+			production: selectedProduction,
+			details: selectedDetails
+		};
+		
+		const contentCheck = contentFilter.checkUserSelections(userSelections);
+		if (contentCheck.isInappropriate) {
+			setError(`${contentCheck.reason} Try: ${contentCheck.suggestions?.join(', ') || 'family-friendly descriptions'}`);
+			return;
+		}
+
 		// Check usage limits before starting workflow
 		if (!canGenerateImages) {
 			setError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
 			return;
 		}
 
-		console.log('🎯 Create button clicked - starting workflow');
+
 		setError(null);
 		
 		// Increment generation counter to trigger new generation
 		setGenerationCounter(prev => prev + 1);
 		setShowWorkflow(true);
 		
-		console.log('✅ Generation triggered with counter:', generationCounter + 1);
+
 	};
 
 	const handleWorkflowComplete = (designId: string, designData?: any) => {
@@ -259,7 +275,7 @@ const handleBackToCategories = () => {
 		
 		if (fromDesignView === 'true') {
 			// User came from DesignView - navigate to the new design view page
-			console.log('🎯 Auto-navigating to new design view:', designId);
+
 			sessionStorage.removeItem('from_design_view');
 			window.location.href = `/design/${designId}`;
 		} else if (designData && designData.modelFiles) {
@@ -297,7 +313,7 @@ const handleBackToCategories = () => {
 	};
 
 	const handleGenerateNewFromViewer = (newPrompt: string) => {
-		console.log('🎯 Generating new design from 3D viewer with prompt:', newPrompt);
+
 		
 		// Switch back to image generation mode
 		setShow3DViewer(false);
@@ -310,7 +326,7 @@ const handleBackToCategories = () => {
 		
 		// Small delay to ensure state is updated before triggering workflow
 		setTimeout(() => {
-			console.log('✅ Triggering new generation workflow');
+
 			setGenerationCounter(prev => prev + 1);
 			setShowWorkflow(true);
 		}, 200);
@@ -501,7 +517,7 @@ const handleBackToCategories = () => {
 						onClick={(e) => {
 							e.preventDefault();
 							e.stopPropagation();
-							console.log('Size back button clicked');
+
 							handleBackToCategories();
 						}}
 						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
@@ -556,7 +572,7 @@ const handleBackToCategories = () => {
 						onClick={(e) => {
 							e.preventDefault();
 							e.stopPropagation();
-							console.log('Production back button clicked');
+
 							handleBackToCategories();
 						}}
 						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
@@ -611,7 +627,7 @@ const handleBackToCategories = () => {
 						onClick={(e) => {
 							e.preventDefault();
 							e.stopPropagation();
-							console.log('Style back button clicked');
+
 							handleBackToCategories();
 						}}
 						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
@@ -666,7 +682,7 @@ const handleBackToCategories = () => {
 						onClick={(e) => {
 							e.preventDefault();
 							e.stopPropagation();
-							console.log('Material back button clicked');
+
 							handleBackToCategories();
 						}}
 						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
@@ -720,7 +736,7 @@ const handleBackToCategories = () => {
 						onClick={(e) => {
 							e.preventDefault();
 							e.stopPropagation();
-							console.log('Detail back button clicked');
+
 							handleBackToCategories();
 						}}
 						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"
@@ -776,7 +792,7 @@ const handleBackToCategories = () => {
 						onClick={(e) => {
 							e.preventDefault();
 							e.stopPropagation();
-							console.log('Color back button clicked');
+
 							handleBackToCategories();
 						}}
 						className="w-10 h-10 rounded-full border border-white/20 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-105 flex items-center justify-center relative z-50 pointer-events-auto"

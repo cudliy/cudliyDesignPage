@@ -75,7 +75,7 @@ export default function GiftViewPage() {
         try {
           await audio.play();
         } catch (err) {
-          console.log('Audio autoplay blocked by browser');
+
         }
       };
 

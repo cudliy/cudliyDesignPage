@@ -32,7 +32,6 @@ export default function DarkModeDebugPanel() {
         </div>
         <button
           onClick={() => {
-            console.log('🐛 Manual toggle clicked');
             toggleTheme();
           }}
           className="w-full mt-2 px-3 py-2 bg-black dark:bg-white text-white dark:text-black rounded font-medium hover:opacity-80 transition-opacity"
@@ -41,7 +40,6 @@ export default function DarkModeDebugPanel() {
         </button>
         <button
           onClick={() => {
-            console.log('🐛 Force dark clicked');
             document.documentElement.classList.remove('light');
             document.documentElement.classList.add('dark');
             localStorage.setItem('theme', 'dark');
@@ -52,7 +50,6 @@ export default function DarkModeDebugPanel() {
         </button>
         <button
           onClick={() => {
-            console.log('🐛 Force light clicked');
             document.documentElement.classList.remove('dark');
             document.documentElement.classList.add('light');
             localStorage.setItem('theme', 'light');

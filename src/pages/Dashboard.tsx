@@ -18,10 +18,10 @@ export default function Dashboard() {
   const [userId] = useState(() => {
     const userId = sessionStorage.getItem('user_id');
     const token = sessionStorage.getItem('token');
-    console.log('Dashboard checking auth:', { userId, token: !!token });
+
     if (!userId || !token) {
       // Redirect to login if not authenticated
-      console.log('No auth found, redirecting to signin');
+
       window.location.href = '/signin';
     }
     return userId;

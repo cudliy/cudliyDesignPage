@@ -75,17 +75,14 @@ export default function MaterialSelector({
   ];
 
   const handleCategoryClick = (categoryKey: string) => {
-    console.log('MaterialSelector: Category clicked:', categoryKey);
     setSelectedCategory(categoryKey);
   };
 
   const handleBackToCategories = () => {
-    console.log('MaterialSelector: Back button clicked');
     setSelectedCategory(null);
   };
 
   const handleSubcategoryClick = (subcategoryKey: string) => {
-    console.log('Subcategory clicked:', subcategoryKey);
     onMaterialChange(subcategoryKey);
   };
 

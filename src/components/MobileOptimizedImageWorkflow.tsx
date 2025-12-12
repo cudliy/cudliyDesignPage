@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/api';
 import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
+import contentFilter from '../utils/contentFilter';
 
 interface MobileOptimizedImageWorkflowProps {
   prompt: string;
@@ -97,12 +98,18 @@ export default function MobileOptimizedImageWorkflow({
       return;
     }
 
+    // CLIENT-SIDE CONTENT FILTERING
+    const contentCheck = contentFilter.checkContent(finalPrompt);
+    if (contentCheck.isInappropriate) {
+      onError(`${contentCheck.reason} Try: ${contentCheck.suggestions?.join(', ') || 'family-friendly descriptions'}`);
+      return;
+    }
+
     if (!canGenerateImages) {
       onError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
       return;
     }
 
-    console.log('ðŸš€ Starting image generation...');
     setIsGenerating(true);
     setGeneratedImages([]); // Clear previous images
     setSelectedImageIndex(null);
@@ -143,18 +150,18 @@ export default function MobileOptimizedImageWorkflow({
         console.log('ðŸ“¥ Images received:', response.data?.images?.length);
         
         if (response.success && response.data) {
-          console.log('âœ… Setting generated images:', response.data.images);
-          console.log('âœ… Number of images:', response.data.images.length);
+
+
           
           setGeneratedImages(response.data.images);
           setSessionId(response.data.session_id);
           
-          console.log('âœ… Images state updated');
+
           
           try {
             await apiService.trackUsage(userId, 'image', response.data.images.length);
             await checkLimits(true);
-            console.log('âœ… Usage tracked successfully');
+
           } catch (trackingError) {
             console.warn('âš ï¸ Usage tracking failed:', trackingError);
             try {
@@ -185,7 +192,7 @@ export default function MobileOptimizedImageWorkflow({
   // Generate when trigger count changes
   useEffect(() => {
     if (generationTrigger > lastTriggerCount && prompt.trim() && !isGenerating) {
-      console.log('ðŸš€ Manual generation triggered - count:', generationTrigger);
+
       setLastTriggerCount(generationTrigger);
       generateImages();
     }

@@ -94,7 +94,7 @@ class AppleAuthService {
       });
 
       this.isInitialized = true;
-      console.log('Apple Sign-In initialized successfully');
+
     } catch (error) {
       console.error('Failed to initialize Apple Sign-In:', error);
       throw error;

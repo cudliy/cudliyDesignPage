@@ -20,12 +20,12 @@ export const verifyPaymentAuth = async (req, res, next) => {
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('JWT decoded:', decoded);
+
     
     // Get user from database
     // JWT token contains MongoDB _id, so we need to find by _id
     const user = await User.findById(decoded.id);
-    console.log('User found:', user ? 'Yes' : 'No', user ? `ID: ${user.id}, _id: ${user._id}` : '');
+
     
     if (!user) {
       return next(new AppError('User not found', 404));

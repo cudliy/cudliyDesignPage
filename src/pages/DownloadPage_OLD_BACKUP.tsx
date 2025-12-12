@@ -119,7 +119,7 @@ export default function DownloadPage() {
   // Start download immediately when model URL is available
   useEffect(() => {
     if (modelUrl && !autoDownloadTriggered && !downloading) {
-      console.log('Model URL available, starting background download...');
+
       setAutoDownloadTriggered(true);
       
       // Start download immediately
@@ -149,7 +149,7 @@ export default function DownloadPage() {
     
     // Force completion after 6 minutes as a safety net
     timeoutId = setTimeout(() => {
-      console.log('Progress timeout reached, forcing completion');
+
       setIsProcessing(false);
       setProgress(100);
       isPolling = false;
@@ -200,7 +200,7 @@ export default function DownloadPage() {
 
         // Stop polling after max attempts to prevent infinite polling
         if (pollCount >= maxPolls) {
-          console.log('Max polling attempts reached, stopping progress tracking');
+
           setIsProcessing(false);
           setProgress(100);
           isPolling = false;

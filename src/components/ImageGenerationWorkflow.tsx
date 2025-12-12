@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/api';
 import type { GenerateImagesRequest, Generate3DModelRequest } from '../services/api';
 import { useUsageLimits } from '../hooks/useUsageLimits';
+import contentFilter from '../utils/contentFilter';
 
 interface ImageGenerationWorkflowProps {
   prompt: string;
@@ -93,12 +94,18 @@ export default function ImageGenerationWorkflow({
       return;
     }
 
+    // CLIENT-SIDE CONTENT FILTERING
+    const contentCheck = contentFilter.checkContent(finalPrompt);
+    if (contentCheck.isInappropriate) {
+      onError(`${contentCheck.reason} Try: ${contentCheck.suggestions?.join(', ') || 'family-friendly descriptions'}`);
+      return;
+    }
+
     if (!canGenerateImages) {
       onError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
       return;
     }
 
-    console.log('🚀 Starting image generation...');
     setIsGenerating(true);
     setGeneratedImages([]);
     setSelectedImageIndex(null);
