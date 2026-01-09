@@ -155,11 +155,11 @@ export default function ModelViewer({
           handleError('Model loading failed');
         });
         
-        modelViewer.addEventListener('model-visibility', (event) => {
+        modelViewer.addEventListener('model-visibility', (_event) => {
           // Model visibility changed
         });
         
-        modelViewer.addEventListener('progress', (event) => {
+        modelViewer.addEventListener('progress', (_event) => {
           // Loading progress
         });
         

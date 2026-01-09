@@ -98,45 +98,45 @@ export const DesignViewAdvancedSection: React.FC<DesignViewAdvancedSectionProps>
         <div className="w-full">
           {selectedSection === 'color' && (
             <div style={{ transform: 'scale(0.8)', transformOrigin: 'top center', overflow: 'hidden' }}>
-              <ColorPicker onColorChange={(color: string) => {}} />
+              <ColorPicker onColorChange={(_color: string) => {}} />
             </div>
           )}
           
           {selectedSection === 'size' && (
             <SizeSelector 
               selectedSize="M"
-              onSizeChange={(size: string) => {}}
+              onSizeChange={(_size: string) => {}}
               customWidth=""
               customHeight=""
-              onCustomSizeChange={(width: string, height: string) => {}}
+              onCustomSizeChange={(_width: string, _height: string) => {}}
             />
           )}
           
           {selectedSection === 'material' && (
             <MaterialSelector 
               selectedMaterial=""
-              onMaterialChange={(material: string) => {}}
+              onMaterialChange={(_material: string) => {}}
             />
           )}
           
           {selectedSection === 'style' && (
             <StyleSelector 
               selectedStyle=""
-              onStyleChange={(style: string) => {}}
+              onStyleChange={(_style: string) => {}}
             />
           )}
           
           {selectedSection === 'production' && (
             <ProductionSelector 
               selectedProduction=""
-              onProductionChange={(production: string) => {}}
+              onProductionChange={(_production: string) => {}}
             />
           )}
           
           {selectedSection === 'detail' && (
             <DetailSelector 
               selectedDetails={[]}
-              onDetailChange={(details: string[]) => {}}
+              onDetailChange={(_details: string[]) => {}}
             />
           )}
         </div>

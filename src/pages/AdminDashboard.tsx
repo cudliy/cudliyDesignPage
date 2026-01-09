@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { apiService } from '../services/api';
 
 interface ContentViolation {
   _id: string;

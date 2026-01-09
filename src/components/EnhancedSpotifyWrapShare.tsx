@@ -461,7 +461,7 @@ export default function EnhancedSpotifyWrapShare({
                 <h1 className="text-3xl font-bold mb-6">{currentSlideData.title}</h1>
                 <p className="text-xl mb-6">{currentSlideData.content}</p>
                 <div className="flex flex-wrap justify-center gap-2">
-                  {currentSlideData.data.concepts.map((concept: string, index: number) => (
+                  {currentSlideData.data.concepts.map((concept: string, _index: number) => (
                     <div key={concept} className="px-3 py-1 bg-white bg-opacity-20 rounded-full">
                       <span className="text-sm font-medium capitalize">{concept}</span>
                     </div>

@@ -129,7 +129,7 @@ export default function ImageGiftViewPage() {
               For {data.recipientName}
             </p>
             <div className="flex flex-wrap justify-center gap-3 mt-6">
-              {concepts.slice(0, 3).map((concept, index) => (
+              {concepts.slice(0, 3).map((concept, _index) => (
                 <div key={concept} className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
                   <span className="text-white font-medium capitalize">{concept}</span>
                 </div>
@@ -210,7 +210,7 @@ export default function ImageGiftViewPage() {
               Created with Cudliy
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-6">
-              {concepts.map((concept, index) => (
+              {concepts.map((concept, _index) => (
                 <div key={concept} className="px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm text-sm">
                   <span className="text-white capitalize">{concept}</span>
                 </div>

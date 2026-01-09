@@ -6,7 +6,6 @@ import StyleSelector from "../components/StyleSelector";
 import MaterialSelector from "../components/MaterialSelector";
 import DetailSelector from "../components/DetailSelector";
 import ModelDropdown from "../components/modelDropdown";
-import ImageUploadManager from "../components/ImageUploadManager";
 import { usePropertiesAggregator } from "../hooks/usePropertiesAggregator";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import SEO from "@/components/SEO";
@@ -77,7 +76,6 @@ export default function DesignPage() {
 	// Image upload states
 	const [uploadedImages, setUploadedImages] = useState<any[]>([]);
 	const [isUploadMode, setIsUploadMode] = useState(false);
-	const [showImageShare, setShowImageShare] = useState(false);
 	
 	// 3D Viewer control states
 	const [lighting3D, setLighting3D] = useState(30);

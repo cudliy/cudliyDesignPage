@@ -20,7 +20,7 @@ export default function ImageUploadDemo() {
     setShowWrap(true);
   };
 
-  const handleWrapShare = (platform: string, slideIndex: number) => {
+  const handleWrapShare = (platform: string, _slideIndex: number) => {
     const shareText = `🖼️ Check out my amazing image collection! Created with Cudliy #Cudliy #ImageCollection`;
     const shareUrl = window.location.origin;
     

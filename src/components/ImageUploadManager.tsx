@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { Upload, X, Check, Share2, Trash2 } from 'lucide-react';
+import { Upload, Check, Share2, Trash2 } from 'lucide-react';
 import { toast } from '@/lib/sonner';
 
 interface UploadedImage {

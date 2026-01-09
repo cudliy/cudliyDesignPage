@@ -5,7 +5,7 @@ import SpotifyWrapShare from './SpotifyWrapShare';
 export default function SpotifyWrapDemo() {
   const [showWrap, setShowWrap] = useState(false);
 
-  const handleShare = async (platform: string, slideIndex: number) => {
+  const handleShare = async (platform: string, _slideIndex: number) => {
     // Simulate share functionality
     const shareText = `🎨 Check out my 3D design journey with Cudliy! From idea to 3D reality in minutes. #Cudliy #3DDesign #AI`;
     const shareUrl = window.location.origin;
