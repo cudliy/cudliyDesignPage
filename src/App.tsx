@@ -18,8 +18,12 @@ import Toaster from '@/components/ui/Toaster'
 import SpotifyWrapDemo from './components/SpotifyWrapDemo'
 import SendGiftPage from './pages/SendGiftPage'
 import GiftViewPage from './pages/GiftViewPage'
+import ImageSharePage from './pages/ImageSharePage'
+import ImageGiftViewPage from './pages/ImageGiftViewPage'
+import ImageUploadTest from './pages/ImageUploadTest'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import ImageUploadDemo from './pages/ImageUploadDemo'
 
 function App() {
   return (
@@ -45,8 +49,12 @@ function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/demo/spotify-wrap" element={<SpotifyWrapDemo />} />
+          <Route path="/demo/image-upload" element={<ImageUploadDemo />} />
+          <Route path="/test/image-upload" element={<ImageUploadTest />} />
           <Route path="/send-gift/:designId" element={<SendGiftPage />} />
           <Route path="/gift/:giftId" element={<GiftViewPage />} />
+          <Route path="/share/images" element={<ImageSharePage />} />
+          <Route path="/gift/images/:giftId" element={<ImageGiftViewPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

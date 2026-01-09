@@ -1,44 +1,48 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import sharp from 'sharp';
 import axios from 'axios';
 import logger from '../utils/logger.js';
 
 class StorageService {
   constructor() {
-    this.s3Client = new S3Client({
-      region: process.env.AWS_REGION,
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-      }
-    });
-    this.bucketName = process.env.AWS_BUCKET_NAME;
+    this.accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+    this.apiToken = process.env.CLOUDFLARE_API_TOKEN;
+    this.bucketName = process.env.CLOUDFLARE_BUCKET_NAME || 'cudily-main';
+    
+    if (!this.accountId || !this.apiToken) {
+      logger.error('Cloudflare R2 credentials not found. Please set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN environment variables.');
+      throw new Error('Cloudflare R2 not configured');
+    }
+    
+    logger.info(`Storage Service using Cloudflare R2 with bucket: ${this.bucketName}`);
   }
 
   async uploadFile(buffer, filename, contentType, metadata = {}) {
     try {
-      const command = new PutObjectCommand({
-        Bucket: this.bucketName,
-        Key: filename,
-        Body: buffer,
-        ContentType: contentType,
-        CacheControl: 'public, max-age=31536000',
-        ACL: 'public-read',
-        Metadata: metadata
+      const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/r2/buckets/${this.bucketName}/objects/${filename}`;
+      
+      const response = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${this.apiToken}`,
+          'Content-Type': contentType,
+        },
+        body: buffer,
       });
 
-      await this.s3Client.send(command);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Cloudflare R2 upload failed: ${response.statusText} - ${errorText}`);
+      }
 
-      const publicUrl = `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
-      logger.info(`File uploaded successfully to S3: ${publicUrl}`);
+      const publicUrl = `https://pub-1ed89e0d7a8c4a12b06428c0c9047120.r2.dev/${filename}`;
+      logger.info(`File uploaded successfully to Cloudflare R2: ${publicUrl}`);
       
       return publicUrl;
     } catch (error) {
-      logger.error('S3 Upload Error:', error);
+      logger.error('Cloudflare R2 Upload Error:', error);
       throw error;
     }
   }
@@ -95,13 +99,20 @@ class StorageService {
 
   async deleteFile(filename) {
     try {
-      const command = new DeleteObjectCommand({
-        Bucket: this.bucketName,
-        Key: filename
-      });
+      const deleteUrl = `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/r2/buckets/${this.bucketName}/objects/${filename}`;
       
-      await this.s3Client.send(command);
-      logger.info(`File deleted from S3: ${filename}`);
+      const response = await fetch(deleteUrl, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${this.apiToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Cloudflare R2 delete failed: ${response.statusText}`);
+      }
+
+      logger.info(`File deleted from Cloudflare R2: ${filename}`);
     } catch (error) {
       logger.error('File Deletion Error:', error);
       throw error;
@@ -109,21 +120,8 @@ class StorageService {
   }
 
   async getSignedUrl(filename, expiration = 3600) {
-    try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: filename
-      });
-      
-      const url = await getSignedUrl(this.s3Client, command, {
-        expiresIn: expiration
-      });
-      
-      return url;
-    } catch (error) {
-      logger.error('Signed URL Error:', error);
-      throw error;
-    }
+    // For Cloudflare R2, return the public URL
+    return `https://pub-1ed89e0d7a8c4a12b06428c0c9047120.r2.dev/${filename}`;
   }
 }
 

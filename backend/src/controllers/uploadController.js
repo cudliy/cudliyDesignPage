@@ -1,7 +1,7 @@
 import multer from 'multer';
 import logger from '../utils/logger.js';
 import { AppError } from '../utils/errorHandler.js';
-import awsService from '../services/awsService.js';
+import awsService from '../services/awsService.js'; // Now using R2Service
 
 // Configure multer for memory storage (we'll upload directly to AWS S3)
 const upload = multer({

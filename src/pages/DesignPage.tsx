@@ -6,6 +6,7 @@ import StyleSelector from "../components/StyleSelector";
 import MaterialSelector from "../components/MaterialSelector";
 import DetailSelector from "../components/DetailSelector";
 import ModelDropdown from "../components/modelDropdown";
+import ImageUploadManager from "../components/ImageUploadManager";
 import { usePropertiesAggregator } from "../hooks/usePropertiesAggregator";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import SEO from "@/components/SEO";
@@ -72,6 +73,11 @@ export default function DesignPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [show3DViewer, setShow3DViewer] = useState(false);
 	const [completedDesign, setCompletedDesign] = useState<any>(null);
+	
+	// Image upload states
+	const [uploadedImages, setUploadedImages] = useState<any[]>([]);
+	const [isUploadMode, setIsUploadMode] = useState(false);
+	const [showImageShare, setShowImageShare] = useState(false);
 	
 	// 3D Viewer control states
 	const [lighting3D, setLighting3D] = useState(30);
@@ -233,6 +239,12 @@ const handleBackToCategories = () => {
 	};
 
 	const handleCreateClick = () => {
+		// Check if in upload mode and prevent AI generation
+		if (isUploadMode && uploadedImages.length > 0) {
+			setError('Cannot generate AI images while in upload mode. Clear uploaded images first.');
+			return;
+		}
+
 		if (!prompt.trim()) {
 			setError('Please enter a prompt first');
 			return;
@@ -258,7 +270,6 @@ const handleBackToCategories = () => {
 			setError(`You have reached your monthly image generation limit. Please upgrade your plan to continue.`);
 			return;
 		}
-
 
 		setError(null);
 		
@@ -330,6 +341,137 @@ const handleBackToCategories = () => {
 			setGenerationCounter(prev => prev + 1);
 			setShowWorkflow(true);
 		}, 200);
+	};
+
+	// Image upload handlers
+	const handleImagesChange = (images: any[]) => {
+		setUploadedImages(images);
+		setIsUploadMode(images.length > 0);
+		
+		// Clear any existing workflow or 3D viewer when switching to upload mode
+		if (images.length > 0) {
+			setShowWorkflow(false);
+			setShow3DViewer(false);
+			setCompletedDesign(null);
+		}
+	};
+
+	const toggleImageSelection = (imageId: string) => {
+		const updatedImages = uploadedImages.map(img => 
+			img.id === imageId ? { ...img, selected: !img.selected } : img
+		);
+		setUploadedImages(updatedImages);
+	};
+
+	const deleteImage = (imageId: string) => {
+		const imageToDelete = uploadedImages.find(img => img.id === imageId);
+		if (imageToDelete && imageToDelete.url && imageToDelete.url.startsWith('blob:')) {
+			URL.revokeObjectURL(imageToDelete.url);
+		}
+		
+		const updatedImages = uploadedImages.filter(img => img.id !== imageId);
+		handleImagesChange(updatedImages);
+	};
+
+	const handleImageShare = async (selectedImages: any[]) => {
+		if (selectedImages.length === 0) {
+			toast.error('Please select at least one image to share');
+			return;
+		}
+		
+		try {
+			console.log('=== STARTING IMAGE SHARE PROCESS ===');
+			console.log('Selected images:', selectedImages);
+			
+			// Convert blob URLs to base64 data URLs immediately
+			console.log('Converting images to base64 for sharing...');
+			const convertedImages = await Promise.all(
+				selectedImages.map(async (img, index) => {
+					try {
+						console.log(`Processing image ${index + 1}:`, img.url);
+						if (img.url.startsWith('blob:')) {
+							console.log(`Converting image ${index + 1} to base64...`);
+							const response = await fetch(img.url);
+							if (!response.ok) {
+								throw new Error(`Failed to fetch blob: ${response.statusText}`);
+							}
+							const blob = await response.blob();
+							console.log(`Blob size for image ${index + 1}:`, blob.size);
+							
+							return new Promise<typeof img>((resolve) => {
+								const reader = new FileReader();
+								reader.onload = () => {
+									const result = reader.result as string;
+									console.log(`Image ${index + 1} converted successfully, data URL length:`, result.length);
+									resolve({
+										...img,
+										url: result,
+										selected: true
+									});
+								};
+								reader.onerror = (error) => {
+									console.error(`Failed to convert image ${index + 1}:`, error);
+									resolve({
+										...img,
+										selected: true
+									});
+								};
+								reader.readAsDataURL(blob);
+							});
+						}
+						console.log(`Image ${index + 1} already processed (not a blob URL)`);
+						return {
+							...img,
+							selected: true
+						};
+					} catch (error) {
+						console.error(`Error converting image ${index + 1}:`, error);
+						return {
+							...img,
+							selected: true
+						};
+					}
+				})
+			);
+			
+			console.log('Conversion complete. Results:', convertedImages.map(img => ({
+				id: img.id,
+				urlType: img.url.startsWith('data:') ? 'base64' : img.url.startsWith('blob:') ? 'blob' : 'other',
+				urlLength: img.url.length
+			})));
+			
+			// Navigate to share page with converted images
+			const imageData = {
+				type: 'uploaded',
+				images: convertedImages,
+				userId: sessionStorage.getItem('user_id') || 'anonymous',
+				createdAt: new Date().toISOString()
+			};
+			
+			console.log('Storing converted image data:', imageData);
+			
+			// Store in session storage for share page
+			sessionStorage.setItem('share_images', JSON.stringify(imageData));
+			console.log('Data stored, navigating to share page...');
+			window.location.href = '/share/images';
+		} catch (error) {
+			console.error('Error preparing images for sharing:', error);
+			toast.error('Failed to prepare images for sharing');
+		}
+	};
+
+	const clearUploadedImages = () => {
+		// Revoke object URLs to prevent memory leaks
+		uploadedImages.forEach(img => {
+			if (img.url && img.url.startsWith('blob:')) {
+				URL.revokeObjectURL(img.url);
+			}
+		});
+		
+		setUploadedImages([]);
+		setIsUploadMode(false);
+		setError(null);
+		toast.success('Upload mode cleared');
 	};
 
 	const handleQualityChange = (quality: string) => {
@@ -1071,13 +1213,47 @@ const handleBackToCategories = () => {
 								{/* Plus button - left */}
 								<button
 									type="button"
-									onClick={() => toast.info('Image upload coming soon!')}
+									onClick={() => {
+										if (showWorkflow || show3DViewer) {
+											toast.info('Please complete or cancel current session first');
+										} else {
+											document.getElementById('image-upload-input')?.click();
+										}
+									}}
 									className="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-white transition-colors"
 								>
 									<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
 										<path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
 									</svg>
 								</button>
+								
+								{/* Hidden file input for image upload */}
+								<input
+									id="image-upload-input"
+									type="file"
+									multiple
+									accept="image/*"
+									onChange={(e) => {
+										if (e.target.files) {
+											const files = Array.from(e.target.files);
+											if (files.length + uploadedImages.length > 5) {
+												toast.error('Maximum 5 images allowed');
+												return;
+											}
+											
+											const newImages = files.map(file => ({
+												id: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+												file,
+												url: URL.createObjectURL(file),
+												selected: false
+											}));
+											
+											handleImagesChange([...uploadedImages, ...newImages]);
+										}
+										e.target.value = ''; // Reset input
+									}}
+									className="hidden"
+								/>
 
 								{/* Right side icons */}
 								<div className="flex items-center gap-1">
@@ -1387,49 +1563,196 @@ const handleBackToCategories = () => {
 						)}
 						</>
 					) : (
-						/* Default Grid Display */
-						<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 ml-0 lg:ml-0 xl:ml-1" style={{
-							paddingTop: window.innerWidth >= 1420 ? '60px' : '0'
-						}}>
-							{/* Camera 1 - Top Left */}
-							<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '800ms' }}>
-								<div className="w-full h-full flex items-center justify-center p-0 relative">
-									<img 
-										src="/image1.png" 
-										alt="Toy design 1" 
-										className="max-w-full max-h-full object-contain rounded-[16px]" 
-									/>
+						/* Default Grid Display or Upload Mode */
+						isUploadMode && uploadedImages.length > 0 ? (
+							/* Upload Mode - Show uploaded images in grid */
+							<div className="w-full h-full flex flex-col">
+								{/* Upload Mode Header */}
+								<div className="flex items-center justify-between mb-4 px-4 pt-4">
+									<div className="flex items-center gap-3">
+										<h3 className="text-white text-lg font-medium">Uploaded Images ({uploadedImages.length}/5)</h3>
+										{uploadedImages.filter(img => img.selected).length > 0 && (
+											<span className="text-sm text-gray-400">
+												{uploadedImages.filter(img => img.selected).length} selected
+											</span>
+										)}
+									</div>
+									<div className="flex items-center gap-2">
+										{uploadedImages.filter(img => img.selected).length > 0 && (
+											<button
+												onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
+												className="px-4 py-2 h-[40px] bg-[#313131] hover:bg-[#414141] text-white rounded-full text-sm font-medium transition-colors flex items-center gap-2"
+											>
+												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+												</svg>
+												Share Selected
+											</button>
+										)}
+										<button
+											onClick={clearUploadedImages}
+											className="px-4 py-2 h-[40px] bg-gray-600 hover:bg-gray-500 text-white rounded-full text-sm font-medium transition-colors"
+										>
+											Clear All
+										</button>
+									</div>
 								</div>
-							</div>
 
-							{/* Camera 2 - Top Right */}
-							<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '900ms' }}>
-								<div className="w-full h-full flex items-center justify-center p-0 relative">
-									<img 
-										src="/image2.png" 
-										alt="Toy design 2" 
-										className="max-w-full max-h-full object-contain rounded-[16px]" 
-									/>
+								{/* Scrollable Images Grid */}
+								<div className="flex-1 overflow-y-auto px-4 image-upload-scroll">
+									<div className="grid grid-cols-2 gap-4 pb-4">
+										{uploadedImages.map((image, index) => (
+											<div
+												key={image.id}
+												className="relative group aspect-square rounded-lg overflow-hidden transition-all duration-200 cursor-pointer"
+												onClick={() => toggleImageSelection(image.id)}
+											>
+												{/* Image Display */}
+												<img
+													src={image.url}
+													alt={`Uploaded image ${index + 1}`}
+													className="w-full h-full object-cover"
+												/>
+												
+												{/* Selection Overlay */}
+												<div className={`absolute inset-0 bg-black/20 transition-opacity ${
+													image.selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+												}`}>
+													{/* Selection Checkbox */}
+													<div className="absolute top-2 left-2">
+														<div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+															image.selected 
+																? 'bg-white border-white' 
+																: 'bg-black/50 border-white/70'
+														}`}>
+															{image.selected && (
+																<svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
+																	<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+																</svg>
+															)}
+														</div>
+													</div>
+													
+													{/* Delete Button */}
+													<button
+														onClick={(e) => {
+															e.stopPropagation();
+															deleteImage(image.id);
+														}}
+														className="absolute top-2 right-2 w-6 h-6 bg-black hover:bg-gray-800 rounded-full flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+													>
+														<svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+														</svg>
+													</button>
+												</div>
+											</div>
+										))}
+										
+										{/* Add More Images Button (if less than 5) */}
+										{uploadedImages.length < 5 && (
+											<div
+												className="aspect-square rounded-lg border-2 border-dashed border-gray-600 hover:border-gray-500 flex items-center justify-center cursor-pointer transition-colors"
+												onClick={() => document.getElementById('image-upload-input')?.click()}
+											>
+												<div className="text-center">
+													<svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+													</svg>
+													<p className="text-gray-400 text-sm">Add Image</p>
+													<p className="text-gray-500 text-xs">{uploadedImages.length}/5</p>
+												</div>
+											</div>
+										)}
+									</div>
 								</div>
-							</div>
 
-							{/* Camera 3 - Bottom Left */}
-							<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
-								isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
-							}`} style={{ transitionDelay: '1000ms' }}>
-								<div className="w-full h-full flex items-center justify-center p-0 relative">
-									<img 
-										src="/image3.png" 
-										alt="Toy design 3" 
-										className="max-w-full max-h-full object-contain rounded-[16px]" 
-									/>
+								{/* Quick Actions */}
+								<div className="flex items-center justify-center gap-3 p-4">
+									<button
+										onClick={() => {
+											const updatedImages = uploadedImages.map(img => ({ ...img, selected: true }));
+											setUploadedImages(updatedImages);
+										}}
+										className="px-4 py-2 h-[40px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-sm transition-colors"
+									>
+										Select All
+									</button>
+									<button
+										onClick={() => {
+											const updatedImages = uploadedImages.map(img => ({ ...img, selected: false }));
+											setUploadedImages(updatedImages);
+										}}
+										className="px-4 py-2 h-[40px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-sm transition-colors"
+									>
+										Deselect All
+									</button>
 								</div>
 							</div>
-						</div>
+						) : (
+							/* Default Grid Display */
+							<div className="grid grid-cols-2 gap-0.5 lg:gap-1 xl:gap-1.5 relative w-full h-full border-none pl-1 lg:pl-1 xl:pl-2 pr-1 lg:pr-1 xl:pr-2 ml-0 lg:ml-0 xl:ml-1" style={{
+								paddingTop: window.innerWidth >= 1420 ? '60px' : '0'
+							}}>
+								{/* Camera 1 - Top Left */}
+								<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+									isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+								}`} style={{ transitionDelay: '800ms' }}>
+									<div className="w-full h-full flex items-center justify-center p-0 relative">
+										<img 
+											src="/image1.png" 
+											alt="Toy design 1" 
+											className="max-w-full max-h-full object-contain rounded-[16px]" 
+										/>
+									</div>
+								</div>
+
+								{/* Camera 2 - Top Right */}
+								<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ${
+									isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+								}`} style={{ transitionDelay: '900ms' }}>
+									<div className="w-full h-full flex items-center justify-center p-0 relative">
+										<img 
+											src="/image2.png" 
+											alt="Toy design 2" 
+											className="max-w-full max-h-full object-contain rounded-[16px]" 
+										/>
+									</div>
+								</div>
+
+								{/* Camera 3 - Bottom Left */}
+								<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
+									isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+								}`} style={{ transitionDelay: '1000ms' }}>
+									<div className="w-full h-full flex items-center justify-center p-0 relative">
+										<img 
+											src="/image3.png" 
+											alt="Toy design 3" 
+											className="max-w-full max-h-full object-contain rounded-[16px]" 
+										/>
+									</div>
+								</div>
+
+								{/* Camera 4 - Bottom Right - Upload Prompt */}
+								<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
+									isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+								}`} style={{ transitionDelay: '1100ms' }}>
+									<div className="w-full h-full flex items-center justify-center p-6 text-center">
+										<div className="space-y-4">
+											<div className="w-16 h-16 mx-auto bg-white/10 rounded-full flex items-center justify-center">
+												<svg className="w-8 h-8 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+												</svg>
+											</div>
+											<div>
+												<p className="text-white/90 text-sm font-medium mb-1">Upload Your Images</p>
+												<p className="text-white/60 text-xs">Click the + button to add up to 5 images</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						)
 					)}
 				</div>
 			</div>

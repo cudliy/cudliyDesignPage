@@ -34,6 +34,11 @@ const giftSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  category: {
+    type: String,
+    enum: ['birthday', 'gender-reveal', 'pet-memorial', 'marriage-proposal', 'graduation', 'corporate', 'others', ''],
+    default: ''
+  },
   shareLink: {
     type: String,
     unique: true,

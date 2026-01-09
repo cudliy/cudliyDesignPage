@@ -623,10 +623,10 @@ class ApiService {
   }
 
   // Gift methods
-  async createGift(designId: string, senderName: string, recipientName: string, recipientEmail: string, message?: string, senderId?: string): Promise<ApiResponse<any>> {
+  async createGift(designId: string, senderName: string, recipientName: string, recipientEmail: string, message?: string, senderId?: string, category?: string): Promise<ApiResponse<any>> {
     return this.request('/gifts/create', {
       method: 'POST',
-      body: JSON.stringify({ designId, senderName, recipientName, recipientEmail, message, senderId }),
+      body: JSON.stringify({ designId, senderName, recipientName, recipientEmail, message, senderId, category }),
     });
   }
 

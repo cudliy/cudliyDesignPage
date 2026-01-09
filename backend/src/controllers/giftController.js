@@ -13,9 +13,9 @@ const getDefaultFrom = () => process.env.EMAIL_FROM || 'onboarding@resend.dev';
 // Create a gift share link
 export const createGift = async (req, res, next) => {
   try {
-    const { designId, senderName, recipientName, recipientEmail, message, senderId } = req.body;
+    const { designId, senderName, recipientName, recipientEmail, message, senderId, category } = req.body;
 
-    logger.info(`Gift creation request: ${senderName} → ${recipientName} (${recipientEmail || 'no email'})`);
+    logger.info(`Gift creation request: ${senderName} → ${recipientName} (${recipientEmail || 'no email'}) [${category || 'no category'}]`);
 
     // Validate required fields
     if (!designId || !senderName || !recipientName) {
@@ -41,6 +41,7 @@ export const createGift = async (req, res, next) => {
       recipientName,
       recipientEmail,
       message: message || '',
+      category: category || '',
       shareLink,
       status: 'created'
     });
@@ -137,6 +138,7 @@ export const getGift = async (req, res, next) => {
           senderName: gift.senderName,
           recipientName: gift.recipientName,
           message: gift.message,
+          category: gift.category,
           createdAt: gift.createdAt
         },
         design: {

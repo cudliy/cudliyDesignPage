@@ -1,12 +1,27 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Check } from 'lucide-react';
-import { apiService } from '../services/api';
-import { useUser } from '../hooks/useUser';
 import CategorySelector from '../components/CategorySelector';
+import { useUser } from '../hooks/useUser';
+import { toast } from '@/lib/sonner';
+import { r2Service } from '../services/cloudflareR2';
 
-export default function SendGiftPage() {
-  const { designId } = useParams();
+interface SharedImage {
+  id: string;
+  file?: File;
+  url: string;
+  selected: boolean;
+}
+
+interface ImageShareData {
+  type: 'uploaded';
+  images: SharedImage[];
+  userId: string;
+  createdAt: string;
+  category?: string;
+}
+
+export default function ImageSharePage() {
   const navigate = useNavigate();
   const { getUserName } = useUser();
 
@@ -26,79 +41,147 @@ export default function SendGiftPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<'form' | 'success'>('form');
-  const [giftLink, setGiftLink] = useState('');
+  const [shareLink, setShareLink] = useState('');
   const [copied, setCopied] = useState(false);
-  const [design, setDesign] = useState<any>(null);
-  const [loadingDesign, setLoadingDesign] = useState(true);
+  const [imageData, setImageData] = useState<ImageShareData | null>(null);
 
-  // Initialize sender name and fetch design
+  // Initialize sender name and load image data
   useEffect(() => {
     setSenderName(getUserName());
     
-    // Fetch design data
-    const fetchDesign = async () => {
-      if (!designId) return;
+    // Clean up old localStorage entries to prevent quota issues
+    try {
+      const now = Date.now();
+      const oneHourAgo = now - (60 * 60 * 1000); // 1 hour ago
       
-      try {
-        setLoadingDesign(true);
-        const response = await apiService.getDesign(designId);
-        if (response.success && response.data) {
-          setDesign(response.data);
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('image_share_img_')) {
+          try {
+            // Extract timestamp from key (format: image_share_img_TIMESTAMP_...)
+            const timestampMatch = key.match(/image_share_img_(\d+)_/);
+            if (timestampMatch) {
+              const timestamp = parseInt(timestampMatch[1]);
+              if (timestamp < oneHourAgo) {
+                localStorage.removeItem(key);
+                console.log('Cleaned up old localStorage entry:', key);
+              }
+            }
+          } catch (e) {
+            // If we can't parse, remove it anyway
+            localStorage.removeItem(key);
+          }
         }
-      } catch (err) {
-        console.error('Error fetching design:', err);
-      } finally {
-        setLoadingDesign(false);
-      }
-    };
+      });
+    } catch (e) {
+      console.warn('Error cleaning localStorage:', e);
+    }
     
-    fetchDesign();
+    // Load image data from session storage
+    const storedData = sessionStorage.getItem('share_images');
+    console.log('Raw stored data:', storedData); // Debug log
+    
+    if (storedData) {
+      try {
+        const data = JSON.parse(storedData) as ImageShareData;
+        console.log('Parsed image data:', data); // Debug log
+        setImageData(data);
+      } catch (err) {
+        console.error('Error parsing image data:', err);
+        toast.error('Invalid image data');
+        navigate('/design');
+      }
+    } else {
+      toast.error('No images to share');
+      navigate('/design');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [designId]);
+  }, []);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== FORM SUBMIT CLICKED ===');
+    console.log('recipientName:', recipientName);
+    console.log('agreeToTerms:', agreeToTerms);
+    console.log('imageData:', imageData);
+    
     setError(null);
 
-    if (!designId) {
-      setError('Design not found');
+    if (!imageData) {
+      console.log('ERROR: No image data found');
+      setError('No image data found');
       return;
     }
 
     if (!recipientName) {
+      console.log('ERROR: No recipient name');
       setError('Please enter recipient name');
       return;
     }
 
     if (!agreeToTerms) {
+      console.log('ERROR: Terms not agreed');
       setError('Please agree to the terms');
       return;
     }
 
     try {
       setLoading(true);
-      
+      console.log('Form submission started');
+      console.log('ImageData before conversion:', imageData);
 
+      // Process and upload images to Cloudflare R2
+      console.log('Starting image processing with R2...');
+      const processedImages = await r2Service.processAndUploadImages(imageData.images);
+
+      // Create a unique share ID
+      const shareId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       
-      const response = await apiService.createGift(
-        designId,
-        isAnonymous ? 'Anonymous' : senderName,
+      // Prepare share data with processed images (only store R2 URLs, not base64)
+      const shareData = {
+        id: shareId,
+        type: 'image_collection',
+        images: processedImages.map(img => ({
+          id: img.id,
+          url: img.url.startsWith('https://pub-1ed89e0d7a8c4a12b06428c0c9047120.r2.dev') ? img.url : img.url, // Ensure R2 URLs
+          selected: true
+        })),
+        senderName: isAnonymous ? 'Anonymous' : senderName,
         recipientName,
         recipientEmail,
         message,
-        localStorage.getItem('userId') || undefined,
-        selectedCategory
-      );
+        category: selectedCategory,
+        userId: imageData.userId,
+        createdAt: new Date().toISOString()
+      };
 
-      if (response.success && response.data) {
-        setGiftLink(response.data.shareLink);
-        setStep('success');
-      } else {
-        setError('Failed to create gift link');
+      // Store in local storage (only R2 URLs, much smaller than base64)
+      console.log('Storing shareId:', shareId);
+      console.log('Storing key:', `image_share_${shareId}`);
+      console.log('Storing data:', shareData);
+      
+      try {
+        localStorage.setItem(`image_share_${shareId}`, JSON.stringify(shareData));
+      } catch (quotaError) {
+        console.error('LocalStorage quota exceeded:', quotaError);
+        // Clear old share data to make space
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('image_share_') && key !== `image_share_${shareId}`) {
+            localStorage.removeItem(key);
+          }
+        });
+        // Try again
+        localStorage.setItem(`image_share_${shareId}`, JSON.stringify(shareData));
       }
+      
+      // Create share link
+      const link = `https://app.cudliy.com/gift/images/${shareId}`;
+      setShareLink(link);
+      setStep('success');
+
+      toast.success('Share link created successfully!');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create gift');
+      setError(err instanceof Error ? err.message : 'Failed to create share link');
     } finally {
       setLoading(false);
     }
@@ -107,7 +190,7 @@ export default function SendGiftPage() {
   // Copy link to clipboard
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(giftLink);
+      await navigator.clipboard.writeText(shareLink);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -115,14 +198,12 @@ export default function SendGiftPage() {
     }
   };
 
-
-
-  if (loadingDesign) {
+  if (!imageData) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <img src="/GIFS/Loading-State.gif" alt="Loading" className="w-16 h-16 mx-auto mb-4" />
-          <p className="text-gray-600">Loading design...</p>
+          <p className="text-gray-600">Loading images...</p>
         </div>
       </div>
     );
@@ -132,7 +213,7 @@ export default function SendGiftPage() {
     return (
       <div className={`min-h-screen bg-white flex items-center justify-center ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`} style={{ transform: 'scale(0.9)', transformOrigin: 'center' }}>
         <div className={`w-full max-w-[1400px] flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-center lg:items-start justify-center`}>
-          {/* Left Side - 3D Model (Hidden on mobile and tablet) */}
+          {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
           <div 
             className="hidden lg:flex items-center justify-center rounded-[32px] overflow-hidden" 
             style={{ 
@@ -141,29 +222,27 @@ export default function SendGiftPage() {
               backgroundColor: '#F5F5F5'
             }}
           >
-            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#F5F5F5' }}>
-              {design?.modelFiles?.originalImage || design?.images?.[0]?.url ? (
-                <div 
-                  className="max-w-[90%] max-h-[90%] flex items-center justify-center"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    padding: '20px'
-                  }}
-                >
-                  <img
-                    src={design.modelFiles?.originalImage || design.images[0].url}
-                    alt="3D Design"
-                    className="w-full h-full object-contain"
-                    style={{
-                      filter: 'brightness(0.98) contrast(1.02)',
-                      mixBlendMode: 'darken'
-                    }}
-                  />
+            <div className="w-full h-full flex items-center justify-center p-4" style={{ backgroundColor: '#F5F5F5' }}>
+              {imageData && imageData.images && imageData.images.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2 w-full h-full">
+                  {imageData.images.slice(0, 4).map((image, index) => (
+                    <div key={image.id || index} className="aspect-square rounded-lg overflow-hidden bg-white">
+                      <img
+                        src={image.url}
+                        alt={`Shared image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Image failed to load:', image.url);
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="text-gray-400 text-center">
-                  <div className="text-6xl mb-4">🎁</div>
-                  <p>Your 3D Design</p>
+                  <div className="text-6xl mb-4">📸</div>
+                  <p>Your Images</p>
                 </div>
               )}
             </div>
@@ -197,7 +276,7 @@ export default function SendGiftPage() {
                 Your link is ready
               </h1>
               <p className={`text-gray-600 ${isSmallHeight ? 'text-[12px]' : 'text-[12px] sm:text-[14px]'}`}>
-                Here's personalized link you can share. No sign-in required
+                Here's your personalized image collection link
               </p>
             </div>
 
@@ -216,7 +295,7 @@ export default function SendGiftPage() {
             >
               <input
                 type="text"
-                value={giftLink}
+                value={shareLink}
                 readOnly
                 className="flex-1 bg-transparent text-sm text-gray-600 outline-none"
               />
@@ -293,7 +372,7 @@ export default function SendGiftPage() {
                   </svg>
                 </a>
                 <a
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(giftLink)}`}
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareLink)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:opacity-70 transition-opacity"
@@ -304,7 +383,7 @@ export default function SendGiftPage() {
                   </svg>
                 </a>
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`Check out this amazing 3D design gift I created for you! ${giftLink}`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`Check out these amazing images I want to share with you! ${shareLink}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:opacity-70 transition-opacity"
@@ -315,18 +394,7 @@ export default function SendGiftPage() {
                   </svg>
                 </a>
                 <a
-                  href={`https://www.tiktok.com/`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:opacity-70 transition-opacity"
-                  title="Share on TikTok"
-                >
-                  <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" className="text-gray-700">
-                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-                  </svg>
-                </a>
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(giftLink)}`}
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:opacity-70 transition-opacity"
@@ -347,7 +415,7 @@ export default function SendGiftPage() {
   return (
     <div className={`min-h-screen bg-white flex items-center justify-center ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`} style={{ transform: 'scale(0.9)', transformOrigin: 'center' }}>
       <div className={`w-full max-w-[1400px] flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-center lg:items-start justify-center`}>
-        {/* Left Side - 3D Model (Hidden on mobile and tablet) */}
+        {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
         <div 
           className="hidden lg:flex items-center justify-center rounded-[24px] lg:rounded-[32px] overflow-hidden" 
           style={{ 
@@ -356,29 +424,36 @@ export default function SendGiftPage() {
             backgroundColor: '#F5F5F5'
           }}
         >
-          <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#F5F5F5' }}>
-            {design?.modelFiles?.originalImage || design?.images?.[0]?.url ? (
-              <div 
-                className="max-w-[90%] max-h-[90%] flex items-center justify-center"
-                style={{ 
-                  backgroundColor: '#F5F5F5',
-                  padding: '20px'
-                }}
-              >
-                <img
-                  src={design.modelFiles?.originalImage || design.images[0].url}
-                  alt="3D Design"
-                  className="w-full h-full object-contain"
-                  style={{
-                    filter: 'brightness(0.98) contrast(1.02)',
-                    mixBlendMode: 'darken'
-                  }}
-                />
+          <div className="w-full h-full flex items-center justify-center p-4" style={{ backgroundColor: '#F5F5F5' }}>
+            {(() => {
+              console.log('ImageData in render:', imageData);
+              return null;
+            })()}
+            {imageData && imageData.images && imageData.images.length > 0 ? (
+              <div className="grid grid-cols-2 gap-2 w-full h-full">
+                {imageData.images.slice(0, 4).map((image, index) => {
+                  console.log('Rendering image:', image); // Debug log
+                  return (
+                    <div key={image.id || index} className="aspect-square rounded-lg overflow-hidden bg-white">
+                      <img
+                        src={image.url}
+                        alt={`Shared image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Image failed to load:', image.url);
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                        onLoad={() => console.log('Image loaded successfully:', image.url)}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="text-gray-400 text-center">
-                <div className="text-6xl mb-4">🎁</div>
-                <p>Your 3D Design</p>
+                <div className="text-6xl mb-4">📸</div>
+                <p>Your Images</p>
+                <p className="text-xs mt-2">Debug: {imageData ? `${imageData.images?.length || 0} images` : 'No data'}</p>
               </div>
             )}
           </div>
@@ -409,10 +484,10 @@ export default function SendGiftPage() {
                 maxWidth: '324px'
               }}
             >
-              Send your Digital gift
+              Share your images
             </h1>
             <p className="text-gray-600 text-[12px] sm:text-[14px]">
-              Tell us who it is for and how you want it delivered.
+              Create a beautiful collection to share with someone special.
             </p>
           </div>
 
@@ -566,7 +641,7 @@ export default function SendGiftPage() {
                 className="mt-0.5 w-4 h-4 rounded border-gray-300 cursor-pointer accent-black"
               />
               <label htmlFor="terms" className="text-[13px] text-gray-600 cursor-pointer leading-relaxed">
-                I understand this is a digital gift and they will receive a private link, not a physical package.
+                I understand this is a digital image collection and they will receive a private link.
               </label>
             </div>
 
@@ -609,7 +684,7 @@ export default function SendGiftPage() {
                 }}
                 className="hover:opacity-90 transition-opacity disabled:opacity-50"
               >
-                {loading ? 'Creating...' : 'Send now →'}
+                {loading ? 'Creating...' : 'Share now →'}
               </button>
             </div>
           </form>

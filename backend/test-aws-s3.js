@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import awsService from './src/services/awsService.js';
+import awsService from './src/services/awsService.js'; // Now using R2Service
 import logger from './src/utils/logger.js';
 
 async function testAWSS3Connection() {

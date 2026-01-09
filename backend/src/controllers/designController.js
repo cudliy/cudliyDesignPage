@@ -8,7 +8,7 @@ import User from '../models/User.js';
 import Subscription from '../models/Subscription.js';
 import aiService from '../services/aiService.js';
 import storageService from '../services/storageService.js';
-import awsService from '../services/awsService.js';
+import awsService from '../services/awsService.js'; // Now using R2Service
 import contentFilter from '../utils/contentFilter.js';
 import requestTracker from '../utils/requestTracker.js';
 
