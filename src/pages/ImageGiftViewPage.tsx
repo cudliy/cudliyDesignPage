@@ -94,8 +94,72 @@ export default function ImageGiftViewPage() {
 
   const generateSlides = (data: ImageGiftData) => {
     const categoryData = GIFT_CATEGORIES.find(cat => cat.value === data.category);
-    const theme = categoryData?.theme || 'personal';
-    const concepts = categoryData?.concepts || ['special', 'meaningful', 'thoughtful', 'unique'];
+
+    // Category-specific statements for each slide
+    const getCategoryStatements = (category: string) => {
+      const statements = {
+        'birthday': {
+          intro: `${data.senderName} has something amazing for your special day!`,
+          recipient: `Happy Birthday, ${data.recipientName}! 🎉`,
+          categoryMessage: "Another year of wonderful memories begins today",
+          journey: "Every birthday is a new chapter in your beautiful story",
+          collection: "These moments capture the joy you bring to everyone around you",
+          finale: "May this new year be filled with endless happiness and dreams come true!"
+        },
+        'gender-reveal': {
+          intro: `${data.senderName} can't wait to share this exciting news with you!`,
+          recipient: `${data.recipientName}, get ready for the big reveal! 💕`,
+          categoryMessage: "A new little miracle is on the way",
+          journey: "The anticipation, the excitement, the pure joy of new life",
+          collection: "These precious moments before your world changes forever",
+          finale: "Welcome to the most beautiful adventure of your lives!"
+        },
+        'pet-memorial': {
+          intro: `${data.senderName} wants to honor a special companion with you`,
+          recipient: `For ${data.recipientName}, in loving memory 🌈`,
+          categoryMessage: "Some bonds transcend time and space",
+          journey: "The love, the loyalty, the countless precious moments shared",
+          collection: "These memories celebrate a life that brought so much joy",
+          finale: "Forever in our hearts, forever part of our story"
+        },
+        'marriage-proposal': {
+          intro: `${data.senderName} has something life-changing to ask you!`,
+          recipient: `${data.recipientName}, this moment is just for you 💍`,
+          categoryMessage: "When you know, you just know",
+          journey: "From the first hello to this perfect moment",
+          collection: "These images tell the story of our love",
+          finale: "Will you make me the happiest person alive?"
+        },
+        'graduation': {
+          intro: `${data.senderName} is so proud to celebrate your achievement!`,
+          recipient: `Congratulations, ${data.recipientName}! You did it! 🎓`,
+          categoryMessage: "Years of hard work have led to this incredible moment",
+          journey: "The late nights, the challenges, the determination that brought you here",
+          collection: "These moments capture your journey to success",
+          finale: "The world is yours to conquer - go make your mark!"
+        },
+        'corporate': {
+          intro: `${data.senderName} appreciates your outstanding contribution`,
+          recipient: `For ${data.recipientName}, with sincere appreciation 🏆`,
+          categoryMessage: "Excellence deserves recognition",
+          journey: "Your dedication and professionalism inspire everyone around you",
+          collection: "These moments represent the impact you've made",
+          finale: "Thank you for being an invaluable part of our success"
+        },
+        'others': {
+          intro: `${data.senderName} has something uniquely special for you`,
+          recipient: `${data.recipientName}, this is just for you ✨`,
+          categoryMessage: "Some gifts come straight from the heart",
+          journey: "The thought, the care, the love behind every detail",
+          collection: "These moments are as unique as you are",
+          finale: "Because you deserve something as special as you are"
+        }
+      };
+      
+      return statements[category as keyof typeof statements] || statements['others'];
+    };
+
+    const categoryStatements = getCategoryStatements(data.category || 'others');
 
     const generatedSlides = [
       {
@@ -105,7 +169,7 @@ export default function ImageGiftViewPage() {
         content: (
           <div className="text-center space-y-4 px-4 max-w-4xl mx-auto animate-fade-in-up">
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              {data.senderName} sent you something special
+              {categoryStatements.intro}
             </p>
             {categoryData && (
               <div className="flex items-center justify-center gap-2 mt-4">
@@ -126,15 +190,11 @@ export default function ImageGiftViewPage() {
         content: (
           <div className="text-center space-y-4 px-4 max-w-4xl mx-auto">
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              For {data.recipientName}
+              {categoryStatements.recipient}
             </p>
-            <div className="flex flex-wrap justify-center gap-3 mt-6">
-              {concepts.slice(0, 3).map((concept, _index) => (
-                <div key={concept} className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
-                  <span className="text-white font-medium capitalize">{concept}</span>
-                </div>
-              ))}
-            </div>
+            <p className="text-lg md:text-xl text-white/90 font-medium mt-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+              {categoryStatements.categoryMessage}
+            </p>
           </div>
         )
       },
@@ -146,15 +206,28 @@ export default function ImageGiftViewPage() {
           <div className="flex items-center justify-center h-full px-4">
             <div className="text-center max-w-4xl mx-auto">
               <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
-                "{data.message}" - {data.senderName}
+                "{data.message}"
               </p>
-              <div className="mt-6 text-lg text-white/80 font-medium">
-                Theme: {theme}
-              </div>
+              <p className="text-lg text-white/80 font-medium mt-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+                - {data.senderName}
+              </p>
             </div>
           </div>
         )
-      }] : []),
+      }] : [{
+        id: 'journey',
+        video: VIDEO_TEMPLATES[2],
+        gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        content: (
+          <div className="flex items-center justify-center h-full px-4">
+            <div className="text-center max-w-4xl mx-auto">
+              <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
+                {categoryStatements.journey}
+              </p>
+            </div>
+          </div>
+        )
+      }]),
       ...data.images.map((image, index) => ({
         id: `image-${index}`,
         video: VIDEO_TEMPLATES[(index + 3) % VIDEO_TEMPLATES.length],
@@ -181,7 +254,7 @@ export default function ImageGiftViewPage() {
         content: (
           <div className="text-center space-y-6 px-4 max-w-4xl mx-auto">
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              A collection of {data.images.length} special moments
+              {categoryStatements.collection}
             </p>
             <div className="grid grid-cols-2 gap-2 max-w-md mx-auto">
               {data.images.slice(0, 4).map((image, index) => (
@@ -204,18 +277,14 @@ export default function ImageGiftViewPage() {
         content: (
           <div className="text-center space-y-4 px-4 max-w-4xl mx-auto">
             <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              Thank you from {data.senderName}
+              {categoryStatements.finale}
             </p>
-            <p className="text-lg md:text-xl lg:text-2xl text-white font-bold" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)' }}>
+            <p className="text-lg md:text-xl text-white/80 font-medium mt-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+              With love, {data.senderName}
+            </p>
+            <p className="text-sm text-white/60 font-medium mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
               Created with Cudliy
             </p>
-            <div className="flex flex-wrap justify-center gap-2 mt-6">
-              {concepts.map((concept, _index) => (
-                <div key={concept} className="px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm text-sm">
-                  <span className="text-white capitalize">{concept}</span>
-                </div>
-              ))}
-            </div>
           </div>
         )
       }
