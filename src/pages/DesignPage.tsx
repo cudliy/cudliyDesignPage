@@ -76,6 +76,7 @@ export default function DesignPage() {
 	// Image upload states
 	const [uploadedImages, setUploadedImages] = useState<any[]>([]);
 	const [isUploadMode, setIsUploadMode] = useState(false);
+	const [isProcessingFiles, setIsProcessingFiles] = useState(false);
 	
 	// 3D Viewer control states
 	const [lighting3D, setLighting3D] = useState(30);
@@ -97,6 +98,15 @@ export default function DesignPage() {
 		getProperties,
 		hasProperties
 	} = usePropertiesAggregator();
+
+	// Helper function to format file sizes
+	const formatFileSize = (bytes: number): string => {
+		if (bytes === 0) return '0 Bytes';
+		const k = 1024;
+		const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+		const i = Math.floor(Math.log(bytes) / Math.log(k));
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+	};
 
   // Get user ID for usage limits (authenticated users only)
   const userId = sessionStorage.getItem('user_id');
@@ -1231,22 +1241,85 @@ const handleBackToCategories = () => {
 									type="file"
 									multiple
 									accept="image/*"
-									onChange={(e) => {
+									onChange={async (e) => {
 										if (e.target.files) {
-											const files = Array.from(e.target.files);
-											if (files.length + uploadedImages.length > 5) {
-												toast.error('Maximum 5 images allowed');
-												return;
+											setIsProcessingFiles(true);
+											
+											try {
+												const files = Array.from(e.target.files);
+												
+												// Check if adding these files would exceed the 5 image limit
+												if (files.length + uploadedImages.length > 5) {
+													toast.error(`Cannot upload ${files.length} images. Maximum 5 images allowed (currently have ${uploadedImages.length}).`);
+													return;
+												}
+												
+												// Validate file sizes and types
+												const maxFileSize = 100 * 1024 * 1024; // 100MB in bytes
+												const validFiles: File[] = [];
+												const errors: string[] = [];
+												
+												files.forEach((file) => {
+													// Check file size
+													if (file.size > maxFileSize) {
+														errors.push(`${file.name} is too large (${formatFileSize(file.size)}). Maximum size is 100MB.`);
+														return;
+													}
+													
+													// Check if file size is 0 (corrupted file)
+													if (file.size === 0) {
+														errors.push(`${file.name} appears to be empty or corrupted.`);
+														return;
+													}
+													
+													// Check file type
+													if (!file.type.startsWith('image/')) {
+														errors.push(`${file.name} is not a valid image file.`);
+														return;
+													}
+													
+													// Additional check for common image formats
+													const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+													if (!allowedTypes.includes(file.type.toLowerCase())) {
+														errors.push(`${file.name} format not supported. Please use JPEG, PNG, WebP, or GIF.`);
+														return;
+													}
+													
+													validFiles.push(file);
+												});
+												
+												// Show errors if any
+												if (errors.length > 0) {
+													errors.forEach(error => toast.error(error));
+													if (validFiles.length === 0) {
+														return; // Don't proceed if no valid files
+													}
+												}
+												
+												// Process valid files
+												if (validFiles.length > 0) {
+													const newImages = validFiles.map(file => ({
+														id: `img_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+														file,
+														url: URL.createObjectURL(file),
+														selected: false
+													}));
+													
+													handleImagesChange([...uploadedImages, ...newImages]);
+													
+													// Show success message
+													if (validFiles.length === 1) {
+														toast.success(`Image uploaded successfully`);
+													} else {
+														toast.success(`${validFiles.length} images uploaded successfully`);
+													}
+												}
+											} catch (error) {
+												console.error('Error processing files:', error);
+												toast.error('An error occurred while processing the files. Please try again.');
+											} finally {
+												setIsProcessingFiles(false);
 											}
-											
-											const newImages = files.map(file => ({
-												id: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-												file,
-												url: URL.createObjectURL(file),
-												selected: false
-											}));
-											
-											handleImagesChange([...uploadedImages, ...newImages]);
 										}
 										e.target.value = ''; // Reset input
 									}}
@@ -1557,6 +1630,7 @@ const handleBackToCategories = () => {
 								onComplete={handleWorkflowComplete}
 								onError={handleWorkflowError}
 								generationTrigger={generationCounter}
+								showImageUpload={true}
 							/>
 						)}
 						</>
@@ -1576,17 +1650,37 @@ const handleBackToCategories = () => {
 										)}
 									</div>
 									<div className="flex items-center gap-2">
+										{/* Select/Deselect All buttons */}
+										<button
+											onClick={() => {
+												const updatedImages = uploadedImages.map(img => ({ ...img, selected: true }));
+												setUploadedImages(updatedImages);
+											}}
+											className="px-3 py-1.5 h-[32px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-xs transition-colors"
+										>
+											Select All
+										</button>
+										<button
+											onClick={() => {
+												const updatedImages = uploadedImages.map(img => ({ ...img, selected: false }));
+												setUploadedImages(updatedImages);
+											}}
+											className="px-3 py-1.5 h-[32px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-xs transition-colors"
+										>
+											Deselect All
+										</button>
+										
+										{/* Share button (only show when images are selected) */}
 										{uploadedImages.filter(img => img.selected).length > 0 && (
 											<button
 												onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
 												className="px-4 py-2 h-[40px] bg-[#313131] hover:bg-[#414141] text-white rounded-full text-sm font-medium transition-colors flex items-center gap-2"
 											>
-												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-												</svg>
 												Share Selected
 											</button>
 										)}
+										
+										{/* Clear button */}
 										<button
 											onClick={clearUploadedImages}
 											className="px-4 py-2 h-[40px] bg-gray-600 hover:bg-gray-500 text-white rounded-full text-sm font-medium transition-colors"
@@ -1650,41 +1744,37 @@ const handleBackToCategories = () => {
 										{/* Add More Images Button (if less than 5) */}
 										{uploadedImages.length < 5 && (
 											<div
-												className="aspect-square rounded-lg border-2 border-dashed border-gray-600 hover:border-gray-500 flex items-center justify-center cursor-pointer transition-colors"
-												onClick={() => document.getElementById('image-upload-input')?.click()}
+												className={`aspect-square rounded-lg border-2 border-dashed flex items-center justify-center transition-colors ${
+													isProcessingFiles 
+														? 'border-blue-400 cursor-wait' 
+														: 'border-gray-600 hover:border-gray-500 cursor-pointer'
+												}`}
+												onClick={() => !isProcessingFiles && document.getElementById('image-upload-input')?.click()}
 											>
 												<div className="text-center">
-													<svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-													</svg>
-													<p className="text-gray-400 text-sm">Add Image</p>
-													<p className="text-gray-500 text-xs">{uploadedImages.length}/5</p>
+													{isProcessingFiles ? (
+														<>
+															<div className="w-8 h-8 mx-auto mb-2 animate-spin">
+																<svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24">
+																	<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+																	<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+																</svg>
+															</div>
+															<p className="text-blue-400 text-sm">Processing...</p>
+														</>
+													) : (
+														<>
+															<svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+															</svg>
+															<p className="text-gray-400 text-sm">Add Image</p>
+															<p className="text-gray-500 text-xs">{uploadedImages.length}/5</p>
+														</>
+													)}
 												</div>
 											</div>
 										)}
 									</div>
-								</div>
-
-								{/* Quick Actions */}
-								<div className="flex items-center justify-center gap-3 p-4">
-									<button
-										onClick={() => {
-											const updatedImages = uploadedImages.map(img => ({ ...img, selected: true }));
-											setUploadedImages(updatedImages);
-										}}
-										className="px-4 py-2 h-[40px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-sm transition-colors"
-									>
-										Select All
-									</button>
-									<button
-										onClick={() => {
-											const updatedImages = uploadedImages.map(img => ({ ...img, selected: false }));
-											setUploadedImages(updatedImages);
-										}}
-										className="px-4 py-2 h-[40px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-sm transition-colors"
-									>
-										Deselect All
-									</button>
 								</div>
 							</div>
 						) : (
@@ -1731,22 +1821,12 @@ const handleBackToCategories = () => {
 									</div>
 								</div>
 
-								{/* Camera 4 - Bottom Right - Upload Prompt */}
+								{/* Camera 4 - Bottom Right - Empty */}
 								<div className={`bg-transparent rounded-[32px] lg:rounded-[40px] flex items-center justify-center relative w-full h-full min-h-[280px] transition-all duration-700 ease-out backdrop-blur-sm ml-0 lg:ml-0 xl:ml-0 ${
 									isLoaded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
 								}`} style={{ transitionDelay: '1100ms' }}>
 									<div className="w-full h-full flex items-center justify-center p-6 text-center">
-										<div className="space-y-4">
-											<div className="w-16 h-16 mx-auto bg-white/10 rounded-full flex items-center justify-center">
-												<svg className="w-8 h-8 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-												</svg>
-											</div>
-											<div>
-												<p className="text-white/90 text-sm font-medium mb-1">Upload Your Images</p>
-												<p className="text-white/60 text-xs">Click the + button to add up to 5 images</p>
-											</div>
-										</div>
+										{/* Empty space */}
 									</div>
 								</div>
 							</div>

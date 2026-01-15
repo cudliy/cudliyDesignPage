@@ -10,6 +10,7 @@ import StyleSelector from './StyleSelector';
 import MaterialSelector from './MaterialSelector';
 import DetailSelector from './DetailSelector';
 import { toast } from '@/lib/sonner';
+// import { CloudflareR2Service } from '../services/cloudflareR2'; // Ready for future use
 
 interface ChatStyleMobileWorkflowProps {
   onError: (error: string) => void;
@@ -23,6 +24,13 @@ interface Message {
   isGenerating?: boolean;
   sessionId?: string;
   creationId?: string;
+}
+
+interface UploadedImage {
+  id: string;
+  file: File;
+  url: string;
+  selected: boolean;
 }
 
 export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWorkflowProps) {
@@ -41,6 +49,14 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
   const [selectedQuality, setSelectedQuality] = useState('medium');
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Image upload states
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [isUploadMode, setIsUploadMode] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  // const r2Service = new CloudflareR2Service(); // Ready for future use
   
   const userId = sessionStorage.getItem('user_id') || '';
   const token = sessionStorage.getItem('token');
@@ -232,6 +248,130 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       setInputValue('');
     }
   };
+
+  // Image upload functions
+  const handleFileUpload = (files: FileList) => {
+    const validFiles = Array.from(files).filter(file => {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image file`);
+        return false;
+      }
+      if (file.size > 100 * 1024 * 1024) { // 100MB limit
+        toast.error(`${file.name} is too large. Maximum size is 100MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    if (uploadedImages.length + validFiles.length > 5) {
+      toast.error('Maximum 5 images allowed');
+      return;
+    }
+
+    const newImages = validFiles.map(file => ({
+      id: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      file: file,
+      url: URL.createObjectURL(file),
+      selected: false
+    }));
+
+    setUploadedImages(prev => [...prev, ...newImages]);
+    setIsUploadMode(true);
+    toast.success(`${validFiles.length} image(s) uploaded successfully`);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileUpload(files);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const toggleImageSelection = (imageId: string) => {
+    setUploadedImages(prev => 
+      prev.map(img => 
+        img.id === imageId ? { ...img, selected: !img.selected } : img
+      )
+    );
+  };
+
+  const selectAllImages = () => {
+    setUploadedImages(prev => prev.map(img => ({ ...img, selected: true })));
+  };
+
+  const deselectAllImages = () => {
+    setUploadedImages(prev => prev.map(img => ({ ...img, selected: false })));
+  };
+
+  const removeImage = (imageId: string) => {
+    setUploadedImages(prev => {
+      const updated = prev.filter(img => img.id !== imageId);
+      if (updated.length === 0) {
+        setIsUploadMode(false);
+      }
+      return updated;
+    });
+  };
+
+  const handleImageShare = async (selectedImages: UploadedImage[]) => {
+    if (selectedImages.length === 0) {
+      toast.error('Please select at least one image to share');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      // Convert blob URLs to base64 data URLs for persistence
+      const convertedImages = await Promise.all(
+        selectedImages.map(async (img) => {
+          if (img.url.startsWith('blob:')) {
+            const response = await fetch(img.url);
+            const blob = await response.blob();
+            return new Promise<UploadedImage>((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve({
+                ...img,
+                url: reader.result as string, // base64 data URL
+                selected: true
+              });
+              reader.readAsDataURL(blob);
+            });
+          }
+          return { ...img, selected: true };
+        })
+      );
+
+      // Store in sessionStorage and navigate
+      sessionStorage.setItem('share_images', JSON.stringify({
+        type: 'uploaded',
+        images: convertedImages,
+        userId: sessionStorage.getItem('user_id') || 'anonymous',
+        createdAt: new Date().toISOString()
+      }));
+
+      window.location.href = '/share/images';
+    } catch (error) {
+      console.error('Error preparing images for sharing:', error);
+      toast.error('Failed to prepare images for sharing');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const selectedImages = uploadedImages.filter(img => img.selected);
+  const hasSelectedImages = selectedImages.length > 0;
 
   // SVG Icon Components matching desktop
   const ColorIcon = () => (
@@ -524,7 +664,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               {/* Plus button - left - white - smaller - shows toast */}
               <button
                 type="button"
-                onClick={() => toast.info('Image upload coming soon!')}
+                onClick={() => fileInputRef.current?.click()}
                 className="w-7 h-7 flex items-center justify-center text-white hover:text-white/80 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -646,7 +786,152 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             </button>
           </div>
         )}
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={(e) => {
+            if (e.target.files && e.target.files.length > 0) {
+              handleFileUpload(e.target.files);
+            }
+          }}
+          className="hidden"
+        />
       </div>
+
+      {/* Image Upload Interface */}
+      {isUploadMode && (
+        <div className="fixed inset-0 bg-[#212121] z-40 flex flex-col transition-colors duration-300">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <button
+              onClick={() => {
+                setIsUploadMode(false);
+                setUploadedImages([]);
+              }}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            >
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <h2 className="text-lg font-semibold text-white">Your Images</h2>
+            
+            {/* Select/Deselect buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={selectAllImages}
+                className="px-3 py-1.5 text-sm text-white/80 hover:text-white transition-colors"
+              >
+                Select All
+              </button>
+              <button
+                onClick={deselectAllImages}
+                className="px-3 py-1.5 text-sm text-white/80 hover:text-white transition-colors"
+              >
+                Deselect
+              </button>
+            </div>
+          </div>
+
+          {/* Images Grid */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="grid grid-cols-2 gap-3">
+              {uploadedImages.map((image) => (
+                <div key={image.id} className="relative">
+                  <div
+                    className={`relative rounded-lg overflow-hidden cursor-pointer transition-all ${
+                      image.selected ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                    onClick={() => toggleImageSelection(image.id)}
+                  >
+                    <img
+                      src={image.url}
+                      alt="Uploaded"
+                      className="w-full h-48 object-cover"
+                    />
+                    
+                    {/* Selection overlay */}
+                    <div className={`absolute inset-0 transition-all ${
+                      image.selected ? 'bg-blue-500/20' : 'bg-black/0 hover:bg-black/10'
+                    }`} />
+                    
+                    {/* Checkbox */}
+                    <div className="absolute top-2 right-2">
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                        image.selected 
+                          ? 'bg-blue-500 border-blue-500' 
+                          : 'bg-black/50 border-white/50'
+                      }`}>
+                        {image.selected && (
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Remove button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeImage(image.id);
+                    }}
+                    className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+              
+              {/* Add more images button */}
+              <div
+                className={`border-2 border-dashed border-white/30 rounded-lg h-48 flex flex-col items-center justify-center cursor-pointer hover:border-white/50 transition-colors ${
+                  isDragOver ? 'border-blue-500 bg-blue-500/10' : ''
+                }`}
+                onClick={() => fileInputRef.current?.click()}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+              >
+                <svg className="w-8 h-8 text-white/50 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="text-white/50 text-sm">Add More</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Action Bar */}
+          {hasSelectedImages && (
+            <div className="p-4 border-t border-white/10">
+              <button
+                onClick={() => handleImageShare(selectedImages)}
+                disabled={isUploading}
+                className="w-full bg-[#E70D57] text-white py-3 rounded-full font-medium hover:bg-[#E70D57]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isUploading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Preparing...
+                  </>
+                ) : (
+                  <>
+                    Share Selected ({selectedImages.length})
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Advanced Bottom Sheet */}
       {showAdvanced && (
