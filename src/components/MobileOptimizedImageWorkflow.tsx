@@ -488,7 +488,7 @@ export default function MobileOptimizedImageWorkflow({
                     e.stopPropagation();
                     removeImage(image.id);
                   }}
-                  className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors"
+                  className="absolute -top-2 -left-2 w-6 h-6 bg-white rounded-full flex items-center justify-center text-black hover:bg-gray-100 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -521,11 +521,11 @@ export default function MobileOptimizedImageWorkflow({
             <button
               onClick={() => handleImageShare(selectedImages)}
               disabled={isUploading}
-              className="w-full bg-[#E70D57] text-white py-3 rounded-full font-medium hover:bg-[#E70D57]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-white text-black py-3 rounded-full font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isUploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                   Preparing...
                 </>
               ) : (
