@@ -367,58 +367,144 @@ export default function MobileOptimizedImageWorkflow({
 
     setIsUploading(true);
     try {
-      // Convert blob URLs to base64 data URLs for persistence
+      // Mobile-optimized image processing
       const convertedImages = await Promise.all(
-        selectedImages.map(async (img) => {
+        selectedImages.map(async (img, index) => {
           try {
             if (img.url.startsWith('blob:')) {
+              // Mobile-specific blob handling
               const response = await fetch(img.url);
               if (!response.ok) {
                 throw new Error(`Failed to fetch blob: ${response.statusText}`);
               }
+              
               const blob = await response.blob();
+              
+              // Check blob size for mobile memory constraints
+              if (blob.size > 50 * 1024 * 1024) { // 50MB limit for mobile
+                throw new Error(`Image ${index + 1} is too large for mobile sharing`);
+              }
               
               return new Promise<UploadedImage>((resolve, reject) => {
                 const reader = new FileReader();
+                
+                // Set timeout for mobile FileReader
+                const timeout = setTimeout(() => {
+                  reject(new Error('FileReader timeout on mobile'));
+                }, 30000); // 30 second timeout
+                
                 reader.onload = () => {
-                  if (reader.result) {
-                    resolve({
-                      ...img,
-                      url: reader.result as string, // base64 data URL
-                      selected: true
-                    });
+                  clearTimeout(timeout);
+                  if (reader.result && typeof reader.result === 'string') {
+                    // Validate base64 result
+                    if (reader.result.startsWith('data:image/')) {
+                      resolve({
+                        ...img,
+                        url: reader.result,
+                        selected: true
+                      });
+                    } else {
+                      reject(new Error('Invalid base64 format'));
+                    }
                   } else {
-                    reject(new Error('FileReader result is null'));
+                    reject(new Error('FileReader result is null or invalid'));
                   }
                 };
-                reader.onerror = () => reject(new Error('FileReader error'));
-                reader.readAsDataURL(blob);
+                
+                reader.onerror = () => {
+                  clearTimeout(timeout);
+                  reject(new Error(`FileReader error for image ${index + 1}`));
+                };
+                
+                reader.onabort = () => {
+                  clearTimeout(timeout);
+                  reject(new Error(`FileReader aborted for image ${index + 1}`));
+                };
+                
+                // Start reading
+                try {
+                  reader.readAsDataURL(blob);
+                } catch (error) {
+                  clearTimeout(timeout);
+                  reject(new Error(`Failed to start FileReader: ${error}`));
+                }
               });
             }
             return { ...img, selected: true };
           } catch (error) {
-            console.error('Error processing image:', error);
-            throw error;
+            console.error(`Error processing image ${index + 1}:`, error);
+            throw new Error(`Failed to process image ${index + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
         })
       );
 
-      // Store in sessionStorage and navigate
-      sessionStorage.setItem('share_images', JSON.stringify({
+      // Create share data with mobile-optimized structure
+      const shareData = {
         type: 'uploaded',
         images: convertedImages,
         userId: sessionStorage.getItem('user_id') || 'anonymous',
-        createdAt: new Date().toISOString()
-      }));
+        createdAt: new Date().toISOString(),
+        platform: 'mobile', // Flag for mobile handling
+        version: '1.0'
+      };
 
-      // Small delay to ensure sessionStorage is written
+      // Mobile-specific storage handling
+      try {
+        const shareDataString = JSON.stringify(shareData);
+        
+        // Check sessionStorage quota (mobile browsers have smaller limits)
+        if (shareDataString.length > 5 * 1024 * 1024) { // 5MB limit
+          throw new Error('Images too large for mobile storage. Please select fewer or smaller images.');
+        }
+        
+        // Clear any existing share data first
+        sessionStorage.removeItem('share_images');
+        
+        // Store with retry mechanism for mobile
+        let retryCount = 0;
+        const maxRetries = 3;
+        
+        while (retryCount < maxRetries) {
+          try {
+            sessionStorage.setItem('share_images', shareDataString);
+            
+            // Verify storage worked
+            const stored = sessionStorage.getItem('share_images');
+            if (stored && stored.length === shareDataString.length) {
+              break; // Success
+            } else {
+              throw new Error('Storage verification failed');
+            }
+          } catch (storageError) {
+            retryCount++;
+            if (retryCount >= maxRetries) {
+              throw new Error(`Failed to store images after ${maxRetries} attempts: ${storageError}`);
+            }
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+        
+      } catch (storageError) {
+        console.error('Storage error:', storageError);
+        throw new Error('Failed to prepare images for sharing. Please try with fewer or smaller images.');
+      }
+
+      // Mobile-optimized navigation with longer delay
       setTimeout(() => {
-        window.location.href = '/share/images';
-      }, 100);
+        try {
+          // Use location.href for better mobile compatibility
+          window.location.href = '/share/images';
+        } catch (navError) {
+          console.error('Navigation error:', navError);
+          toast.error('Navigation failed. Please try again.');
+        }
+      }, 200); // Longer delay for mobile
       
     } catch (error) {
-      console.error('Error preparing images for sharing:', error);
-      toast.error('Failed to prepare images for sharing. Please try again.');
+      console.error('Mobile image sharing error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Mobile sharing failed: ${errorMessage}`);
     } finally {
       setIsUploading(false);
     }

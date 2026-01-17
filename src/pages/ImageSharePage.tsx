@@ -89,20 +89,48 @@ export default function ImageSharePage() {
     
     // Load image data from session storage
     const storedData = sessionStorage.getItem('share_images');
-    console.log('Raw stored data:', storedData); // Debug log
+    console.log('Raw stored data length:', storedData?.length || 0); // Debug log
+    console.log('User agent:', navigator.userAgent); // Mobile detection
+    console.log('Is mobile:', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
     
     if (storedData) {
       try {
         const data = JSON.parse(storedData) as ImageShareData;
-        console.log('Parsed image data:', data); // Debug log
+        console.log('Parsed image data:', {
+          type: data.type,
+          imageCount: data.images?.length || 0,
+          platform: (data as any).platform || 'unknown',
+          version: (data as any).version || 'unknown'
+        });
+        
+        // Validate image data for mobile
+        if (!data.images || data.images.length === 0) {
+          throw new Error('No images found in share data');
+        }
+        
+        // Check for mobile-specific issues
+        const invalidImages = data.images.filter(img => 
+          !img.url || (!img.url.startsWith('data:image/') && !img.url.startsWith('blob:') && !img.url.startsWith('http'))
+        );
+        
+        if (invalidImages.length > 0) {
+          console.error('Invalid image URLs found:', invalidImages);
+          throw new Error(`${invalidImages.length} images have invalid URLs`);
+        }
+        
         setImageData(data);
       } catch (err) {
         console.error('Error parsing image data:', err);
-        toast.error('Invalid image data');
+        const errorMsg = err instanceof Error ? err.message : 'Invalid image data';
+        toast.error(`Mobile sharing error: ${errorMsg}`);
+        
+        // Clear corrupted data
+        sessionStorage.removeItem('share_images');
         navigate('/design');
       }
     } else {
-      toast.error('No images to share');
+      console.error('No stored image data found');
+      toast.error('No images to share. Please upload images first.');
       navigate('/design');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,11 +167,39 @@ export default function ImageSharePage() {
     try {
       setLoading(true);
       console.log('Form submission started');
-      console.log('ImageData before conversion:', imageData);
+      console.log('ImageData before conversion:', {
+        type: imageData.type,
+        imageCount: imageData.images?.length || 0,
+        platform: (imageData as any).platform || 'unknown'
+      });
+
+      // Mobile-specific validation
+      if (!imageData.images || imageData.images.length === 0) {
+        throw new Error('No images found to process');
+      }
+
+      // Check for mobile memory constraints
+      const totalSize = imageData.images.reduce((total, img) => {
+        if (img.url.startsWith('data:image/')) {
+          // Estimate base64 size
+          return total + (img.url.length * 0.75); // base64 is ~33% larger than binary
+        }
+        return total;
+      }, 0);
+
+      console.log('Total estimated image size:', Math.round(totalSize / 1024 / 1024), 'MB');
+
+      if (totalSize > 100 * 1024 * 1024) { // 100MB limit
+        throw new Error('Images too large for mobile processing. Please select fewer or smaller images.');
+      }
 
       // Process and upload images to Cloudflare R2
       console.log('Starting image processing with R2...');
       const processedImages = await r2Service.processAndUploadImages(imageData.images);
+
+      if (!processedImages || processedImages.length === 0) {
+        throw new Error('Failed to process images for sharing');
+      }
 
       // Create a unique share ID
       const shareId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
