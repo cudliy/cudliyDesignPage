@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Copy, Check } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 import CategorySelector from '../components/CategorySelector';
 import { useUser } from '../hooks/useUser';
 import { toast } from '@/lib/sonner';
@@ -397,7 +397,9 @@ export default function ImageSharePage() {
                   }}
                   className="hover:bg-gray-300 transition-colors"
                 >
-                  <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
                 </button>
                 <button
                   onClick={copyToClipboard}
@@ -726,7 +728,9 @@ export default function ImageSharePage() {
                   }}
                   className="hover:bg-gray-300 transition-colors"
                 >
-                  <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
                 </button>
                 <button
                   type="submit"

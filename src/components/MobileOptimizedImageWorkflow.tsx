@@ -381,7 +381,7 @@ export default function MobileOptimizedImageWorkflow({
               const blob = await response.blob();
               
               // Check blob size for mobile memory constraints
-              if (blob.size > 50 * 1024 * 1024) { // 50MB limit for mobile
+              if (blob.size > 100 * 1024 * 1024) { // 100MB limit for mobile
                 throw new Error(`Image ${index + 1} is too large for mobile sharing`);
               }
               
