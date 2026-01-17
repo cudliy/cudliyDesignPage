@@ -315,15 +315,23 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
   };
 
   const toggleImageSelection = (imageId: string) => {
-    setUploadedImages(prev => 
-      prev.map(img => 
+    console.log('Toggling selection for image:', imageId);
+    setUploadedImages(prev => {
+      const updated = prev.map(img => 
         img.id === imageId ? { ...img, selected: !img.selected } : img
-      )
-    );
+      );
+      console.log('Updated images after toggle:', updated.map(img => ({ id: img.id, selected: img.selected })));
+      return updated;
+    });
   };
 
   const selectAllImages = () => {
-    setUploadedImages(prev => prev.map(img => ({ ...img, selected: true })));
+    console.log('Select All clicked, current images:', uploadedImages.map(img => ({ id: img.id, selected: img.selected })));
+    setUploadedImages(prev => {
+      const updated = prev.map(img => ({ ...img, selected: true }));
+      console.log('After select all:', updated.map(img => ({ id: img.id, selected: img.selected })));
+      return updated;
+    });
   };
 
   const deselectAllImages = () => {
@@ -341,13 +349,21 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
   };
 
   const handleImageShare = async (selectedImages: UploadedImage[]) => {
+    console.log('=== handleImageShare called ===');
+    console.log('Selected images count:', selectedImages.length);
+    console.log('Selected images:', selectedImages);
+    
     if (selectedImages.length === 0) {
+      console.log('No images selected, showing error');
       toast.error('Please select at least one image to share');
       return;
     }
 
+    console.log('Setting isUploading to true');
     setIsUploading(true);
+    
     try {
+      console.log('Starting mobile-optimized image processing...');
       // Mobile-optimized image processing
       const convertedImages = await Promise.all(
         selectedImages.map(async (img, index) => {
@@ -494,6 +510,11 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
 
   const selectedImages = uploadedImages.filter(img => img.selected);
   const hasSelectedImages = selectedImages.length > 0;
+
+  // Debug logging
+  console.log('Current uploadedImages:', uploadedImages.map(img => ({ id: img.id, selected: img.selected })));
+  console.log('selectedImages count:', selectedImages.length);
+  console.log('hasSelectedImages:', hasSelectedImages);
 
   // SVG Icon Components matching desktop
   const ColorIcon = () => (
@@ -916,6 +937,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
           multiple
           accept="image/*"
           onChange={(e) => {
+            console.log('File input changed, files:', e.target.files);
             if (e.target.files && e.target.files.length > 0) {
               handleFileUpload(e.target.files);
             }
@@ -1030,10 +1052,17 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
           </div>
 
           {/* Bottom Action Bar */}
-          {hasSelectedImages && (
-            <div className="p-4 border-t border-white/10">
-              <button
-                onClick={() => handleImageShare(selectedImages)}
+          {(() => {
+            console.log('Rendering Share Selected button, hasSelectedImages:', hasSelectedImages, 'selectedImages.length:', selectedImages.length);
+            return hasSelectedImages && (
+              <div className="p-4 border-t border-white/10">
+                <button
+                onClick={() => {
+                  console.log('Share Selected button clicked');
+                  console.log('Selected images:', selectedImages);
+                  console.log('Is uploading:', isUploading);
+                  handleImageShare(selectedImages);
+                }}
                 disabled={isUploading}
                 className="w-full bg-white text-black py-3 rounded-full font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -1049,7 +1078,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                 )}
               </button>
             </div>
-          )}
+            );
+          })()}
         </div>
       )}
 

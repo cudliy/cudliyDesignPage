@@ -623,7 +623,12 @@ export default function MobileOptimizedImageWorkflow({
         {hasSelectedImages && (
           <div className="p-4 border-t border-white/10">
             <button
-              onClick={() => handleImageShare(selectedImages)}
+              onClick={() => {
+                console.log('Share Selected button clicked (MobileOptimized)');
+                console.log('Selected images:', selectedImages);
+                console.log('Is uploading:', isUploading);
+                handleImageShare(selectedImages);
+              }}
               disabled={isUploading}
               className="w-full bg-white text-black py-3 rounded-full font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
