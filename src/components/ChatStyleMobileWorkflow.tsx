@@ -336,20 +336,36 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
       // Convert blob URLs to base64 data URLs for persistence
       const convertedImages = await Promise.all(
         selectedImages.map(async (img) => {
-          if (img.url.startsWith('blob:')) {
-            const response = await fetch(img.url);
-            const blob = await response.blob();
-            return new Promise<UploadedImage>((resolve) => {
-              const reader = new FileReader();
-              reader.onload = () => resolve({
-                ...img,
-                url: reader.result as string, // base64 data URL
-                selected: true
+          try {
+            if (img.url.startsWith('blob:')) {
+              const response = await fetch(img.url);
+              if (!response.ok) {
+                throw new Error(`Failed to fetch blob: ${response.statusText}`);
+              }
+              const blob = await response.blob();
+              
+              return new Promise<UploadedImage>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  if (reader.result) {
+                    resolve({
+                      ...img,
+                      url: reader.result as string, // base64 data URL
+                      selected: true
+                    });
+                  } else {
+                    reject(new Error('FileReader result is null'));
+                  }
+                };
+                reader.onerror = () => reject(new Error('FileReader error'));
+                reader.readAsDataURL(blob);
               });
-              reader.readAsDataURL(blob);
-            });
+            }
+            return { ...img, selected: true };
+          } catch (error) {
+            console.error('Error processing image:', error);
+            throw error;
           }
-          return { ...img, selected: true };
         })
       );
 
@@ -361,10 +377,14 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
         createdAt: new Date().toISOString()
       }));
 
-      window.location.href = '/share/images';
+      // Small delay to ensure sessionStorage is written
+      setTimeout(() => {
+        window.location.href = '/share/images';
+      }, 100);
+      
     } catch (error) {
       console.error('Error preparing images for sharing:', error);
-      toast.error('Failed to prepare images for sharing');
+      toast.error('Failed to prepare images for sharing. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -844,9 +864,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               {uploadedImages.map((image) => (
                 <div key={image.id} className="relative">
                   <div
-                    className={`relative rounded-lg overflow-hidden cursor-pointer transition-all ${
-                      image.selected ? 'ring-2 ring-blue-500' : ''
-                    }`}
+                    className="relative rounded-lg overflow-hidden cursor-pointer transition-all"
                     onClick={() => toggleImageSelection(image.id)}
                   >
                     <img
@@ -857,18 +875,18 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                     
                     {/* Selection overlay */}
                     <div className={`absolute inset-0 transition-all ${
-                      image.selected ? 'bg-blue-500/20' : 'bg-black/0 hover:bg-black/10'
+                      image.selected ? 'bg-white/20' : 'bg-black/0 hover:bg-black/10'
                     }`} />
                     
                     {/* Checkbox */}
                     <div className="absolute top-2 right-2">
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                         image.selected 
-                          ? 'bg-blue-500 border-blue-500' 
-                          : 'bg-black/50 border-white/50'
+                          ? 'bg-white' 
+                          : 'bg-black/50'
                       }`}>
                         {image.selected && (
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         )}
@@ -893,8 +911,8 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
               
               {/* Add more images button */}
               <div
-                className={`border-2 border-dashed border-white/30 rounded-lg h-48 flex flex-col items-center justify-center cursor-pointer hover:border-white/50 transition-colors ${
-                  isDragOver ? 'border-blue-500 bg-blue-500/10' : ''
+                className={`rounded-lg h-48 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                  isDragOver ? 'bg-white/10' : 'bg-gray-800/30 hover:bg-gray-800/50'
                 }`}
                 onClick={() => fileInputRef.current?.click()}
                 onDrop={handleDrop}
