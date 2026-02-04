@@ -162,7 +162,7 @@ export default function DesignPage() {
 
 	// Close dropdown when clicking outside
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
+		const handleClickOutside = (_event: MouseEvent) => {
 			if (openDropdownId) {
 				setOpenDropdownId(null);
 			}
