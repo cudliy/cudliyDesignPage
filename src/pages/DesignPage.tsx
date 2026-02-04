@@ -1785,7 +1785,7 @@ const handleBackToCategories = () => {
 															
 															{/* Dropdown Menu - shows only when clicked, 1.2x bigger, no red background */}
 															{openDropdownId === image.id && (
-																<div className="absolute right-0 top-full mt-1 mr-2 w-48 rounded-2xl shadow-lg border border-gray-700 z-50 scale-110" style={{ backgroundColor: '#313131' }}>
+																<div className="absolute right-0 top-full mt-1 mr-2 w-48 rounded-2xl shadow-lg z-50 scale-110" style={{ backgroundColor: '#313131' }}>
 																	<button
 																		onClick={(e) => {
 																			e.stopPropagation();
