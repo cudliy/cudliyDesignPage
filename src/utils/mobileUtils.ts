@@ -13,13 +13,13 @@ export const isAndroidDevice = (): boolean => {
 };
 
 export const getMobileStorageLimit = (): number => {
-  // Conservative storage limits for mobile devices
+  // Increased storage limits for mobile devices
   if (isIOSDevice()) {
-    return 2 * 1024 * 1024; // 2MB for iOS (very conservative)
+    return 10 * 1024 * 1024; // 10MB for iOS
   } else if (isAndroidDevice()) {
-    return 3 * 1024 * 1024; // 3MB for Android
+    return 15 * 1024 * 1024; // 15MB for Android
   }
-  return 5 * 1024 * 1024; // 5MB for other mobile devices
+  return 20 * 1024 * 1024; // 20MB for other mobile devices
 };
 
 export const compressImageForMobile = async (file: File): Promise<File> => {

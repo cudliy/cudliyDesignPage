@@ -77,6 +77,7 @@ export default function DesignPage() {
 	const [uploadedImages, setUploadedImages] = useState<any[]>([]);
 	const [isUploadMode, setIsUploadMode] = useState(false);
 	const [isProcessingFiles, setIsProcessingFiles] = useState(false);
+	const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 	
 	// 3D Viewer control states
 	const [lighting3D, setLighting3D] = useState(30);
@@ -158,6 +159,23 @@ export default function DesignPage() {
 	useEffect(() => {
 		// showWorkflow changed
 	}, [showWorkflow]);
+
+	// Close dropdown when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (openDropdownId) {
+				setOpenDropdownId(null);
+			}
+		};
+
+		if (openDropdownId) {
+			document.addEventListener('click', handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	}, [openDropdownId]);
 
 	// Strategic Enhancement: Sync initial state with properties aggregator
 	useEffect(() => {
@@ -1641,7 +1659,22 @@ const handleBackToCategories = () => {
 							<div className="w-full h-full flex flex-col">
 								{/* Upload Mode Header */}
 								<div className="flex items-center justify-between mb-4 px-4 pt-4">
+									{/* Left side - X button and title */}
 									<div className="flex items-center gap-3">
+										{/* X Close Button */}
+										<button
+											onClick={() => {
+												setIsUploadMode(false);
+												setUploadedImages([]);
+											}}
+											className="p-2 hover:bg-white/10 rounded-full transition-colors"
+											title="Close"
+										>
+											<svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+											</svg>
+										</button>
+										
 										<h3 className="text-white text-lg font-medium">Uploaded Images ({uploadedImages.length}/5)</h3>
 										{uploadedImages.filter(img => img.selected).length > 0 && (
 											<span className="text-sm text-gray-400">
@@ -1649,54 +1682,61 @@ const handleBackToCategories = () => {
 											</span>
 										)}
 									</div>
-									<div className="flex items-center gap-2">
-										{/* Select/Deselect All buttons */}
-										<button
-											onClick={() => {
-												const updatedImages = uploadedImages.map(img => ({ ...img, selected: true }));
-												setUploadedImages(updatedImages);
-											}}
-											className="px-3 py-1.5 h-[32px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-xs transition-colors"
-										>
-											Select All
-										</button>
-										<button
-											onClick={() => {
-												const updatedImages = uploadedImages.map(img => ({ ...img, selected: false }));
-												setUploadedImages(updatedImages);
-											}}
-											className="px-3 py-1.5 h-[32px] bg-gray-700 hover:bg-gray-600 text-white rounded-full text-xs transition-colors"
-										>
-											Deselect All
-										</button>
-										
-										{/* Share button (only show when images are selected) */}
-										{uploadedImages.filter(img => img.selected).length > 0 && (
-											<button
-												onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
-												className="px-4 py-2 h-[40px] bg-[#313131] hover:bg-[#414141] text-white rounded-full text-sm font-medium transition-colors flex items-center gap-2"
-											>
-												Share Selected
-											</button>
-										)}
-										
-										{/* Clear button */}
+									
+									{/* Right side - Action buttons exactly as shown in image */}
+									<div className="flex items-center gap-3">
+										{/* Delete All Icon */}
 										<button
 											onClick={clearUploadedImages}
-											className="px-4 py-2 h-[40px] bg-gray-600 hover:bg-gray-500 text-white rounded-full text-sm font-medium transition-colors"
+											className="p-2 hover:bg-white/10 rounded-full transition-colors"
+											title="Delete all"
 										>
-											Clear All
+											<svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+											</svg>
+										</button>
+										
+										{/* Select/Deselect Toggle Icon - SQUARE with checkmark */}
+										<button
+											onClick={() => {
+												const selectedCount = uploadedImages.filter(img => img.selected).length;
+												const allSelected = selectedCount === uploadedImages.length;
+												if (allSelected) {
+													const updatedImages = uploadedImages.map(img => ({ ...img, selected: false }));
+													setUploadedImages(updatedImages);
+												} else {
+													const updatedImages = uploadedImages.map(img => ({ ...img, selected: true }));
+													setUploadedImages(updatedImages);
+												}
+											}}
+											className="p-2 hover:bg-white/10 rounded-full transition-colors"
+											title={uploadedImages.filter(img => img.selected).length === uploadedImages.length ? "Deselect all" : "Select all"}
+										>
+											<svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<rect x="3" y="3" width="18" height="18" rx="2" ry="2" strokeWidth={2}/>
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
+											</svg>
+										</button>
+										
+										{/* Share Selected Button */}
+										<button
+											onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
+											disabled={uploadedImages.filter(img => img.selected).length === 0}
+											className="px-3 py-1.5 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+										>
+											Share selected
 										</button>
 									</div>
 								</div>
 
 								{/* Scrollable Images Grid */}
 								<div className="flex-1 overflow-y-auto px-4 image-upload-scroll">
-									<div className="grid grid-cols-2 gap-4 pb-4">
+									<div className="grid grid-cols-2 gap-2 pb-4" style={{ gridTemplateRows: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
 										{uploadedImages.map((image, index) => (
 											<div
 												key={image.id}
-												className="relative group aspect-square rounded-lg overflow-hidden transition-all duration-200 cursor-pointer"
+												className="relative group rounded-lg overflow-hidden transition-all duration-200 cursor-pointer"
+												style={{ minHeight: '280px' }}
 												onClick={() => toggleImageSelection(image.id)}
 											>
 												{/* Image Display */}
@@ -1725,18 +1765,57 @@ const handleBackToCategories = () => {
 														</div>
 													</div>
 													
-													{/* Delete Button */}
-													<button
-														onClick={(e) => {
-															e.stopPropagation();
-															deleteImage(image.id);
-														}}
-														className="absolute top-2 right-2 w-6 h-6 bg-black hover:bg-gray-800 rounded-full flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
-													>
-														<svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-														</svg>
-													</button>
+													{/* Three-dot Menu - horizontal dots, no background, shows on hover */}
+													<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+														<div className="relative">
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	setOpenDropdownId(openDropdownId === image.id ? null : image.id);
+																}}
+																className="p-2 transition-colors cursor-pointer"
+															>
+																{/* Horizontal three dots - BIGGER */}
+																<svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+																	<circle cx="5" cy="12" r="2.5"/>
+																	<circle cx="12" cy="12" r="2.5"/>
+																	<circle cx="19" cy="12" r="2.5"/>
+																</svg>
+															</button>
+															
+															{/* Dropdown Menu - shows only when clicked, 1.2x bigger, no red background */}
+															{openDropdownId === image.id && (
+																<div className="absolute right-0 top-full mt-1 mr-2 w-48 rounded-2xl shadow-lg border border-gray-700 z-50 scale-110" style={{ backgroundColor: '#313131' }}>
+																	<button
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			window.open(image.url, '_blank');
+																			setOpenDropdownId(null);
+																		}}
+																		className="w-full px-4 py-3 text-left text-white rounded-t-2xl flex items-center gap-3 text-base cursor-pointer"
+																	>
+																		<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+																		</svg>
+																		Open in new tab
+																	</button>
+																	<button
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			deleteImage(image.id);
+																			setOpenDropdownId(null);
+																		}}
+																		className="w-full px-4 py-3 text-left text-white rounded-b-2xl flex items-center gap-3 text-base cursor-pointer"
+																	>
+																		<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+																		</svg>
+																		Delete Image
+																	</button>
+																</div>
+															)}
+														</div>
+													</div>
 												</div>
 											</div>
 										))}

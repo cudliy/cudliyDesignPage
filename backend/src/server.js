@@ -47,19 +47,27 @@ app.use(helmet({
 // CORS configuration - Dynamic origins based on environment
 const corsOptions = {
   origin: function (origin, callback) {
+    // Define allowed origins with comprehensive localhost support
     const allowedOrigins = process.env.CORS_ORIGINS ? 
       process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
       [
+        // Production domains
         'https://www.cudliy.com',
         'https://cudliy.com',
+        'https://app.cudliy.com',
+        // Development domains
         'http://localhost:5173',
-        'http://localhost:5174',
+        'http://localhost:5174', 
         'http://localhost:3000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:3000',
+        // OAuth domains
         'https://accounts.google.com',
         'https://accounts.google.com:443'
       ];
     
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin (like mobile apps, curl, or same-origin requests)
     if (!origin) return callback(null, true);
     
     // Allow Google domains for OAuth
@@ -67,20 +75,21 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    // Allow cudliy.com domains
+    // Allow all cudliy.com subdomains
     if (origin && origin.includes('cudliy.com')) {
       return callback(null, true);
     }
     
-    // Allow localhost for development
-    if (origin && (origin.includes('localhost:5173') || origin.includes('localhost:5174') || origin.includes('localhost:3000'))) {
+    // Allow localhost and 127.0.0.1 for development
+    if (origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
       return callback(null, true);
     }
     
+    // Check against explicit allowed origins
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-
+      console.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -118,26 +127,26 @@ app.use('/api/', generalLimiter);
 // Global CORS preflight handler - MUST be before routes
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
-
   
   const allowedOrigins = process.env.CORS_ORIGINS ? 
     process.env.CORS_ORIGINS.split(',').map(o => o.trim()) :
     [
       'https://www.cudliy.com',
       'https://cudliy.com',
+      'https://app.cudliy.com',
       'http://localhost:5173',
-      'http://localhost:5174'
+      'http://localhost:5174',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:5174',
+      'http://127.0.0.1:3000'
     ];
   
-
-  
-  // Allow cudliy.com domains
-  const isAllowed = allowedOrigins.includes(origin) || !origin || (origin && origin.includes('cudliy.com') 
-  || (origin && origin.includes('http://localhost:5173'))
-  || (origin && origin.includes('http://localhost:5174'))
-) 
-  
-
+  // Check if origin is allowed
+  const isAllowed = allowedOrigins.includes(origin) || 
+                   !origin || 
+                   (origin && origin.includes('cudliy.com')) ||
+                   (origin && (origin.includes('localhost') || origin.includes('127.0.0.1')));
   
   if (isAllowed) {
     res.header('Access-Control-Allow-Origin', origin || '*');
@@ -145,10 +154,9 @@ app.options('*', (req, res) => {
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Max-Age', '86400'); // 24 hours
-
     res.status(200).end();
   } else {
-
+    console.warn(`CORS preflight blocked origin: ${origin}`);
     res.status(403).json({ error: 'CORS policy violation' });
   }
 });
@@ -347,11 +355,12 @@ process.on('SIGINT', gracefulShutdown);
 // Run cleanup every hour
 setInterval(cleanupOldSessions, 60 * 60 * 1000);
 
-// Start server
-const server = app.listen(PORT, () => {
+// Start server - Listen on all interfaces for both localhost and network access
+const server = app.listen(PORT, '0.0.0.0', () => {
   logger.info(`🚀 Cudliy Backend Server running on port ${PORT}`);
   logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info(`🔗 Health check: http://localhost:${PORT}/api/health`);
+  logger.info(`🌐 Network access: http://0.0.0.0:${PORT}/api/health`);
   
   // Log available endpoints
   const routes = [
@@ -367,6 +376,10 @@ const server = app.listen(PORT, () => {
   
   logger.info('🛠️  Available API endpoints:');
   routes.forEach(route => logger.info(`   ${route}`));
+  
+  // Log CORS configuration
+  const corsOrigins = process.env.CORS_ORIGINS || 'Default origins';
+  logger.info(`🔒 CORS Origins: ${corsOrigins}`);
 });
 
 export default app;

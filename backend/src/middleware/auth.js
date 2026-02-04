@@ -3,45 +3,23 @@ import { AppError } from '../utils/errorHandler.js';
 import User from '../models/User.js';
 
 export const signToken = (id) => {
-  // Parse JWT_EXPIRES_IN format (e.g., "7d", "24h", "3600s") into seconds
-  const parseExpiresIn = (expiresIn) => {
-    if (!expiresIn) return '7d'; // default fallback
-    
-    const match = expiresIn.match(/^(\d+)([dhms])$/);
-    if (!match) return expiresIn; // return as-is if not in expected format
-    
-    const [, value, unit] = match;
-    const num = parseInt(value, 10);
-    
-    switch (unit) {
-      case 'd': return num * 24 * 60 * 60; // days to seconds
-      case 'h': return num * 60 * 60;       // hours to seconds
-      case 'm': return num * 60;            // minutes to seconds
-      case 's': return num;                 // seconds
-      default: return expiresIn;
-    }
-  };
-
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: parseExpiresIn(process.env.JWT_EXPIRES_IN)
+    expiresIn: process.env.JWT_EXPIRES_IN
   });
 };
 
-export const createSendToken = (user, statusCode, res, additionalData = {}) => {
+export const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
   
-  // Sanitize cookie expiry from env (in days). Fallback to 7 days if unset/invalid
-  const cookieExpireDaysRaw = process.env.JWT_COOKIE_EXPIRES_IN;
-  const cookieExpireDaysParsed = Number(cookieExpireDaysRaw);
-  const cookieExpireDays = Number.isFinite(cookieExpireDaysParsed) && cookieExpireDaysParsed > 0
-    ? cookieExpireDaysParsed
-    : 7;
-
+  // Default to 7 days if JWT_COOKIE_EXPIRES_IN is not set
+  const cookieExpiresIn = process.env.JWT_COOKIE_EXPIRES_IN || 7;
+  
   const cookieOptions = {
-    maxAge: Math.round(cookieExpireDays * 24 * 60 * 60 * 1000), // milliseconds
+    expires: new Date(
+      Date.now() + cookieExpiresIn * 24 * 60 * 60 * 1000
+    ),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none'
+    secure: process.env.NODE_ENV === 'production'
   };
 
   res.cookie('jwt', token, cookieOptions);
@@ -53,8 +31,7 @@ export const createSendToken = (user, statusCode, res, additionalData = {}) => {
     status: 'success',
     token,
     data: {
-      user,
-      ...additionalData
+      user
     }
   });
 };
