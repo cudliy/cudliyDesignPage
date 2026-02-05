@@ -1799,16 +1799,14 @@ const handleBackToCategories = () => {
 																</svg>
 															</button>
 															
-															{/* Dropdown Menu - Custom dimensions and positioning */}
+															{/* Dropdown Menu - Fixed positioning relative to button */}
 															{openDropdownId === image.id && (
 																<div 
-																	className="absolute shadow-lg z-50" 
+																	className="absolute right-0 top-full mt-1 shadow-lg z-50" 
 																	style={{ 
 																		backgroundColor: '#313131',
 																		width: '142px',
 																		height: '66px',
-																		top: '134px',
-																		left: '878px',
 																		borderRadius: '10px',
 																		opacity: 1
 																	}}
