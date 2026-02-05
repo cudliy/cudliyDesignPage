@@ -1715,7 +1715,7 @@ const handleBackToCategories = () => {
 											<img src="/swapicon.png" alt="Select/Deselect" className="w-5 h-5" />
 										</button>
 										
-										{/* Share Selected Button - Custom dimensions and positioning */}
+										{/* Share Selected Button - Custom dimensions */}
 										<button
 											onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
 											disabled={uploadedImages.filter(img => img.selected).length === 0}
@@ -1723,9 +1723,6 @@ const handleBackToCategories = () => {
 											style={{
 												width: '202px',
 												height: '61px',
-												position: 'absolute',
-												top: '18px',
-												left: '1393px',
 												borderRadius: '40px',
 												borderWidth: '2px',
 												borderStyle: 'solid',
