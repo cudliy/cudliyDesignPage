@@ -1696,7 +1696,7 @@ const handleBackToCategories = () => {
 											</svg>
 										</button>
 										
-										{/* Select/Deselect Toggle Icon - SQUARE with checkmark */}
+										{/* Select/Deselect Toggle Icon - Using swapicon.png */}
 										<button
 											onClick={() => {
 												const selectedCount = uploadedImages.filter(img => img.selected).length;
@@ -1712,17 +1712,27 @@ const handleBackToCategories = () => {
 											className="p-2 hover:bg-white/10 rounded-full transition-colors"
 											title={uploadedImages.filter(img => img.selected).length === uploadedImages.length ? "Deselect all" : "Select all"}
 										>
-											<svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<rect x="3" y="3" width="18" height="18" rx="2" ry="2" strokeWidth={2}/>
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
-											</svg>
+											<img src="/swapicon.png" alt="Select/Deselect" className="w-5 h-5" />
 										</button>
 										
-										{/* Share Selected Button */}
+										{/* Share Selected Button - Custom dimensions and positioning */}
 										<button
 											onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
 											disabled={uploadedImages.filter(img => img.selected).length === 0}
-											className="px-3 py-1.5 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+											className="bg-white text-black font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+											style={{
+												width: '202px',
+												height: '61px',
+												position: 'absolute',
+												top: '18px',
+												left: '1393px',
+												borderRadius: '40px',
+												borderWidth: '2px',
+												borderStyle: 'solid',
+												borderColor: '#000000',
+												opacity: 1,
+												fontSize: '14px'
+											}}
 										>
 											Share selected
 										</button>
@@ -1750,6 +1760,15 @@ const handleBackToCategories = () => {
 												<div className={`absolute inset-0 bg-black/20 transition-opacity ${
 													image.selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
 												}`}>
+												
+												{/* Hover Effect Overlay */}
+												<div 
+													className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg"
+													style={{ 
+														backgroundColor: '#1717174F',
+														borderRadius: '10px'
+													}}
+												></div>
 													{/* Selection Checkbox */}
 													<div className="absolute top-2 left-2">
 														<div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -1783,18 +1802,30 @@ const handleBackToCategories = () => {
 																</svg>
 															</button>
 															
-															{/* Dropdown Menu - shows only when clicked, 1.2x bigger, no red background */}
+															{/* Dropdown Menu - Custom dimensions and positioning */}
 															{openDropdownId === image.id && (
-																<div className="absolute right-0 top-full mt-1 mr-2 w-48 rounded-2xl shadow-lg z-50 scale-110" style={{ backgroundColor: '#313131' }}>
+																<div 
+																	className="absolute shadow-lg z-50" 
+																	style={{ 
+																		backgroundColor: '#313131',
+																		width: '142px',
+																		height: '66px',
+																		top: '134px',
+																		left: '878px',
+																		borderRadius: '10px',
+																		opacity: 1
+																	}}
+																>
 																	<button
 																		onClick={(e) => {
 																			e.stopPropagation();
 																			window.open(image.url, '_blank');
 																			setOpenDropdownId(null);
 																		}}
-																		className="w-full px-4 py-3 text-left text-white rounded-t-2xl flex items-center gap-3 text-base cursor-pointer"
+																		className="w-full px-2 py-1.5 text-left text-white flex items-center gap-2 text-sm cursor-pointer"
+																		style={{ borderRadius: '10px 10px 0 0' }}
 																	>
-																		<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																		<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
 																		</svg>
 																		Open in new tab
@@ -1805,7 +1836,8 @@ const handleBackToCategories = () => {
 																			deleteImage(image.id);
 																			setOpenDropdownId(null);
 																		}}
-																		className="w-full px-4 py-3 text-left text-white rounded-b-2xl flex items-center gap-3 text-base cursor-pointer"
+																		className="w-full px-2 py-1.5 text-left text-white flex items-center gap-2 text-sm cursor-pointer"
+																		style={{ borderRadius: '0 0 10px 10px' }}
 																	>
 																		<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																			<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
