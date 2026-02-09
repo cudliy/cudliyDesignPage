@@ -1,41 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Import Spotify Wrap styles */
-@import './styles/spotify-wrap.css';
+@import "tailwindcss";
 
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
 
 /* Import Fromage ExtraBold from Google Fonts or custom source */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
-
-/* Dark mode CSS variables - compatible with Tailwind v4 */
-:root {
-  --color-dark-bg-primary: #0f172a;
-  --color-dark-bg-secondary: #1e293b;
-  --color-dark-bg-tertiary: #334155;
-  --color-dark-text-primary: #f1f5f9;
-  --color-dark-text-secondary: #cbd5e1;
-  --color-dark-text-tertiary: #94a3b8;
-  --color-dark-border-primary: #334155;
-  --color-dark-border-secondary: #475569;
-}
-
-/* Ensure smooth transitions for dark mode */
-html {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-html.dark {
-  color-scheme: dark;
-}
-
-html.light {
-  color-scheme: light;
-}
-
 
 /* Cudliy Trademark Font */
 @font-face {
@@ -64,6 +33,7 @@ h2, h3, h4, h5, h6, .heading {
   .font-manrope { font-family: "Manrope", sans-serif; }
   .font-fromage { font-family: "Playfair Display", serif; }
 }
+
 /* Custom font definitions for better fallbacks */
 .font-fromage-extrabold {
   font-family: "Playfair Display", "Times New Roman", serif;
@@ -71,16 +41,17 @@ h2, h3, h4, h5, h6, .heading {
   font-style: normal;
 }
 
-  .font-manrope-bold {
-    font-family: "Manrope", "Arial", sans-serif;
-    font-weight: 800;
-    font-style: normal;
-  }
-  .font-manrope-extrabold {
-    font-family: "Manrope", "Arial", sans-serif;
-    font-weight: 900;
-    font-style: normal;
-  }
+.font-manrope-bold {
+  font-family: "Manrope", "Arial", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.font-manrope-extrabold {
+  font-family: "Manrope", "Arial", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
 
 /* iro.js Color Picker Custom Styles */
 .IroWheel {
@@ -131,120 +102,18 @@ h2, h3, h4, h5, h6, .heading {
     1px 1px 0 rgba(0, 0, 0, 1),
     -1px -1px 0 rgba(0, 0, 0, 1),
     1px -1px 0 rgba(0, 0, 0, 1),
-    -1px 1px 0 rgba(0, 0, 0, 1),
-    0 0 10px rgba(255, 255, 255, 0.5),
-    0 0 20px rgba(255, 255, 255, 0.3) !important;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)) !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.02em !important;
+    -1px 1px 0 rgba(0, 0, 0, 1) !important;
 }
 
-/* Hide scrollbars while preserving scroll (desktop + mobile) */
-html, body {
-  scrollbar-width: none; /* Firefox */
-}
-body::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+/* Ensure smooth transitions for dark mode */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Override any focus outlines globally */
-input:focus,
-textarea:focus,
-select:focus,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
+html.dark {
+  color-scheme: dark;
 }
 
-/* Ensure no focus rings anywhere */
-*:focus,
-*:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Responsive scaling for DesignPage left pane only */
-.left-pane-scale {
-  /* Removed aggressive scaling - using natural responsive sizing instead */
-  position: relative;
-  z-index: 30;
-}
-
-/* Responsive scaling for DesignPage tour video */
-
-.design-tour-video {
-  transform: scale(0.85); /* Default: 1300px and below */
-  transform-origin: center;
-  max-width: 100%;
-}
-
-@media (min-width: 1400px) {
-  .design-tour-video {
-    transform: scale(0.75); /* At 1400px */
-  }
-}
-
-@media (min-width: 1500px) {
-  .design-tour-video {
-    transform: scale(0.85); /* At 1500px and above */
-  }
-}
-
-/* Ensure left pane contents remain accessible on short screens */
-@media (max-height: 600px) {
-  .left-pane-scale {
-    --left-pane-scale: 0.85; /* slightly shrink to fit more vertically */
-    height: 100vh; /* keep full viewport height */
-    overflow-y: auto; /* allow scroll inside the pane if needed */
-  }
-  .left-pane-content {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 1rem; /* breathing room at bottom */
-  }
-}
-
-/* Hide scrollbars inside left pane content across browsers */
-.left-pane-content {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge Legacy */
-}
-.left-pane-content::-webkit-scrollbar {
-  display: none; /* WebKit */
-}
-
-/* Utility class to hide scrollbars */
-.scrollbar-hide {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge Legacy */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* WebKit */
-}
-
-/* Custom scrollbar styles for image upload area */
-.image-upload-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.image-upload-scroll::-webkit-scrollbar-track {
-  background: #1F2937;
-  border-radius: 3px;
-}
-
-.image-upload-scroll::-webkit-scrollbar-thumb {
-  background: #4B5563;
-  border-radius: 3px;
-}
-
-.image-upload-scroll::-webkit-scrollbar-thumb:hover {
-  background: #6B7280;
-}
-
-/* Firefox scrollbar */
-.image-upload-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: #4B5563 #1F2937;
+html.light {
+  color-scheme: light;
 }
