@@ -11,7 +11,8 @@
 /* Import Fromage ExtraBold from Google Fonts or custom source */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
-@theme {
+/* Dark mode CSS variables - compatible with Tailwind v4 */
+:root {
   --color-dark-bg-primary: #0f172a;
   --color-dark-bg-secondary: #1e293b;
   --color-dark-bg-tertiary: #334155;
@@ -52,7 +53,9 @@ h1, .heading-large {
 }
 
 /* Apply Manrope Bold to smaller titles */
-
+h2, h3, h4, h5, h6, .heading {
+  font-family: "Abril", sans-serif;
+}
 
 @layer utilities {
   .font-abril { 
@@ -60,9 +63,6 @@ h1, .heading-large {
   }
   .font-manrope { font-family: "Manrope", sans-serif; }
   .font-fromage { font-family: "Playfair Display", serif; }
-}
-h2, h3, h4, h5, h6, .heading {
-  font-family: "Abril", sans-serif;
 }
 /* Custom font definitions for better fallbacks */
 .font-fromage-extrabold {
