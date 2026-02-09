@@ -93,144 +93,42 @@ export default function ImageGiftViewPage() {
   }, [loading, error, slides.length]);
 
   const generateSlides = (data: ImageGiftData) => {
-    const categoryData = GIFT_CATEGORIES.find(cat => cat.value === data.category);
-
-    // Category-specific statements for each slide
-    const getCategoryStatements = (category: string) => {
-      const statements = {
-        'birthday': {
-          intro: `${data.senderName} has something amazing for your special day!`,
-          recipient: `Happy Birthday, ${data.recipientName}! 🎉`,
-          categoryMessage: "Another year of wonderful memories begins today",
-          journey: "Every birthday is a new chapter in your beautiful story",
-          collection: "These moments capture the joy you bring to everyone around you",
-          finale: "May this new year be filled with endless happiness and dreams come true!"
-        },
-        'gender-reveal': {
-          intro: `${data.senderName} can't wait to share this exciting news with you!`,
-          recipient: `${data.recipientName}, get ready for the big reveal! 💕`,
-          categoryMessage: "A new little miracle is on the way",
-          journey: "The anticipation, the excitement, the pure joy of new life",
-          collection: "These precious moments before your world changes forever",
-          finale: "Welcome to the most beautiful adventure of your lives!"
-        },
-        'pet-memorial': {
-          intro: `${data.senderName} wants to honor a special companion with you`,
-          recipient: `For ${data.recipientName}, in loving memory 🌈`,
-          categoryMessage: "Some bonds transcend time and space",
-          journey: "The love, the loyalty, the countless precious moments shared",
-          collection: "These memories celebrate a life that brought so much joy",
-          finale: "Forever in our hearts, forever part of our story"
-        },
-        'marriage-proposal': {
-          intro: `${data.senderName} has something life-changing to ask you!`,
-          recipient: `${data.recipientName}, this moment is just for you 💍`,
-          categoryMessage: "When you know, you just know",
-          journey: "From the first hello to this perfect moment",
-          collection: "These images tell the story of our love",
-          finale: "Will you make me the happiest person alive?"
-        },
-        'graduation': {
-          intro: `${data.senderName} is so proud to celebrate your achievement!`,
-          recipient: `Congratulations, ${data.recipientName}! You did it! 🎓`,
-          categoryMessage: "Years of hard work have led to this incredible moment",
-          journey: "The late nights, the challenges, the determination that brought you here",
-          collection: "These moments capture your journey to success",
-          finale: "The world is yours to conquer - go make your mark!"
-        },
-        'corporate': {
-          intro: `${data.senderName} appreciates your outstanding contribution`,
-          recipient: `For ${data.recipientName}, with sincere appreciation 🏆`,
-          categoryMessage: "Excellence deserves recognition",
-          journey: "Your dedication and professionalism inspire everyone around you",
-          collection: "These moments represent the impact you've made",
-          finale: "Thank you for being an invaluable part of our success"
-        },
-        'others': {
-          intro: `${data.senderName} has something uniquely special for you`,
-          recipient: `${data.recipientName}, this is just for you ✨`,
-          categoryMessage: "Some gifts come straight from the heart",
-          journey: "The thought, the care, the love behind every detail",
-          collection: "These moments are as unique as you are",
-          finale: "Because you deserve something as special as you are"
-        }
-      };
-      
-      return statements[category as keyof typeof statements] || statements['others'];
-    };
-
-    const categoryStatements = getCategoryStatements(data.category || 'others');
-
     const generatedSlides = [
+      // Video-only slides without overlay text
       {
         id: 'intro',
         video: VIDEO_TEMPLATES[0],
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        content: (
-          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto animate-fade-in-up">
-            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              {categoryStatements.intro}
-            </p>
-            {categoryData && (
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <div 
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: categoryData.color }}
-                />
-                <span className="text-white/90 font-normal" style={{ fontSize: '16px' }}>{categoryData.label}</span>
-              </div>
-            )}
-          </div>
-        )
+        content: null
       },
       {
-        id: 'recipient',
+        id: 'video-2',
         video: VIDEO_TEMPLATES[1],
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        content: (
-          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto">
-            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              {categoryStatements.recipient}
-            </p>
-            <p className="text-white/90 font-normal mt-4" style={{ fontSize: '16px', textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
-              {categoryStatements.categoryMessage}
-            </p>
-          </div>
-        )
+        content: null
       },
-      ...(data.message ? [{
-        id: 'message',
+      {
+        id: 'video-3',
         video: VIDEO_TEMPLATES[2],
         gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        content: (
-          <div className="flex items-center justify-center h-full px-4">
-            <div className="text-center max-w-4xl mx-auto">
-              <p className="text-white font-medium leading-relaxed" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
-                "{data.message}"
-              </p>
-              <p className="text-white/80 font-normal mt-4" style={{ fontSize: '16px', textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
-                - {data.senderName}
-              </p>
-            </div>
-          </div>
-        )
-      }] : [{
-        id: 'journey',
-        video: VIDEO_TEMPLATES[2],
-        gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        content: (
-          <div className="flex items-center justify-center h-full px-4">
-            <div className="text-center max-w-4xl mx-auto">
-              <p className="text-white font-medium leading-relaxed" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
-                {categoryStatements.journey}
-              </p>
-            </div>
-          </div>
-        )
-      }]),
+        content: null
+      },
+      {
+        id: 'video-4',
+        video: VIDEO_TEMPLATES[3],
+        gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+        content: null
+      },
+      {
+        id: 'video-5',
+        video: VIDEO_TEMPLATES[4],
+        gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+        content: null
+      },
+      // Images at the end of the slider
       ...data.images.map((image, index) => ({
         id: `image-${index}`,
-        video: VIDEO_TEMPLATES[(index + 3) % VIDEO_TEMPLATES.length],
+        video: VIDEO_TEMPLATES[(index + 5) % VIDEO_TEMPLATES.length],
         gradient: `linear-gradient(135deg, ${
           ['#ff9a9e 0%, #fecfef 100%', '#a8edea 0%, #fed6e3 100%', '#ffecd2 0%, #fcb69f 100%', '#ff8a80 0%, #ea80fc 100%'][index % 4]
         })`,
@@ -246,48 +144,7 @@ export default function ImageGiftViewPage() {
             </div>
           </div>
         )
-      })),
-      {
-        id: 'collection',
-        video: VIDEO_TEMPLATES[5],
-        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        content: (
-          <div className="text-center space-y-6 px-4 max-w-4xl mx-auto">
-            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              {categoryStatements.collection}
-            </p>
-            <div className="grid grid-cols-2 gap-2 max-w-md mx-auto">
-              {data.images.slice(0, 4).map((image, index) => (
-                <div key={image.id} className="aspect-square rounded-lg overflow-hidden">
-                  <img
-                    src={image.url}
-                    alt={`Collection ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      },
-      {
-        id: 'thanks',
-        video: VIDEO_TEMPLATES[6],
-        gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
-        content: (
-          <div className="text-center space-y-4 px-4 max-w-4xl mx-auto">
-            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
-              {categoryStatements.finale}
-            </p>
-            <p className="text-white/80 font-normal mt-4" style={{ fontSize: '16px', textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
-              With love, {data.senderName}
-            </p>
-            <p className="text-white/60 font-normal mt-2" style={{ fontSize: '16px', textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
-              Created with Cudliy
-            </p>
-          </div>
-        )
-      }
+      }))
     ];
 
     setSlides(generatedSlides);
@@ -296,9 +153,9 @@ export default function ImageGiftViewPage() {
   useEffect(() => {
     if (slides.length === 0 || isPaused) return;
 
-    // Use longer duration for image slides (8 seconds), shorter for others (4 seconds)
+    // Use consistent duration for all slides (4 seconds for videos, 6 seconds for images)
     const currentSlideId = slides[currentSlide]?.id;
-    const duration = currentSlideId?.startsWith('image-') ? 8000 : 4000;
+    const duration = currentSlideId?.startsWith('image-') ? 6000 : 4000;
 
     const timer = setTimeout(() => {
       setCurrentSlide((prev) => {
@@ -413,11 +270,12 @@ export default function ImageGiftViewPage() {
           muted
           playsInline
           preload="auto"
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
           style={{ 
-            minWidth: '100%', 
-            minHeight: '100%',
+            width: '100%', 
+            height: '100%',
             objectFit: 'cover',
+            objectPosition: 'center',
             zIndex: 1
           }}
           onLoadStart={() => {
@@ -445,9 +303,11 @@ export default function ImageGiftViewPage() {
         )}
 
         {/* Content Overlay */}
-        <div className="relative z-10 h-full flex items-center justify-center p-4 md:p-8">
-          {currentSlideData.content}
-        </div>
+        {currentSlideData.content && (
+          <div className="relative z-10 h-full flex items-center justify-center p-4 md:p-8">
+            {currentSlideData.content}
+          </div>
+        )}
 
         {/* Close Button */}
         <button
