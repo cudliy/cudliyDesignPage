@@ -280,7 +280,7 @@ export default function ImageSharePage() {
     return (
       <div className="min-h-screen bg-white overflow-x-hidden">
         <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
-          <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-center lg:items-start justify-center min-h-screen`}>
+          <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-start justify-center min-h-screen`}>
             {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
             <div 
               className="hidden lg:flex items-center justify-center rounded-[32px] overflow-hidden" 
@@ -475,7 +475,7 @@ export default function ImageSharePage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
-        <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-center lg:items-start justify-center min-h-screen`}>
+        <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-start justify-center min-h-screen`}>
           {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
           <div 
             className="hidden lg:flex items-center justify-center rounded-[24px] lg:rounded-[32px] overflow-hidden" 

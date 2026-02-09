@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { GIFT_CATEGORIES } from '../components/CategorySelector';
 import { audioService } from '../services/audioService';
 
 interface ImageGiftData {
