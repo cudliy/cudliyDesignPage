@@ -1715,20 +1715,26 @@ const handleBackToCategories = () => {
 											<img src="/swapicon.png" alt="Select/Deselect" className="w-5 h-5" />
 										</button>
 										
-										{/* Share Selected Button - Custom dimensions */}
+										{/* Share Selected Button - Matching Share now button size */}
 										<button
 											onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
 											disabled={uploadedImages.filter(img => img.selected).length === 0}
-											className="bg-white text-black font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+											className="hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
 											style={{
-												width: '202px',
-												height: '61px',
+												width: '178px',
+												height: '54px',
 												borderRadius: '40px',
-												borderWidth: '2px',
+												borderWidth: '1px',
 												borderStyle: 'solid',
-												borderColor: '#000000',
-												opacity: 1,
-												fontSize: '14px'
+												borderColor: '#313131',
+												backgroundColor: '#313131',
+												color: 'white',
+												fontSize: '15px',
+												fontWeight: 600,
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												gap: '8px'
 											}}
 										>
 											Share selected
