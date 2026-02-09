@@ -22,13 +22,13 @@ interface ImageGiftData {
 }
 
 const VIDEO_TEMPLATES = [
-  '/Wrap vid1.mp4',
-  '/Wrap vid 2.mp4',
-  '/Wrap vid3.mp4',
-  '/Wrap vid1.mp4',
-  '/Wrap vid 2.mp4',
-  '/Wrap vid3.mp4',
-  '/Wrap vid1.mp4',
+  '/1.mp4',
+  '/2.mp4',
+  '/3.mp4',
+  '/4.mp4',
+  '/5.mp4',
+  '/1.mp4',
+  '/2.mp4',
 ];
 
 export default function ImageGiftViewPage() {
@@ -168,7 +168,7 @@ export default function ImageGiftViewPage() {
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         content: (
           <div className="text-center space-y-4 px-4 max-w-4xl mx-auto animate-fade-in-up">
-            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
+            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               {categoryStatements.intro}
             </p>
             {categoryData && (
@@ -177,7 +177,7 @@ export default function ImageGiftViewPage() {
                   className="w-4 h-4 rounded-full"
                   style={{ backgroundColor: categoryData.color }}
                 />
-                <span className="text-lg text-white/90 font-medium">{categoryData.label}</span>
+                <span className="text-white/90 font-normal" style={{ fontSize: '16px' }}>{categoryData.label}</span>
               </div>
             )}
           </div>
@@ -189,10 +189,10 @@ export default function ImageGiftViewPage() {
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
         content: (
           <div className="text-center space-y-4 px-4 max-w-4xl mx-auto">
-            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
+            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               {categoryStatements.recipient}
             </p>
-            <p className="text-lg md:text-xl text-white/90 font-medium mt-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+            <p className="text-white/90 font-normal mt-4" style={{ fontSize: '16px', textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
               {categoryStatements.categoryMessage}
             </p>
           </div>
@@ -205,10 +205,10 @@ export default function ImageGiftViewPage() {
         content: (
           <div className="flex items-center justify-center h-full px-4">
             <div className="text-center max-w-4xl mx-auto">
-              <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
+              <p className="text-white font-medium leading-relaxed" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
                 "{data.message}"
               </p>
-              <p className="text-lg text-white/80 font-medium mt-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+              <p className="text-white/80 font-normal mt-4" style={{ fontSize: '16px', textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
                 - {data.senderName}
               </p>
             </div>
@@ -221,7 +221,7 @@ export default function ImageGiftViewPage() {
         content: (
           <div className="flex items-center justify-center h-full px-4">
             <div className="text-center max-w-4xl mx-auto">
-              <p className="text-2xl md:text-3xl lg:text-4xl text-white font-bold leading-relaxed" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
+              <p className="text-white font-medium leading-relaxed" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word', hyphens: 'auto' }}>
                 {categoryStatements.journey}
               </p>
             </div>
@@ -253,7 +253,7 @@ export default function ImageGiftViewPage() {
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         content: (
           <div className="text-center space-y-6 px-4 max-w-4xl mx-auto">
-            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
+            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               {categoryStatements.collection}
             </p>
             <div className="grid grid-cols-2 gap-2 max-w-md mx-auto">
@@ -276,13 +276,13 @@ export default function ImageGiftViewPage() {
         gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: (
           <div className="text-center space-y-4 px-4 max-w-4xl mx-auto">
-            <p className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-white font-black leading-tight" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
+            <p className="text-white font-medium leading-tight" style={{ fontSize: '16px', textShadow: '3px 3px 6px rgba(0,0,0,0.9)', wordBreak: 'break-word' }}>
               {categoryStatements.finale}
             </p>
-            <p className="text-lg md:text-xl text-white/80 font-medium mt-4" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
+            <p className="text-white/80 font-normal mt-4" style={{ fontSize: '16px', textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>
               With love, {data.senderName}
             </p>
-            <p className="text-sm text-white/60 font-medium mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+            <p className="text-white/60 font-normal mt-2" style={{ fontSize: '16px', textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
               Created with Cudliy
             </p>
           </div>
