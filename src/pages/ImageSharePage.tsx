@@ -278,16 +278,17 @@ export default function ImageSharePage() {
 
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-white overflow-x-hidden">
+      <div className="min-h-screen bg-white overflow-x-hidden" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
         <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
-          <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-start justify-center min-h-screen`}>
+          <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-stretch justify-center min-h-screen`}>
             {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
             <div 
               className="hidden lg:flex items-center justify-center rounded-[32px] overflow-hidden" 
               style={{ 
                 width: '642px', 
                 height: '579.56px',
-                backgroundColor: '#F5F5F5'
+                backgroundColor: '#F5F5F5',
+                minHeight: '579.56px'
               }}
             >
               <div className="w-full h-full flex items-center justify-center p-4" style={{ backgroundColor: '#F5F5F5' }}>
@@ -317,7 +318,7 @@ export default function ImageSharePage() {
             </div>
 
             {/* Right Side - Success Content */}
-            <div className={`w-full lg:flex-1 lg:max-w-[400px] ${isSmallHeight ? 'pt-2' : 'pt-2 sm:pt-4 lg:pt-8'} mx-auto`}>
+            <div className={`w-full lg:flex-1 lg:max-w-[400px] flex flex-col justify-center mx-auto`} style={{ minHeight: '579.56px' }}>
               {/* Header */}
               <div className={`${isSmallHeight ? 'mb-4' : 'mb-4 sm:mb-6 lg:mb-8'} text-center`}>
                 <img 
@@ -473,16 +474,17 @@ export default function ImageSharePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen bg-white overflow-x-hidden" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
       <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
-        <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-start justify-center min-h-screen`}>
+        <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-stretch justify-center min-h-screen`}>
           {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
           <div 
             className="hidden lg:flex items-center justify-center rounded-[24px] lg:rounded-[32px] overflow-hidden" 
             style={{ 
               width: '642px', 
               height: '579.56px',
-              backgroundColor: '#F5F5F5'
+              backgroundColor: '#F5F5F5',
+              minHeight: '579.56px'
             }}
           >
             <div className="w-full h-full flex items-center justify-center p-4" style={{ backgroundColor: '#F5F5F5' }}>
@@ -514,9 +516,9 @@ export default function ImageSharePage() {
           </div>
 
           {/* Right Side - Form Content */}
-          <div className="w-full lg:flex-1 lg:max-w-[400px] pt-2 sm:pt-4 lg:pt-8 mx-auto">
+          <div className="w-full lg:flex-1 lg:max-w-[400px] flex flex-col justify-center mx-auto" style={{ minHeight: '579.56px' }}>
             {/* Header */}
-            <div className="mb-4 sm:mb-6 lg:mb-8 text-center">
+            <div className={`${isSmallHeight ? 'mb-4' : 'mb-4 sm:mb-6 lg:mb-8'} text-center`}>
               <img 
                 src="/CudliyLogo.svg" 
                 alt="Cudliy Logo" 

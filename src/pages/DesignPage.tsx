@@ -1719,22 +1719,23 @@ const handleBackToCategories = () => {
 										<button
 											onClick={() => handleImageShare(uploadedImages.filter(img => img.selected))}
 											disabled={uploadedImages.filter(img => img.selected).length === 0}
-											className="hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+											className="hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
 											style={{
 												width: '178px',
 												height: '54px',
 												borderRadius: '40px',
 												borderWidth: '1px',
 												borderStyle: 'solid',
-												borderColor: '#313131',
-												backgroundColor: '#313131',
-												color: 'white',
+												borderColor: uploadedImages.filter(img => img.selected).length > 0 ? 'white' : '#313131',
+												backgroundColor: uploadedImages.filter(img => img.selected).length > 0 ? 'white' : '#313131',
+												color: uploadedImages.filter(img => img.selected).length > 0 ? '#313131' : 'white',
 												fontSize: '15px',
 												fontWeight: 600,
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: 'center',
-												gap: '8px'
+												gap: '8px',
+												transition: 'all 0.2s ease'
 											}}
 										>
 											Share selected
