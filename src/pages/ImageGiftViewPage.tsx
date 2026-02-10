@@ -131,22 +131,27 @@ export default function ImageGiftViewPage() {
         gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: (
           <div className="flex items-center justify-center w-full h-full p-4 md:p-8">
-            <div className="w-full max-w-6xl h-full flex items-center justify-center">
-              <div className={`grid gap-3 md:gap-4 w-full h-full ${
+            <div className="w-full max-w-6xl" style={{ maxHeight: '85vh' }}>
+              <div className={`grid gap-3 md:gap-4 w-full ${
                 data.images.length === 1 ? 'grid-cols-1' :
                 data.images.length === 2 ? 'grid-cols-2' :
                 data.images.length === 3 ? 'grid-cols-3' :
                 data.images.length === 4 ? 'grid-cols-2 grid-rows-2' :
                 data.images.length <= 6 ? 'grid-cols-3 grid-rows-2' :
                 'grid-cols-4 grid-rows-2'
-              }`}>
+              }`} style={{ 
+                maxHeight: '85vh',
+                height: data.images.length <= 3 ? 'auto' : '85vh'
+              }}>
                 {data.images.map((image, index) => (
                   <div 
                     key={index}
-                    className="relative rounded-xl overflow-hidden shadow-2xl bg-black/20 backdrop-blur-sm"
+                    className="relative rounded-xl overflow-hidden shadow-2xl bg-black/20 backdrop-blur-sm flex items-center justify-center"
                     style={{ 
                       animation: `fadeInScale 0.8s ease-out ${index * 0.1}s forwards`,
-                      opacity: 0
+                      opacity: 0,
+                      aspectRatio: '1',
+                      maxHeight: data.images.length <= 3 ? '400px' : 'auto'
                     }}
                   >
                     <img
@@ -155,7 +160,8 @@ export default function ImageGiftViewPage() {
                       className="w-full h-full object-contain"
                       style={{ 
                         maxHeight: '100%',
-                        maxWidth: '100%'
+                        maxWidth: '100%',
+                        objectFit: 'contain'
                       }}
                     />
                   </div>
