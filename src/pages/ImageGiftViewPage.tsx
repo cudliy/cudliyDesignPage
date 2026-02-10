@@ -100,9 +100,9 @@ export default function ImageGiftViewPage() {
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         content: (
           <div className="flex items-center justify-center w-full h-full">
-            <div className="text-center px-8">
+            <div className="text-center px-4 md:px-8">
               <h1 
-                className="text-white text-5xl md:text-7xl font-bold mb-6"
+                className="text-white text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-6"
                 style={{ 
                   animation: 'fadeInUp 1s ease-out forwards',
                   fontFamily: 'Playfair Display, serif'
@@ -111,7 +111,7 @@ export default function ImageGiftViewPage() {
                 Hey {data.recipientName}! 👋
               </h1>
               <p 
-                className="text-white/90 text-xl md:text-2xl"
+                className="text-white/90 text-lg sm:text-xl md:text-2xl"
                 style={{ 
                   animation: 'fadeInUp 1s ease-out 0.3s forwards',
                   opacity: 0
@@ -129,10 +129,10 @@ export default function ImageGiftViewPage() {
         video: VIDEO_TEMPLATES[1],
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
         content: (
-          <div className="flex items-center justify-center w-full h-full px-8">
+          <div className="flex items-center justify-center w-full h-full px-4 md:px-8">
             <div className="max-w-3xl text-center">
               <div 
-                className="text-white/80 text-sm md:text-base mb-4"
+                className="text-white/80 text-xs sm:text-sm md:text-base mb-3 md:mb-4"
                 style={{ 
                   animation: 'fadeInUp 1s ease-out forwards',
                   fontFamily: 'Manrope, sans-serif'
@@ -141,7 +141,7 @@ export default function ImageGiftViewPage() {
                 {data.senderName !== 'Anonymous' ? `From ${data.senderName}` : 'From someone who cares'}
               </div>
               <p 
-                className="text-white text-2xl md:text-4xl leading-relaxed"
+                className="text-white text-xl sm:text-2xl md:text-4xl leading-relaxed px-2"
                 style={{ 
                   animation: 'fadeInUp 1s ease-out 0.3s forwards',
                   opacity: 0,
@@ -180,11 +180,11 @@ export default function ImageGiftViewPage() {
         video: VIDEO_TEMPLATES[5],
         gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: (
-          <div className="flex flex-col items-center justify-center w-full h-full p-6 md:p-10">
+          <div className="flex flex-col items-center justify-center w-full h-full p-3 sm:p-4 md:p-6 lg:p-10">
             <div className="w-full max-w-6xl flex flex-col items-center" style={{ maxHeight: '90vh' }}>
               {/* Title above images */}
               <h2 
-                className="text-white text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6"
+                className="text-white text-xl sm:text-2xl md:text-3xl font-bold text-center mb-3 sm:mb-4 md:mb-6"
                 style={{ 
                   animation: 'fadeInUp 1s ease-out forwards',
                   fontFamily: 'Playfair Display, serif'
@@ -193,13 +193,13 @@ export default function ImageGiftViewPage() {
                 Your Special Moments 💝
               </h2>
               <div 
-                className={`grid gap-2 md:gap-3 w-full ${
-                  data.images.length === 1 ? 'grid-cols-1 max-w-md' :
-                  data.images.length === 2 ? 'grid-cols-2 max-w-3xl' :
-                  data.images.length === 3 ? 'grid-cols-3 max-w-4xl' :
-                  data.images.length === 4 ? 'grid-cols-2 grid-rows-2 max-w-3xl' :
-                  data.images.length <= 6 ? 'grid-cols-3 grid-rows-2 max-w-5xl' :
-                  'grid-cols-4 grid-rows-2 max-w-6xl'
+                className={`grid gap-1.5 sm:gap-2 md:gap-3 w-full ${
+                  data.images.length === 1 ? 'grid-cols-1 max-w-sm sm:max-w-md' :
+                  data.images.length === 2 ? 'grid-cols-2 max-w-2xl sm:max-w-3xl' :
+                  data.images.length === 3 ? 'grid-cols-2 sm:grid-cols-3 max-w-3xl sm:max-w-4xl' :
+                  data.images.length === 4 ? 'grid-cols-2 grid-rows-2 max-w-2xl sm:max-w-3xl' :
+                  data.images.length <= 6 ? 'grid-cols-2 sm:grid-cols-3 grid-rows-3 sm:grid-rows-2 max-w-3xl sm:max-w-5xl' :
+                  'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 grid-rows-4 sm:grid-rows-3 md:grid-rows-2 max-w-4xl sm:max-w-6xl'
                 }`} 
                 style={{ 
                   maxHeight: data.images.length <= 3 ? '60vh' : '70vh',
@@ -208,7 +208,7 @@ export default function ImageGiftViewPage() {
                 {data.images.map((image, index) => (
                   <div 
                     key={index}
-                    className="relative rounded-xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-sm p-2"
+                    className="relative rounded-lg sm:rounded-xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-sm p-1.5 sm:p-2"
                     style={{ 
                       animation: `fadeInScale 0.8s ease-out ${index * 0.1 + 0.5}s forwards`,
                       opacity: 0,
