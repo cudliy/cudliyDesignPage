@@ -1744,7 +1744,7 @@ const handleBackToCategories = () => {
 								</div>
 
 								{/* Scrollable Images Grid */}
-								<div className="flex-1 overflow-y-auto px-4 image-upload-scroll">
+								<div className="flex-1 overflow-y-auto px-4 image-upload-scroll hide-scrollbar">
 									<div className="grid grid-cols-2 gap-2 pb-4" style={{ gridTemplateRows: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
 										{uploadedImages.map((image, index) => (
 											<div

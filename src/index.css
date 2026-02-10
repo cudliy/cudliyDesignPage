@@ -105,6 +105,16 @@ h2, h3, h4, h5, h6, .heading {
     -1px 1px 0 rgba(0, 0, 0, 1) !important;
 }
 
+/* Hide scrollbar while keeping scroll functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 /* Ensure smooth transitions for dark mode */
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
