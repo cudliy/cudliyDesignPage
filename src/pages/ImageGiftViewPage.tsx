@@ -124,26 +124,47 @@ export default function ImageGiftViewPage() {
         gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
         content: null
       },
-      // Images at the end of the slider
-      ...data.images.map((image, index) => ({
-        id: `image-${index}`,
-        video: VIDEO_TEMPLATES[(index + 5) % VIDEO_TEMPLATES.length],
-        gradient: `linear-gradient(135deg, ${
-          ['#ff9a9e 0%, #fecfef 100%', '#a8edea 0%, #fed6e3 100%', '#ffecd2 0%, #fcb69f 100%', '#ff8a80 0%, #ea80fc 100%'][index % 4]
-        })`,
+      // All images together on the last slide
+      {
+        id: 'images-collection',
+        video: VIDEO_TEMPLATES[5],
+        gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: (
-          <div className="flex items-center justify-center w-full h-full px-4">
-            <div className="w-full max-w-lg aspect-square rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src={image.url}
-                alt={`Shared image ${index + 1}`}
-                className="w-full h-full object-cover"
-                style={{ animation: 'fadeInScale 1s ease-out forwards' }}
-              />
+          <div className="flex items-center justify-center w-full h-full p-4 md:p-8">
+            <div className="w-full max-w-6xl h-full flex items-center justify-center">
+              <div className={`grid gap-3 md:gap-4 w-full h-full ${
+                data.images.length === 1 ? 'grid-cols-1' :
+                data.images.length === 2 ? 'grid-cols-2' :
+                data.images.length === 3 ? 'grid-cols-3' :
+                data.images.length === 4 ? 'grid-cols-2 grid-rows-2' :
+                data.images.length <= 6 ? 'grid-cols-3 grid-rows-2' :
+                'grid-cols-4 grid-rows-2'
+              }`}>
+                {data.images.map((image, index) => (
+                  <div 
+                    key={index}
+                    className="relative rounded-xl overflow-hidden shadow-2xl bg-black/20 backdrop-blur-sm"
+                    style={{ 
+                      animation: `fadeInScale 0.8s ease-out ${index * 0.1}s forwards`,
+                      opacity: 0
+                    }}
+                  >
+                    <img
+                      src={image.url}
+                      alt={`Shared image ${index + 1}`}
+                      className="w-full h-full object-contain"
+                      style={{ 
+                        maxHeight: '100%',
+                        maxWidth: '100%'
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )
-      }))
+      }
     ];
 
     setSlides(generatedSlides);
@@ -152,9 +173,9 @@ export default function ImageGiftViewPage() {
   useEffect(() => {
     if (slides.length === 0 || isPaused) return;
 
-    // Use consistent duration for all slides (4 seconds for videos, 6 seconds for images)
+    // Use consistent duration for all slides (4 seconds for videos, 8 seconds for images collection)
     const currentSlideId = slides[currentSlide]?.id;
-    const duration = currentSlideId?.startsWith('image-') ? 6000 : 4000;
+    const duration = currentSlideId === 'images-collection' ? 8000 : 4000;
 
     const timer = setTimeout(() => {
       setCurrentSlide((prev) => {
