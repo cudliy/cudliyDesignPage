@@ -93,33 +93,83 @@ export default function ImageGiftViewPage() {
 
   const generateSlides = (data: ImageGiftData) => {
     const generatedSlides = [
-      // Video-only slides without overlay text
+      // Welcome slide with recipient name
       {
-        id: 'intro',
+        id: 'welcome',
         video: VIDEO_TEMPLATES[0],
         gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        content: null
+        content: (
+          <div className="flex items-center justify-center w-full h-full">
+            <div className="text-center px-8">
+              <h1 
+                className="text-white text-5xl md:text-7xl font-bold mb-6"
+                style={{ 
+                  animation: 'fadeInUp 1s ease-out forwards',
+                  fontFamily: 'Playfair Display, serif'
+                }}
+              >
+                Hey {data.recipientName}! 👋
+              </h1>
+              <p 
+                className="text-white/90 text-xl md:text-2xl"
+                style={{ 
+                  animation: 'fadeInUp 1s ease-out 0.3s forwards',
+                  opacity: 0
+                }}
+              >
+                Someone special has something for you...
+              </p>
+            </div>
+          </div>
+        )
       },
-      {
-        id: 'video-2',
+      // Message slide (if message exists)
+      ...(data.message ? [{
+        id: 'message',
         video: VIDEO_TEMPLATES[1],
         gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        content: null
-      },
+        content: (
+          <div className="flex items-center justify-center w-full h-full px-8">
+            <div className="max-w-3xl text-center">
+              <div 
+                className="text-white/80 text-sm md:text-base mb-4"
+                style={{ 
+                  animation: 'fadeInUp 1s ease-out forwards',
+                  fontFamily: 'Manrope, sans-serif'
+                }}
+              >
+                {data.senderName !== 'Anonymous' ? `From ${data.senderName}` : 'From someone who cares'}
+              </div>
+              <p 
+                className="text-white text-2xl md:text-4xl leading-relaxed"
+                style={{ 
+                  animation: 'fadeInUp 1s ease-out 0.3s forwards',
+                  opacity: 0,
+                  fontFamily: 'Playfair Display, serif',
+                  fontStyle: 'italic'
+                }}
+              >
+                "{data.message}"
+              </p>
+            </div>
+          </div>
+        )
+      }] : []),
+      // Video transition slides
       {
-        id: 'video-3',
+        id: 'video-2',
         video: VIDEO_TEMPLATES[2],
         gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
         content: null
       },
       {
-        id: 'video-4',
+        id: 'video-3',
         video: VIDEO_TEMPLATES[3],
         gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
         content: null
       },
       {
-        id: 'video-5',
+        id: 'video-4',
         video: VIDEO_TEMPLATES[4],
         gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
         content: null
@@ -132,6 +182,16 @@ export default function ImageGiftViewPage() {
         content: (
           <div className="flex items-center justify-center w-full h-full p-4 md:p-8">
             <div className="w-full max-w-6xl" style={{ maxHeight: '85vh' }}>
+              {/* Title above images */}
+              <h2 
+                className="text-white text-3xl md:text-4xl font-bold text-center mb-6"
+                style={{ 
+                  animation: 'fadeInUp 1s ease-out forwards',
+                  fontFamily: 'Playfair Display, serif'
+                }}
+              >
+                Your Special Moments 💝
+              </h2>
               <div className={`grid gap-3 md:gap-4 w-full ${
                 data.images.length === 1 ? 'grid-cols-1' :
                 data.images.length === 2 ? 'grid-cols-2' :
@@ -140,15 +200,15 @@ export default function ImageGiftViewPage() {
                 data.images.length <= 6 ? 'grid-cols-3 grid-rows-2' :
                 'grid-cols-4 grid-rows-2'
               }`} style={{ 
-                maxHeight: '85vh',
-                height: data.images.length <= 3 ? 'auto' : '85vh'
+                maxHeight: '75vh',
+                height: data.images.length <= 3 ? 'auto' : '75vh'
               }}>
                 {data.images.map((image, index) => (
                   <div 
                     key={index}
                     className="relative rounded-xl overflow-hidden shadow-2xl bg-black/20 backdrop-blur-sm flex items-center justify-center"
                     style={{ 
-                      animation: `fadeInScale 0.8s ease-out ${index * 0.1}s forwards`,
+                      animation: `fadeInScale 0.8s ease-out ${index * 0.1 + 0.5}s forwards`,
                       opacity: 0,
                       aspectRatio: '1',
                       maxHeight: data.images.length <= 3 ? '400px' : 'auto'
@@ -179,9 +239,17 @@ export default function ImageGiftViewPage() {
   useEffect(() => {
     if (slides.length === 0 || isPaused) return;
 
-    // Use consistent duration for all slides (4 seconds for videos, 8 seconds for images collection)
+    // Use consistent duration for different slide types
     const currentSlideId = slides[currentSlide]?.id;
-    const duration = currentSlideId === 'images-collection' ? 8000 : 4000;
+    let duration = 4000; // Default for video slides
+    
+    if (currentSlideId === 'welcome') {
+      duration = 5000; // 5 seconds for welcome
+    } else if (currentSlideId === 'message') {
+      duration = 7000; // 7 seconds for message
+    } else if (currentSlideId === 'images-collection') {
+      duration = 10000; // 10 seconds for images
+    }
 
     const timer = setTimeout(() => {
       setCurrentSlide((prev) => {
