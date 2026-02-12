@@ -280,10 +280,10 @@ export default function ImageSharePage() {
     return (
       <div className="min-h-screen bg-white overflow-hidden hide-scrollbar" style={{ transform: 'scale(0.92)', transformOrigin: 'top center' }}>
         <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
-          <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-stretch justify-center min-h-screen`}>
+          <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-center justify-center min-h-screen`}>
             {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
             <div 
-              className="hidden lg:flex items-center justify-center rounded-[32px] overflow-hidden" 
+              className="hidden lg:flex items-center justify-center rounded-[32px] overflow-hidden flex-shrink-0" 
               style={{ 
                 width: '642px', 
                 height: '579.56px',
@@ -293,13 +293,27 @@ export default function ImageSharePage() {
             >
               <div className="w-full h-full flex items-center justify-center p-4" style={{ backgroundColor: '#F5F5F5' }}>
                 {imageData && imageData.images && imageData.images.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-2 w-full h-full">
+                  <div className="grid grid-cols-2 gap-3 w-full" style={{ maxHeight: '500px' }}>
                     {imageData.images.slice(0, 4).map((image, index) => (
-                      <div key={image.id || index} className="aspect-square rounded-lg overflow-hidden bg-white">
+                      <div 
+                        key={image.id || index} 
+                        className="rounded-lg overflow-hidden bg-white p-2 flex items-center justify-center"
+                        style={{ 
+                          aspectRatio: '1',
+                          maxHeight: '240px',
+                          height: '240px'
+                        }}
+                      >
                         <img
                           src={image.url}
                           alt={`Shared image ${index + 1}`}
-                          className="w-full h-full object-cover"
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain'
+                          }}
                           onError={(e) => {
                             console.error('Image failed to load:', image.url);
                             (e.target as HTMLImageElement).style.display = 'none';
@@ -476,10 +490,10 @@ export default function ImageSharePage() {
   return (
     <div className="min-h-screen bg-white overflow-hidden hide-scrollbar" style={{ transform: 'scale(0.92)', transformOrigin: 'top center' }}>
       <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
-        <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-stretch justify-center min-h-screen`}>
+        <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-center justify-center min-h-screen`}>
           {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
           <div 
-            className="hidden lg:flex items-center justify-center rounded-[24px] lg:rounded-[32px] overflow-hidden" 
+            className="hidden lg:flex items-center justify-center rounded-[24px] lg:rounded-[32px] overflow-hidden flex-shrink-0" 
             style={{ 
               width: '642px', 
               height: '579.56px',
@@ -489,13 +503,27 @@ export default function ImageSharePage() {
           >
             <div className="w-full h-full flex items-center justify-center p-4" style={{ backgroundColor: '#F5F5F5' }}>
               {imageData && imageData.images && imageData.images.length > 0 ? (
-                <div className="grid grid-cols-2 gap-2 w-full h-full">
+                <div className="grid grid-cols-2 gap-3 w-full" style={{ maxHeight: '500px' }}>
                   {imageData.images.slice(0, 4).map((image, index) => (
-                    <div key={image.id || index} className="aspect-square rounded-lg overflow-hidden bg-white">
+                    <div 
+                      key={image.id || index} 
+                      className="rounded-lg overflow-hidden bg-white p-2 flex items-center justify-center"
+                      style={{ 
+                        aspectRatio: '1',
+                        maxHeight: '240px',
+                        height: '240px'
+                      }}
+                    >
                       <img
                         src={image.url}
                         alt={`Shared image ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%',
+                          width: 'auto',
+                          height: 'auto',
+                          objectFit: 'contain'
+                        }}
                         onError={(e) => {
                           console.error('Image failed to load:', image.url);
                           (e.target as HTMLImageElement).style.display = 'none';

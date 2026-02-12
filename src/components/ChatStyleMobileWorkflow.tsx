@@ -1094,7 +1094,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             console.log('Rendering Share Selected button, hasSelectedImages:', hasSelectedImages, 'selectedImages.length:', selectedImages.length);
             return hasSelectedImages && (
               <div className="border-t border-white/10">
-                <div className="p-4 flex justify-center">
+                <div className="p-4">
                   <button
                   onClick={() => {
                     console.log('Share Selected button clicked');
@@ -1104,7 +1104,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   }}
                   disabled={isUploading}
                   style={{
-                    width: '178px',
+                    width: '100%',
                     height: '54px',
                     borderRadius: '40px',
                     borderWidth: '1px',
