@@ -1017,19 +1017,6 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </button>
-              
-              {/* Share Selected Button */}
-              <button
-                onClick={() => {
-                  if (selectedImages.length > 0) {
-                    handleImageShare(selectedImages);
-                  }
-                }}
-                disabled={selectedImages.length === 0}
-                className="px-3 py-1.5 bg-white text-black rounded-full text-sm font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Share selected
-              </button>
             </div>
           </div>
 
@@ -1107,7 +1094,7 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
             console.log('Rendering Share Selected button, hasSelectedImages:', hasSelectedImages, 'selectedImages.length:', selectedImages.length);
             return hasSelectedImages && (
               <div className="border-t border-white/10">
-                <div className="p-4">
+                <div className="p-4 flex justify-center">
                   <button
                   onClick={() => {
                     console.log('Share Selected button clicked');
@@ -1116,7 +1103,23 @@ export default function ChatStyleMobileWorkflow({ onError }: ChatStyleMobileWork
                     handleImageShare(selectedImages);
                   }}
                   disabled={isUploading}
-                  className="w-full bg-white text-black py-3 rounded-full font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{
+                    width: '178px',
+                    height: '54px',
+                    borderRadius: '40px',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: 'white',
+                    backgroundColor: 'white',
+                    color: '#313131',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  className="hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUploading ? (
                     <>

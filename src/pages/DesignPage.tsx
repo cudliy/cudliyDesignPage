@@ -1077,36 +1077,38 @@ const handleBackToCategories = () => {
 					keywords="toy playground, 3D design tool, AI toy creator, custom toy design, color picker, material selector, toy customization"
 					url="/design"
 				/>
-				<div className="w-screen h-screen bg-[#2c2c2c] flex flex-col fixed inset-0 overflow-hidden">
-					{/* Mobile Header - Clean with Inter font */}
-					<div className="bg-[#2c2c2c] text-white px-4 py-3 flex items-center gap-2">
-						<button
-							onClick={() => window.location.href = '/dashboard'}
-							className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-						>
-							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-							</svg>
-						</button>
-						<h1 className="text-lg font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
-					</div>
-
-					{/* Chat Interface */}
-					<div className="flex-1 overflow-hidden">
-						<ChatStyleMobileWorkflow onError={setError} />
-					</div>
-
-					{/* Error Toast */}
-					{error && (
-						<div className="absolute bottom-4 left-4 right-4 bg-red-500 text-white px-4 py-3 rounded-xl shadow-lg flex items-center justify-between">
-							<span className="text-sm">{error}</span>
-							<button onClick={() => setError(null)} className="ml-2">
+				<div className="min-h-screen bg-[#2c2c2c] flex justify-center items-start pt-4">
+					<div className="w-full max-w-sm bg-[#2c2c2c] flex flex-col h-screen overflow-hidden">
+						{/* Mobile Header - Clean with Inter font */}
+						<div className="bg-[#2c2c2c] text-white px-4 py-3 flex items-center gap-2">
+							<button
+								onClick={() => window.location.href = '/dashboard'}
+								className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+							>
 								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
 								</svg>
 							</button>
+							<h1 className="text-lg font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>Cudliy</h1>
 						</div>
-					)}
+
+						{/* Chat Interface */}
+						<div className="flex-1 overflow-hidden">
+							<ChatStyleMobileWorkflow onError={setError} />
+						</div>
+
+						{/* Error Toast */}
+						{error && (
+							<div className="absolute bottom-4 left-4 right-4 bg-red-500 text-white px-4 py-3 rounded-xl shadow-lg flex items-center justify-between">
+								<span className="text-sm">{error}</span>
+								<button onClick={() => setError(null)} className="ml-2">
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+									</svg>
+								</button>
+							</div>
+						)}
+					</div>
 				</div>
 			</>
 		);

@@ -278,7 +278,7 @@ export default function ImageSharePage() {
 
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-white overflow-hidden hide-scrollbar" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
+      <div className="min-h-screen bg-white overflow-hidden hide-scrollbar" style={{ transform: 'scale(0.92)', transformOrigin: 'top center' }}>
         <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
           <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-stretch justify-center min-h-screen`}>
             {/* Left Side - Image Preview (Hidden on mobile and tablet) */}
@@ -474,7 +474,7 @@ export default function ImageSharePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden hide-scrollbar" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
+    <div className="min-h-screen bg-white overflow-hidden hide-scrollbar" style={{ transform: 'scale(0.92)', transformOrigin: 'top center' }}>
       <div className={`w-full ${isSmallHeight ? 'p-2' : 'p-2 sm:p-4 lg:p-8'}`}>
         <div className={`w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row ${isSmallHeight ? 'gap-3' : 'gap-4 sm:gap-8 lg:gap-32'} items-stretch justify-center min-h-screen`}>
           {/* Left Side - Image Preview (Hidden on mobile and tablet) */}

@@ -41,6 +41,7 @@ export default function ImageGiftViewPage() {
   const [slides, setSlides] = useState<any[]>([]);
   const [isPaused, setIsPaused] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoDuration, setVideoDuration] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchGift = async () => {
@@ -247,9 +248,9 @@ export default function ImageGiftViewPage() {
   useEffect(() => {
     if (slides.length === 0 || isPaused) return;
 
-    // Use consistent duration for different slide types
+    // Use video duration or fallback to fixed durations
     const currentSlideId = slides[currentSlide]?.id;
-    let duration = 4000; // Default for video slides
+    let duration = 4000; // Default fallback
     
     if (currentSlideId === 'welcome') {
       duration = 5000; // 5 seconds for welcome
@@ -257,6 +258,9 @@ export default function ImageGiftViewPage() {
       duration = 7000; // 7 seconds for message
     } else if (currentSlideId === 'images-collection') {
       duration = 10000; // 10 seconds for images
+    } else if (videoDuration && videoDuration > 0) {
+      // Use actual video duration for video slides
+      duration = Math.max(videoDuration * 1000, 3000); // At least 3 seconds
     }
 
     const timer = setTimeout(() => {
@@ -267,11 +271,12 @@ export default function ImageGiftViewPage() {
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [currentSlide, slides.length, isPaused]);
+  }, [currentSlide, slides.length, isPaused, videoDuration]);
 
   // Reset video loading state when slide changes
   useEffect(() => {
     setVideoLoaded(false);
+    setVideoDuration(null);
   }, [currentSlide]);
 
   useEffect(() => {
@@ -382,6 +387,11 @@ export default function ImageGiftViewPage() {
           }}
           onLoadStart={() => {
             setVideoLoaded(false);
+            setVideoDuration(null);
+          }}
+          onLoadedMetadata={(e) => {
+            const video = e.target as HTMLVideoElement;
+            setVideoDuration(video.duration);
           }}
           onCanPlay={() => {
             setVideoLoaded(true);
@@ -389,6 +399,7 @@ export default function ImageGiftViewPage() {
           onError={() => {
             console.error('Video failed to load:', currentSlideData.video);
             setVideoLoaded(true); // Show gradient background
+            setVideoDuration(null);
           }}
         >
           <source src={currentSlideData.video} type="video/mp4" />
