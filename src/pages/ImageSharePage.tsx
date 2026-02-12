@@ -334,7 +334,7 @@ export default function ImageSharePage() {
             {/* Right Side - Success Content */}
             <div className={`w-full lg:flex-1 lg:max-w-[400px] flex flex-col justify-center mx-auto`} style={{ minHeight: '579.56px' }}>
               {/* Header */}
-              <div className={`${isSmallHeight ? 'mb-4' : 'mb-4 sm:mb-6 lg:mb-8'} text-center`}>
+              <div className={`${isSmallHeight ? 'mb-4' : 'mb-4 sm:mb-6 lg:mb-8'} w-full max-w-[406.4px] mx-auto`}>
                 <img 
                   src="/CudliyLogo.svg" 
                   alt="Cudliy Logo" 
@@ -343,22 +343,21 @@ export default function ImageSharePage() {
                     height: '27px',
                     transform: 'rotate(0deg)'
                   }}
-                  className={`mx-auto ${isSmallHeight ? 'mb-2' : 'mb-2 sm:mb-4'}`}
+                  className={`${isSmallHeight ? 'mb-2' : 'mb-2 sm:mb-4'}`}
                 />
                 <h1 
-                  className={`text-gray-900 mb-2 mx-auto ${isSmallHeight ? 'text-2xl' : 'text-2xl sm:text-3xl lg:text-[32px]'}`}
+                  className={`text-gray-900 mb-2 ${isSmallHeight ? 'text-2xl' : 'text-2xl sm:text-3xl lg:text-[32px]'}`}
                   style={{
                     fontFamily: 'Inter, sans-serif',
                     fontWeight: 600,
                     lineHeight: '1.1',
                     letterSpacing: '0%',
-                    textAlign: 'center',
-                    maxWidth: '324px'
+                    textAlign: 'left'
                   }}
                 >
                   Your link is ready
                 </h1>
-                <p className={`text-gray-600 ${isSmallHeight ? 'text-[12px]' : 'text-[12px] sm:text-[14px]'}`}>
+                <p className={`text-gray-600 ${isSmallHeight ? 'text-[12px]' : 'text-[12px] sm:text-[14px]'} text-left`}>
                   Here's your personalized image collection link
                 </p>
               </div>
@@ -546,7 +545,7 @@ export default function ImageSharePage() {
           {/* Right Side - Form Content */}
           <div className="w-full lg:flex-1 lg:max-w-[400px] flex flex-col justify-center mx-auto" style={{ minHeight: '579.56px' }}>
             {/* Header */}
-            <div className={`${isSmallHeight ? 'mb-4' : 'mb-4 sm:mb-6 lg:mb-8'} text-center`}>
+            <div className={`${isSmallHeight ? 'mb-4' : 'mb-4 sm:mb-6 lg:mb-8'} w-full max-w-[406.4px] mx-auto`}>
               <img 
                 src="/CudliyLogo.svg" 
                 alt="Cudliy Logo" 
@@ -555,22 +554,21 @@ export default function ImageSharePage() {
                   height: '27px',
                   transform: 'rotate(0deg)'
                 }}
-                className="mx-auto mb-2 sm:mb-4"
+                className="mb-2 sm:mb-4"
               />
               <h1 
-                className="text-gray-900 mb-2 mx-auto text-2xl sm:text-3xl lg:text-[32px]"
+                className="text-gray-900 mb-2 text-2xl sm:text-3xl lg:text-[32px]"
                 style={{
                   fontFamily: 'Inter, sans-serif',
                   fontWeight: 600,
                   lineHeight: '1.1',
                   letterSpacing: '0%',
-                  textAlign: 'center',
-                  maxWidth: '324px'
+                  textAlign: 'left'
                 }}
               >
                 Share your images
               </h1>
-              <p className="text-gray-600 text-[12px] sm:text-[14px]">
+              <p className="text-gray-600 text-[12px] sm:text-[14px] text-left">
                 Create a beautiful collection to share with someone special.
               </p>
             </div>
